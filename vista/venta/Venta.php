@@ -36,6 +36,19 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 scope:this
             });         
         } 
+        
+        this.addButton('btnImprimir',
+			{
+				text: 'Imprimir',
+				iconCls: 'bprint',
+				disabled: true,
+				handler: this.imprimirNota,
+				tooltip: '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
+			}
+		);
+		
+		
+		
 	},
 	gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-eye"></i> En Registro</h1>',grupo:0,height:0},
                        {name:'elaboracion',title:'<H1 align="center"><i class="fa fa-eye"></i> En elaboración</h1>',grupo:1,height:0},
@@ -446,13 +459,15 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         }
                
         this.getBoton('diagrama_gantt').enable(); 
+        this.getBoton('btnImprimir').setDisabled(false);
         Phx.vista.Venta.superclass.preparaMenu.call(this);
     },
     liberaMenu:function()
     {   
         this.getBoton('diagrama_gantt').disable();
         this.getBoton('ant_estado').disable();
-        this.getBoton('sig_estado').disable();        
+        this.getBoton('sig_estado').disable();   
+        this.getBoton('btnImprimir').setDisabled(true);     
         Phx.vista.Venta.superclass.liberaMenu.call(this);
     },
     
@@ -560,6 +575,24 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                scope:this
              })
    },
+   
+   imprimirNota: function(){
+		//Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
+			var rec = this.sm.getSelected();
+			var data = rec.data;
+			if (data) {
+				Ext.Ajax.request({
+						url : '../../sis_ventas_farmacia/control/Venta/reporteNotaVenta',
+						params : {
+							'id_venta' : data.id_venta
+						},
+						success : this.successExport,
+						failure : this.conexionFailure,
+						timeout : this.timeout,
+						scope : this
+					});
+			}
+	},
    
    onAntEstado:function(wizard,resp){
             Phx.CP.loadingShow(); 

@@ -18,6 +18,9 @@ class MODVenta extends MODbase{
 		$this->procedimiento='vef.ft_venta_sel';
 		$this->transaccion='VF_VEN_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		
+			
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_venta','int4');
@@ -270,6 +273,86 @@ class MODVenta extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+	
+	function listarNotaVentaDet(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_NOTAVEND_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		
+		$this->setParametro('id_venta','id_venta','int4');
+		//captura parametros adicionales para el count
+		$this->capturaCount('suma_total','numeric');		
+		//Definicion de la lista del resultado del query
+		$this->captura('id_venta','int4');
+		
+		$this->captura('id_venta_detalle','int4');
+		$this->captura('precio','numeric');
+		$this->captura('tipo','varchar');
+		$this->captura('cantidad','int4');
+		$this->captura('precio_total','numeric');		
+		$this->captura('codigo_nombre','varchar');
+		$this->captura('item_nombre','varchar');
+		$this->captura('nombre_producto','varchar');
+		$this->captura('id_formula','int4');
+		$this->captura('id_formula_detalle','int4');
+		$this->captura('cantidad_df','NUMERIC');
+		$this->captura('item_nombre_df','varchar');	
+		$this->captura('nombre_formula','varchar');
+		
+		
+		 
+		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+    function listarNotaVenta(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_NOTVEN_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+		$this->setParametro('id_venta','id_venta','int4');
+		
+			
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_venta','int4');
+		$this->captura('id_cliente','int4');
+		$this->captura('id_sucursal','int4');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_estado_wf','int4');
+		$this->captura('estado_reg','varchar');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('a_cuenta','numeric');
+		$this->captura('total_venta','numeric');
+		$this->captura('fecha_estimada_entrega','date');
+		$this->captura('usuario_ai','varchar');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('id_usuario_ai','int4');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+        $this->captura('estado','varchar');
+        $this->captura('nombre_completo','text');
+        $this->captura('nombre_sucursal','varchar');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>
