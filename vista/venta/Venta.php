@@ -542,9 +542,11 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
    
    imprimirNota: function(){
 		//Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
+			
 			var rec = this.sm.getSelected();
 			var data = rec.data;
 			if (data) {
+				Phx.CP.loadingShow();
 				Ext.Ajax.request({
 						url : '../../sis_ventas_farmacia/control/Venta/reporteNotaVenta',
 						params : {
