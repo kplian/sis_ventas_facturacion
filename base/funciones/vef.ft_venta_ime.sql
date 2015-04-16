@@ -262,12 +262,14 @@ BEGIN
               v_tipo_noti,
               v_titulo);
                
-            update vef.tventa  set 
-               id_estado_wf =  v_id_estado_actual,
-               estado = v_codigo_estado,
-               id_usuario_mod=p_id_usuario,
-               fecha_mod=now()                   
-            where id_proceso_wf = v_id_proceso_wf; 
+            IF  vef.f_fun_regreso_venta_wf(p_id_usuario, 
+           									v_parametros._id_usuario_ai, 
+                                            v_parametros._nombre_usuario_ai, 
+                                            v_id_estado_actual, 
+                                            v_id_proceso_wf, 
+                                            v_codigo_estado) THEN
+                                            
+          END IF; 
                          
          -- si hay mas de un estado disponible  preguntamos al usuario
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado)'); 
