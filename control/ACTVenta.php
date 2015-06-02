@@ -13,6 +13,14 @@ class ACTVenta extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_venta');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+        if ($this->objParam->getParametro('pes_estado') != '') {
+            if ($this->objParam->getParametro('pes_estado') == 'elaboracion') {
+                $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
+            } else {
+                $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
+            }
+            
+        }  
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarVenta');
@@ -47,6 +55,22 @@ class ACTVenta extends ACTbase{
 		$this->res=$this->objFunc->eliminarVenta($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+    
+    function siguienteEstadoVenta(){
+        $this->objFunc=$this->create('MODVenta');  
+        
+        $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+        
+        $this->res=$this->objFunc->siguienteEstadoVenta($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    
+     function anteriorEstadoVenta(){
+        $this->objFunc=$this->create('MODVenta');  
+        $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+        $this->res=$this->objFunc->anteriorEstadoVenta($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 			
 }
 

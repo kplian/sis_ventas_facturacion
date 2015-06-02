@@ -17,8 +17,43 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.Venta.superclass.constructor.call(this,config);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		this.store.baseParams.pes_estado = 'borrador';
+		this.load({params:{start:0, limit:this.tam_pag}});
+		
+		this.finCons = true;
+		this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
+        this.addButton('sig_estado',{text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
+        this.addButton('diagrama_gantt',{text:'Gant',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
+        function diagramGantt(){            
+            var data=this.sm.getSelected().data.id_proceso_wf;
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+                params:{'id_proceso_wf':data},
+                success:this.successExport,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });         
+        } 
 	},
+	gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-eye"></i> En Registro</h1>',grupo:0,height:0},
+                       {name:'elaboracion',title:'<H1 align="center"><i class="fa fa-eye"></i> En elaboración</h1>',grupo:1,height:0},
+                       {name:'pendiente_entrega',title:'<H1 align="center"><i class="fa fa-eye"></i> Para Entrega</h1>',grupo:2,height:0},
+                       {name:'entregado',title:'<H1 align="center"><i class="fa fa-eye"></i> Entregado</h1>',grupo:3,height:0},
+                       {name:'descartado',title:'<H1 align="center"><i class="fa fa-eye"></i> Descartado</h1>',grupo:4,height:0}],
+    
+    actualizarSegunTab: function(name, indice){
+        if(this.finCons){
+             this.store.baseParams.pes_estado = name;
+             this.load({params:{start:0, limit:this.tam_pag}});
+           }
+    },
+    beditGroups: [0],
+    bdelGroups:  [0],
+    bactGroups:  [0,1,2,3,4],
+    btestGroups: [0],
+    bexcelGroups: [0,1,2,3,4],
 			
 	Atributos:[
 		{
@@ -398,10 +433,28 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         
         Phx.vista.Venta.superclass.onButtonNew.call(this);
     },
-    
-    
-    
-    
+    preparaMenu:function()
+    {   var rec = this.sm.getSelected();
+        
+        if (rec.data.estado == 'borrador') {
+              this.getBoton('ant_estado').disable();
+              this.getBoton('sig_estado').enable();
+                          
+        } else {
+             this.getBoton('ant_estado').enable();
+             this.getBoton('sig_estado').enable();
+        }
+               
+        this.getBoton('diagrama_gantt').enable(); 
+        Phx.vista.Venta.superclass.preparaMenu.call(this);
+    },
+    liberaMenu:function()
+    {   
+        this.getBoton('diagrama_gantt').disable();
+        this.getBoton('ant_estado').disable();
+        this.getBoton('sig_estado').disable();        
+        Phx.vista.Venta.superclass.liberaMenu.call(this);
+    },
     
     south : {
             url : '../../../sis_ventas_farmacia/vista/venta_detalle/VentaDetalle.php',
@@ -435,6 +488,103 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     
     arrayDefaultColumHidden:['estado_reg','usuario_ai',
     'fecha_reg','fecha_mod','usr_reg','usr_mod'],
+    sigEstado:function(){                   
+      var rec=this.sm.getSelected();
+      this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+                                'Estado de Wf',
+                                {
+                                    modal:true,
+                                    width:700,
+                                    height:450
+                                }, {data:{
+                                       id_estado_wf:rec.data.id_estado_wf,
+                                       id_proceso_wf:rec.data.id_proceso_wf
+                                    }}, this.idContenedor,'FormEstadoWf',
+                                {
+                                    config:[{
+                                              event:'beforesave',
+                                              delegate: this.onSaveWizard,
+                                              
+                                            }],
+                                    
+                                    scope:this
+                                 });        
+               
+     },
+     
+    
+     onSaveWizard:function(wizard,resp){
+        Phx.CP.loadingShow();
+        
+        Ext.Ajax.request({
+            url:'../../sis_ventas_farmacia/control/Venta/siguienteEstadoVenta',
+            params:{
+                    
+                id_proceso_wf_act:  resp.id_proceso_wf_act,
+                id_estado_wf_act:   resp.id_estado_wf_act,
+                id_tipo_estado:     resp.id_tipo_estado,
+                id_funcionario_wf:  resp.id_funcionario_wf,
+                id_depto_wf:        resp.id_depto_wf,
+                obs:                resp.obs,
+                json_procesos:      Ext.util.JSON.encode(resp.procesos)
+                },
+            success:this.successWizard,
+            failure: this.conexionFailure,
+            argument:{wizard:wizard},
+            timeout:this.timeout,
+            scope:this
+        });
+    },
+     
+    successWizard:function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+     },
+     
+     antEstado:function(){
+         var rec=this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/AntFormEstadoWf.php',
+            'Estado de Wf',
+            {
+                modal:true,
+                width:450,
+                height:250
+            }, {data:rec.data}, this.idContenedor,'AntFormEstadoWf',
+            {
+                config:[{
+                          event:'beforesave',
+                          delegate: this.onAntEstado,
+                        }
+                        ],
+               scope:this
+             })
+   },
+   
+   onAntEstado:function(wizard,resp){
+            Phx.CP.loadingShow(); 
+            Ext.Ajax.request({ 
+                // form:this.form.getForm().getEl(),
+                url:'../../sis_ventas_farmacia/control/Venta/anteriorEstadoVenta',
+                params:{
+                        id_proceso_wf:resp.id_proceso_wf,
+                        id_estado_wf:resp.id_estado_wf,  
+                        obs:resp.obs
+                 },
+                argument:{wizard:wizard},  
+                success:this.successEstadoSinc,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+           
+     },
+     
+   successEstadoSinc:function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+     },
 	}
 )
 </script>
