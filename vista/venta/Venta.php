@@ -16,15 +16,10 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.Venta.superclass.constructor.call(this,config);
-		this.init();
-		this.store.baseParams.pes_estado = 'borrador';
-		this.load({params:{start:0, limit:this.tam_pag}});
-		
-		this.finCons = true;
-		this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
-        this.addButton('sig_estado',{text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
-        this.addButton('diagrama_gantt',{text:'Gant',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
-        function diagramGantt(){            
+		this.init();		
+        
+	},
+	diagramGantt : function (){            
             var data=this.sm.getSelected().data.id_proceso_wf;
             Phx.CP.loadingShow();
             Ext.Ajax.request({
@@ -35,26 +30,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 timeout:this.timeout,
                 scope:this
             });         
-        } 
-	},
-	gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-eye"></i> En Registro</h1>',grupo:0,height:0},
-                       {name:'elaboracion',title:'<H1 align="center"><i class="fa fa-eye"></i> En elaboración</h1>',grupo:1,height:0},
-                       {name:'pendiente_entrega',title:'<H1 align="center"><i class="fa fa-eye"></i> Para Entrega</h1>',grupo:2,height:0},
-                       {name:'entregado',title:'<H1 align="center"><i class="fa fa-eye"></i> Entregado</h1>',grupo:3,height:0},
-                       {name:'descartado',title:'<H1 align="center"><i class="fa fa-eye"></i> Descartado</h1>',grupo:4,height:0}],
-    
-    actualizarSegunTab: function(name, indice){
-        if(this.finCons){
-             this.store.baseParams.pes_estado = name;
-             this.load({params:{start:0, limit:this.tam_pag}});
-           }
-    },
-    beditGroups: [0],
-    bdelGroups:  [0],
-    bactGroups:  [0,1,2,3,4],
-    btestGroups: [0],
-    bexcelGroups: [0,1,2,3,4],
-			
+        } ,
+				
 	Atributos:[
 		{
 			//configuracion del componente
@@ -433,58 +410,13 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         
         Phx.vista.Venta.superclass.onButtonNew.call(this);
     },
-    preparaMenu:function()
-    {   var rec = this.sm.getSelected();
-        
-        if (rec.data.estado == 'borrador') {
-              this.getBoton('ant_estado').disable();
-              this.getBoton('sig_estado').enable();
-                          
-        } else {
-             this.getBoton('ant_estado').enable();
-             this.getBoton('sig_estado').enable();
-        }
-               
-        this.getBoton('diagrama_gantt').enable(); 
-        Phx.vista.Venta.superclass.preparaMenu.call(this);
-    },
-    liberaMenu:function()
-    {   
-        this.getBoton('diagrama_gantt').disable();
-        this.getBoton('ant_estado').disable();
-        this.getBoton('sig_estado').disable();        
-        Phx.vista.Venta.superclass.liberaMenu.call(this);
-    },
-    
-    south : {
+   south : {
             url : '../../../sis_ventas_farmacia/vista/venta_detalle/VentaDetalle.php',
             title : 'Detalle',
             height : '50%',
             cls : 'VentaDetalle'
     },
-    onButtonNew : function () {
-        //abrir formulario de solicitud
-           var me = this;
-           me.objSolForm = Phx.CP.loadWindows('../../../sis_ventas_farmacia/vista/venta/FormVenta.php',
-                                    'Formulario de Venta',
-                                    {
-                                        modal:true,
-                                        width:'80%',
-                                        height:'90%'
-                                    }, {data:{objPadre: me}
-                                    }, 
-                                    this.idContenedor,
-                                    'FormVenta',
-                                    {
-                                        config:[{
-                                                  event:'successsave',
-                                                  delegate: this.onSaveForm,
-                                                  
-                                                }],
-                                        
-                                        scope:this
-                                     });      
-    },
+    
     
     arrayDefaultColumHidden:['estado_reg','usuario_ai',
     'fecha_reg','fecha_mod','usr_reg','usr_mod'],
@@ -511,8 +443,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                                  });        
                
      },
-     
-    
+       
      onSaveWizard:function(wizard,resp){
         Phx.CP.loadingShow();
         

@@ -527,7 +527,28 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
        
    },
    arrayDefaultColumHidden:['estado_reg','usuario_ai',
-    'fecha_reg','fecha_mod','usr_reg','usr_mod']
+    'fecha_reg','fecha_mod','usr_reg','usr_mod'],
+    
+    preparaMenu:function()
+    {   
+        Phx.vista.VentaDetalle.superclass.preparaMenu.call(this);
+        if (this.maestro.estado != 'borrador') {
+            this.getBoton('save').disable();
+            this.getBoton('new').disable();
+            this.getBoton('edit').disable();
+            this.getBoton('del').disable();
+        }
+    },
+    
+    liberaMenu:function()
+    {   
+           
+        Phx.vista.VentaDetalle.superclass.liberaMenu.call(this);
+        if (this.maestro.estado != 'borrador') {            
+            this.getBoton('new').disable();
+            this.getBoton('save').disable();            
+        }
+    }
     
 	}
 )

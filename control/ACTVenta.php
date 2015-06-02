@@ -14,10 +14,12 @@ class ACTVenta extends ACTbase{
 
 		$this->objParam->defecto('dir_ordenacion','asc');
         if ($this->objParam->getParametro('pes_estado') != '') {
-            if ($this->objParam->getParametro('pes_estado') == 'elaboracion') {
+            if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
                 $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
             } else {
-                $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
+                if ($this->objParam->getParametro('historico') != 'si') {
+                    $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
+                }
             }
             
         }  

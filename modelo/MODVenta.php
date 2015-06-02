@@ -18,6 +18,8 @@ class MODVenta extends MODbase{
 		$this->procedimiento='vef.ft_venta_sel';
 		$this->transaccion='VF_VEN_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('historico','historico','varchar');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_venta','int4');
