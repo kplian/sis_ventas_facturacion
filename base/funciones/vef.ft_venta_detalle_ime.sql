@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_venta_detalle_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_venta_detalle_ime
@@ -30,6 +33,7 @@ DECLARE
 	v_precio					numeric;
 	v_sucursal_define_precio	varchar;
 	v_id_item_sucursal			integer;
+    v_id_venta					integer;
 	
 			    
 BEGIN
@@ -92,8 +96,6 @@ BEGIN
 			cantidad,
 			precio,
 			sw_porcentaje_formula,
-			id_usuario_ai,
-			usuario_ai,
 			fecha_reg,
 			id_usuario_reg,
 			id_usuario_mod,
@@ -108,8 +110,6 @@ BEGIN
 			v_parametros.cantidad_det,
 			v_precio,
 			v_parametros.sw_porcentaje_formula,
-			v_parametros._id_usuario_ai,
-			v_parametros._nombre_usuario_ai,
 			now(),
 			p_id_usuario,
 			null,
@@ -119,7 +119,11 @@ BEGIN
 			
 			)RETURNING id_venta_detalle into v_id_venta_detalle;
 			
-			--Definicion de la respuesta
+            update vef.tventa
+            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta)
+            where id_venta = v_parametros.id_venta;
+			
+            --Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de Venta almacenado(a) con exito (id_venta_detalle'||v_id_venta_detalle||')'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_venta_detalle',v_id_venta_detalle::varchar);
 
@@ -189,6 +193,10 @@ BEGIN
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai
 			where id_venta_detalle=v_parametros.id_venta_detalle;
+            
+            update vef.tventa
+            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta)
+            where id_venta = v_parametros.id_venta;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de Venta modificado(a)'); 
@@ -209,9 +217,18 @@ BEGIN
 	elsif(p_transaccion='VF_VEDET_ELI')then
 
 		begin
-			--Sentencia de la eliminacion
+        	select id_venta into v_id_venta
+            from vef.tventa_detalle
+            where id_venta_detalle = v_parametros.id_venta_detalle;
+			
+            --Sentencia de la eliminacion
 			delete from vef.tventa_detalle
             where id_venta_detalle=v_parametros.id_venta_detalle;
+            
+                       
+            update vef.tventa
+            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_id_venta)
+            where id_venta = v_id_venta;
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de Venta eliminado(a)'); 
@@ -238,7 +255,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_venta_detalle_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

@@ -33,6 +33,14 @@ class ACTVenta extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+    
+    function insertarVentaCompleta(){
+        $this->objFunc=$this->create('MODVenta'); 
+        if($this->objParam->insertar('id_venta')){
+            $this->res=$this->objFunc->insertarVentaCompleta($this->objParam);           
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 						
 	function eliminarVenta(){
 			$this->objFunc=$this->create('MODVenta');	

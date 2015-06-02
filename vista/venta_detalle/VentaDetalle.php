@@ -13,6 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
+	    this.config = config;
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.VentaDetalle.superclass.constructor.call(this,config);
@@ -53,7 +54,7 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender:true,
                 mode: 'local',
-                gwidth: 150,
+                gwidth: 120,
                 store:['producto_terminado','formula', 'servicio']
             },
                 type:'ComboBox',
@@ -100,21 +101,14 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
                 pageSize : 10,
                 queryDelay : 1000,
                 anchor : '100%',
-                gwidth : 250,
+                gwidth : 220,
                 minChars : 2,
-                turl : '../../../sis_almacenes/vista/item/BuscarItem.php',
-                tasignacion : true,
-                tname : 'id_item',
-                ttitle : 'Items',
-                tdata : {},
-                tcls : 'BuscarItem',
-                pid : this.idContenedor,
                 renderer : function(value, p, record) {
                     return String.format('{0}', record.data['nombre_item']);
                 },
                 resizable: true
             },
-            type : 'TrigguerCombo',
+            type : 'ComboBox',
             id_grupo : 1,
             filters : {
                 pfiltro : 'item.nombre',
@@ -166,7 +160,8 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
 			id_grupo: 0,
 			filters: {pfiltro: 'sprod.nombre_producto',type: 'string'},
 			grid: true,
-			form: true
+			form: true,
+            bottom_filter: true
 		},
 		{
             config : {
@@ -202,7 +197,7 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
                 pageSize : 10,
                 queryDelay : 1000,
                 anchor : '100%',
-                gwidth : 200,
+                gwidth : 220,
                 minChars : 2,
                 turl : '../../../sis_ventas_farmacia/vista/formula/Formula.php',  
                 tasignacion : true,           
@@ -234,7 +229,7 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Cantidad',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 80,
 				maxLength:4
 			},
 				type:'NumberField',
@@ -247,8 +242,8 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
 		{
             config:{
                 name: 'precio',
-                fieldLabel: 'Precio',               
-                gwidth: 100
+                fieldLabel: 'P / Unit',               
+                gwidth: 90
             },
                 type:'NumberField',                              
                 grid:true,
@@ -274,7 +269,7 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender:true,
                 mode: 'local',
-                gwidth: 150,
+                gwidth: 70,
                 store:['no','si'],
                 disabled :true
             },
@@ -442,6 +437,22 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
         this.load({params:{start:0, limit:50}});
             
     },
+    successDel:function(resp){
+        //console.log(resp)
+        Phx.CP.loadingHide();
+        Phx.CP.getPagina(this.config.idContenedorPadre).reload();
+        //this.sm.fireEvent('rowdeselect',this.sm);
+        this.reload();
+        
+    },
+
+    // funcion que corre cuando se guarda con exito
+    successSave:function(resp){
+        Phx.vista.VentaDetalle.superclass.successSave.call(this,resp); 
+        
+        Phx.CP.getPagina(this.config.idContenedorPadre).reload();
+
+    },
     loadValoresIniciales:function()
     {
         this.Cmp.id_venta.setValue(this.maestro.id_venta); 
@@ -458,52 +469,66 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
         
         Phx.vista.VentaDetalle.superclass.onButtonNew.call(this);
     },
+    
+    cambiarCombo : function (tipo) {
+        if (tipo == 'formula') {
+            this.mostrarComponente(this.Cmp.id_formula);
+            this.Cmp.id_formula.allowBlank = false;
+            
+            this.ocultarComponente(this.Cmp.id_sucursal_producto);
+            this.Cmp.id_sucursal_producto.allowBlank = true;
+            this.Cmp.id_sucursal_producto.reset();
+            
+            this.ocultarComponente(this.Cmp.id_item);
+            this.Cmp.id_item.allowBlank = true;
+            this.Cmp.id_item.reset();
+            
+            this.Cmp.sw_porcentaje_formula.setDisabled(false);
+            this.Cmp.sw_porcentaje_formula.setValue('si');
+        } else if (tipo == 'producto_terminado') {
+            this.ocultarComponente(this.Cmp.id_formula);
+            this.Cmp.id_formula.allowBlank = true;
+            this.Cmp.id_formula.reset();
+            
+            this.ocultarComponente(this.Cmp.id_sucursal_producto);
+            this.Cmp.id_sucursal_producto.allowBlank = true;
+            this.Cmp.id_sucursal_producto.reset();
+            
+            this.mostrarComponente(this.Cmp.id_item);
+            this.Cmp.id_item.allowBlank = false;
+            
+            this.Cmp.sw_porcentaje_formula.setDisabled(true);
+            this.Cmp.sw_porcentaje_formula.setValue('no');
+        } else {
+            this.ocultarComponente(this.Cmp.id_formula);
+            this.Cmp.id_formula.allowBlank = true;
+            this.Cmp.id_formula.reset();
+            
+            this.mostrarComponente(this.Cmp.id_sucursal_producto);
+            this.Cmp.id_sucursal_producto.allowBlank = false;
+            
+            this.ocultarComponente(this.Cmp.id_item);
+            this.Cmp.id_item.allowBlank = true;
+            this.Cmp.id_item.reset();
+            
+            this.Cmp.sw_porcentaje_formula.setDisabled(true);
+            this.Cmp.sw_porcentaje_formula.setValue('no');
+        }
+    },
     iniciarEventos : function () {
         this.Cmp.tipo.on('select',function(c,r,i) {
-            if (r.data.field1 == 'formula') {
-                this.mostrarComponente(this.Cmp.id_formula);
-                this.Cmp.id_formula.allowBlank = false;
-                
-                this.ocultarComponente(this.Cmp.id_sucursal_producto);
-                this.Cmp.id_sucursal_producto.allowBlank = true;
-                this.Cmp.id_sucursal_producto.reset();
-                
-                this.ocultarComponente(this.Cmp.id_item);
-                this.Cmp.id_item.allowBlank = true;
-                this.Cmp.id_item.reset();
-                
-                this.Cmp.sw_porcentaje_formula.setDisabled(false);
-            } else if (r.data.field1 == 'producto_terminado') {
-                this.ocultarComponente(this.Cmp.id_formula);
-                this.Cmp.id_formula.allowBlank = true;
-                this.Cmp.id_formula.reset();
-                
-                this.ocultarComponente(this.Cmp.id_sucursal_producto);
-                this.Cmp.id_sucursal_producto.allowBlank = true;
-                this.Cmp.id_sucursal_producto.reset();
-                
-                this.mostrarComponente(this.Cmp.id_item);
-                this.Cmp.id_item.allowBlank = false;
-                
-                this.Cmp.sw_porcentaje_formula.setDisabled(true);
-                this.Cmp.sw_porcentaje_formula.setValue('no');
-            } else {
-                this.ocultarComponente(this.Cmp.id_formula);
-                this.Cmp.id_formula.allowBlank = true;
-                this.Cmp.id_formula.reset();
-                
-                this.mostrarComponente(this.Cmp.id_sucursal_producto);
-                this.Cmp.id_sucursal_producto.allowBlank = false;
-                
-                this.ocultarComponente(this.Cmp.id_item);
-                this.Cmp.id_item.allowBlank = true;
-                this.Cmp.id_item.reset();
-                
-                this.Cmp.sw_porcentaje_formula.setDisabled(true);
-                this.Cmp.sw_porcentaje_formula.setValue('no');
-            }
-        },this)
-    }
+            this.cambiarCombo(r.data.field1);
+        },this);
+    },
+    onButtonEdit : function () {
+        this.cambiarCombo(this.Cmp.tipo.getValue());
+        Phx.vista.VentaDetalle.superclass.onButtonEdit.call(this);
+        this.cambiarCombo(this.Cmp.tipo.getValue());
+       
+   },
+   arrayDefaultColumHidden:['estado_reg','usuario_ai',
+    'fecha_reg','fecha_mod','usr_reg','usr_mod']
+    
 	}
 )
 </script>

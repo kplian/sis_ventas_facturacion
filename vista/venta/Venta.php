@@ -384,11 +384,53 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.Venta.superclass.loadValoresIniciales.call(this);        
     },
     
+    onButtonNew:function(){
+        //llamamos primero a la funcion new de la clase padre por que reseta el valor los componentes
+        this.Cmp.id_sucursal.store.load({params:{start:0,limit:this.tam_pag}, 
+           callback : function (r) {
+                if (r.length == 1 ) {                       
+                    this.Cmp.id_sucursal.setValue(r[0].data.id_sucursal);
+                    this.Cmp.id_sucursal.fireEvent('select', r[0]);
+                }    
+                                
+            }, scope : this
+        });
+        
+        Phx.vista.Venta.superclass.onButtonNew.call(this);
+    },
+    
+    
+    
+    
+    
     south : {
             url : '../../../sis_ventas_farmacia/vista/venta_detalle/VentaDetalle.php',
             title : 'Detalle',
             height : '50%',
             cls : 'VentaDetalle'
+    },
+    onButtonNew : function () {
+        //abrir formulario de solicitud
+           var me = this;
+           me.objSolForm = Phx.CP.loadWindows('../../../sis_ventas_farmacia/vista/venta/FormVenta.php',
+                                    'Formulario de Venta',
+                                    {
+                                        modal:true,
+                                        width:'80%',
+                                        height:'90%'
+                                    }, {data:{objPadre: me}
+                                    }, 
+                                    this.idContenedor,
+                                    'FormVenta',
+                                    {
+                                        config:[{
+                                                  event:'successsave',
+                                                  delegate: this.onSaveForm,
+                                                  
+                                                }],
+                                        
+                                        scope:this
+                                     });      
     },
     
     arrayDefaultColumHidden:['estado_reg','usuario_ai',
