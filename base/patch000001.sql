@@ -149,5 +149,8 @@ ALTER TABLE vef.tventa
 /************************************I-SCP-JRR-VEF-0-05/07/2015*************************************************/
 ALTER TABLE vef.tsucursal
   ADD COLUMN direccion VARCHAR(255);
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN id_movimiento INTEGER;
 
 /************************************F-SCP-JRR-VEF-0-05/07/2015*************************************************/
