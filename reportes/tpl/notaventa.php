@@ -10,7 +10,7 @@ $detalle = $dataSource->getParameter('detalle');
 	<tbody>
 	<tr>
 		
-		<td style="width: 23%; color: #444444;" rowspan="2"><img  style="width: 150px;" src="./../../../lib/<?php echo $_SESSION['_DIR_LOGO']?>" alt="Logo"></td>		
+		<td style="width: 23%; color: #444444;" rowspan="2"><img  style="width: 150px;" src="<?php echo dirname(__FILE__) . "/" . $_SESSION['_DIR_LOGO']?>" alt="Logo"></td>		
 		<td style="width: 54%; color: #444444;" rowspan="2"><h1>Nota de Venta </h1></td>
 		<td style="width: 23%; height: 50%; color: #444444;" ><b>N°:</b> <?php  echo $cabecera[0]['nro_tramite']; ?> </td>
 	</tr>

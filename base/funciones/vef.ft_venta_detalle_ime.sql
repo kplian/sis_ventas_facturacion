@@ -34,6 +34,7 @@ DECLARE
 	v_sucursal_define_precio	varchar;
 	v_id_item_sucursal			integer;
     v_id_venta					integer;
+    v_tiene_formula				varchar;
 	
 			    
 BEGIN
@@ -51,8 +52,9 @@ BEGIN
 	if(p_transaccion='VF_VEDET_INS')then
 					
         begin
+        	v_tiene_formula = 'no';
         	if (v_parametros.tipo = 'formula') then
-        	
+        		v_tiene_formula = 'si';
         		select sum(i.precio_ref*fd.cantidad) into v_precio
         		from vef.tformula_detalle fd
         		inner join alm.titem i on i.id_item = fd.id_item
@@ -120,7 +122,8 @@ BEGIN
 			)RETURNING id_venta_detalle into v_id_venta_detalle;
 			
             update vef.tventa
-            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta)
+            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta),
+            tiene_formula = v_tiene_formula
             where id_venta = v_parametros.id_venta;
 			
             --Definicion de la respuesta
@@ -142,8 +145,9 @@ BEGIN
 	elsif(p_transaccion='VF_VEDET_MOD')then
 
 		begin
+        	v_tiene_formula = 'no';
 			if (v_parametros.tipo = 'formula') then
-        	
+        		v_tiene_formula = 'si';
         		select sum(i.precio_ref*fd.cantidad) into v_precio
         		from vef.tformula_detalle fd
         		inner join alm.titem i on i.id_item = fd.id_item
@@ -195,7 +199,8 @@ BEGIN
 			where id_venta_detalle=v_parametros.id_venta_detalle;
             
             update vef.tventa
-            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta)
+            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta),
+            tiene_formula = v_tiene_formula
             where id_venta = v_parametros.id_venta;
                
 			--Definicion de la respuesta
@@ -224,10 +229,16 @@ BEGIN
             --Sentencia de la eliminacion
 			delete from vef.tventa_detalle
             where id_venta_detalle=v_parametros.id_venta_detalle;
+            /*Verificar si todavia existe una formula*/
+            v_tiene_formula = 'no';
+            if (exists (select 1 from vef.tventa_detalle where id_venta = v_id_venta
+            				and tipo = 'formula')) then
+           		v_tiene_formula = 'si';
+            end if;           
             
-                       
             update vef.tventa
-            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_id_venta)
+            set total_venta = coalesce((select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_id_venta),0),
+            tiene_formula = v_tiene_formula
             where id_venta = v_id_venta;
                
             --Definicion de la respuesta

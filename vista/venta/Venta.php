@@ -17,15 +17,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.Venta.superclass.constructor.call(this,config);
 		this.init();
-		this.addButton('btnImprimir',
-            {
-                text: 'Imprimir',
-                iconCls: 'bprint',
-                disabled: true,
-                handler: this.imprimirNota,
-                tooltip: '<b>Imprimir Comprobante</b><br/>Imprime el Comprobante en el formato oficial'
-            }
-        );		
+				
         
 	},
 	diagramGantt : function (){            
@@ -494,14 +486,36 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 json_procesos:      Ext.util.JSON.encode(resp.procesos)
                 },
             success:this.successWizard,
-            failure: this.conexionFailure,
+            failure: this.failureWizard,
             argument:{wizard:wizard},
             timeout:this.timeout,
             scope:this
         });
     },
-     
+    
+    failureWizard:function(resp1,resp2,resp3,resp4,resp5){ 
+        var resp = resp1;// error conexion
+        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+        if (reg.ROOT.detalle.mensaje.indexOf('insuficientes')!=-1) {
+            var mensaje = reg.ROOT.detalle.mensaje;
+            mensaje = mensaje.replace(/#/g, "");
+            mensaje = mensaje.replace("*", "");            
+            mensaje = mensaje.replace("*", "");
+            mensaje = mensaje.replace("{", "");
+            mensaje = mensaje.replace("}", "");
+            alert(mensaje);
+            Phx.CP.loadingHide();
+            
+        } else {
+            Phx.vista.Venta.superclass.conexionFailure.call(this,resp1,resp2,resp3,resp4,resp5);
+        }
+        
+    }, 
     successWizard:function(resp){
+        var rec=this.sm.getSelected();
+        if (rec.data.estado = 'borrador') {
+            this.imprimirNota();
+        }
         Phx.CP.loadingHide();
         resp.argument.wizard.panel.destroy()
         this.reload();

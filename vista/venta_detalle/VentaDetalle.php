@@ -519,6 +519,13 @@ Phx.vista.VentaDetalle=Ext.extend(Phx.gridInterfaz,{
         this.Cmp.tipo.on('select',function(c,r,i) {
             this.cambiarCombo(r.data.field1);
         },this);
+        
+        this.Cmp.id_formula.on('select',function(c,r,i) {
+            if (r.data.precio == '' || r.data.precio == undefined) {
+                alert('La formula seleccionada no tiene ningun detalle y no puede ser utilizada');
+                this.Cmp.id_formula.reset();
+            }
+        },this);
     },
     onButtonEdit : function () {
         this.cambiarCombo(this.Cmp.tipo.getValue());

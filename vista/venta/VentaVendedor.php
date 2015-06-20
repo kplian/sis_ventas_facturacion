@@ -27,7 +27,15 @@ Phx.vista.VentaVendedor = {
         this.addButton('ant_estado',{grupo:[3,4],argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
         this.addButton('sig_estado',{grupo:[0,2],text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
         this.addButton('diagrama_gantt',{grupo:[0,1,2,3,4],text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
-        
+        this.addButton('btnImprimir',
+            {   grupo:[0,1,2,3,4],
+                text: 'Imprimir',
+                iconCls: 'bpdf32',
+                disabled: true,
+                handler: this.imprimirNota,
+                tooltip: '<b>Imprimir Formulario de Venta</b><br/>Imprime el formulario de la venta'
+            }
+        );
         
     } ,
     gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-eye"></i> En Registro</h1>',grupo:0,height:0},

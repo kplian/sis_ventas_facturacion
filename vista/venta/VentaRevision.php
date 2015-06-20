@@ -47,7 +47,15 @@ Phx.vista.VentaRevision = {
         this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
         this.addButton('sig_estado',{text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
         this.addButton('diagrama_gantt',{text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
-        
+        this.addButton('btnImprimir',
+            {   
+                text: 'Imprimir',
+                iconCls: 'bpdf32',
+                disabled: true,
+                handler: this.imprimirNota,
+                tooltip: '<b>Imprimir Formulario de Venta</b><br/>Imprime el formulario de la venta'
+            }
+        );
         
     } ,        
     preparaMenu:function()
