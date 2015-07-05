@@ -513,7 +513,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     }, 
     successWizard:function(resp){
         var rec=this.sm.getSelected();
-        if (rec.data.estado = 'borrador') {
+        
+        if (rec.data.estado == 'borrador') {
             this.imprimirNota();
         }
         Phx.CP.loadingHide();
