@@ -322,25 +322,25 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Sucursal',
-	ActSave:'../../sis_ventas_farmacia/control/Sucursal/insertarSucursal',
-	ActDel:'../../sis_ventas_farmacia/control/Sucursal/eliminarSucursal',
-	ActList:'../../sis_ventas_farmacia/control/Sucursal/listarSucursal',
+	ActSave:'../../sis_ventas_facturacion/control/Sucursal/insertarSucursal',
+	ActDel:'../../sis_ventas_facturacion/control/Sucursal/eliminarSucursal',
+	ActList:'../../sis_ventas_facturacion/control/Sucursal/listarSucursal',
 	id_store:'id_sucursal',
 	south : {
-            url : '../../../sis_ventas_farmacia/vista/sucursal_producto/SucursalProducto.php',
+            url : '../../../sis_ventas_facturacion/vista/sucursal_producto/SucursalProducto.php',
             title : 'Productos',
             height : '50%',
             cls : 'SucursalProducto'
         },
     tabeast:[
           { 
-              url:'../../../sis_ventas_farmacia/vista/sucursal_usuario/SucursalUsuario.php',
+              url:'../../../sis_ventas_facturacion/vista/sucursal_usuario/SucursalUsuario.php',
               title:'Usuarios', 
               width:'50%',
               cls:'SucursalUsuario'
          },
           { 
-          url:'../../../sis_ventas_farmacia/vista/sucursal_almacen/SucursalAlmacen.php',
+          url:'../../../sis_ventas_facturacion/vista/sucursal_almacen/SucursalAlmacen.php',
           title:'Almacenes', 
           height:'50%',
           cls:'SucursalAlmacen'

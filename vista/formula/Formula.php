@@ -46,7 +46,7 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
                 allowBlank : false,
                 emptyText : 'Medico...',
                 store : new Ext.data.JsonStore({
-                    url : '../../sis_ventas_farmacia/control/Medico/listarMedico',
+                    url : '../../sis_ventas_facturacion/control/Medico/listarMedico',
                     id : 'id_medico',
                     root : 'datos',
                     sortInfo : {
@@ -72,7 +72,7 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
                 mode : 'remote',
                 pageSize : 10,
                 queryDelay : 1000,
-                turl:'../../../sis_ventas_farmacia/vista/medico/Medico.php',
+                turl:'../../../sis_ventas_facturacion/vista/medico/Medico.php',
                 ttitle:'Medicos',
                 // tconfig:{width:1800,height:500},
                 tdata:{},
@@ -101,7 +101,7 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
                 allowBlank : false,
                 emptyText : 'Tipo...',
                 store : new Ext.data.JsonStore({
-                    url : '../../sis_ventas_farmacia/control/TipoPresentacion/listarTipoPresentacion',
+                    url : '../../sis_ventas_facturacion/control/TipoPresentacion/listarTipoPresentacion',
                     id : 'id_tipo_presentacion',
                     root : 'datos',
                     sortInfo : {
@@ -361,9 +361,9 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Fórmula',
-	ActSave:'../../sis_ventas_farmacia/control/Formula/insertarFormula',
-	ActDel:'../../sis_ventas_farmacia/control/Formula/eliminarFormula',
-	ActList:'../../sis_ventas_farmacia/control/Formula/listarFormula',
+	ActSave:'../../sis_ventas_facturacion/control/Formula/insertarFormula',
+	ActDel:'../../sis_ventas_facturacion/control/Formula/eliminarFormula',
+	ActList:'../../sis_ventas_facturacion/control/Formula/listarFormula',
 	id_store:'id_formula',
 	fields: [
 		{name:'id_formula', type: 'numeric'},
@@ -393,7 +393,7 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
 	},
 	
     south : {
-            url : '../../../sis_ventas_farmacia/vista/formula_detalle/FormulaDetalle.php',
+            url : '../../../sis_ventas_facturacion/vista/formula_detalle/FormulaDetalle.php',
             title : 'Detalle',
             height : '50%',
             cls : 'FormulaDetalle'
@@ -401,7 +401,7 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
     onButtonNew : function () {
         //abrir formulario de solicitud
            var me = this;
-           me.objSolForm = Phx.CP.loadWindows('../../../sis_ventas_farmacia/vista/formula/FormFormula.php',
+           me.objSolForm = Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/formula/FormFormula.php',
                                     'Formulario de Solicitud de Compra',
                                     {
                                         modal:true,

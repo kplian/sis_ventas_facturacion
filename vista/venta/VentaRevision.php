@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.VentaRevision = {    
     bsave:false,    
-    require:'../../../sis_ventas_farmacia/vista/venta/Venta.php',
+    require:'../../../sis_ventas_facturacion/vista/venta/Venta.php',
     requireclase:'Phx.vista.Venta',
     title:'Venta',
     nombreVista: 'VentaRevision',

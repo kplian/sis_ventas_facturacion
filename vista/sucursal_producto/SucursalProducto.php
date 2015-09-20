@@ -302,9 +302,9 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
     },
 	tam_pag:50,	
 	title:'Productos',
-	ActSave:'../../sis_ventas_farmacia/control/SucursalProducto/insertarSucursalProducto',
-	ActDel:'../../sis_ventas_farmacia/control/SucursalProducto/eliminarSucursalProducto',
-	ActList:'../../sis_ventas_farmacia/control/SucursalProducto/listarSucursalProducto',
+	ActSave:'../../sis_ventas_facturacion/control/SucursalProducto/insertarSucursalProducto',
+	ActDel:'../../sis_ventas_facturacion/control/SucursalProducto/eliminarSucursalProducto',
+	ActList:'../../sis_ventas_facturacion/control/SucursalProducto/listarSucursalProducto',
 	id_store:'id_sucursal_producto',
 	fields: [
 		{name:'id_sucursal_producto', type: 'numeric'},

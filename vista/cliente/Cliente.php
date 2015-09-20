@@ -292,9 +292,9 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Cliente',
-	ActSave:'../../sis_ventas_farmacia/control/Cliente/insertarCliente',
-	ActDel:'../../sis_ventas_farmacia/control/Cliente/eliminarCliente',
-	ActList:'../../sis_ventas_farmacia/control/Cliente/listarCliente',
+	ActSave:'../../sis_ventas_facturacion/control/Cliente/insertarCliente',
+	ActDel:'../../sis_ventas_facturacion/control/Cliente/eliminarCliente',
+	ActList:'../../sis_ventas_facturacion/control/Cliente/listarCliente',
 	id_store:'id_cliente',
 	fields: [
 		{name:'id_cliente', type: 'numeric'},

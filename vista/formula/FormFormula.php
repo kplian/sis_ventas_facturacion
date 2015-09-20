@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 <script>
 Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
-    ActSave:'../../sis_ventas_farmacia/control/Formula/insertarFormulaCompleta',
+    ActSave:'../../sis_ventas_facturacion/control/Formula/insertarFormulaCompleta',
     tam_pag: 10,
     //layoutType: 'wizard',
     layout: 'fit',
@@ -125,7 +125,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                     ]);
         
         this.mestore = new Ext.data.JsonStore({
-                    url: '../../sis_ventas_farmacia/control/FormulaDetalle/listarFormulaDetalle',
+                    url: '../../sis_ventas_facturacion/control/FormulaDetalle/listarFormulaDetalle',
                     id: 'id_formula_detalle',
                     root: 'datos',
                     totalProperty: 'total',
@@ -335,7 +335,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                 allowBlank : false,
                 emptyText : 'Medico...',
                 store : new Ext.data.JsonStore({
-                    url : '../../sis_ventas_farmacia/control/Medico/listarMedico',
+                    url : '../../sis_ventas_facturacion/control/Medico/listarMedico',
                     id : 'id_medico',
                     root : 'datos',
                     sortInfo : {
@@ -358,7 +358,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                 triggerAction : 'all',
                 lazyRender : true,
                 mode : 'remote',
-                turl:'../../../sis_ventas_farmacia/vista/medico/Medico.php',
+                turl:'../../../sis_ventas_facturacion/vista/medico/Medico.php',
                 ttitle:'Medicos',
                 tasignacion : true,           
                 tname : 'id_medico',

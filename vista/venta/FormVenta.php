@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 <script>
 Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
-    ActSave:'../../sis_ventas_farmacia/control/Venta/insertarVentaCompleta',
+    ActSave:'../../sis_ventas_facturacion/control/Venta/insertarVentaCompleta',
     tam_pag: 10,
     //layoutType: 'wizard',
     layout: 'fit',
@@ -135,7 +135,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                             allowBlank : false,
                                             emptyText : 'Elija una formula...',
                                             store : new Ext.data.JsonStore({
-                                                url : '../../sis_ventas_farmacia/control/Formula/listarFormula',
+                                                url : '../../sis_ventas_facturacion/control/Formula/listarFormula',
                                                 id : 'id_formula',
                                                 root : 'datos',
                                                 sortInfo : {
@@ -164,7 +164,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                             anchor : '100%',
                                             gwidth : 200,
                                             minChars : 2,
-                                            turl : '../../../sis_ventas_farmacia/vista/formula/Formula.php',  
+                                            turl : '../../../sis_ventas_facturacion/vista/formula/Formula.php',  
                                             tasignacion : true,           
                                             tname : 'id_formula',
                                             ttitle : 'Formula',
@@ -180,7 +180,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                             allowBlank: false,
                                             emptyText: 'Servicios...',
                                             store: new Ext.data.JsonStore({
-                                                url: '../../sis_ventas_farmacia/control/SucursalProducto/listarSucursalProducto',
+                                                url: '../../sis_ventas_facturacion/control/SucursalProducto/listarSucursalProducto',
                                                 id: 'id_sucursal_producto',
                                                 root: 'datos',
                                                 sortInfo: {
@@ -363,7 +363,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                     ]);
         
         this.mestore = new Ext.data.JsonStore({
-                    url: '../../sis_ventas_farmacia/control/VentaDetalle/listarVentaDetalle',
+                    url: '../../sis_ventas_facturacion/control/VentaDetalle/listarVentaDetalle',
                     id: 'id_venta_detalle',
                     root: 'datos',
                     totalProperty: 'total',
@@ -659,7 +659,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 allowBlank : false,
                 emptyText : 'Cliente...',
                 store : new Ext.data.JsonStore({
-                    url : '../../sis_ventas_farmacia/control/Cliente/listarCliente',
+                    url : '../../sis_ventas_facturacion/control/Cliente/listarCliente',
                     id : 'id_cliente',
                     root : 'datos',
                     sortInfo : {
@@ -684,7 +684,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 mode : 'remote',
                 pageSize : 10,
                 queryDelay : 1000,
-                turl:'../../../sis_ventas_farmacia/vista/cliente/Cliente.php',
+                turl:'../../../sis_ventas_facturacion/vista/cliente/Cliente.php',
                 ttitle:'Clientes',
                 // tconfig:{width:1800,height:500},
                 tasignacion : true,           
@@ -733,7 +733,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 allowBlank: false,
                 emptyText: 'Elija una Suc...',
                 store: new Ext.data.JsonStore({
-                    url: '../../sis_ventas_farmacia/control/Sucursal/listarSucursal',
+                    url: '../../sis_ventas_facturacion/control/Sucursal/listarSucursal',
                     id: 'is_sucursal',
                     root: 'datos',
                     sortInfo: {
