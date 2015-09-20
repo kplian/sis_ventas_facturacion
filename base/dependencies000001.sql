@@ -30,12 +30,12 @@ ALTER TABLE ONLY vef.tsucursal_almacen
     ADD CONSTRAINT fk_tsucursal_almacen__id_almacen
     FOREIGN KEY (id_almacen) REFERENCES alm.talmacen(id_almacen);
     
-ALTER TABLE ONLY vef.tsucursal_item
-    ADD CONSTRAINT fk_tsucursal_item__id_sucursal
+ALTER TABLE ONLY vef.tsucursal_producto
+    ADD CONSTRAINT fk_tsucursal_producto__id_sucursal
     FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(id_sucursal);    
     
-ALTER TABLE ONLY vef.tsucursal_item
-    ADD CONSTRAINT fk_tsucursal_item__id_item
+ALTER TABLE ONLY vef.tsucursal_producto
+    ADD CONSTRAINT fk_tsucursal_producto__id_item
     FOREIGN KEY (id_item) REFERENCES alm.titem(id_item); 
     
 ALTER TABLE ONLY vef.tformula
@@ -68,7 +68,7 @@ ALTER TABLE ONLY vef.tventa
 
 ALTER TABLE ONLY vef.tventa_detalle
     ADD CONSTRAINT fk_tventa_detalle__id_venta
-    FOREIGN KEY (id_venta) REFERENCES wf.tventa(id_venta);
+    FOREIGN KEY (id_venta) REFERENCES vef.tventa(id_venta);
     
 ALTER TABLE ONLY vef.tventa_detalle
     ADD CONSTRAINT fk_tventa_detalle__id_item

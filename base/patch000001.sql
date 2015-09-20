@@ -71,8 +71,8 @@ CREATE TABLE vef.tsucursal_producto (
     tipo_producto VARCHAR(30) NOT NULL,
     nombre_producto VARCHAR(150) NOT NULL, 
     descripcion_producto TEXT NOT NULL,   
-    CONSTRAINT pk_tsucursal_item__id_sucursal_item
-    PRIMARY KEY (id_sucursal_item))
+    CONSTRAINT pk_tsucursal_item__id_sucursal_producto
+    PRIMARY KEY (id_sucursal_producto))
 INHERITS (pxp.tbase) WITHOUT OIDS;
 
 
