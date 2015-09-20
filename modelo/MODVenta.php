@@ -346,6 +346,14 @@ class MODVenta extends MODbase{
         $this->captura('nombre_completo','text');
         $this->captura('nombre_sucursal','varchar');
 		
+		$this->captura('direccion','varchar');
+		$this->captura('correo','varchar');
+		$this->captura('telefono','varchar');
+		$this->captura('total_string','varchar');
+				
+		
+		
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

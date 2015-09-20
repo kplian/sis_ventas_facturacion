@@ -292,7 +292,12 @@ BEGIN
 						usu2.cuenta as usr_mod,
                         ven.estado,
                         cli.nombre_completo,
-                        suc.nombre	
+                        suc.nombre,
+                        suc.direccion,
+                        suc.correo,
+                        suc.telefono,
+                        pxp.f_convertir_num_a_letra(ven.total_venta) as total_string
+                        	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
