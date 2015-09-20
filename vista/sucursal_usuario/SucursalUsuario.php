@@ -233,9 +233,9 @@ Phx.vista.SucursalUsuario=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Usuarios',
-	ActSave:'../../sis_ventas_farmacia/control/SucursalUsuario/insertarSucursalUsuario',
-	ActDel:'../../sis_ventas_farmacia/control/SucursalUsuario/eliminarSucursalUsuario',
-	ActList:'../../sis_ventas_farmacia/control/SucursalUsuario/listarSucursalUsuario',
+	ActSave:'../../sis_ventas_facturacion/control/SucursalUsuario/insertarSucursalUsuario',
+	ActDel:'../../sis_ventas_facturacion/control/SucursalUsuario/eliminarSucursalUsuario',
+	ActList:'../../sis_ventas_facturacion/control/SucursalUsuario/listarSucursalUsuario',
 	id_store:'id_sucursal_usuario',
 	fields: [
 		{name:'id_sucursal_usuario', type: 'numeric'},

@@ -248,9 +248,9 @@ Phx.vista.FormulaDetalle=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Formula Detalle',
-	ActSave:'../../sis_ventas_farmacia/control/FormulaDetalle/insertarFormulaDetalle',
-	ActDel:'../../sis_ventas_farmacia/control/FormulaDetalle/eliminarFormulaDetalle',
-	ActList:'../../sis_ventas_farmacia/control/FormulaDetalle/listarFormulaDetalle',
+	ActSave:'../../sis_ventas_facturacion/control/FormulaDetalle/insertarFormulaDetalle',
+	ActDel:'../../sis_ventas_facturacion/control/FormulaDetalle/eliminarFormulaDetalle',
+	ActList:'../../sis_ventas_facturacion/control/FormulaDetalle/listarFormulaDetalle',
 	id_store:'id_formula_detalle',
 	fields: [
 		{name:'id_formula_detalle', type: 'numeric'},

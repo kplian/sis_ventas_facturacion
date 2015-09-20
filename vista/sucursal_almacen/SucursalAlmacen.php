@@ -234,9 +234,9 @@ Phx.vista.SucursalAlmacen=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Almacenes',
-	ActSave:'../../sis_ventas_farmacia/control/SucursalAlmacen/insertarSucursalAlmacen',
-	ActDel:'../../sis_ventas_farmacia/control/SucursalAlmacen/eliminarSucursalAlmacen',
-	ActList:'../../sis_ventas_farmacia/control/SucursalAlmacen/listarSucursalAlmacen',
+	ActSave:'../../sis_ventas_facturacion/control/SucursalAlmacen/insertarSucursalAlmacen',
+	ActDel:'../../sis_ventas_facturacion/control/SucursalAlmacen/eliminarSucursalAlmacen',
+	ActList:'../../sis_ventas_facturacion/control/SucursalAlmacen/listarSucursalAlmacen',
 	id_store:'id_sucursal_almacen',
 	fields: [
 		{name:'id_sucursal_almacen', type: 'numeric'},

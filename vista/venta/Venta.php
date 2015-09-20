@@ -85,7 +85,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 allowBlank : false,
                 emptyText : 'Cliente...',
                 store : new Ext.data.JsonStore({
-                    url : '../../sis_ventas_farmacia/control/Cliente/listarCliente',
+                    url : '../../sis_ventas_facturacion/control/Cliente/listarCliente',
                     id : 'id_cliente',
                     root : 'datos',
                     sortInfo : {
@@ -111,7 +111,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 mode : 'remote',
                 pageSize : 10,
                 queryDelay : 1000,
-                turl:'../../../sis_ventas_farmacia/vista/cliente/Cliente.php',
+                turl:'../../../sis_ventas_facturacion/vista/cliente/Cliente.php',
                 ttitle:'Clientes',
                 // tconfig:{width:1800,height:500},
                 tasignacion : true,           
@@ -191,7 +191,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 emptyText: 'Elija una Suc...',
                 store: new Ext.data.JsonStore({
-                    url: '../../sis_ventas_farmacia/control/Sucursal/listarSucursal',
+                    url: '../../sis_ventas_facturacion/control/Sucursal/listarSucursal',
                     id: 'is_sucursal',
                     root: 'datos',
                     sortInfo: {
@@ -347,9 +347,9 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Ventas',
-	ActSave:'../../sis_ventas_farmacia/control/Venta/insertarVenta',
-	ActDel:'../../sis_ventas_farmacia/control/Venta/eliminarVenta',
-	ActList:'../../sis_ventas_farmacia/control/Venta/listarVenta',
+	ActSave:'../../sis_ventas_facturacion/control/Venta/insertarVenta',
+	ActDel:'../../sis_ventas_facturacion/control/Venta/eliminarVenta',
+	ActList:'../../sis_ventas_facturacion/control/Venta/listarVenta',
 	id_store:'id_venta',
 	fields: [
 		{name:'id_venta', type: 'numeric'},
@@ -437,7 +437,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     },
     
     south : {
-            url : '../../../sis_ventas_farmacia/vista/venta_detalle/VentaDetalle.php',
+            url : '../../../sis_ventas_facturacion/vista/venta_detalle/VentaDetalle.php',
             title : 'Detalle',
             height : '50%',
             cls : 'VentaDetalle'
@@ -474,7 +474,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         Phx.CP.loadingShow();
         
         Ext.Ajax.request({
-            url:'../../sis_ventas_farmacia/control/Venta/siguienteEstadoVenta',
+            url:'../../sis_ventas_facturacion/control/Venta/siguienteEstadoVenta',
             params:{
                     
                 id_proceso_wf_act:  resp.id_proceso_wf_act,
@@ -549,7 +549,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 			if (data) {
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({
-						url : '../../sis_ventas_farmacia/control/Venta/reporteNotaVenta',
+						url : '../../sis_ventas_facturacion/control/Venta/reporteNotaVenta',
 						params : {
 							'id_venta' : data.id_venta
 						},
@@ -565,7 +565,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
             Phx.CP.loadingShow(); 
             Ext.Ajax.request({ 
                 // form:this.form.getForm().getEl(),
-                url:'../../sis_ventas_farmacia/control/Venta/anteriorEstadoVenta',
+                url:'../../sis_ventas_facturacion/control/Venta/anteriorEstadoVenta',
                 params:{
                         id_proceso_wf:resp.id_proceso_wf,
                         id_estado_wf:resp.id_estado_wf,  

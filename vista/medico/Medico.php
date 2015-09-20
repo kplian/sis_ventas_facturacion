@@ -288,9 +288,9 @@ Phx.vista.Medico=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Medico',
-	ActSave:'../../sis_ventas_farmacia/control/Medico/insertarMedico',
-	ActDel:'../../sis_ventas_farmacia/control/Medico/eliminarMedico',
-	ActList:'../../sis_ventas_farmacia/control/Medico/listarMedico',
+	ActSave:'../../sis_ventas_facturacion/control/Medico/insertarMedico',
+	ActDel:'../../sis_ventas_facturacion/control/Medico/eliminarMedico',
+	ActList:'../../sis_ventas_facturacion/control/Medico/listarMedico',
 	id_store:'id_medico',
 	fields: [
 		{name:'id_medico', type: 'numeric'},

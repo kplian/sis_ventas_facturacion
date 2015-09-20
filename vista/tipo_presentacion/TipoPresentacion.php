@@ -158,9 +158,9 @@ Phx.vista.TipoPresentacion=Ext.extend(Phx.gridInterfaz,{
 	],
 	tam_pag:50,	
 	title:'Tipo de Presentacion',
-	ActSave:'../../sis_ventas_farmacia/control/TipoPresentacion/insertarTipoPresentacion',
-	ActDel:'../../sis_ventas_farmacia/control/TipoPresentacion/eliminarTipoPresentacion',
-	ActList:'../../sis_ventas_farmacia/control/TipoPresentacion/listarTipoPresentacion',
+	ActSave:'../../sis_ventas_facturacion/control/TipoPresentacion/insertarTipoPresentacion',
+	ActDel:'../../sis_ventas_facturacion/control/TipoPresentacion/eliminarTipoPresentacion',
+	ActList:'../../sis_ventas_facturacion/control/TipoPresentacion/listarTipoPresentacion',
 	id_store:'id_tipo_presentacion',
 	fields: [
 		{name:'id_tipo_presentacion', type: 'numeric'},

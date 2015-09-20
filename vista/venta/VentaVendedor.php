@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.VentaVendedor = {    
     bsave:false,    
-    require:'../../../sis_ventas_farmacia/vista/venta/Venta.php',
+    require:'../../../sis_ventas_facturacion/vista/venta/Venta.php',
     requireclase:'Phx.vista.Venta',
     title:'Venta',
     nombreVista: 'VentaVendedor',
@@ -80,7 +80,7 @@ Phx.vista.VentaVendedor = {
     onButtonNew : function () {
         //abrir formulario de solicitud
            var me = this;
-           me.objSolForm = Phx.CP.loadWindows('../../../sis_ventas_farmacia/vista/venta/FormVenta.php',
+           me.objSolForm = Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/venta/FormVenta.php',
                                     'Formulario de Venta',
                                     {
                                         modal:true,
