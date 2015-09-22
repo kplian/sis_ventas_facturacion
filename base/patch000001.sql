@@ -157,6 +157,24 @@ ALTER TABLE vef.tventa
 
 /************************************I-SCP-JRR-VEF-0-20/09/2015*************************************************/
 ALTER TABLE vef.tsucursal
-  ADD COLUMN id_entidad INTEGER;
-
+  ADD COLUMN id_entidad INTEGER NOT NULL;
+  
+ALTER TABLE vef.tsucursal
+  ADD COLUMN plantilla_documento_factura VARCHAR (50);
+  
+ALTER TABLE vef.tsucursal
+  ADD COLUMN plantilla_documento_recibo VARCHAR (50);
+  
+ALTER TABLE vef.tsucursal
+  ADD COLUMN formato_comprobante VARCHAR (50);
+  
+CREATE TABLE vef.tsucursal_moneda (
+    id_sucursal_moneda serial NOT NULL,
+    tipo_moneda VARCHAR(20) NOT NULL,
+    id_sucursal INTEGER NOT NULL,  
+    id_moneda INTEGER NOT NULL,    
+    CONSTRAINT pk_tsucursal_moneda__id_sucursal_moneda
+    PRIMARY KEY (id_sucursal_moneda))
+INHERITS (pxp.tbase) WITHOUT OIDS;
+  
 /************************************F-SCP-JRR-VEF-0-20/09/2015*************************************************/

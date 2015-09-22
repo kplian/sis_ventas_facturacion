@@ -180,6 +180,14 @@ ALTER TABLE ONLY vef.tsucursal
     ADD CONSTRAINT fk_tsucursal__id_entidad
     FOREIGN KEY (id_entidad) REFERENCES param.tentidad(id_entidad);  
 
+ALTER TABLE ONLY vef.tsucursal_moneda
+    ADD CONSTRAINT fk_tsucursal_moneda__id_moneda
+    FOREIGN KEY (id_moneda) REFERENCES param.tmoneda(id_moneda);  
+    
+ALTER TABLE ONLY vef.tsucursal_moneda
+    ADD CONSTRAINT fk_tsucursal_moneda__id_sucursal
+    FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(is_sucursal);  
+
 /************************************F-DEP-JRR-VEF-0-20/09/2015*************************************************/
 
 

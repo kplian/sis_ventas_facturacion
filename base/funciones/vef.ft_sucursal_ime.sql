@@ -63,7 +63,10 @@ BEGIN
 			fecha_reg,
 			id_usuario_mod,
 			fecha_mod,
-			id_entidad
+			id_entidad,
+			plantilla_documento_factura,
+			plantilla_documento_recibo,
+			formato_comprobante
           	) values(
 			v_parametros.correo,
 			v_parametros.nombre,
@@ -79,9 +82,10 @@ BEGIN
 			now(),
 			null,
 			null,
-			v_parametros.id_entidad
-							
-			
+			v_parametros.id_entidad,
+			v_parametros.plantilla_documento_factura,
+			v_parametros.plantilla_documento_recibo,
+			v_parametros.formato_comprobante		
 			
 			)RETURNING id_sucursal into v_id_sucursal;
 			
@@ -116,7 +120,10 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
 			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+			usuario_ai = v_parametros._nombre_usuario_ai,
+			plantilla_documento_factura = v_parametros.plantilla_documento_factura,
+			plantilla_documento_recibo = v_parametros.plantilla_documento_recibo,
+			formato_comprobante = v_parametros.formato_comprobante
 			where id_sucursal=v_parametros.id_sucursal;
                
 			--Definicion de la respuesta

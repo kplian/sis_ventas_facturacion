@@ -69,6 +69,9 @@ BEGIN
                         (select pxp.list(c.nombre)
                         from alm.tclasificacion c
                         where id_clasificacion = ANY(suc.clasificaciones_para_venta))::varchar as desc_clasificaciones_para_venta 	
+						,suc.plantilla_documento_factura
+						,suc.plantilla_documento_recibo,
+						suc.formato_comprobante
 						from vef.tsucursal suc
 						inner join segu.tusuario usu1 on usu1.id_usuario = suc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = suc.id_usuario_mod

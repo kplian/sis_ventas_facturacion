@@ -19,8 +19,30 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Sucursal.superclass.constructor.call(this,config);
 		this.init();
 		this.iniciarEventos();
+		this.addButton('btnMonedas',
+            {
+                text: 'Monedas',
+                iconCls: 'bmoney',
+                disabled: true,                
+                handler: this.onButtonMonedas,
+                tooltip: 'Monedas'                
+            }
+        );
 		
 	},
+	onButtonMonedas : function() {
+        var rec = {maestro: this.sm.getSelected().data};
+                              
+            Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/sucursal_moneda/SucursalMoneda.php',
+                    'Monedas por sucursal',
+                    {
+                        width:600,
+                        height:'80%'
+                    },
+                    rec,
+                    this.idContenedor,
+                    'SucursalMoneda');
+    },
 	cmbEntidad:new Ext.form.ComboBox({
             store: new Ext.data.JsonStore({
 
@@ -161,6 +183,51 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
             form:true
         },				
 		
+        {
+            config:{
+                name: 'plantilla_documento_factura',
+                fieldLabel: 'Plantilla de documento Factura',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 230,
+                maxLength:50
+            },
+                type:'TextField',                
+                id_grupo:1,
+                grid:true,
+                form:true
+        },
+        
+        {
+            config:{
+                name: 'plantilla_documento_recibo',
+                fieldLabel: 'Plantilla de documento Recibo',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 230,
+                maxLength:50
+            },
+                type:'TextField',                
+                id_grupo:1,
+                grid:true,
+                form:true
+        },
+        
+        {
+            config:{
+                name: 'formato_comprobante',
+                fieldLabel: 'Formato Comprobante',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 230,
+                maxLength:50
+            },
+                type:'TextField',                
+                id_grupo:1,
+                grid:true,
+                form:true
+        },
+        
         
         {
             config:{
@@ -392,6 +459,9 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombre', type: 'string'},
 		{name:'telefono', type: 'string'},
 		{name:'tiene_precios_x_sucursal', type: 'string'},
+		{name:'plantilla_documento_factura', type: 'string'},
+		{name:'plantilla_documento_recibo', type: 'string'},
+		{name:'formato_comprobante', type: 'string'},		
 		{name:'estado_reg', type: 'string'},
 		{name:'id_clasificaciones_para_formula', type: 'string'},
 		{name:'desc_clasificaciones_para_formula', type: 'string'},
@@ -449,6 +519,17 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Modificado por:&nbsp;&nbsp;</b> {usr_mod}</p><br>'
             )
     }),
+    preparaMenu:function()
+    {   
+        this.getBoton('btnMonedas').enable(); 
+        Phx.vista.Sucursal.superclass.preparaMenu.call(this);
+    },
+    
+    liberaMenu:function()
+    {   
+        this.getBoton('btnMonedas').disable(); 
+        Phx.vista.Sucursal.superclass.liberaMenu.call(this);
+    },
     
     arrayDefaultColumHidden:['correo','telefono','estado_reg','usuario_ai',
     'fecha_reg','fecha_mod','usr_reg','usr_mod','id_clasificaciones_para_formula','id_clasificaciones_para_venta'],

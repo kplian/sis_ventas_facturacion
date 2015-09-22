@@ -54,14 +54,14 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                     triggerAction: 'all',
                     lazyRender:true,
                     mode: 'local',                    
-                    store:['item_almacen','servicio_o_producto']
+                    store:['item_almacen','servicio', 'producto']
                     
                 },
                 type:'ComboBox',
                 id_grupo:0,
                 filters:{   
                          type: 'list',
-                         options: ['item_almacen','servicio_o_producto'], 
+                         options: ['item_almacen',,'servicio', 'producto'], 
                     },
                 grid:true,
                 form:true
@@ -139,6 +139,54 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                 id_grupo:2,
                 grid:true,
                 form:true
+        },
+        
+        {
+            config:{
+                name:'nombre_producto',
+                fieldLabel:'Nombre Producto/Servicio',
+                allowBlank:true,
+                emptyText:'Concepto Ingreso Gasto...',
+                store: new Ext.data.JsonStore({
+                         url: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas',
+                         id: 'id_concepto_ingas',
+                         root: 'datos',
+                         sortInfo:{
+                            field: 'desc_ingas',
+                            direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'desc_ingas',movimiento:'recurso'}
+                    }),
+                valueField: 'id_concepto_ingas',
+                displayField: 'desc_ingas',
+                gdisplayField:'nombre_ingas',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><p>TIPO:{tipo}</p><p>MOVIMIENTO:{movimiento}</p></div></tpl>',
+                hiddenName: 'id_concepto_ingas',
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                listWidth:600,
+                resizable:true,
+                anchor:'80%', 
+                gwidth: 200,      
+                renderer:function(value, p, record){return String.format('{0}', record.data['nombre_ingas']);}
+            },
+            type:'ComboBox',
+            id_grupo:0,
+            filters:{   
+                        pfiltro:'cig.movimiento#cig.desc_ingas',
+                        type:'string'
+                    },
+            grid:true,
+            form:true
         },
         
         
