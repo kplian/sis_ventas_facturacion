@@ -46,6 +46,7 @@ BEGIN
     		--Sentencia de la consulta
 			v_consulta:='select
 						suc.id_sucursal,
+						suc.id_entidad,
 						suc.correo,
 						suc.nombre,
 						suc.telefono,

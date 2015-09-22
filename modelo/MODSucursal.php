@@ -21,6 +21,7 @@ class MODSucursal extends MODbase{
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_sucursal','int4');
+        $this->captura('id_entidad','int4');
 		$this->captura('correo','varchar');
 		$this->captura('nombre','varchar');
 		$this->captura('telefono','varchar');
@@ -63,6 +64,7 @@ class MODSucursal extends MODbase{
 		$this->setParametro('id_clasificaciones_para_formula','id_clasificaciones_para_formula','varchar');
 		$this->setParametro('codigo','codigo','varchar');
 		$this->setParametro('id_clasificaciones_para_venta','id_clasificaciones_para_venta','varchar');
+        $this->setParametro('id_entidad','id_entidad','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

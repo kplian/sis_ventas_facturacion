@@ -62,7 +62,8 @@ BEGIN
 			usuario_ai,
 			fecha_reg,
 			id_usuario_mod,
-			fecha_mod
+			fecha_mod,
+			id_entidad
           	) values(
 			v_parametros.correo,
 			v_parametros.nombre,
@@ -77,7 +78,8 @@ BEGIN
 			v_parametros._nombre_usuario_ai,
 			now(),
 			null,
-			null
+			null,
+			v_parametros.id_entidad
 							
 			
 			

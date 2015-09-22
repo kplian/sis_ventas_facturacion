@@ -174,3 +174,13 @@ AS
   FROM vef.tcliente c;
 
 /************************************F-DEP-JRR-VEF-0-02/05/2015*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-20/09/2015*************************************************/
+ALTER TABLE ONLY vef.tsucursal
+    ADD CONSTRAINT fk_tsucursal__id_entidad
+    FOREIGN KEY (id_entidad) REFERENCES param.tentidad(id_entidad);  
+
+/************************************F-DEP-JRR-VEF-0-20/09/2015*************************************************/
+
+
+

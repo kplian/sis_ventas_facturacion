@@ -21,6 +21,11 @@ class ACTSucursal extends ACTbase{
                                                 " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
                                                 vef.tsucursal_usuario su where su.id_sucursal = sucusu.id_sucursal)) ");
         }
+        
+        if($this->objParam->getParametro('id_entidad') != '') {
+                $this->objParam->addFiltro(" suc.id_entidad = " . $this->objParam->getParametro('id_entidad'));
+        }
+        
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODSucursal','listarSucursal');

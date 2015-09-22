@@ -15,10 +15,40 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
+    	this.initButtons=[this.cmbEntidad];
 		Phx.vista.Sucursal.superclass.constructor.call(this,config);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		this.iniciarEventos();
+		
 	},
+	cmbEntidad:new Ext.form.ComboBox({
+            store: new Ext.data.JsonStore({
+
+                url: '../../sis_parametros/control/Entidad/listarEntidad',
+                id: 'id_entidad',
+                root: 'datos',
+                sortInfo:{
+                    field: 'nombre',
+                    direction: 'ASC'
+                },
+                totalProperty: 'total',
+                fields: [
+                    {name:'id_entidad'},
+                    {name:'nombre', type: 'string'},
+                    {name:'nit', type: 'string'}
+                ],
+                remoteSort: true,
+                baseParams:{start:0,limit:10}
+            }),
+            displayField: 'nombre',
+            valueField: 'id_entidad',
+            typeAhead: false,
+            mode: 'remote',
+            triggerAction: 'all',
+            emptyText:'Entidad...',
+            selectOnFocus:true,
+            width:135
+        }),
 			
 	Atributos:[
 		{
@@ -31,6 +61,16 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
+		{
+            //configuracion del componente
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_entidad'
+            },
+            type:'Field',
+            form:true 
+        },
 		{
             config:{
                 name: 'codigo',
@@ -347,6 +387,7 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
          }],
 	fields: [
 		{name:'id_sucursal', type: 'numeric'},
+		{name:'id_entidad', type: 'numeric'},
 		{name:'correo', type: 'string'},
 		{name:'nombre', type: 'string'},
 		{name:'telefono', type: 'string'},
@@ -371,6 +412,28 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 		field: 'id_sucursal',
 		direction: 'ASC'
 	},
+	iniciarEventos : function () {
+	    
+	    this.cmbEntidad.store.load({params:{start:0,limit:this.tam_pag}, 
+           callback : function (r) {
+                if (r.length == 1 ) {                       
+                    this.cmbEntidad.setValue(r[0].data.id_entidad);  
+                    this.cmbEntidad.fireEvent('select', r[0]);                  
+                }    
+                                
+            }, scope : this
+        });
+        this.cmbEntidad.on('select', function(c,r,i) {            
+            this.store.baseParams.id_entidad = this.cmbEntidad.getValue();
+            this.load({params:{start:0, limit:this.tam_pag}});
+            
+        } , this);
+	},
+	loadValoresIniciales:function()
+    {
+        this.Cmp.id_entidad.setValue(this.cmbEntidad.getValue());          
+        Phx.vista.Sucursal.superclass.loadValoresIniciales.call(this);        
+    },
 	bdel:true,
 	bsave:true,
 	rowExpander: new Ext.ux.grid.RowExpander({
