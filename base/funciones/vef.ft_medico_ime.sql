@@ -60,7 +60,8 @@ BEGIN
 			usuario_ai,
 			id_usuario_ai,
 			id_usuario_mod,
-			fecha_mod
+			fecha_mod,
+			fecha_nacimiento
           	) values(
 			v_parametros.correo,
 			v_parametros.telefono_fijo,
@@ -77,7 +78,8 @@ BEGIN
 			v_parametros._nombre_usuario_ai,
 			v_parametros._id_usuario_ai,
 			null,
-			null
+			null,
+			v_parametros.fecha_nacimiento
 							
 			
 			
@@ -116,7 +118,8 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
 			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+			usuario_ai = v_parametros._nombre_usuario_ai,
+			fecha_nacimiento = v_parametros.fecha_nacimiento
 			where id_medico=v_parametros.id_medico;
                
 			--Definicion de la respuesta

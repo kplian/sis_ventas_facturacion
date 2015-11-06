@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -87,7 +85,17 @@ BEGIN
             
             
     		--Sentencia de la consulta
-			v_consulta:='select
+			v_consulta:='with forma_pago_temporal as(
+					    	select count(*)as cantidad_forma_pago,vfp.id_venta,
+					        	pxp.list(fp.id_forma_pago::text) as id_forma_pago, pxp.list(fp.nombre) as forma_pago,
+                                sum(monto_transaccion) as monto_transaccion,pxp.list(vfp.numero_tarjeta) as numero_tarjeta,
+                                pxp.list(vfp.codigo_tarjeta) as codigo_tarjeta,pxp.list(vfp.tipo_tarjeta) as tipo_tarjeta
+					        from vef.tventa_forma_pago vfp
+					        inner join vef.tforma_pago fp on fp.id_forma_pago = vfp.id_forma_pago
+					        group by vfp.id_venta        
+					    )
+			
+						select
 						' || v_select || ',
 						ven.id_cliente,
 						ven.id_sucursal,
@@ -107,13 +115,52 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         ven.estado,
-                        cli.nombre_completo,
-                        suc.nombre	
+                        cli.nombre_factura,
+                        suc.nombre,
+                        cli.nit,
+                        puve.id_punto_venta,
+                        puve.nombre as nombre_punto_venta,
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	0::integer
+                        else
+                        	forpa.id_forma_pago::integer
+                        end) as id_forma_pago,
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''DIVIDIDO''::varchar
+                        else
+                        	forpa.forma_pago::varchar
+                        end) as forma_pago,
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	0::numeric
+                        else
+                        	forpa.monto_transaccion::numeric
+                        end) as monto_forma_pago,
+                        
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''''::varchar
+                        else
+                        	forpa.numero_tarjeta::varchar
+                        end) as numero_tarjeta,
+                        
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''''::varchar
+                        else
+                        	forpa.codigo_tarjeta::varchar
+                        end) as codigo_tarjeta,
+                        
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''''::varchar
+                        else
+                        	forpa.tipo_tarjeta::varchar
+                        end) as tipo_tarjeta
+                        	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
 				        inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
+                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
                         ' || v_join || '
                         where  ' || v_filtro;
 			
@@ -176,11 +223,45 @@ BEGIN
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
 					    inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
                         ' || v_join || '
                         where  ' || v_filtro;
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+	/*********************************    
+ 	#TRANSACCION:  'VF_VENCONF_SEL'
+ 	#DESCRIPCION:	Obtener configuraciones basicas para sistema de ventas
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VENCONF_SEL')then
+
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='	select variable, valor
+						 	from pxp.variable_global
+						 	where variable like ''vef_%'' 
+						 union all
+						 	select ''sucursales''::varchar,pxp.list(id_sucursal::text)::varchar
+						 	from vef.tsucursal_usuario 
+						 	where estado_reg = ''activo'' and id_usuario = ' || p_id_usuario || '
+						 	and id_sucursal is not null and id_punto_venta is null
+						 union all
+						 	select ''puntos_venta''::Varchar,pxp.list(id_punto_venta::text)::varchar
+						 	from vef.tsucursal_usuario 
+						 	where estado_reg = ''activo'' and id_usuario = ' || p_id_usuario || '
+						 	and id_sucursal is null and id_punto_venta is not null
+						 ';
+			
+			--Definicion de la respuesta		    
+			
 
 			--Devuelve la respuesta
 			return v_consulta;

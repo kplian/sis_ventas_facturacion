@@ -232,7 +232,12 @@ Phx.vista.SucursalMoneda=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.SucursalMoneda.superclass.loadValoresIniciales.call(this);
     },
 	bdel:true,
-	bsave:true
+	bsave:true,
+    loadValoresIniciales:function()
+    {
+    	this.Cmp.id_sucursal.setValue(this.maestro.id_sucursal);       
+        Phx.vista.SucursalMoneda.superclass.loadValoresIniciales.call(this);        
+    }
 	}
 )
 </script>

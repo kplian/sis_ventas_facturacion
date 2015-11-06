@@ -28,6 +28,26 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                 tooltip: 'Monedas'                
             }
         );
+        
+        this.addButton('btnDosificaciones',
+            {
+                text: 'Dosificaciones',
+                iconCls: 'blist',
+                disabled: true,                
+                handler: this.onButtonDosificaciones,
+                tooltip: 'Dosificaciones para la sucursal'                
+            }
+        );
+        
+        this.addButton('btnPVenta',
+            {
+                text: 'P. Venta',
+                iconCls: 'blist',
+                disabled: true,                
+                handler: this.onButtonPVenta,
+                tooltip: 'Puntos de Venta'                
+            }
+        );
 		
 	},
 	onButtonMonedas : function() {
@@ -43,6 +63,35 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                     this.idContenedor,
                     'SucursalMoneda');
     },
+    
+    onButtonDosificaciones : function() {
+        var rec = {maestro: this.sm.getSelected().data};
+                              
+            Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/dosificacion/Dosificacion.php',
+                    'Dosificaciones por sucursal',
+                    {
+                        width:800,
+                        height:'80%'
+                    },
+                    rec,
+                    this.idContenedor,
+                    'Dosificacion');
+    },
+    
+    onButtonPVenta : function() {
+        var rec = {maestro: this.sm.getSelected().data};
+                              
+            Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/punto_venta/PuntoVenta.php',
+                    'Puntos de Venta',
+                    {
+                        width:800,
+                        height:'80%'
+                    },
+                    rec,
+                    this.idContenedor,
+                    'PuntoVenta');
+    },
+    
 	cmbEntidad:new Ext.form.ComboBox({
             store: new Ext.data.JsonStore({
 
@@ -135,6 +184,37 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
             },
                 type:'TextField',
                 filters:{pfiltro:'suc.telefono',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:true
+        },
+        {
+            config:{
+                name: 'direccion',
+                fieldLabel: 'Direccion',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 100,
+                maxLength:255
+            },
+                type:'TextField',
+                filters:{pfiltro:'suc.direccion',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:true
+        },
+        
+        {
+            config:{
+                name: 'lugar',
+                fieldLabel: 'Lugar',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 100,
+                maxLength:255
+            },
+                type:'TextField',
+                filters:{pfiltro:'suc.lugar',type:'string'},
                 id_grupo:1,
                 grid:true,
                 form:true
@@ -458,6 +538,8 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 		{name:'correo', type: 'string'},
 		{name:'nombre', type: 'string'},
 		{name:'telefono', type: 'string'},
+		{name:'direccion', type: 'string'},
+		{name:'lugar', type: 'string'},
 		{name:'tiene_precios_x_sucursal', type: 'string'},
 		{name:'plantilla_documento_factura', type: 'string'},
 		{name:'plantilla_documento_recibo', type: 'string'},
@@ -522,12 +604,16 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
     preparaMenu:function()
     {   
         this.getBoton('btnMonedas').enable(); 
+        this.getBoton('btnDosificaciones').enable(); 
+        this.getBoton('btnPVenta').enable(); 
         Phx.vista.Sucursal.superclass.preparaMenu.call(this);
     },
     
     liberaMenu:function()
     {   
         this.getBoton('btnMonedas').disable(); 
+        this.getBoton('btnDosificaciones').disable();
+        this.getBoton('btnPVenta').disable();
         Phx.vista.Sucursal.superclass.liberaMenu.call(this);
     },
     

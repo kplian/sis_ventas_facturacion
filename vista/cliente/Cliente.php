@@ -34,9 +34,25 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'nombre_factura',
+				fieldLabel: 'Nombre Factura',
+				allowBlank: false,
+				anchor: '100%',
+				gwidth: 170,
+				maxLength:100
+			},
+				type:'TextField',
+				filters:{pfiltro:'cli.nombre_factura',type:'string'},
+				id_grupo:2,
+				grid:true,
+				form:true,
+                bottom_filter: true
+		},
+		{
+			config:{
 				name: 'nombres',
 				fieldLabel: 'Nombres',
-				allowBlank: false,
+				allowBlank: true,
 				anchor: '100%',
 				gwidth: 200,
 				maxLength:100
@@ -52,10 +68,11 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'primer_apellido',
                 fieldLabel: 'Primer Apellido',
-                allowBlank: false,
+                allowBlank: true,
                 anchor: '100%',
                 gwidth: 250,
-                maxLength:100
+                maxLength:100,
+                enableKeyEvents:true
             },
                 type:'TextField',
                 filters:{pfiltro:'cli.primer_apellido',type:'string'},
@@ -178,22 +195,7 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		},
 		
 		
-		{
-			config:{
-				name: 'nombre_factura',
-				fieldLabel: 'Nombre Factura',
-				allowBlank: true,
-				anchor: '100%',
-				gwidth: 100,
-				maxLength:100
-			},
-				type:'TextField',
-				filters:{pfiltro:'cli.nombre_factura',type:'string'},
-				id_grupo:2,
-				grid:true,
-				form:true,
-                bottom_filter: true
-		},
+		
 		
 		{
 			config:{
@@ -325,17 +327,17 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:false,
-	iniciarEventos : function() {
-	   this.Cmp.primer_apellido.on('blur',function(){
-	       if (this.Cmp.nombre_factura.getValue() == '') {
-	           this.Cmp.nombre_factura.setValue(this.Cmp.primer_apellido.getValue());
-	       }
-	       
-	   },this)  
+	fheight: '65%',
+	iniciarEventos : function() {		  
+	   this.Cmp.primer_apellido.on('keyup',function(){
+	       this.Cmp.nombre_factura.setValue(this.Cmp.primer_apellido.getValue());       
+	   },this);
+	    
 	},
 	rowExpander: new Ext.ux.grid.RowExpander({
             tpl : new Ext.Template(
                 '<br>',
+                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Segundo Apellido:&nbsp;&nbsp;</b> {segundo_apellido}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Correo:&nbsp;&nbsp;</b> {correo}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Otros Correos:&nbsp;&nbsp;</b> {otros_correos}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Telefono Celular:&nbsp;&nbsp;</b> {telefono_celular}, <b>Telefono Fijo</b>: {telefono_fijo}</p>',
@@ -348,8 +350,8 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
             )
     }),
     
-    arrayDefaultColumHidden:['otros_telefonos','otros_correos','telefono_celular','nombre_factura','estado_reg','telefono_fijo','correo','usuario_ai',
-    'fecha_reg','fecha_mod','usr_reg','usr_mod'],
+    arrayDefaultColumHidden:['otros_telefonos','otros_correos','telefono_celular','estado_reg','telefono_fijo','correo','usuario_ai',
+    'fecha_reg','fecha_mod','usr_reg','usr_mod','segundo_apellido'],
 
 	Grupos: [
             {

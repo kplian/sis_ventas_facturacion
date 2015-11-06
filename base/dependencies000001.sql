@@ -186,8 +186,43 @@ ALTER TABLE ONLY vef.tsucursal_moneda
     
 ALTER TABLE ONLY vef.tsucursal_moneda
     ADD CONSTRAINT fk_tsucursal_moneda__id_sucursal
-    FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(is_sucursal);  
+    FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(id_sucursal); 
 
+ALTER TABLE ONLY vef.tsucursal_producto
+    ADD CONSTRAINT fk_tsucursal_producto__id_concepto_ingas
+    FOREIGN KEY (id_concepto_ingas) REFERENCES param.tconcepto_ingas(id_concepto_ingas);  
+    
+ALTER TABLE ONLY param.tconcepto_ingas
+    ADD CONSTRAINT fk_tconcepto_ingas__id_actividad_economica
+    FOREIGN KEY (id_actividad_economica) REFERENCES vef.tactividad_economica(id_actividad_economica); 
+
+ALTER TABLE ONLY vef.tdosificacion
+    ADD CONSTRAINT fk_tdosificacion__id_sucursal
+    FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(id_sucursal);  
+    
+ALTER TABLE ONLY vef.tsucursal_usuario
+    ADD CONSTRAINT fk_tsucursal_usuario__id_punto_venta
+    FOREIGN KEY (id_punto_venta) REFERENCES vef.tpunto_venta(id_punto_venta); 
+
+ALTER TABLE ONLY vef.tforma_pago
+    ADD CONSTRAINT fk_tforma_pago__id_entidad
+    FOREIGN KEY (id_entidad) REFERENCES param.tentidad(id_entidad); 
+    
+ALTER TABLE ONLY vef.tforma_pago
+    ADD CONSTRAINT fk_tforma_pago__id_moneda
+    FOREIGN KEY (id_moneda) REFERENCES param.tmoneda(id_moneda);  
+    
+ALTER TABLE ONLY vef.tventa
+    ADD CONSTRAINT fk_tventa__id_punto_venta
+    FOREIGN KEY (id_punto_venta) REFERENCES vef.tpunto_venta(id_punto_venta); 
+
+ALTER TABLE ONLY vef.tventa_forma_pago
+    ADD CONSTRAINT fk_tventa_forma_pago__id_forma_pago
+    FOREIGN KEY (id_forma_pago) REFERENCES vef.tforma_pago(id_forma_pago); 
+    
+ALTER TABLE ONLY vef.tventa_forma_pago
+    ADD CONSTRAINT fk_tventa_forma_pago__id_venta
+    FOREIGN KEY (id_venta) REFERENCES vef.tventa(id_venta); 
 /************************************F-DEP-JRR-VEF-0-20/09/2015*************************************************/
 
 

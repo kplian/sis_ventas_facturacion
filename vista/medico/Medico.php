@@ -159,6 +159,22 @@ Phx.vista.Medico=Ext.extend(Phx.gridInterfaz,{
                 form:true
         },
         {
+			config:{
+				name: 'fecha_nacimiento',
+				fieldLabel: 'Fecha de Nacimiento',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 130,
+							format: 'd/m/Y', 
+							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			},
+				type:'DateField',
+				filters:{pfiltro:'med.fecha_nacimiento',type:'date'},
+				id_grupo:1,
+				grid:true,
+				form:true
+		},
+        {
             config:{
                 name: 'porcentaje',
                 fieldLabel: 'Porcentaje Comision',
@@ -306,6 +322,7 @@ Phx.vista.Medico=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombres', type: 'string'},
 		{name:'id_usuario_reg', type: 'numeric'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{name:'fecha_nacimiento', type: 'date',dateFormat:'Y-m-d'},
 		{name:'usuario_ai', type: 'string'},
 		{name:'id_usuario_ai', type: 'numeric'},
 		{name:'id_usuario_mod', type: 'numeric'},

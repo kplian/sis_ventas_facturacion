@@ -35,6 +35,10 @@ DECLARE
 	v_id_item_sucursal			integer;
     v_id_venta					integer;
     v_tiene_formula				varchar;
+    v_id_formula				integer;
+    v_id_item					integer;
+    v_id_sucursal_producto		integer;
+    
 	
 			    
 BEGIN
@@ -58,18 +62,23 @@ BEGIN
         		select sum(i.precio_ref*fd.cantidad) into v_precio
         		from vef.tformula_detalle fd
         		inner join alm.titem i on i.id_item = fd.id_item
-        		where fd.id_formula = v_parametros.id_formula and fd.estado_reg = 'activo';
+        		where fd.id_formula = v_parametros.id_producto and fd.estado_reg = 'activo';
+        		
+        		v_id_formula = v_parametros.id_producto;
         	
-        	elsif (v_parametros.tipo = 'servicio') then
+        	elsif (v_parametros.tipo = 'servicio' or 
+        		(v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'false'))then
         		select sp.precio into v_precio
         		from vef.tsucursal_producto sp 
-        		where sp.id_sucursal_producto = v_parametros.id_sucursal_producto;
+        		where sp.id_sucursal_producto = v_parametros.id_producto;
+        		
+        		v_id_sucursal_producto = v_parametros.id_producto;
         	else
         		select tiene_precios_x_sucursal,sp.precio into v_sucursal_define_precio, v_precio
         		from vef.tventa v
         		inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal
         		left join vef.tsucursal_producto sp on sp.id_sucursal = s.id_sucursal 
-        		where v.id_venta = v_parametros.id_venta and sp.id_item = v_parametros.id_item;
+        		where v.id_venta = v_parametros.id_venta and sp.id_item = v_parametros.id_producto;
         		
         		if (v_sucursal_define_precio = 'si') then
         			if (v_precio is null) then
@@ -78,13 +87,14 @@ BEGIN
         		else
         			select precio_ref into v_precio
         			from alm.titem i
-        			where i.id_item = v_parametros.id_item;
+        			where i.id_item = v_parametros.id_producto;
         			if (v_precio is null) then
         				raise exception 'El item seleccionado no tiene precio referencial';
         			end if;
         			
         		
-        		end if;        		
+        		end if;  
+        		v_id_item = v_id_producto;      		
         	
         	end if;
         	--Sentencia de la insercion
@@ -97,21 +107,19 @@ BEGIN
 			estado_reg,
 			cantidad,
 			precio,
-			sw_porcentaje_formula,
 			fecha_reg,
 			id_usuario_reg,
 			id_usuario_mod,
 			fecha_mod
           	) values(
 			v_parametros.id_venta,
-			v_parametros.id_item,
-			v_parametros.id_sucursal_producto,
-			v_parametros.id_formula,
+			v_id_item,
+			v_id_sucursal_producto,
+			v_id_formula,
 			v_parametros.tipo,
 			'activo',
 			v_parametros.cantidad_det,
 			v_precio,
-			v_parametros.sw_porcentaje_formula,
 			now(),
 			p_id_usuario,
 			null,

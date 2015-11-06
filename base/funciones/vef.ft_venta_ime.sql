@@ -50,6 +50,17 @@ DECLARE
     v_id_estado_actual		integer;
     v_codigo_estado_siguiente varchar;
     v_obs					text;
+    v_id_cliente			integer;
+    v_venta					record;
+    v_suma_fp				numeric;
+    v_suma_det				numeric;
+    v_registros				record;    
+    v_id_sucursal			integer;
+    v_cantidad_fp			integer;
+    v_acumulado_fp			numeric;
+    v_monto_fp				numeric;
+    v_a_cuenta				numeric;
+    v_fecha_estimada_entrega date;
 			    
 BEGIN
 
@@ -67,6 +78,54 @@ BEGIN
 					
         begin
         
+        if (v_parametros.id_punto_venta is not null) then
+        	select id_sucursal into v_id_sucursal
+        	from vef.tpunto_venta
+        	where id_punto_venta = v_parametros.id_punto_venta;
+        else
+	        v_id_sucursal = v_parametros.id_sucursal;
+	        
+        end if;
+        
+        if (pxp.f_existe_parametro(p_tabla,'a_cuenta')) then
+        	v_a_cuenta = v_parametros.a_cuenta;
+        else
+        	v_a_cuenta = 0;
+        end if;
+        
+        if (pxp.f_existe_parametro(p_tabla,'fecha_estimada_entrega')) then
+        	v_fecha_estimada_entrega = v_parametros.fecha_estimada_entrega;
+        else
+        	v_fecha_estimada_entrega = now();
+        end if;
+        
+        
+        
+        if (pxp.f_is_positive_integer(v_parametros.id_cliente)) THEN
+        	v_id_cliente = v_parametros.id_cliente::integer;
+            
+            update vef.tcliente
+            set nit = v_parametros.nit
+            where id_cliente = v_id_cliente;
+        else
+        	INSERT INTO 
+              vef.tcliente
+            (
+              id_usuario_reg,              
+              fecha_reg,              
+              estado_reg, 
+              nombre_factura,
+              nit
+            )
+            VALUES (
+              p_id_usuario,
+              now(),
+              'activo',              
+              v_parametros.id_cliente,
+              v_parametros.nit
+            ) returning id_cliente into v_id_cliente;
+        	
+        end if;
         --obtener gestion a partir de la fecha actual
         select id_gestion into v_id_gestion
         from param.tgestion
@@ -116,26 +175,67 @@ BEGIN
 			id_usuario_ai,
 			id_usuario_mod,
 			fecha_mod,
-			estado
+			estado,
+			id_punto_venta
           	) values(
             v_id_venta,
-			v_parametros.id_cliente,
-			v_parametros.id_sucursal,
+			v_id_cliente,
+			v_id_sucursal,
 			v_id_proceso_wf,
 			v_id_estado_wf,
 			'activo',
 			v_num_tramite,
-			v_parametros.a_cuenta,			
-			v_parametros.fecha_estimada_entrega,
+			v_a_cuenta,			
+			v_fecha_estimada_entrega,
 			v_parametros._nombre_usuario_ai,
 			now(),
 			p_id_usuario,
 			v_parametros._id_usuario_ai,
 			null,
 			null,
-			v_codigo_estado		
+			v_codigo_estado,
+			v_parametros.id_punto_venta		
 			
-			);
+			) returning id_venta into v_id_venta;
+			
+			if (v_parametros.id_forma_pago != 0 ) then
+				if (v_parametros.monto_forma_pago = 0 ) then
+					raise exception 'El importe recibido no puede ser 0';
+				end if;
+				insert into vef.tventa_forma_pago(
+					usuario_ai,
+					fecha_reg,
+					id_usuario_reg,
+					id_usuario_ai,
+					estado_reg,
+					id_forma_pago,
+					id_venta,
+					monto_transaccion,
+					monto,
+					cambio,
+					monto_mb_efectivo,
+					numero_tarjeta,
+					codigo_tarjeta,
+					tipo_tarjeta
+				)	
+				values(
+					v_parametros._nombre_usuario_ai,
+					now(),
+					p_id_usuario,
+					v_parametros._id_usuario_ai,
+					'activo',
+                    v_parametros.id_forma_pago,
+					v_id_venta,                    
+					v_parametros.monto_forma_pago,
+					0,
+					0,
+					0,
+					v_parametros.numero_tarjeta,
+					v_parametros.codigo_tarjeta,
+					v_parametros.tipo_tarjeta
+				);
+			end if;
+			
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas almacenado(a) con exito (id_venta'||v_id_venta||')'); 
@@ -156,17 +256,109 @@ BEGIN
 	elsif(p_transaccion='VF_VEN_MOD')then
 
 		begin
+        	
+			if (v_parametros.id_punto_venta is not null) then
+	        	select id_sucursal into v_id_sucursal
+	        	from vef.tpunto_venta
+	        	where id_punto_venta = v_parametros.id_punto_venta;
+	        else
+	        	v_id_sucursal = v_parametros.id_sucursal;
+	        end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'a_cuenta')) then
+                v_a_cuenta = v_parametros.a_cuenta;
+            else
+                v_a_cuenta = 0;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'fecha_estimada_entrega')) then
+                v_fecha_estimada_entrega = v_parametros.fecha_estimada_entrega;
+            else
+                v_fecha_estimada_entrega = now();
+            end if;
+            
+			if (pxp.f_is_positive_integer(v_parametros.id_cliente)) THEN
+	        	v_id_cliente = v_parametros.id_cliente::integer;
+	            
+	            update vef.tcliente
+	            set nit = v_parametros.nit
+	            where id_cliente = v_id_cliente;
+	        else
+	        	INSERT INTO 
+	              vef.tcliente
+	            (
+	              id_usuario_reg,              
+	              fecha_reg,              
+	              estado_reg, 
+	              nombre_factura,
+	              nit
+	            )
+	            VALUES (
+	              p_id_usuario,
+	              now(),
+	              'activo',              
+	              v_parametros.id_cliente,
+	              v_parametros.nit
+	            ) returning id_cliente into v_id_cliente;
+	        	
+	        end if;
+	        
+	        
+	        
 			--Sentencia de la modificacion
 			update vef.tventa set
-			id_cliente = v_parametros.id_cliente,
-			id_sucursal = v_parametros.id_sucursal,
-			a_cuenta = v_parametros.a_cuenta,
-			fecha_estimada_entrega = v_parametros.fecha_estimada_entrega,
+			id_cliente = v_id_cliente,
+			id_sucursal = v_id_sucursal,
+			a_cuenta = v_a_cuenta,
+			fecha_estimada_entrega = v_fecha_estimada_entrega,
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
 			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+			usuario_ai = v_parametros._nombre_usuario_ai,
+			id_punto_venta = v_parametros.id_punto_venta
 			where id_venta=v_parametros.id_venta;
+			
+			if (v_parametros.id_forma_pago != 0 ) then
+				if (v_parametros.monto_forma_pago = 0 ) then
+					raise exception 'El importe recibido no puede ser 0';
+				end if;
+                
+                delete from vef.tventa_forma_pago 
+                where id_venta = v_parametros.id_venta;
+                
+				insert into vef.tventa_forma_pago(
+					usuario_ai,
+					fecha_reg,
+					id_usuario_reg,
+					id_usuario_ai,
+					estado_reg,
+					id_forma_pago,
+					id_venta,
+					monto_transaccion,
+					monto,
+					cambio,
+					monto_mb_efectivo,
+                    numero_tarjeta,
+					codigo_tarjeta,
+					tipo_tarjeta
+				)	
+				values(
+					v_parametros._nombre_usuario_ai,
+					now(),
+					p_id_usuario,
+					v_parametros._id_usuario_ai,
+					'activo',
+                    v_parametros.id_forma_pago,
+					v_parametros.id_venta,
+					v_parametros.monto_forma_pago,
+					0,
+					0,
+					0,
+                    v_parametros.numero_tarjeta,
+					v_parametros.codigo_tarjeta,
+					v_parametros.tipo_tarjeta
+				);
+			end if;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas modificado(a)'); 
@@ -194,6 +386,140 @@ BEGIN
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas eliminado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+	
+	/*********************************    
+ 	#TRANSACCION:  'VF_VEALLFORPA_ELI'
+ 	#DESCRIPCION:	Eliminacion de formas de pago relacionadas a una venta
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VEALLFORPA_ELI')then
+
+		begin
+			--Sentencia de la eliminacion
+			delete from vef.tventa_forma_pago
+            where id_venta=v_parametros.id_venta;
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas forma de pago eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+	
+	/*********************************    
+ 	#TRANSACCION:  'VF_VEALLDET_ELI'
+ 	#DESCRIPCION:	Eliminacion de los detalles relacionados a una venta
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VEALLDET_ELI')then
+
+		begin
+			--Sentencia de la eliminacion
+			delete from vef.tventa_detalle
+            where id_venta=v_parametros.id_venta;
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas detalle eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+		
+	/*********************************    
+ 	#TRANSACCION:  'VF_VENVALI_MOD'
+ 	#DESCRIPCION:	Validacion de montos en una venta
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VENVALI_MOD')then
+
+		begin
+			select v.* ,sm.id_moneda as id_moneda_base,m.codigo  as moneda into v_venta
+			from vef.tventa v
+			inner join vef.tsucursal suc on suc.id_sucursal = v.id_sucursal
+			inner join vef.tsucursal_moneda sm on suc.id_sucursal = v.id_sucursal and sm.tipo_moneda = 'moneda_base'
+			inner join param.tmoneda m on m.id_moneda = sm.id_moneda
+			where id_venta = v_parametros.id_venta;
+			
+			select count(*) into v_cantidad_fp
+            from vef.tventa_forma_pago
+            where id_venta =   v_parametros.id_venta;
+			
+			v_acumulado_fp = 0;
+			
+			for v_registros in (select vfp.id_venta_forma_pago, fp.id_moneda,vfp.monto_transaccion
+								from vef.tventa_forma_pago vfp
+								inner join vef.tforma_pago fp on fp.id_forma_pago = vfp.id_forma_pago								
+								where vfp.id_venta = v_parametros.id_venta)loop
+				if (v_registros.id_moneda != v_venta.id_moneda_base) then
+					v_monto_fp = param.f_get_tipo_cambio(v_registros.id_moneda,v_venta.fecha_reg::date,NULL) * v_registros.monto_transaccion;
+				else
+					v_monto_fp = v_registros.monto_transaccion;
+				end if;
+				
+				if (v_monto_fp >= v_venta.total_venta and v_cantidad_fp > 1) then
+					raise exception 'Se ha definido mas de una forma de pago, pero existe una que supera el valor de la venta(solo se requiere una forma de pago)';
+				end if;
+				
+				update vef.tventa_forma_pago set
+				monto = v_monto_fp,
+				cambio = (case when (v_monto_fp + v_acumulado_fp - v_venta.total_venta) > 0 then
+						 	(v_monto_fp + v_acumulado_fp - v_venta.total_venta)
+						 else
+						 	0
+						 end),
+				monto_mb_efectivo = (case when (v_monto_fp + v_acumulado_fp - v_venta.total_venta) > 0 then
+									 	v_monto_fp - (v_monto_fp + v_acumulado_fp - v_venta.total_venta)
+									 else
+									 	v_monto_fp
+									 end)
+				where id_venta_forma_pago = v_registros.id_venta_forma_pago;
+                v_acumulado_fp = v_acumulado_fp + v_monto_fp;
+			end loop;
+			
+            select sum(monto_mb_efectivo) into v_suma_fp
+            from vef.tventa_forma_pago
+            where id_venta =   v_parametros.id_venta;
+            
+            select sum(cantidad*precio) into v_suma_det
+            from vef.tventa_detalle
+            where id_venta =   v_parametros.id_venta;
+            
+            if (v_suma_fp < v_venta.total_venta) then
+            	raise exception 'El importe recibido es menor al valor de la venta';
+            end if;
+            
+            if (v_suma_fp > v_venta.total_venta) then
+            	raise exception 'El total de la venta no coincide con la división por forma de pago%',v_suma_fp;
+            end if;
+            
+            if (v_suma_det != v_venta.total_venta) then
+            	raise exception 'El total de la venta no coincide con la suma de los detalles';
+            end if;
+            
+            select sum(cambio) into v_suma_fp
+            from vef.tventa_forma_pago
+            where id_venta =   v_parametros.id_venta;
+            
+             
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'cambio',(v_suma_fp::varchar || ' ' || v_venta.moneda)::varchar);
               
             --Devuelve la respuesta
             return v_resp;

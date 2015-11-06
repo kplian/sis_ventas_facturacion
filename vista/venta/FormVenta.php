@@ -12,15 +12,63 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     ActSave:'../../sis_ventas_facturacion/control/Venta/insertarVentaCompleta',
-    tam_pag: 10,
-    //layoutType: 'wizard',
+    tam_pag: 10,    
     layout: 'fit',
+    tabEnter: true,
     autoScroll: false,
     breset: false,
     labelSubmit: '<i class="fa fa-check"></i> Guardar',
+    storeFormaPago : false,
     constructor:function(config)
     {   
+        Ext.apply(this,config);
         
+        if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {  
+        	
+			this.Atributos.push({
+	            config: {
+	                name: 'id_punto_venta',
+	                fieldLabel: 'Punto de Venta',
+	                allowBlank: false,
+	                emptyText: 'Elija un Pun...',
+	                store: new Ext.data.JsonStore({
+	                    url: '../../sis_ventas_facturacion/control/PuntoVenta/listarPuntoVenta',
+	                    id: 'id_punto_venta',
+	                    root: 'datos',
+	                    sortInfo: {
+	                        field: 'nombre',
+	                        direction: 'ASC'
+	                    },
+	                    totalProperty: 'total',
+	                    fields: ['id_punto_venta', 'nombre', 'codigo'],
+	                    remoteSort: true,
+	                    baseParams: {filtro_usuario: 'si',par_filtro: 'puve.nombre#puve.codigo'}
+	                }),
+	                valueField: 'id_punto_venta',
+	                displayField: 'nombre',
+	                gdisplayField: 'nombre_punto_venta',
+	                hiddenName: 'id_punto_venta',
+	                forceSelection: true,
+	                typeAhead: false,
+	                triggerAction: 'all',
+	                lazyRender: true,
+	                mode: 'remote',
+	                pageSize: 15,
+	                queryDelay: 1000,               
+	                gwidth: 150,
+	                minChars: 2,
+	                renderer : function(value, p, record) {
+	                    return String.format('{0}', record.data['nombre_punto_venta']);
+	                }
+	            },
+	            type: 'ComboBox',
+	            id_grupo: 1,
+	            filters: {pfiltro: 'puve.nombre',type: 'string'},
+	            grid: true,
+	            form: true
+	        });
+		}
+		this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
         this.addEvents('beforesave');
         this.addEvents('successsave');
         
@@ -31,51 +79,34 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         Phx.vista.FormVenta.superclass.constructor.call(this,config);
         this.init();    
         this.iniciarEventos();
+        
         //this.iniciarEventosDetalle();
         //this.onNew();
+        
+        if(this.data.tipo_form == 'new'){
+        	this.onNew();
+        }
+        else{
+        	this.onEdit();
+        }
+        
+        if(this.data.readOnly===true){
+        	for(var index in this.Cmp) { 
+					if( this.Cmp[index].setReadOnly){
+					    	 this.Cmp[index].setReadOnly(true);
+					   }
+			}
+			
+			this.megrid.getTopToolbar().disable();
+					
+        }
+        if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {          	
+        	this.Cmp.id_sucursal.allowBlank = true;
+        	this.Cmp.id_sucursal.setDisabled(true);
+        }
                 
     },
-    iniciarEventos : function () {
-        this.Cmp.id_sucursal.store.load({params:{start:0,limit:this.tam_pag}, 
-           callback : function (r) {
-                if (r.length == 1 ) {                       
-                    this.Cmp.id_sucursal.setValue(r[0].data.id_sucursal);
-                    this.detCmp.id_item.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
-                    this.detCmp.id_sucursal_producto.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
-                    this.Cmp.id_sucursal.fireEvent('select', r[0]);
-                }    
-                                
-            }, scope : this
-        });
-        this.detCmp.tipo.on('select',function(c,r,i) {
-            this.cambiarCombo(r.data.field1);
-        },this);
-        
-        this.detCmp.id_item.on('select',function(c,r,i) {
-            this.detCmp.precio_unitario.setValue(Number(r.data.precio_ref));
-            this.detCmp.precio_total.setValue(Number(r.data.precio_ref) * Number(this.detCmp.cantidad.getValue()));
-        },this);
-        
-        this.detCmp.id_formula.on('select',function(c,r,i) {
-            if (r.data.precio == '' || r.data.precio == undefined) {
-                alert('La formula seleccionada no tiene ningun detalle y no puede ser utilizada');
-                this.detCmp.id_formula.reset();
-            } else {
-                this.detCmp.precio_unitario.setValue(Number(r.data.precio));
-                this.detCmp.precio_total.setValue(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()));
-            }
-            
-        },this);
-        
-        this.detCmp.id_sucursal_producto.on('select',function(c,r,i) {
-            this.detCmp.precio_unitario.setValue(Number(r.data.precio));
-            this.detCmp.precio_total.setValue(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()));
-        },this);
-        
-        this.detCmp.cantidad.on('keyup',function() {  
-            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
-        },this);
-    },
+    
     buildComponentesDetalle: function(){
         this.detCmp = {
                     'tipo': new Ext.form.ComboBox({
@@ -88,124 +119,45 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                             lazyRender:true,
                             mode: 'local',
                             gwidth: 150,
-                            store:['producto_terminado','formula', 'servicio']
+                            store:this.tipoDetalleArray
                     }),
-                    'id_item': new Ext.form.ComboBox({
-                                            name : 'id_item',
-                                            fieldLabel : 'Item',
-                                            allowBlank : false,
-                                            msgTarget: 'title',
-                                            emptyText : 'Elija un Item...',
-                                            store : new Ext.data.JsonStore({
-                                                url : '../../sis_almacenes/control/Item/listarItemNotBase',
-                                                id : 'id_item',
-                                                root : 'datos',
-                                                sortInfo : {
-                                                    field : 'nombre',
-                                                    direction : 'ASC'
-                                                },
-                                                totalProperty : 'total',
-                                                fields : ['id_item', 'nombre', 'codigo', 'precio_ref', 'codigo_unidad'],
-                                                remoteSort : true,
-                                                baseParams : {
-                                                    par_filtro : 'item.nombre#item.codigo#cla.nombre'
-                                                }
-                                            }),
-                                            valueField : 'id_item',
-                                            displayField : 'nombre',                                           
-                                            qtip:'Seleccione un item',
-                                            tpl : '<tpl for="."><div class="x-combo-list-item"><p>Nombre: {nombre}</p><p>Código: {codigo}</p><p>Precio.: {precio_ref}</p></div></tpl>',
-                                            hiddenName : 'id_item',
-                                            forceSelection : true,
-                                            typeAhead : false,
-                                            triggerAction : 'all',
-                                            lazyRender : true,
-                                            mode : 'remote',
-                                            pageSize : 10,
-                                            queryDelay : 1000,                
-                                            minChars : 2,                                        
-                                            resizable: true,
-                                            disabled:true
-                                         }),
                     
-                    
-                   'id_formula': new Ext.form.TrigguerCombo({
-                                            name : 'id_formula',
-                                            fieldLabel : 'Formula',
-                                            allowBlank : false,
-                                            emptyText : 'Elija una formula...',
-                                            store : new Ext.data.JsonStore({
-                                                url : '../../sis_ventas_facturacion/control/Formula/listarFormula',
-                                                id : 'id_formula',
-                                                root : 'datos',
-                                                sortInfo : {
-                                                    field : 'nombre',
-                                                    direction : 'ASC'
-                                                },
-                                                totalProperty : 'total',
-                                                fields : ['id_formula', 'nombre', 'descripcion', 'precio'],
-                                                remoteSort : true,
-                                                baseParams : {
-                                                    par_filtro : 'form.nombre#form.descripcion'
-                                                }
-                                            }),
-                                            valueField : 'id_formula',
-                                            displayField : 'nombre',
-                                            gdisplayField : 'nombre_formula',
-                                            tpl : '<tpl for="."><div class="x-combo-list-item"><p>Nombre: {nombre}</p><p>Descripción: {descripcion}</p><p>Precio.: {precio}</p></div></tpl>',
-                                            hiddenName : 'id_formula',
-                                            forceSelection : true,
-                                            typeAhead : false,
-                                            triggerAction : 'all',
-                                            lazyRender : true,
-                                            mode : 'remote',
-                                            pageSize : 10,
-                                            queryDelay : 1000,
-                                            anchor : '100%',
-                                            gwidth : 200,
-                                            minChars : 2,
-                                            turl : '../../../sis_ventas_facturacion/vista/formula/Formula.php',  
-                                            tasignacion : true,           
-                                            tname : 'id_formula',
-                                            ttitle : 'Formula',
-                                            tdata : {},
-                                            tcls : 'Formula',
-                                            pid : this.idContenedor,                                            
-                                            resizable: true,
-                                            disabled:true
-                                         }),
-                    'id_sucursal_producto': new Ext.form.ComboBox({
-                                            name: 'id_sucursal_producto',
-                                            fieldLabel: 'Servicio',
+                    'id_producto': new Ext.form.ComboBox({
+                                            name: 'id_producto',
+                                            fieldLabel: 'Producto/Servicio',
                                             allowBlank: false,
-                                            emptyText: 'Servicios...',
+                                            emptyText: 'Productos...',
                                             store: new Ext.data.JsonStore({
-                                                url: '../../sis_ventas_facturacion/control/SucursalProducto/listarSucursalProducto',
-                                                id: 'id_sucursal_producto',
+                                                url: '../../sis_ventas_facturacion/control/SucursalProducto/listarProductoServicioItem',
+                                                id: 'id_producto',
                                                 root: 'datos',
                                                 sortInfo: {
                                                     field: 'nombre',
                                                     direction: 'ASC'
                                                 },
                                                 totalProperty: 'total',
-                                                fields: ['id_sucursal_producto', 'nombre_producto', 'precio'],
+                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico', 'precio'],
                                                 remoteSort: true,
-                                                baseParams: {par_filtro: 'sprod.nombre_producto'}
+                                                baseParams: {par_filtro: 'todo.nombre'}
                                             }),
-                                            valueField: 'id_sucursal_producto',
+                                            valueField: 'id_producto',
                                             displayField: 'nombre_producto',
                                             gdisplayField: 'nombre_producto',
-                                            hiddenName: 'id_sucursal_producto',
+                                            hiddenName: 'id_producto',
                                             forceSelection: true,
-                                            tpl : '<tpl for="."><div class="x-combo-list-item"><p>Nombre: {nombre_producto}</p><p>Precio.: {precio}</p></div></tpl>',
+                                            tpl : new Ext.XTemplate('<tpl for="."><div class="x-combo-list-item">','<tpl if="tipo == \'formula\'">',
+                                            '<p><b>Medico:</b> {medico}</p>','</tpl>',
+                                            '<p><b>Nombre:</b> {nombre_producto}</p><p><b>Descripcion:</b> {descripcion}</p><p><b>Precio:</b> {precio}</p></div></tpl>'),
                                             typeAhead: false,
                                             triggerAction: 'all',
                                             lazyRender: true,
                                             mode: 'remote',
+                                            resizable:true,
                                             pageSize: 15,
                                             queryDelay: 1000,
                                             anchor: '100%',
-                                            gwidth: 150,
+                                            width : 250,
+                                            listWidth:'450',
                                             minChars: 2 ,
                                             disabled:true                                           
                                          }),
@@ -237,70 +189,157 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                         allowDecimals: false,
                                         maxLength:10,
                                         readOnly :true
-                                }),
-                    
-                    'sw_porcentaje_formula': new Ext.form.ComboBox({
-                            name: 'sw_porcentaje_formula',
-                            fieldLabel: 'Comisión',
-                            allowBlank:false,
-                            emptyText:'Aplicar Comisión...',                
-                            triggerAction: 'all',
-                            lazyRender:true,
-                            mode: 'local',
-                            gwidth: 150,
-                            store:['no','si'],
-                            disabled :true
-                    }),
+                                })
                     
               }
             
             
     }, 
     
+    iniciarEventos : function () {
+    	if (this.data.objPadre.variables_globales.vef_tiene_punto_venta != 'true') {  
+	        this.Cmp.id_sucursal.store.load({params:{start:0,limit:this.tam_pag}, 
+	           callback : function (r) {
+	           		console.log(r.getById(this.data.objPadre.variables_globales.id_sucursal));
+	           		this.Cmp.id_sucursal.setValue(this.data.objPadre.variables_globales.id_sucursal);
+	           		this.detCmp.id_producto.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
+	                this.Cmp.id_sucursal.fireEvent('select',this.Cmp.id_sucursal, this.Cmp.id_sucursal.store.getById(this.data.objPadre.variables_globales.id_sucursal));	                   
+	                                
+	            }, scope : this
+	        });
+	    }
+        if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {
+	        this.Cmp.id_punto_venta.store.load({params:{start:0,limit:this.tam_pag}, 
+	           callback : function (r) {
+	           		console.log(this.Cmp.id_punto_venta.store.getById(this.data.objPadre.variables_globales.id_punto_venta));
+	                this.Cmp.id_punto_venta.setValue(this.data.objPadre.variables_globales.id_punto_venta);
+	           		this.detCmp.id_producto.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+	                this.Cmp.id_punto_venta.fireEvent('select',this.Cmp.id_punto_venta, this.Cmp.id_punto_venta.store.getById(this.data.objPadre.variables_globales.id_punto_venta));   
+	                                
+	            }, scope : this
+	        });
+	    }
+	    
+	    this.Cmp.id_punto_venta.on('select',function(c,r,i) {
+	    	if (this.accionFormulario != 'EDIT') {
+            	this.Cmp.id_forma_pago.store.baseParams.defecto = 'si';
+           }
+            this.cargarFormaPago();
+            
+        },this);
+        
+        this.Cmp.id_forma_pago.on('select',function(c,r,i) {
+            if (r.data.registrar_tarjeta == 'si' || r.data.registrar_cc == 'si') {
+            	this.mostrarComponente(this.Cmp.numero_tarjeta);
+            	this.Cmp.numero_tarjeta.allowBlank = false;
+            	if (r.data.registrar_tarjeta == 'si') {
+	            	this.mostrarComponente(this.Cmp.codigo_tarjeta);
+	            	this.mostrarComponente(this.Cmp.tipo_tarjeta);
+	            	
+	            	this.Cmp.codigo_tarjeta.allowBlank = false;
+	            	this.Cmp.tipo_tarjeta.allowBlank = false;
+	            } else {
+	            	this.Cmp.codigo_tarjeta.allowBlank = true;
+            		this.Cmp.tipo_tarjeta.allowBlank = true;
+            		this.ocultarComponente(this.Cmp.codigo_tarjeta);
+            		this.ocultarComponente(this.Cmp.tipo_tarjeta);
+            		this.Cmp.codigo_tarjeta.reset();
+            		this.Cmp.tipo_tarjeta.reset();
+	            }
+            } else {
+            	this.ocultarComponente(this.Cmp.numero_tarjeta);
+            	this.ocultarComponente(this.Cmp.codigo_tarjeta);
+            	this.ocultarComponente(this.Cmp.tipo_tarjeta);
+            	this.Cmp.numero_tarjeta.allowBlank = true;
+            	this.Cmp.codigo_tarjeta.allowBlank = true;
+            	this.Cmp.tipo_tarjeta.allowBlank = true;
+            	this.Cmp.numero_tarjeta.reset();
+            	this.Cmp.codigo_tarjeta.reset();
+            	this.Cmp.tipo_tarjeta.reset();
+            }
+        },this);
+        
+        this.Cmp.id_sucursal.on('select',function(c,r,i) {
+        	if (this.accionFormulario != 'EDIT') {
+            	this.Cmp.id_forma_pago.store.baseParams.defecto = 'si';
+            }
+            this.cargarFormaPago();
+            
+        },this);
+        
+        this.detCmp.tipo.on('select',function(c,r,i) {
+            this.cambiarCombo(r.data.field1);
+        },this);       
+        
+        this.Cmp.id_cliente.on('select',function(c,r,i) {
+            this.Cmp.nit.setValue(r.data.nit);            
+        },this);      
+        
+        
+        this.detCmp.id_producto.on('select',function(c,r,i) {
+            this.detCmp.precio_unitario.setValue(Number(r.data.precio));
+            this.detCmp.precio_total.setValue(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()));
+        },this);
+        
+        this.detCmp.cantidad.on('keyup',function() {  
+            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
+        },this);
+    },    
+    
     cambiarCombo : function (tipo) {
-        if (tipo == 'formula') {
-            this.detCmp.id_formula.setDisabled(false);            
-            this.detCmp.id_formula.allowBlank = false;
-            
-            this.detCmp.id_sucursal_producto.setDisabled(true); 
-            this.detCmp.id_sucursal_producto.allowBlank = true;
-            this.detCmp.id_sucursal_producto.reset();
-            
-            this.detCmp.id_item.setDisabled(true); 
-            this.detCmp.id_item.allowBlank = true;
-            this.detCmp.id_item.reset();
-            
-            this.detCmp.sw_porcentaje_formula.setDisabled(false);
-            this.detCmp.sw_porcentaje_formula.setValue('si');
-        } else if (tipo == 'producto_terminado') {
-            this.detCmp.id_formula.setDisabled(true);            
-            this.detCmp.id_formula.allowBlank = true;
-            this.detCmp.id_formula.reset();
-            
-            this.detCmp.id_sucursal_producto.setDisabled(true); 
-            this.detCmp.id_sucursal_producto.allowBlank = true;
-            this.detCmp.id_sucursal_producto.reset();
-            
-            this.detCmp.id_item.setDisabled(false); 
-            this.detCmp.id_item.allowBlank = false;            
-            
-            this.detCmp.sw_porcentaje_formula.setDisabled(true);
-            this.detCmp.sw_porcentaje_formula.setValue('no');
-        } else {
-            this.detCmp.id_formula.setDisabled(true);            
-            this.detCmp.id_formula.allowBlank = true;
-            this.detCmp.id_formula.reset();
-            
-            this.detCmp.id_sucursal_producto.setDisabled(false); 
-            this.detCmp.id_sucursal_producto.allowBlank = false;            
-            
-            this.detCmp.id_item.setDisabled(true); 
-            this.detCmp.id_item.allowBlank = true;  
-            this.detCmp.id_sucursal_producto.reset();          
-            
-            this.detCmp.sw_porcentaje_formula.setDisabled(true);
-            this.detCmp.sw_porcentaje_formula.setValue('no');
-        }
+    	this.detCmp.id_producto.setDisabled(false);
+    	this.detCmp.id_producto.store.baseParams.tipo = tipo;
+    	if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') { 
+    		this.detCmp.id_producto.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+    	} else {
+    		this.detCmp.id_sucursal.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
+    	}
+    	this.detCmp.id_producto.modificado = true;
+    	this.detCmp.id_producto.reset();
+    },
+    cargarFormaPago : function () {
+    	this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+    	this.Cmp.id_forma_pago.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
+    	
+    	if (this.accionFormulario == 'EDIT' && this.Cmp.id_forma_pago.getValue() == '0') {
+    		this.ocultarComponente(this.Cmp.numero_tarjeta);
+        	this.ocultarComponente(this.Cmp.codigo_tarjeta);
+        	this.ocultarComponente(this.Cmp.tipo_tarjeta);
+        	this.Cmp.numero_tarjeta.allowBlank = false;
+        	this.Cmp.codigo_tarjeta.allowBlank = false;
+        	this.Cmp.tipo_tarjeta.allowBlank = false;
+        	this.Cmp.numero_tarjeta.reset();
+        	this.Cmp.codigo_tarjeta.reset();
+        	this.Cmp.tipo_tarjeta.reset();        	
+        	this.Cmp.monto_forma_pago.setDisabled(true);        	
+        	this.Cmp.id_forma_pago.setDisabled(true);
+        	this.Cmp.tipo_tarjeta.setDisabled(true);
+      } else {
+    	
+	    	this.Cmp.id_forma_pago.store.load({params:{start:0,limit:this.tam_pag}, 
+		           callback : function (r) {
+		           		if (this.accionFormulario != 'EDIT') {
+		           			if (r.length == 1 ) {                       
+			                    this.Cmp.id_forma_pago.setValue(r[0].data.id_forma_pago); 
+			                    this.Cmp.id_forma_pago.fireEvent('select', this.Cmp.id_forma_pago,r[0],0);
+			                }
+		           		} else {		           		
+		           			this.Cmp.id_forma_pago.fireEvent('select', this.Cmp.id_forma_pago,this.Cmp.id_forma_pago.store.getById(this.Cmp.id_forma_pago.getValue()),0);
+		           		}
+		                
+		                this.Cmp.id_forma_pago.store.baseParams.defecto = 'no';  
+		                this.Cmp.id_forma_pago.modificado = true;
+		                                
+		            }, scope : this
+		        });
+		}
+    },
+    
+    onInitAdd: function(){
+    	if(this.data.readOnly===true){
+    		return false
+    	}
+    	
     },
     
     onCancelAdd: function(re,save){
@@ -309,33 +348,51 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         }
         
         this.sw_init_add = false;
-        //this.evaluaGrilla();
+        this.evaluaGrilla();
     },
+    
+    
     onUpdateRegister: function(){
         this.sw_init_add = false;
     },
     
     onAfterEdit:function(re, o, rec, num){
-        //set descriptins values ...  in combos boxs
+        //set descriptins values ...  in combos boxs       
         
-        var cmb_rec = this.detCmp['id_item'].store.getById(rec.get('id_item'));
-        if(cmb_rec) {
-            
-            rec.set('nombre_item', cmb_rec.get('nombre')); 
-        }
-        
-        cmb_rec = this.detCmp['id_formula'].store.getById(rec.get('id_formula'));
-        if(cmb_rec) {
-            
-            rec.set('nombre_formula', cmb_rec.get('nombre')); 
-        }
-        
-        cmb_rec = this.detCmp['id_sucursal_producto'].store.getById(rec.get('id_sucursal_producto'));
+        cmb_rec = this.detCmp['id_producto'].store.getById(rec.get('id_producto'));
         if(cmb_rec) {
             
             rec.set('nombre_producto', cmb_rec.get('nombre_producto')); 
-        }               
+        }
+                     
         
+    },
+    evaluaRequistos: function(){
+    	//valida que todos los requistosprevios esten completos y habilita la adicion en el grid
+     	var i = 0;
+    	sw = true,
+    	me =this;
+    	while( i < me.Componentes.length) {
+    		
+    		if(me.Componentes[i] &&!me.Componentes[i].isValid()){
+    		   sw = false;
+    		   //i = this.Componentes.length;
+    		}
+    		i++;
+    	}
+    	return sw
+    },
+    bloqueaRequisitos: function(sw){
+    	this.Cmp.id_sucursal.setDisabled(sw);    	
+    	
+    },    
+    
+    evaluaGrilla: function(){
+    	//al eliminar si no quedan registros en la grilla desbloquea los requisitos en el maestro
+    	var  count = this.mestore.getCount();
+    	if(count == 0){
+    		this.bloqueaRequisitos(false);
+    	} 
     },
         
     buildDetailGrid: function(){
@@ -345,19 +402,10 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                         name: 'cantidad',
                         type: 'int'
                     }, {
-                        name: 'id_item',
+                        name: 'id_producto',
                         type: 'int'
-                    }, {
-                        name: 'id_sucursal_producto',
-                        type: 'int'
-                    }, {
-                        name: 'id_formula',
-                        type: 'int'
-                    }, {
+                    },{
                         name: 'tipo',
-                        type: 'string'
-                    }, {
-                        name: 'sw_porcentaje_formula',
                         type: 'string'
                     }
                     ]);
@@ -369,19 +417,14 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                     totalProperty: 'total',
                     fields: [
                         {name:'id_venta_detalle', type: 'numeric'},
-                        {name:'id_venta', type: 'numeric'},
-                        {name:'id_item', type: 'numeric'},
-                        {name:'nombre_item', type: 'string'},
-                        {name:'nombre_formula', type: 'string'},
+                        {name:'id_venta', type: 'numeric'}, 
                         {name:'nombre_producto', type: 'string'},
-                        {name:'id_sucursal_producto', type: 'numeric'},
-                        {name:'id_formula', type: 'numeric'},
+                        {name:'id_producto', type: 'numeric'},
                         {name:'tipo', type: 'string'},
                         {name:'estado_reg', type: 'string'},
                         {name:'cantidad', type: 'numeric'},
                         {name:'precio', type: 'numeric'},
-                        {name:'precio_total', type: 'numeric'},
-                        {name:'sw_porcentaje_formula', type: 'string'},
+                        {name:'precio_total', type: 'numeric'},                        
                         {name:'id_usuario_ai', type: 'numeric'},
                         {name:'usuario_ai', type: 'string'},
                         {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
@@ -393,7 +436,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                         
                     ],
                     remoteSort: true,
-                    baseParams: {dir:'ASC',sort:'id_formula_detalle',limit:'50',start:'0'}
+                    baseParams: {dir:'ASC',sort:'id_venta_detalle',limit:'50',start:'0'}
                 });
         
         this.editorDetail = new Ext.ux.grid.RowEditor({
@@ -428,19 +471,32 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                         text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Detalle',
                         scope: this,
                         width: '100',
-                        handler: function() {                                
+                        handler: function() { 
+                        	
+                        	if(this.evaluaRequistos() === true){                               
                                  var e = new Items({
-                                    id_item: undefined,
+                                    id_producto: undefined,                                    
                                     cantidad: 1,
                                     precio_unitario:0,
                                     precio_total:0});
                                 
                                 this.editorDetail.stopEditing();
                                 this.mestore.insert(0, e);
+                                
                                 this.megrid.getView().refresh();
                                 this.megrid.getSelectionModel().selectRow(0);
                                 this.editorDetail.startEditing(0);
                                 this.sw_init_add = true;
+                                
+                                if (this.detCmp.tipo.store.getTotalCount() == 1) {                                	                       		
+	                        		this.detCmp.tipo.setValue(this.detCmp.tipo.store.getAt(0).data.field1);
+	                        		this.detCmp.tipo.fireEvent('select',this.detCmp.tipo,this.detCmp.tipo.store.getAt(0),0)
+	                        		
+	                        	}
+                                this.bloqueaRequisitos(true);
+                            } else {
+                            	
+                            }
                                                        
                         }
                     },{
@@ -453,7 +509,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                             for(var i = 0, r; r = s[i]; i++){
                                 this.mestore.remove(r);
                             }
-                            //this.evaluaGrilla();
+                            this.evaluaGrilla();
                         }
                     }],
             
@@ -465,32 +521,14 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                         width: 90,
                         sortable: false,                        
                         editor: this.detCmp.tipo 
-                    },
-                    {
-                        header: 'Fórmula',
-                        dataIndex: 'id_formula',
-                        width: 200,
-                        sortable: false,
-                        renderer:function(value, p, record){return String.format('{0}', record.data['nombre_formula']);},
-                        editor: this.detCmp.id_formula 
-                    },
-                    
-                      
-                    {
-                        header: 'Item',
-                        dataIndex: 'id_item',
-                        width: 200,
-                        sortable: false,
-                        renderer:function(value, p, record){return String.format('{0}', record.data['nombre_item']);},
-                        editor: this.detCmp.id_item 
                     }, 
                     {
-                        header: 'Servicio',
-                        dataIndex: 'id_sucursal_producto',
-                        width: 170,
+                        header: 'Producto/Servicio',
+                        dataIndex: 'id_producto',
+                        width: 350,
                         sortable: false,
                         renderer:function(value, p, record){return String.format('{0}', record.data['nombre_producto']);},
-                        editor: this.detCmp.id_sucursal_producto 
+                        editor: this.detCmp.id_producto 
                     },                   
                     {
                        
@@ -519,22 +557,12 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                         summaryType: 'sum',
                         format: '$0,0.00',
                         editor: this.detCmp.precio_total 
-                    },
-                    {
-                        header: 'Comisión',
-                        dataIndex: 'sw_porcentaje_formula',
-                        width: 75,
-                        sortable: false,                        
-                        editor: this.detCmp.sw_porcentaje_formula 
-                    }]
+                    }
+                    ]
                 });
     },
-    onInitAdd : function (r, i) {
-        this.detCmp.id_formula.setDisabled(true);            
-        this.detCmp.id_sucursal_producto.setDisabled(true); 
-        this.detCmp.id_item.setDisabled(true); 
-        this.detCmp.sw_porcentaje_formula.setDisabled(true);
-        
+    onInitAdd : function (r, i) {                
+        this.detCmp.id_producto.setDisabled(true);       
         record = this.megrid.store.getAt(i);
         //alert(record.data.tipo);
         if (record.data.tipo != '' && record.data.tipo != undefined) {
@@ -602,6 +630,33 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                         items: [],
                                      }]
                                  },
+                                 {
+                                  bodyStyle: 'padding-right:5px;',
+                                
+                                  border: false,
+                                  autoHeight: true,
+                                  items: [{
+                                        xtype: 'fieldset',
+                                        frame: true,
+                                        layout: 'form',
+                                        title: ' Forma de Pago ',
+                                        width: '33%',
+                                        border: false,
+                                        //margins: '0 0 0 5',
+                                        padding: '0 0 0 10',
+                                        bodyStyle: 'padding-left:5px;',
+                                        id_grupo: 2,
+                                        items: [{
+								             xtype:'button',
+								             
+								             text:'Dividir Forma de Pago',
+								             handler: this.onDividirFormaPago,
+								             scope:this,
+								             //makes the button 24px high, there is also 'large' for this config
+								             scale: 'medium'
+								           }],
+                                     }]
+                                 },
                                  
                               ]
                           },
@@ -611,36 +666,181 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         
         
     },
-    onSubmit: function(o) {
-        //  validar formularios
-        var arra = [], i, me = this;
-        for (i = 0; i < me.megrid.store.getCount(); i++) {
-            record = me.megrid.store.getAt(i);
-            arra[i] = record.data;            
-        }        
+    crearStoreFormaPago : function () {
+    	this.storeFormaPago = new Ext.data.JsonStore({
+    		url: '../../sis_ventas_facturacion/control/FormaPago/listarFormaPago',
+			id: 'id_forma_pago',
+			root: 'datos',
+			sortInfo: {
+				field: 'id_forma_pago',
+				direction: 'ASC'
+			},
+			totalProperty: 'total',
+			fields: [
+	           {name: 'id_forma_pago',type: 'numeric'},
+	           {name: 'nombre',      type: 'string'},
+	           {name: 'valor',     type: 'numeric'},
+	           {name: 'numero_tarjeta',     type: 'string'},
+	           {name: 'codigo_tarjeta',     type: 'string'},
+	           {name: 'registrar_tarjeta',     type: 'string'},
+	           {name: 'registrar_cc',     type: 'string'},
+	           {name: 'tipo_tarjeta',     type: 'string'}
+	        ]
+		});
+		this.storeFormaPago.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+		this.storeFormaPago.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
+		this.storeFormaPago.baseParams.id_venta = this.Cmp.id_venta.getValue();
+		this.storeFormaPago.load({params:{start:0,limit:100}});
+    },
+    onDividirFormaPago : function () {
+    	if (!this.Cmp.id_sucursal.getValue() && !this.Cmp.id_punto_venta.getValue()) {
+    		Ext.Msg.alert('ATENCION', 'Debe registrar la sucursal o el punto de venta para dividir la forma de pago');
+    	} else {
+	    	var wid = Ext.id();
+	    	
+		    if (!this.storeFormaPago) {
+		    	this.crearStoreFormaPago();
+			}
+			
+		    // create the Grid
+		    var grid = new Ext.grid.EditorGridPanel({
+		        store: this.storeFormaPago,
+		        stateful: false,
+		        margins: '3 3 3 0',
+		        loadMask: true,
+		        columns: [
+		            {
+		                header     : 'Forma de Pago',	 
+		                flex     : 1,
+		                width    : 280,               
+		                dataIndex: 'nombre'
+		            },
+		            {
+		                header     : 'Valor',
+		                width    : 100,	                
+		                dataIndex: 'valor',
+		                align : 'right',
+		                editable : true,
+		                editor: new Ext.form.NumberField({
+	                                        name: 'valor',                                        
+	                                        fieldLabel: 'Cantidad',
+	                                        allowBlank: false,
+	                                        allowDecimals: true,
+	                                        allowNegative: false,
+	                                        maxLength:15                                       
+	                                })
+		            },
+		            {
+		                header     : 'Tipo Tarjeta',
+		                width    : 125,	                
+		                dataIndex: 'tipo_tarjeta',		                
+		                editable : true,
+		                editor: new Ext.form.ComboBox({
+	                                        name: 'tipo_tarjeta',
+							                fieldLabel: 'Tipo Tarjeta',
+							                allowBlank: true,  
+							                emptyText:'tipo...',
+							                triggerAction: 'all',
+							                lazyRender:true,
+							                mode: 'local', 
+							                displayField: 'text',
+                							valueField: 'value',
+							                store:new Ext.data.SimpleStore({
+												data : [['VI', 'VISA'], ['AX', 'AMERICAN EXPRESS'],
+														['DC', 'DINERS CLUB'],['CA', 'MASTER CARD'],
+														['RE', 'RED ENLACE']],
+												id : 'value',
+												fields : ['value', 'text']
+											})                                      
+	                                })
+		            },
+		            {
+		                header     : 'No Tarjeta / Cuenta Corriente',
+		                width    : 170,	                
+		                dataIndex: 'numero_tarjeta',		                
+		                editable : true,
+		                editor: new Ext.form.TextField({
+	                                        name: 'numero_tarjeta',                                        
+	                                        fieldLabel: 'Numero Tarjeta',
+	                                        allowBlank: true,	                                        
+	                                        maxLength:24,
+	                                        minLength:15                                     
+	                                })
+		            },
+		            {
+		                header     : 'Codigo de Autorizacion',
+		                width    : 130,	                
+		                dataIndex: 'codigo_tarjeta',		                
+		                editable : true,
+		                editor: new Ext.form.TextField({
+	                                        name: 'codigo_tarjeta',                                        
+	                                        fieldLabel: 'Codigo de Autorizacion',
+	                                        allowBlank: true,	                                        
+	                                        maxLength:24,
+	                                        minLength:15
+	                                                                               
+	                                })
+		            }
+		        ],
+		        region:  'center',
+		    });
+		    
+	        var win = new Ext.Window({            
+	            id: wid,
+	            layout:'fit',
+	            width:820,
+	            height:350,
+	            modal:true,
+	            items: grid,
+	            title: 'Dividir Formas de Pago',
+	            buttons: [{
+	                text:'Guardar',
+	                disabled:false,
+	                scope : this,
+	                handler : function () {
+	                	this.storeFormaPago.commitChanges();
+	                	var validado = true;
+	                	for(var i = 0; i < this.storeFormaPago.getTotalCount() ;i++) {
+	                		var fp = this.storeFormaPago.getAt(i);
+	                		if (fp.data.valor != "0" && fp.data.registrar_tarjeta == 'si' && (fp.data.numero_tarjeta == '' || fp.data.codigo_tarjeta == '' || fp.data.tipo_tarjeta == '')) {
+	                			validado = false;
+	                			alert('La forma de pago ' + fp.data.nombre + ' requiere el tipo, numero de tarjeta y codigo de autorización')
+	                		}
+	                		
+	                		if (fp.data.valor != "0" && fp.data.registrar_cc == 'si' && (fp.data.numero_tarjeta == '')) {
+	                			validado = false;
+	                			alert('La forma de pago ' + fp.data.nombre + ' requiere el código de cuenta corriente');
+	                		}
+	                	}
+	                	if (validado) {
+		                	this.Cmp.id_forma_pago.setValue(0);
+		                	this.Cmp.monto_forma_pago.setValue(0);
+		                	this.Cmp.monto_forma_pago.setDisabled(true);
+		                	this.Cmp.id_forma_pago.setRawValue('DIVIDIDO');
+		                	this.Cmp.id_forma_pago.setDisabled(true);
+		                	this.ocultarComponente(this.Cmp.numero_tarjeta);
+			            	this.ocultarComponente(this.Cmp.codigo_tarjeta);
+			            	this.ocultarComponente(this.Cmp.tipo_tarjeta);
+			            	this.Cmp.numero_tarjeta.allowBlank = false;
+			            	this.Cmp.codigo_tarjeta.allowBlank = false;
+			            	this.Cmp.tipo_tarjeta.allowBlank = false;
+			            	this.Cmp.numero_tarjeta.reset();
+			            	this.Cmp.codigo_tarjeta.reset();
+			            	this.Cmp.tipo_tarjeta.reset();
+		                	win.close();
+		                }         	
+	                	
+	                }
+	            }]
+	        });
+	        win.show();
+	    }
         
-        me.argumentExtraSubmit = { 'json_new_records': JSON.stringify(arra, function replacer(key, value) {
-                       if (typeof value === 'string') {
-                                    return String(value).replace(/&/g, "%26")
-                                }
-                                return value;
-                            }) };
-        if( i > 0 &&  !this.editorDetail.isVisible()){
-             Phx.vista.FormVenta.superclass.onSubmit.call(this,o);
-        }
-        else{
-            alert('no tiene ningun elemento en la formula')
-        }
-    },    
-    
-    successSave:function(resp)
-    {
-        Phx.CP.loadingHide();
-        Phx.CP.getPagina(this.idContenedorPadre).reload();
-        this.panel.close();
-    },        
-    
-    
+    },
+    loadValoresIniciales:function() 
+    {                
+       Phx.vista.FormVenta.superclass.loadValoresIniciales.call(this);
+    },
     Atributos:[
         {
             //configuracion del componente
@@ -667,18 +867,19 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                         direction : 'ASC'
                     },
                     totalProperty : 'total',
-                    fields : ['id_cliente', 'nombres', 'primer_apellido', 'segundo_apellido'],
+                    fields : ['id_cliente', 'nombres', 'primer_apellido', 'segundo_apellido','nombre_factura','nit'],
                     remoteSort : true,
                     baseParams : {
-                        par_filtro : 'cli.nombres#cli.primer_apellido#cli.segundo_apellido'
+                        par_filtro : 'cli.nombres#cli.primer_apellido#cli.segundo_apellido#nombre_factura#nit'
                     }
                 }),
                 valueField : 'id_cliente',
-                displayField : 'primer_apellido',                
+                displayField : 'nombre_factura',  
+                gdisplayField : 'nombre_factura',              
                 hiddenName : 'id_cliente',
-                forceSelection : true,
+                forceSelection : false,
                 typeAhead : false,
-                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombres} {primer_apellido} {segundo_apellido}</p> </div></tpl>',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>NIT:</b> {nit}</p><p><b>Razon Social:</b> {nombre_factura}</p><p><b>Nombre:</b> {nombres} {primer_apellido} {segundo_apellido}</p> </div></tpl>',
                 triggerAction : 'all',
                 lazyRender : true,
                 mode : 'remote',
@@ -697,35 +898,20 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             type : 'TrigguerCombo',
             id_grupo : 0,            
             form : true
-        },  
+        },
         {
             config:{
-                name: 'a_cuenta',
-                fieldLabel: 'A cuenta',
+                name: 'nit',
+                fieldLabel: 'NIT',
                 allowBlank: false,
                 anchor: '80%',                
-                maxLength:5
+                maxLength:20
             },
-                type:'NumberField',                
+                type:'TextField',                
                 id_grupo:0,                
-                form:true
-        },
-        
-        {
-            config:{
-                name: 'fecha_estimada_entrega',
-                fieldLabel: 'Fecha de Entrega Estimada',
-                allowBlank: false,              
-                gwidth: 150,
-                            format: 'd/m/Y', 
-                            renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-            },
-                type:'DateField',
-                filters:{pfiltro:'ven.fecha_estimada_entrega',type:'date'},
-                id_grupo:0,
-                grid:true,
-                form:true
-        },
+                form:true,
+                valorInicial:'0'
+        },          
         {
             config: {
                 name: 'id_sucursal',
@@ -734,7 +920,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 emptyText: 'Elija una Suc...',
                 store: new Ext.data.JsonStore({
                     url: '../../sis_ventas_facturacion/control/Sucursal/listarSucursal',
-                    id: 'is_sucursal',
+                    id: 'id_sucursal',
                     root: 'datos',
                     sortInfo: {
                         field: 'nombre',
@@ -743,9 +929,10 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                     totalProperty: 'total',
                     fields: ['id_sucursal', 'nombre', 'codigo'],
                     remoteSort: true,
-                    baseParams: {par_filtro: 'suc.nombre#suc.codigo'}
+                    baseParams: {filtro_usuario: 'si',par_filtro: 'suc.nombre#suc.codigo'}
                 }),
                 valueField: 'id_sucursal',
+                gdisplayField : 'nombre_sucursal',
                 displayField: 'nombre',                
                 hiddenName: 'id_sucursal',
                 forceSelection: true,
@@ -761,9 +948,193 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             id_grupo: 1,            
             form: true
         },  
+        {
+            config: {
+                name: 'id_forma_pago',
+                fieldLabel: 'Forma de Pago',
+                allowBlank: false,
+                emptyText: 'Forma de Pago...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_ventas_facturacion/control/FormaPago/listarFormaPago',
+                    id: 'id_forma_pago',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'nombre',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_forma_pago', 'nombre', 'desc_moneda','registrar_tarjeta','registrar_cc'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'forpa.nombre#mon.codigo'}
+                }),
+                valueField: 'id_forma_pago',
+                displayField: 'nombre',
+                gdisplayField: 'forma_pago',
+                hiddenName: 'id_forma_pago',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,               
+                gwidth: 150,
+                minChars: 2,
+                renderer : function(value, p, record) {
+                    return String.format('{0}', record.data['forma_pago']);
+                }
+            },
+            type: 'ComboBox',
+            id_grupo: 2,
+            grid: true,
+            form: true
+        },
+        {
+            config:{
+                name: 'monto_forma_pago',
+                fieldLabel: 'Importe Recibido',
+                allowBlank: false,
+                anchor: '80%',                
+                maxLength:20,
+                allowNegative:false,
+                value:0
+            },
+                type:'NumberField',                
+                id_grupo:2,                
+                form:true,
+                valorInicial:'0'
+        },
+        {
+            config:{
+                name: 'tipo_tarjeta',
+                fieldLabel: 'Tipo Tarjeta',
+                allowBlank: true,  
+                emptyText:'tipo...',
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',                                  
+                displayField: 'text',
+                valueField: 'value',
+                store:new Ext.data.SimpleStore({
+					data : [['VI', 'VISA'], ['AX', 'AMERICAN EXPRESS'],
+							['DC', 'DINERS CLUB'],['CA', 'MASTER CARD'],
+							['RE', 'RED ENLACE']],
+					id : 'value',
+					fields : ['value', 'text']
+				})
+            },
+            type:'ComboBox',            
+            id_grupo:2,            
+            form:true
+        },        
+        {
+            config:{
+                name: 'numero_tarjeta',
+                fieldLabel: 'No Tarjeta/Cuenta Corriente',
+                allowBlank: true,
+                anchor: '80%',                
+                maxLength:24,
+	            minLength:15
+                
+            },
+                type:'TextField',                
+                id_grupo:2,                
+                form:true
+        },
+        {
+            config:{
+                name: 'codigo_tarjeta',
+                fieldLabel: 'Codigo de Autorización',
+                allowBlank: true,
+                anchor: '80%',                
+                maxLength:20
+                
+            },
+                type:'TextField',                
+                id_grupo:2,                
+                form:true
+        }
+           
           
         
     ],
-    title: 'Formulario Venta'
+    title: 'Formulario Venta',
+    onEdit:function(){
+        
+    	this.accionFormulario = 'EDIT';    	
+    	this.loadForm(this.data.datos_originales);    	
+    	
+        //load detalle de conceptos
+        this.mestore.baseParams.id_venta = this.Cmp.id_venta.getValue();
+        this.mestore.load();  
+        this.crearStoreFormaPago();    	
+        
+    },    
+    onNew: function(){    	
+    	this.accionFormulario = 'NEW';
+	},
+    
+    onSubmit: function(o) {
+        //  validar formularios
+        var arra = [], i, me = this;
+        var formapa = [];
+        for (i = 0; i < me.megrid.store.getCount(); i++) {
+            var record = me.megrid.store.getAt(i);
+            arra[i] = record.data;            
+        } 
+        if (me.storeFormaPago) {
+	        for (i = 0; i < me.storeFormaPago.getCount(); i++) {
+	            var record = me.storeFormaPago.getAt(i);
+	            formapa[i] = record.data;            
+	        }
+	    }        
+        
+        me.argumentExtraSubmit = { 'json_new_records': JSON.stringify(arra, 
+        				function replacer(key, value) {
+                       		if (typeof value === 'string') {
+                            	return String(value).replace(/&/g, "%26")
+                            }
+                            return value;
+                        }),
+                        'formas_pago' :  JSON.stringify(formapa, 
+        				function replacer(key, value) {
+                       		if (typeof value === 'string') {
+                            	return String(value).replace(/&/g, "%26")
+                            }
+                            return value;
+                        })};
+        if( i > 0 &&  !this.editorDetail.isVisible()){
+             Phx.vista.FormVenta.superclass.onSubmit.call(this,o);
+        }
+        else{
+            alert('La venta no tiene registrado ningun detalle');
+        }
+    },    
+    
+    successSave:function(resp)
+    {
+    	var datos_respuesta = JSON.parse(resp.responseText);
+    	Phx.CP.loadingHide();
+    	if ('cambio' in datos_respuesta.ROOT.datos) {
+    		Ext.Msg.show({
+			   title:'DEVOLUCION',
+			   msg: 'Debe devolver ' + datos_respuesta.ROOT.datos.cambio + ' al cliente',
+			   buttons: Ext.Msg.OK,
+			   fn: function () {			   	
+		        Phx.CP.getPagina(this.idContenedorPadre).reload();
+		        this.panel.close();
+			   },
+			   scope:this
+			});
+    		//Ext.Msg.alert('DEVOLUCION', 'Debe devolver ' + datos_respuesta.ROOT.datos.cambio + ' al cliente');
+    	} else {
+    		Phx.CP.getPagina(this.idContenedorPadre).reload();
+		    this.panel.close();
+    	}
+        
+    }, 
+    
+    
+    
 })    
 </script>

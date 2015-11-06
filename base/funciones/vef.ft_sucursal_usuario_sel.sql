@@ -43,6 +43,7 @@ BEGIN
 			v_consulta:='select
 						sucusu.id_sucursal_usuario,
 						sucusu.id_sucursal,
+						sucusu.id_punto_venta,
 						sucusu.id_usuario,
 						sucusu.estado_reg,
 						sucusu.tipo_usuario,

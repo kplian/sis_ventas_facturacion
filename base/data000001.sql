@@ -9,6 +9,7 @@ select pxp.f_insert_tgui ('SISTEMA DE VENTAS', '', 'VEF', 'si', 1, '', 1, '', ''
 
 /***********************************I-DAT-JRR-VEF-0-05/07/2015*****************************************/
 
+select pxp.f_insert_tgui ('Sucursal', 'Sucursal', 'SUCUR', 'si', 1, 'sis_ventas_facturacion/vista/sucursal/Sucursal.php', 2, '', 'Sucursal', 'VEF');
 select pxp.f_insert_tgui ('Ventas', 'Ventas', 'VFVENTA', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaVendedor.php', 2, '', 'VentaVendedor', 'VEF');
 select pxp.f_insert_tgui ('Revisión de Venta', 'Revisión de Venta', 'REVVEN', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaRevision.php', 2, '', 'VentaRevision', 'VEF');
 select pxp.f_insert_tgui ('Elaboración de Formulas', 'Elaboración de Formulas', 'VENELABO', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaRevision.php', 2, '', 'VentaRevision', 'VEF');
@@ -16,4 +17,21 @@ select pxp.f_insert_tgui ('Elaboración de Formulas', 'Elaboración de Formulas'
 select pxp.f_insert_testructura_gui ('VFVENTA', 'VEF');
 select pxp.f_insert_testructura_gui ('REVVEN', 'VEF');
 select pxp.f_insert_testructura_gui ('VENELABO', 'VEF');
+select pxp.f_insert_testructura_gui ('SUCUR', 'VEF');
 /***********************************F-DAT-JRR-VEF-0-05/07/2015*****************************************/
+
+
+/***********************************I-DAT-JRR-VEF-0-06/10/2015*****************************************/
+select pxp.f_insert_tgui ('Actividad Economica', 'Actividad Economica', 'ACTECO', 'si', 1, 'sis_ventas_facturacion/vista/actividad_economica/ActividadEconomica.php', 2, '', 'ActividadEconomica', 'VEF');
+select pxp.f_insert_testructura_gui ('ACTECO', 'VEF');
+
+select pxp.f_insert_tgui ('Entidad Forma de Pago', 'Entidad Forma de Pago', 'ENFORPA', 'si', 1, 'sis_ventas_facturacion/vista/forma_pago/EntidadFormaPago.php', 2, '', 'EntidadFormaPago', 'VEF');
+select pxp.f_insert_testructura_gui ('ENFORPA', 'VEF');
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_tiene_punto_venta', E'false', E'variable global para definir si las ventas se manejaran a nivel sucursal o a nivel punto de venta');
+
+select pxp.f_insert_tgui ('Cliente', 'Cliente', 'VEFCLI', 'si', 1, 'sis_ventas_facturacion/vista/cliente/Cliente.php', 2, '', 'Cliente', 'VEF');
+select pxp.f_insert_testructura_gui ('VEFCLI', 'VEF');
+
+/***********************************F-DAT-JRR-VEF-0-06/10/2015*****************************************/

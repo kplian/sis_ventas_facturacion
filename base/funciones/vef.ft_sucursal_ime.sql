@@ -66,7 +66,9 @@ BEGIN
 			id_entidad,
 			plantilla_documento_factura,
 			plantilla_documento_recibo,
-			formato_comprobante
+			formato_comprobante,
+			direccion,
+			lugar
           	) values(
 			v_parametros.correo,
 			v_parametros.nombre,
@@ -85,7 +87,9 @@ BEGIN
 			v_parametros.id_entidad,
 			v_parametros.plantilla_documento_factura,
 			v_parametros.plantilla_documento_recibo,
-			v_parametros.formato_comprobante		
+			v_parametros.formato_comprobante,
+			v_parametros.direccion,
+			v_parametros.lugar		
 			
 			)RETURNING id_sucursal into v_id_sucursal;
 			
@@ -123,7 +127,9 @@ BEGIN
 			usuario_ai = v_parametros._nombre_usuario_ai,
 			plantilla_documento_factura = v_parametros.plantilla_documento_factura,
 			plantilla_documento_recibo = v_parametros.plantilla_documento_recibo,
-			formato_comprobante = v_parametros.formato_comprobante
+			formato_comprobante = v_parametros.formato_comprobante,
+			direccion = v_parametros.direccion,
+			lugar = v_parametros.lugar
 			where id_sucursal=v_parametros.id_sucursal;
                
 			--Definicion de la respuesta

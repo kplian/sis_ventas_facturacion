@@ -22,10 +22,8 @@ class MODSucursalProducto extends MODbase{
 		//Definicion de la lista del resultado del query
 		$this->captura('id_sucursal_producto','int4');
 		$this->captura('id_sucursal','int4');
-		$this->captura('id_item','int4');
-		$this->captura('descripcion_producto','text');
-		$this->captura('precio','numeric');
-		$this->captura('nombre_producto','varchar');
+		$this->captura('id_item','int4');		
+		$this->captura('precio','numeric');		
 		$this->captura('estado_reg','varchar');
 		$this->captura('tipo_producto','varchar');
 		$this->captura('fecha_reg','timestamp');
@@ -37,6 +35,38 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
         $this->captura('nombre_item','varchar');
+		$this->captura('id_concepto_ingas','integer');
+		$this->captura('nombre_producto','varchar');
+		$this->captura('descripcion_producto','text');
+		$this->captura('id_actividad_economica','integer');
+		$this->captura('nombre_actividad','varchar');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarProductoServicioItem(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_sucursal_producto_sel';
+		$this->transaccion='VF_PRODITEFOR_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('tipo','tipo','varchar');
+		$this->setParametro('id_sucursal','id_sucursal','int4');
+		$this->setParametro('id_punto_venta','id_punto_venta','int4');
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_producto','integer');
+		$this->captura('tipo','varchar');
+		$this->captura('nombre_producto','varchar');		
+		$this->captura('descripcion','text');
+		$this->captura('precio','numeric');			
+		$this->captura('medico','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -60,6 +90,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('nombre_producto','nombre_producto','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo_producto','tipo_producto','varchar');
+		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -84,6 +115,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('nombre_producto','nombre_producto','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo_producto','tipo_producto','varchar');
+		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

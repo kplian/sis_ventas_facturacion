@@ -61,7 +61,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                 id_grupo:0,
                 filters:{   
                          type: 'list',
-                         options: ['item_almacen',,'servicio', 'producto'], 
+                         options: ['item_almacen','servicio', 'producto'], 
                     },
                 grid:true,
                 form:true
@@ -125,28 +125,12 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
             form : true
         },
         
-        {
-            config:{
-                name: 'nombre_producto',
-                fieldLabel: 'Nombre Producto/Servicio',
-                allowBlank: false,
-                anchor: '100%',
-                gwidth: 200,
-                maxLength:150
-            },
-                type:'TextField',
-                filters:{pfiltro:'sprod.nombre_producto',type:'string'},
-                id_grupo:2,
-                grid:true,
-                form:true
-        },
-        
+                
         {
             config:{
                 name:'nombre_producto',
                 fieldLabel:'Nombre Producto/Servicio',
-                allowBlank:true,
-                emptyText:'Concepto Ingreso Gasto...',
+                allowBlank:true,                
                 store: new Ext.data.JsonStore({
                          url: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas',
                          id: 'id_concepto_ingas',
@@ -156,33 +140,35 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                             direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
+                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot','descripcion_larga'],
                     // turn on remote sorting
                     remoteSort: true,
-                    baseParams:{par_filtro:'desc_ingas',movimiento:'recurso'}
+                    baseParams:{par_filtro:'desc_ingas',movimiento:'recurso',start:0,
+                        limit:99999}
                     }),
                 valueField: 'id_concepto_ingas',
                 displayField: 'desc_ingas',
-                gdisplayField:'nombre_ingas',
+                gdisplayField:'nombre_producto',
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><p>TIPO:{tipo}</p><p>MOVIMIENTO:{movimiento}</p></div></tpl>',
                 hiddenName: 'id_concepto_ingas',
-                forceSelection:true,
-                typeAhead: false,
-                triggerAction: 'all',
+                forceSelection : false,
+                typeAhead : false,
+                hideTrigger : true,                
                 lazyRender:true,
                 mode:'remote',
-                pageSize:10,
+                pageSize:0,
                 queryDelay:1000,
                 listWidth:600,
                 resizable:true,
-                anchor:'80%', 
-                gwidth: 200,      
-                renderer:function(value, p, record){return String.format('{0}', record.data['nombre_ingas']);}
+                anchor:'100%', 
+                gwidth: 200,  
+                minChars : 3,    
+                renderer:function(value, p, record){return String.format('{0}', record.data['nombre_producto']);}
             },
             type:'ComboBox',
-            id_grupo:0,
+            id_grupo:2,
             filters:{   
-                        pfiltro:'cig.movimiento#cig.desc_ingas',
+                        filters:{pfiltro:'cig.desc_ingas',type:'string'},
                         type:'string'
                     },
             grid:true,
@@ -204,6 +190,49 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+		{
+            config : {
+                name : 'id_actividad_economica',
+                fieldLabel : 'Actividad Economica',
+                allowBlank : false,
+                emptyText : 'Actividad...',
+                store : new Ext.data.JsonStore({
+                    url : '../../sis_ventas_facturacion/control/ActividadEconomica/listarActividadEconomica',
+                    id : 'id_actividad_economica',
+                    root : 'datos',
+                    sortInfo : {
+                        field : 'codigo',
+                        direction : 'ASC'
+                    },
+                    totalProperty : 'total',
+                    fields : ['id_actividad_economica', 'nombre', 'codigo', 'descripcion'],
+                    remoteSort : true,
+                    baseParams : {
+                        par_filtro : 'acteco.codigo#acteco.nombre'
+                    }
+                }),
+                valueField : 'id_actividad_economica',
+                displayField : 'nombre',   
+                gdisplayField : 'nombre_actividad',             
+                hiddenName : 'id_actividad_economica',
+                forceSelection : true,
+                typeAhead : false,
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}</p><p>{nombre}</p><p>{descripcion}</p> </div></tpl>',
+                triggerAction : 'all',
+                lazyRender : true,
+                mode : 'remote',
+                pageSize : 10,
+                queryDelay : 1000,                
+                gwidth : 170,
+                minChars : 2,
+                renderer:function(value, p, record){return String.format('{0}', record.data['nombre_actividad']);}
+            },
+            type : 'ComboBox',
+            id_grupo : 2,
+            filters:{pfiltro:'acteco.nombre',type:'string'},            
+            form : true,
+            grid:true
+        },  
 		{
 			config:{
 				name: 'precio',
@@ -328,6 +357,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
         this.Atributos[1].valorInicial = this.maestro.id_sucursal;
         this.store.baseParams={id_sucursal:this.maestro.id_sucursal};
         this.load({params:{start:0, limit:50}});
+        this.Cmp.nombre_producto.store.baseParams.id_entidad = this.maestro.id_entidad;
             
     },
     iniciarEventos :  function () {
@@ -340,12 +370,23 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                 this.resetGroup(2)
                 
             } else {
+            	if (r.data.field1 == 'servicio') {
+            		this.Cmp.nombre_producto.store.baseParams.tipo = 'Servicio';
+            	} else {
+            		this.Cmp.nombre_producto.store.baseParams.tipo = 'Bien';
+            	}
+            	this.Cmp.nombre_producto.reset();
+            	this.Cmp.nombre_producto.modificado = true;
                 this.mostrarGrupo(2);
                 this.allowBlankGrupo(2, false);
                 this.ocultarGrupo(1);
                 this.allowBlankGrupo(1, true);
                 this.resetGroup(1)
             }
+        },this);
+        
+        this.Cmp.nombre_producto.on('select',function (c,r,v) {
+        	this.Cmp.descripcion_producto.setValue(r.data.descripcion_larga);
         },this);
     },
 	tam_pag:50,	
@@ -356,9 +397,12 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 	id_store:'id_sucursal_producto',
 	fields: [
 		{name:'id_sucursal_producto', type: 'numeric'},
+		{name:'id_concepto_ingas', type: 'numeric'},
+		{name:'id_actividad_economica', type: 'numeric'},
 		{name:'id_sucursal', type: 'numeric'},
 		{name:'id_item', type: 'numeric'},
 		{name:'nombre_item', type: 'string'},
+		{name:'nombre_actividad', type: 'string'},
 		{name:'descripcion_producto', type: 'string'},
 		{name:'precio', type: 'numeric'},
 		{name:'nombre_producto', type: 'string'},
@@ -442,6 +486,13 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                 this.resetGroup(2)
                 
             } else {
+            	if (this.Cmp.tipo_producto.getValue() == 'servicio') {
+            		this.Cmp.nombre_producto.store.baseParams.tipo = 'Servicio';
+            	} else {
+            		this.Cmp.nombre_producto.store.baseParams.tipo = 'Bien';
+            	}
+            	
+            	this.Cmp.nombre_producto.modificado = true;
                 this.mostrarGrupo(2);
                 this.allowBlankGrupo(2, false);
                 this.ocultarGrupo(1);

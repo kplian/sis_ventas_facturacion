@@ -48,7 +48,16 @@ Phx.vista.SucursalUsuario=Ext.extend(Phx.gridInterfaz,{
             type:'Field',
             form:true 
         },        
-        
+        {
+            //configuracion del componente
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_punto_venta'
+            },
+            type:'Field',
+            form:true 
+        },
         {
             config:{
                 name: 'tipo_usuario',
@@ -240,6 +249,7 @@ Phx.vista.SucursalUsuario=Ext.extend(Phx.gridInterfaz,{
 	fields: [
 		{name:'id_sucursal_usuario', type: 'numeric'},
 		{name:'id_sucursal', type: 'numeric'},
+		{name:'id_punto_venta', type: 'numeric'},
 		{name:'id_usuario', type: 'numeric'},
 		{name:'cuenta', type: 'string'},
 		{name:'estado_reg', type: 'string'},
@@ -262,14 +272,28 @@ Phx.vista.SucursalUsuario=Ext.extend(Phx.gridInterfaz,{
 	bsave:true,
 	onReloadPage:function(m)
     {
-        this.maestro=m;                     
-        this.store.baseParams={id_sucursal:this.maestro.id_sucursal};
+        this.maestro=m; 
+        if(this.maestro.hasOwnProperty('id_punto_venta')){
+		    this.store.baseParams.id_punto_venta = this.maestro.id_punto_venta;
+		} else if (this.maestro.hasOwnProperty('id_sucursal')){
+		    this.store.baseParams.id_sucursal = this.maestro.id_sucursal;
+		} 
+		
+		                   
+        
+        
         this.load({params:{start:0, limit:50}});            
     },
     loadValoresIniciales:function()
     {
         Phx.vista.SucursalUsuario.superclass.loadValoresIniciales.call(this);
-        this.getComponente('id_sucursal').setValue(this.maestro.id_sucursal);
+        if(this.maestro.hasOwnProperty('id_punto_venta')){
+		    this.getComponente('id_punto_venta').setValue(this.maestro.id_punto_venta);
+		
+		} else if (this.maestro.hasOwnProperty('id_sucursal')){
+		    this.getComponente('id_sucursal').setValue(this.maestro.id_sucursal);
+		}  
+        
               
     }
 	}

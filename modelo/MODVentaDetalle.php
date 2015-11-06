@@ -22,14 +22,11 @@ class MODVentaDetalle extends MODbase{
 		//Definicion de la lista del resultado del query
 		$this->captura('id_venta_detalle','int4');
 		$this->captura('id_venta','int4');
-		$this->captura('id_item','int4');
-		$this->captura('id_sucursal_producto','int4');
-		$this->captura('id_formula','int4');
+		$this->captura('id_producto','int4');		
 		$this->captura('tipo','varchar');
 		$this->captura('estado_reg','varchar');
 		$this->captura('cantidad','int4');
-		$this->captura('precio','numeric');
-		$this->captura('sw_porcentaje_formula','varchar');
+		$this->captura('precio','numeric');		
 		$this->captura('id_usuario_ai','int4');
 		$this->captura('usuario_ai','varchar');
 		$this->captura('fecha_reg','timestamp');
@@ -38,9 +35,7 @@ class MODVentaDetalle extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-        $this->captura('precio_total','numeric');
-        $this->captura('nombre_item','varchar');
-        $this->captura('nombre_formula','varchar');
+        $this->captura('precio_total','numeric');        
         $this->captura('nombre_producto','varchar');
 		
 		//Ejecuta la instruccion

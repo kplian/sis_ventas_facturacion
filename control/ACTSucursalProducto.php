@@ -27,6 +27,28 @@ class ACTSucursalProducto extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function listarProductoServicioItem(){		
+        
+        if ($this->objParam->getParametro('id_sucursal') != '') {
+            $this->objParam->addFiltro("todo.id_sucursal = ". $this->objParam->getParametro('id_sucursal'));
+        }  
+
+		if ($this->objParam->getParametro('tipo') != '') {
+            $this->objParam->addFiltro("todo.tipo = ''". $this->objParam->getParametro('tipo')."''");
+        }  
+        
+         
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODSucursalProducto','listarProductoServicioItem');
+		} else{
+			$this->objFunc=$this->create('MODSucursalProducto');
+			
+			$this->res=$this->objFunc->listarProductoServicioItem($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 				
 	function insertarSucursalProducto(){
 		$this->objFunc=$this->create('MODSucursalProducto');	

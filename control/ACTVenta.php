@@ -33,6 +33,18 @@ class ACTVenta extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+	function getVariablesBasicas() {	        
+		
+		$this->objFunc=$this->create('MODVenta');
+		$this->res=$this->objFunc->getVariablesBasicas($this->objParam);
+		$newDatos = array();
+		foreach ($this->res->datos as $valor) {
+			$newDatos[$valor['variable']] = $valor['valor'];
+		} 		
+		$this->res->datos = $newDatos;		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 				
 	function insertarVenta(){
 		$this->objFunc=$this->create('MODVenta');	
@@ -45,10 +57,8 @@ class ACTVenta extends ACTbase{
 	}
     
     function insertarVentaCompleta(){
-        $this->objFunc=$this->create('MODVenta'); 
-        if($this->objParam->insertar('id_venta')){
-            $this->res=$this->objFunc->insertarVentaCompleta($this->objParam);           
-        }
+        $this->objFunc=$this->create('MODVenta');        
+        $this->res=$this->objFunc->insertarVentaCompleta($this->objParam);        
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 						

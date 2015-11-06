@@ -54,7 +54,8 @@ BEGIN
 			fecha_reg,
 			usuario_ai,
 			id_usuario_mod,
-			fecha_mod
+			fecha_mod,
+			id_punto_venta
           	) values(
 			v_parametros.id_sucursal,
 			v_parametros.id_usuario,
@@ -65,7 +66,8 @@ BEGIN
 			now(),
 			v_parametros._nombre_usuario_ai,
 			null,
-			null
+			null,
+			v_parametros.id_punto_venta
 							
 			
 			
@@ -91,8 +93,7 @@ BEGIN
 
 		begin
 			--Sentencia de la modificacion
-			update vef.tsucursal_usuario set
-			id_sucursal = v_parametros.id_sucursal,
+			update vef.tsucursal_usuario set			
 			id_usuario = v_parametros.id_usuario,
 			tipo_usuario = v_parametros.tipo_usuario,
 			id_usuario_mod = p_id_usuario,

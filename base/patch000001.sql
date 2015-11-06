@@ -176,5 +176,130 @@ CREATE TABLE vef.tsucursal_moneda (
     CONSTRAINT pk_tsucursal_moneda__id_sucursal_moneda
     PRIMARY KEY (id_sucursal_moneda))
 INHERITS (pxp.tbase) WITHOUT OIDS;
+
+ALTER TABLE vef.tsucursal
+  ADD COLUMN lugar VARCHAR (150);
+  
+ALTER TABLE vef.tsucursal_producto
+  ADD COLUMN id_concepto_ingas INTEGER;
+  
+ 
+ALTER TABLE vef.tsucursal_producto
+  DROP COLUMN nombre_producto;
+  
+ALTER TABLE vef.tsucursal_producto
+  DROP COLUMN descripcion_producto;
+  
+CREATE TABLE vef.tactividad_economica (
+    id_actividad_economica serial NOT NULL,
+    codigo VARCHAR(50) NOT NULL,
+    nombre VARCHAR(200) NOT NULL, 
+    descripcion TEXT,       
+    CONSTRAINT pk_tactividad_economica__id_actividad_economica
+    PRIMARY KEY (id_actividad_economica))
+INHERITS (pxp.tbase) WITHOUT OIDS;
+
+CREATE TABLE vef.tdosificacion (
+  id_dosificacion SERIAL,  
+  tipo VARCHAR(50) NOT NULL,
+  id_sucursal INTEGER NOT NULL,  
+  nroaut VARCHAR(150) NOT NULL,
+  tipo_generacion VARCHAR(50) NOT NULL,
+  inicial INTEGER,
+  final INTEGER,
+  llave VARCHAR(150),
+  fecha_dosificacion DATE NOT NULL,  
+  fecha_inicio_emi DATE,
+  fecha_limite DATE,  
+  id_activida_economica INTEGER[] NOT NULL,
+  glosa_impuestos VARCHAR(150),  
+  glosa_empresa VARCHAR(150),  
+  nro_siguiente INTEGER,
+  CONSTRAINT pk_tdosificacion__id_dosificacion PRIMARY KEY(id_dosificacion)
+) INHERITS (pxp.tbase);
+
+COMMENT ON COLUMN vef.tdosificacion.tipo
+IS 'F Factura, Notas de Credito y Debito todavia no se tiene ';
+
+COMMENT ON COLUMN vef.tdosificacion.tipo_generacion
+IS 'manual|computarizada';
+
+CREATE TABLE vef.tpunto_venta (
+  id_punto_venta SERIAL,  
+  id_sucursal INTEGER NOT NULL, 
+  nombre VARCHAR(100) NOT NULL,
+  descripcion TEXT,  
+  CONSTRAINT pk_tpunto_venta__id_punto_venta PRIMARY KEY(id_punto_venta)
+) INHERITS (pxp.tbase);
+
+ALTER TABLE vef.tsucursal_usuario
+  ADD COLUMN id_punto_venta INTEGER;
+  
+ALTER TABLE vef.tmedico
+  ADD COLUMN fecha_nacimiento date;
+  
+  
+CREATE TABLE vef.tforma_pago (
+  id_forma_pago SERIAL,  
+  codigo VARCHAR NOT NULL, 
+  nombre VARCHAR(200) NOT NULL,
+  id_entidad INTEGER NOT NULL,  
+  id_moneda INTEGER NOT NULL,   
+  CONSTRAINT pk_tforma_pago__id_forma_pago PRIMARY KEY(id_forma_pago)
+) INHERITS (pxp.tbase);
+
+ALTER TABLE vef.tcliente
+  ALTER COLUMN nombres DROP NOT NULL;
+  
+ALTER TABLE vef.tcliente
+  ALTER COLUMN primer_apellido DROP NOT NULL;
+  
+ALTER TABLE vef.tcliente
+  ALTER COLUMN nombre_factura TYPE VARCHAR(200) COLLATE pg_catalog."default";
+
+ALTER TABLE vef.tcliente
+  ALTER COLUMN nombre_factura SET NOT NULL;
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN id_punto_venta INTEGER;
+  
+  
+CREATE TABLE vef.tventa_forma_pago (
+  id_venta_forma_pago SERIAL,  
+  id_forma_pago INTEGER NOT NULL, 
+  id_venta INTEGER NOT NULL,
+  monto NUMERIC(18,2) NOT NULL,    
+  CONSTRAINT pk_tventa_forma_pago__id_venta_forma_pago PRIMARY KEY(id_venta_forma_pago)
+) INHERITS (pxp.tbase);
+
+ALTER TABLE vef.tforma_pago
+  ADD COLUMN defecto VARCHAR(2);
+  
+ALTER TABLE vef.tventa_forma_pago
+  ADD COLUMN monto_transaccion NUMERIC(18,2) NOT NULL;
+  
+ALTER TABLE vef.tventa_forma_pago
+  ADD COLUMN cambio NUMERIC(18,2) NOT NULL;
+
+ALTER TABLE vef.tventa_forma_pago
+  ADD COLUMN monto_mb_efectivo NUMERIC(18,2) NOT NULL;
+
+ALTER TABLE vef.tventa_detalle
+  DROP COLUMN sw_porcentaje_formula;
+
+ALTER TABLE vef.tforma_pago
+  ADD COLUMN registrar_tarjeta VARCHAR(2);
+
+ALTER TABLE vef.tforma_pago
+  ADD COLUMN registrar_cc VARCHAR(2);
+
+ALTER TABLE vef.tventa_forma_pago
+  ADD COLUMN numero_tarjeta VARCHAR(25);
+  
+ALTER TABLE vef.tventa_forma_pago
+  ADD COLUMN codigo_tarjeta VARCHAR(25);
+  
+ALTER TABLE vef.tventa_forma_pago
+  ADD COLUMN tipo_tarjeta VARCHAR(10);
   
 /************************************F-SCP-JRR-VEF-0-20/09/2015*************************************************/

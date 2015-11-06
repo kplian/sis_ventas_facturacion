@@ -1,7 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_venta_detalle_sel"(	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_venta_detalle_sel
@@ -43,14 +47,17 @@ BEGIN
 			v_consulta:='select
 						vedet.id_venta_detalle,
 						vedet.id_venta,
-						vedet.id_item,
-						vedet.id_sucursal_producto,
-						vedet.id_formula,
+						(case when vedet.id_item is not null then
+							vedet.id_item
+						when vedet.id_sucursal_producto is not null then
+							vedet.id_sucursal_producto
+						when vedet.id_formula is not null then
+							vedet.id_formula
+						end) as id_producto,
 						vedet.tipo,
 						vedet.estado_reg,
 						vedet.cantidad,
-						vedet.precio,
-						vedet.sw_porcentaje_formula,
+						vedet.precio,						
 						vedet.id_usuario_ai,
 						vedet.usuario_ai,
 						vedet.fecha_reg,
@@ -59,16 +66,21 @@ BEGIN
 						vedet.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-						vedet.precio*vedet.cantidad,
-						item.nombre as nombre_item,
-						form.nombre as nombre_formula,
-						sprod.nombre_producto	as nombre_producto
+						vedet.precio*vedet.cantidad,						
+						(case when vedet.id_item is not null then
+							item.nombre
+						when vedet.id_sucursal_producto is not null then
+							cig.desc_ingas
+						when vedet.id_formula is not null then
+							form.nombre
+						end) as nombre_producto
 						from vef.tventa_detalle vedet
 						inner join segu.tusuario usu1 on usu1.id_usuario = vedet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = vedet.id_usuario_mod
 						left join vef.tsucursal_producto sprod on sprod.id_sucursal_producto = vedet.id_sucursal_producto
 						left join vef.tformula form on form.id_formula = vedet.id_formula
 						left join alm.titem item on item.id_item = vedet.id_item
+                        left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -98,6 +110,7 @@ BEGIN
 						left join vef.tsucursal_producto sprod on sprod.id_sucursal_producto = vedet.id_sucursal_producto
 						left join vef.tformula form on form.id_formula = vedet.id_formula
 						left join alm.titem item on item.id_item = vedet.id_item
+                        left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
 					    where ';
 			
 			--Definicion de la respuesta		    
@@ -123,7 +136,9 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_venta_detalle_sel"(integer, integer, character varying, character varying) OWNER TO postgres;

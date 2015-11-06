@@ -22,6 +22,7 @@ class MODSucursalUsuario extends MODbase{
 		//Definicion de la lista del resultado del query
 		$this->captura('id_sucursal_usuario','int4');
 		$this->captura('id_sucursal','int4');
+		$this->captura('id_punto_venta','int4');
 		$this->captura('id_usuario','int4');
 		$this->captura('estado_reg','varchar');
 		$this->captura('tipo_usuario','varchar');
@@ -50,6 +51,7 @@ class MODSucursalUsuario extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_sucursal','id_sucursal','int4');
+		$this->setParametro('id_punto_venta','id_punto_venta','int4');
 		$this->setParametro('id_usuario','id_usuario','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo_usuario','tipo_usuario','varchar');
@@ -71,6 +73,7 @@ class MODSucursalUsuario extends MODbase{
 		//Define los parametros para la funcion
 		$this->setParametro('id_sucursal_usuario','id_sucursal_usuario','int4');
 		$this->setParametro('id_sucursal','id_sucursal','int4');
+		$this->setParametro('id_punto_venta','id_punto_venta','int4');
 		$this->setParametro('id_usuario','id_usuario','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo_usuario','tipo_usuario','varchar');

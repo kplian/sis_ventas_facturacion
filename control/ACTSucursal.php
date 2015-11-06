@@ -19,7 +19,7 @@ class ACTSucursal extends ACTbase{
                                                 from segu.tusuario_rol ur 
                                                 where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " )) or (
                                                 " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
-                                                vef.tsucursal_usuario su where su.id_sucursal = sucusu.id_sucursal)) ");
+                                                vef.tsucursal_usuario sucusu where suc.id_sucursal = sucusu.id_sucursal)) ");
         }
         
         if($this->objParam->getParametro('id_entidad') != '') {

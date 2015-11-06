@@ -44,6 +44,8 @@ class MODSucursal extends MODbase{
         $this->captura('plantilla_documento_factura','varchar');
         $this->captura('plantilla_documento_recibo','varchar');
         $this->captura('formato_comprobante','varchar');
+		$this->captura('direccion','varchar');
+		$this->captura('lugar','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -68,11 +70,14 @@ class MODSucursal extends MODbase{
 		$this->setParametro('id_clasificaciones_para_formula','id_clasificaciones_para_formula','varchar');
 		$this->setParametro('codigo','codigo','varchar');
 		$this->setParametro('id_clasificaciones_para_venta','id_clasificaciones_para_venta','varchar');
-        $this->setParametro('id_entidad','id_entidad','varchar');
+        $this->setParametro('id_entidad','id_entidad','integer');
         
         $this->setParametro('plantilla_documento_factura','plantilla_documento_factura','varchar');
         $this->setParametro('plantilla_documento_recibo','plantilla_documento_recibo','varchar');
         $this->setParametro('formato_comprobante','formato_comprobante','varchar');
+		
+		$this->setParametro('direccion','direccion','varchar');
+		$this->setParametro('lugar','lugar','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -102,6 +107,9 @@ class MODSucursal extends MODbase{
         $this->setParametro('plantilla_documento_factura','plantilla_documento_factura','varchar');
         $this->setParametro('plantilla_documento_recibo','plantilla_documento_recibo','varchar');
         $this->setParametro('formato_comprobante','formato_comprobante','varchar');
+		
+		$this->setParametro('direccion','direccion','varchar');
+		$this->setParametro('lugar','lugar','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

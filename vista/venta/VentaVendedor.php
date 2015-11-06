@@ -20,9 +20,12 @@ Phx.vista.VentaVendedor = {
         this.maestro=config.maestro;  
         Phx.vista.VentaVendedor.superclass.constructor.call(this,config);
         
-        this.store.baseParams.pes_estado = 'borrador';
-        this.load({params:{start:0, limit:this.tam_pag}});
         
+        
+    } ,
+    successGetVariables :function (response,request) {   
+    	Phx.vista.VentaVendedor.superclass.successGetVariables.call(this,response,request);  				  		
+  		this.store.baseParams.pes_estado = 'borrador';        
         this.finCons = true;
         this.addButton('ant_estado',{grupo:[3,4],argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
         this.addButton('sig_estado',{grupo:[0,2],text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
@@ -36,8 +39,8 @@ Phx.vista.VentaVendedor = {
                 tooltip: '<b>Imprimir Formulario de Venta</b><br/>Imprime el formulario de la venta'
             }
         );
-        
-    } ,
+		  
+  	},
     gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-eye"></i> En Registro</h1>',grupo:0,height:0},
                        {name:'proceso_elaboracion',title:'<H1 align="center"><i class="fa fa-eye"></i> En elaboración</h1>',grupo:1,height:0},
                        {name:'pendiente_entrega',title:'<H1 align="center"><i class="fa fa-eye"></i> Para Entrega</h1>',grupo:2,height:0},
@@ -46,6 +49,7 @@ Phx.vista.VentaVendedor = {
     
     actualizarSegunTab: function(name, indice){
         if(this.finCons){
+        	
              this.store.baseParams.pes_estado = name;
              this.load({params:{start:0, limit:this.tam_pag}});
            }
@@ -76,30 +80,8 @@ Phx.vista.VentaVendedor = {
         this.getBoton('ant_estado').disable();
         this.getBoton('sig_estado').disable();        
         Phx.vista.VentaVendedor.superclass.liberaMenu.call(this);
-    },
-    onButtonNew : function () {
-        //abrir formulario de solicitud
-           var me = this;
-           me.objSolForm = Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/venta/FormVenta.php',
-                                    'Formulario de Venta',
-                                    {
-                                        modal:true,
-                                        width:'80%',
-                                        height:'90%'
-                                    }, {data:{objPadre: me}
-                                    }, 
-                                    this.idContenedor,
-                                    'FormVenta',
-                                    {
-                                        config:[{
-                                                  event:'successsave',
-                                                  delegate: this.onSaveForm,
-                                                  
-                                                }],
-                                        
-                                        scope:this
-                                     });      
-    }    
+    }
+    
     
 };
 </script>
