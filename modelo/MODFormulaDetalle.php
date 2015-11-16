@@ -21,7 +21,7 @@ class MODFormulaDetalle extends MODbase{
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_formula_detalle','int4');
-		$this->captura('id_item','int4');
+		$this->captura('id_producto','int4');
 		$this->captura('id_formula','int4');
 		$this->captura('cantidad','numeric');
 		$this->captura('estado_reg','varchar');
@@ -33,9 +33,9 @@ class MODFormulaDetalle extends MODbase{
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-        $this->captura('nombre_item','varchar');
-        $this->captura('precio_unitario','numeric');
-        $this->captura('precio','numeric');
+        $this->captura('nombre_producto','varchar');
+		$this->captura('tipo','varchar');
+        
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

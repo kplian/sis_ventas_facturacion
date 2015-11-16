@@ -48,6 +48,28 @@ class MODMedico extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function listarVendedorMedico(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='vef.ft_medico_sel';
+        $this->transaccion='VF_VENMED_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        
+        $this->setParametro('id_sucursal','id_sucursal','integer');
+                
+        //Definicion de la lista del resultado del query
+        $this->captura('id_vendedor_medico','varchar');
+        $this->captura('nombre_vendedor_medico','varchar');
+        $this->captura('tipo','varchar');
+        
+        
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 			
 	function insertarMedico(){
 		//Definicion de variables para ejecucion del procedimiento

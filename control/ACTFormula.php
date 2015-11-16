@@ -36,9 +36,9 @@ class ACTFormula extends ACTbase{
     
     function insertarFormulaCompleta(){
         $this->objFunc=$this->create('MODFormula'); 
-        if($this->objParam->insertar('id_formula')){
-            $this->res=$this->objFunc->insertarFormulaCompleta($this->objParam);           
-        }
+        
+        $this->res=$this->objFunc->insertarFormulaCompleta($this->objParam);           
+        
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 						

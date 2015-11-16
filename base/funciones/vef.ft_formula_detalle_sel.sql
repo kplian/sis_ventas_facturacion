@@ -46,7 +46,11 @@ BEGIN
     		--Sentencia de la consulta
 			v_consulta:='select
 						fordet.id_formula_detalle,
-						fordet.id_item,
+						(case  when fordet.id_item is not null then
+                        	fordet.id_item
+                        else
+                        	fordet.id_concepto_ingas
+                        end) as id_producto,                        
 						fordet.id_formula,
 						fordet.cantidad,
 						fordet.estado_reg,
@@ -58,12 +62,20 @@ BEGIN
 						fordet.id_usuario_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-						item.nombre,
-                        item.precio_ref,
-                        item.precio_ref * fordet.cantidad	
+						(case  when fordet.id_item is not null then
+                        	item.nombre
+                        else
+                        	cig.desc_ingas
+                        end) as nombre_producto,
+                        (case  when fordet.id_item is not null then
+                        	''item''::varchar
+                        else
+                        	''producto_servicio''::varchar
+                        end) as tipo
 						from vef.tformula_detalle fordet
 						inner join segu.tusuario usu1 on usu1.id_usuario = fordet.id_usuario_reg
-						inner join alm.titem item on item.id_item = fordet.id_item
+						left join alm.titem item on item.id_item = fordet.id_item
+                        left join param.tconcepto_ingas cig on cig.id_concepto_ingas = fordet.id_concepto_ingas
 						left join segu.tusuario usu2 on usu2.id_usuario = fordet.id_usuario_mod
 				        where  ';
 			
@@ -90,7 +102,8 @@ BEGIN
 			v_consulta:='select count(id_formula_detalle)
 					    from vef.tformula_detalle fordet
 					    inner join segu.tusuario usu1 on usu1.id_usuario = fordet.id_usuario_reg
-					    inner join alm.titem item on item.id_item = fordet.id_item
+					    left join alm.titem item on item.id_item = fordet.id_item
+                        left join param.tconcepto_ingas cig on cig.id_concepto_ingas = fordet.id_concepto_ingas
 						left join segu.tusuario usu2 on usu2.id_usuario = fordet.id_usuario_mod
 					    where ';
 			

@@ -31,6 +31,17 @@ select pxp.f_insert_testructura_gui ('ENFORPA', 'VEF');
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
 VALUES (E'vef_tiene_punto_venta', E'false', E'variable global para definir si las ventas se manejaran a nivel sucursal o a nivel punto de venta');
 
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_tipo_venta_habilitado', E'producto_terminado,formula,servicio', E'variable global para definir que tipos de venta estaran habilitados');
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_estados_validar_fp', E'pendiente_entrega,entregado', E'variable global para definir los estados en los q se valida la forma de pago');
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_integracion_almacenes', E'true', E'variable global para definir si el sistema de ventas se integrara con el de almacenes para obtener listadod e items');
+
+
 select pxp.f_insert_tgui ('Cliente', 'Cliente', 'VEFCLI', 'si', 1, 'sis_ventas_facturacion/vista/cliente/Cliente.php', 2, '', 'Cliente', 'VEF');
 select pxp.f_insert_testructura_gui ('VEFCLI', 'VEF');
 

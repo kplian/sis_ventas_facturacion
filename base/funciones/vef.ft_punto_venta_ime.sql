@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_punto_venta_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION vef.ft_punto_venta_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_punto_venta_ime
@@ -58,7 +61,9 @@ BEGIN
 			id_usuario_ai,
 			usuario_ai,
 			id_usuario_mod,
-			fecha_mod
+			fecha_mod,
+            codigo,
+            habilitar_comisiones
           	) values(
 			'activo',
 			v_parametros.id_sucursal,
@@ -69,7 +74,9 @@ BEGIN
 			v_parametros._id_usuario_ai,
 			v_parametros._nombre_usuario_ai,
 			null,
-			null
+			null,
+            v_parametros.codigo,
+            v_parametros.habilitar_comisiones
 							
 			
 			
@@ -102,7 +109,9 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
 			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+			usuario_ai = v_parametros._nombre_usuario_ai,
+            codigo = v_parametros.codigo,
+            habilitar_comisiones = v_parametros.habilitar_comisiones
 			where id_punto_venta=v_parametros.id_punto_venta;
                
 			--Definicion de la respuesta
@@ -153,7 +162,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_punto_venta_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

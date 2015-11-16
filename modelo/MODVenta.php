@@ -53,6 +53,9 @@ class MODVenta extends MODbase{
 		$this->captura('numero_tarjeta','varchar');
 		$this->captura('codigo_tarjeta','varchar');
 		$this->captura('tipo_tarjeta','varchar');
+        $this->captura('porcentaje_descuento','numeric');
+        $this->captura('id_vendedor_medico','varchar');
+		$this->captura('comision','numeric');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -173,6 +176,9 @@ class MODVenta extends MODbase{
 			$this->setParametro('numero_tarjeta','numero_tarjeta','varchar'); 
 			$this->setParametro('codigo_tarjeta','codigo_tarjeta','varchar'); 
 			$this->setParametro('tipo_tarjeta','tipo_tarjeta','varchar'); 
+            $this->setParametro('porcentaje_descuento','porcentaje_descuento','integer'); 
+            $this->setParametro('id_vendedor_medico','id_vendedor_medico','varchar'); 
+			$this->setParametro('comision','comision','numeric'); 
 			 
             
             
@@ -212,6 +218,9 @@ class MODVenta extends MODbase{
                 $this->arreglo['cantidad'] = $f['cantidad'];
                 $this->arreglo['precio'] = $f['precio_unitario'];
                 $this->arreglo['sw_porcentaje_formula'] = $f['sw_porcentaje_formula'];
+                $this->arreglo['porcentaje_descuento'] = $f['porcentaje_descuento'];
+                $this->arreglo['id_vendedor_medico'] = $f['id_vendedor_medico'];
+				$this->arreglo['descripcion'] = $f['descripcion'];
                 $this->arreglo['id_venta'] = $id_venta;                
                 
                 //Define los parametros para la funcion
@@ -223,7 +232,10 @@ class MODVenta extends MODbase{
                 $this->setParametro('estado_reg','estado_reg','varchar');
                 $this->setParametro('cantidad_det','cantidad','int4');
                 $this->setParametro('precio','precio','numeric');
-                $this->setParametro('sw_porcentaje_formula','sw_porcentaje_formula','varchar');               
+                $this->setParametro('sw_porcentaje_formula','sw_porcentaje_formula','varchar');  
+                $this->setParametro('porcentaje_descuento','porcentaje_descuento','int4');             
+                $this->setParametro('id_vendedor_medico','id_vendedor_medico','varchar');
+				$this->setParametro('descripcion','descripcion','text'); 
                 
                 //Ejecuta la instruccion
                 $this->armarConsulta();

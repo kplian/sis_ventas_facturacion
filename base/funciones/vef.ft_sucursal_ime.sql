@@ -68,7 +68,9 @@ BEGIN
 			plantilla_documento_recibo,
 			formato_comprobante,
 			direccion,
-			lugar
+			lugar,
+            habilitar_comisiones,
+            id_lugar
           	) values(
 			v_parametros.correo,
 			v_parametros.nombre,
@@ -89,8 +91,9 @@ BEGIN
 			v_parametros.plantilla_documento_recibo,
 			v_parametros.formato_comprobante,
 			v_parametros.direccion,
-			v_parametros.lugar		
-			
+			v_parametros.lugar,
+            v_parametros.habilitar_comisiones,		
+			v_parametros.id_lugar
 			)RETURNING id_sucursal into v_id_sucursal;
 			
 			--Definicion de la respuesta
@@ -129,7 +132,9 @@ BEGIN
 			plantilla_documento_recibo = v_parametros.plantilla_documento_recibo,
 			formato_comprobante = v_parametros.formato_comprobante,
 			direccion = v_parametros.direccion,
-			lugar = v_parametros.lugar
+			lugar = v_parametros.lugar,
+            habilitar_comisiones = v_parametros.habilitar_comisiones,
+            id_lugar = v_parametros.id_lugar
 			where id_sucursal=v_parametros.id_sucursal;
                
 			--Definicion de la respuesta

@@ -232,7 +232,35 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'acteco.nombre',type:'string'},            
             form : true,
             grid:true
-        },  
+        }, 
+        {
+            config:{
+                name: 'requiere_descripcion',
+                fieldLabel: 'Requiere Descripción',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 130,
+                maxLength:2,
+                emptyText:'si/no...',                   
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',                                  
+               // displayField: 'descestilo',
+                store:['si','no']
+            },
+            type:'ComboBox',
+            //filters:{pfiltro:'promac.inicio',type:'string'},
+            id_grupo:2,
+            filters:{   
+                         type: 'list',
+                         pfiltro:'sprod.requiere_descripcion',
+                         options: ['si','no'],  
+                    },
+            grid:true,
+            form:true
+        },		
+         
 		{
 			config:{
 				name: 'precio',
@@ -402,6 +430,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_sucursal', type: 'numeric'},
 		{name:'id_item', type: 'numeric'},
 		{name:'nombre_item', type: 'string'},
+		{name:'requiere_descripcion', type: 'string'},
 		{name:'nombre_actividad', type: 'string'},
 		{name:'descripcion_producto', type: 'string'},
 		{name:'precio', type: 'numeric'},

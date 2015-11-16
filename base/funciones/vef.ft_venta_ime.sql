@@ -61,6 +61,11 @@ DECLARE
     v_monto_fp				numeric;
     v_a_cuenta				numeric;
     v_fecha_estimada_entrega date;
+    vef_estados_validar_fp	varchar;
+    v_id_punto_venta			integer;
+    v_porcentaje_descuento	integer;
+    v_id_vendedor_medico	varchar;
+    v_comision				numeric;
 			    
 BEGIN
 
@@ -78,19 +83,45 @@ BEGIN
 					
         begin
         
-        if (v_parametros.id_punto_venta is not null) then
+        if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
+        	v_id_punto_venta = v_parametros.id_punto_venta;
+        else
+        	v_id_punto_venta = NULL;
+        end if;
+        
+        v_porcentaje_descuento = 0;
+        --verificar si existe porcentaje de descuento
+        if (pxp.f_existe_parametro(p_tabla,'porcentaje_descuento')) then
+            v_porcentaje_descuento = v_parametros.porcentaje_descuento;
+        end if;
+                  
+        v_id_vendedor_medico = NULL;
+        if (pxp.f_existe_parametro(p_tabla,'id_vendedor_medico')) then
+        	v_id_vendedor_medico = v_parametros.id_vendedor_medico;            
+        end if;
+        
+        if (v_id_punto_venta is not null) then
         	select id_sucursal into v_id_sucursal
         	from vef.tpunto_venta
-        	where id_punto_venta = v_parametros.id_punto_venta;
+        	where id_punto_venta = v_id_punto_venta;
         else
 	        v_id_sucursal = v_parametros.id_sucursal;
 	        
         end if;
+       
+        
+        
         
         if (pxp.f_existe_parametro(p_tabla,'a_cuenta')) then
         	v_a_cuenta = v_parametros.a_cuenta;
         else
         	v_a_cuenta = 0;
+        end if;
+        
+        if (pxp.f_existe_parametro(p_tabla,'comision')) then
+        	v_comision = v_parametros.comision;
+        else
+        	v_comision = 0;
         end if;
         
         if (pxp.f_existe_parametro(p_tabla,'fecha_estimada_entrega')) then
@@ -176,7 +207,11 @@ BEGIN
 			id_usuario_mod,
 			fecha_mod,
 			estado,
-			id_punto_venta
+			id_punto_venta,
+            id_vendedor_medico,
+            porcentaje_descuento,
+            comision
+            
           	) values(
             v_id_venta,
 			v_id_cliente,
@@ -194,14 +229,15 @@ BEGIN
 			null,
 			null,
 			v_codigo_estado,
-			v_parametros.id_punto_venta		
+			v_id_punto_venta,
+            v_id_vendedor_medico,
+            v_porcentaje_descuento,
+            v_comision		
 			
 			) returning id_venta into v_id_venta;
 			
 			if (v_parametros.id_forma_pago != 0 ) then
-				if (v_parametros.monto_forma_pago = 0 ) then
-					raise exception 'El importe recibido no puede ser 0';
-				end if;
+				
 				insert into vef.tventa_forma_pago(
 					usuario_ai,
 					fecha_reg,
@@ -225,8 +261,8 @@ BEGIN
 					v_parametros._id_usuario_ai,
 					'activo',
                     v_parametros.id_forma_pago,
-					v_id_venta,                    
-					v_parametros.monto_forma_pago,
+					v_id_venta,   
+                    v_parametros.monto_forma_pago,                 
 					0,
 					0,
 					0,
@@ -256,11 +292,16 @@ BEGIN
 	elsif(p_transaccion='VF_VEN_MOD')then
 
 		begin
+        	if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
+                v_id_punto_venta = v_parametros.id_punto_venta;
+            else
+                v_id_punto_venta = NULL;
+            end if;
         	
-			if (v_parametros.id_punto_venta is not null) then
+			if (v_id_punto_venta is not null) then
 	        	select id_sucursal into v_id_sucursal
 	        	from vef.tpunto_venta
-	        	where id_punto_venta = v_parametros.id_punto_venta;
+	        	where id_punto_venta = v_id_punto_venta;
 	        else
 	        	v_id_sucursal = v_parametros.id_sucursal;
 	        end if;
@@ -269,6 +310,23 @@ BEGIN
                 v_a_cuenta = v_parametros.a_cuenta;
             else
                 v_a_cuenta = 0;
+            end if;
+            
+             if (pxp.f_existe_parametro(p_tabla,'comision')) then
+                v_comision = v_parametros.comision;
+            else
+                v_comision = 0;
+            end if;
+            
+            v_porcentaje_descuento = 0;
+            --verificar si existe porcentaje de descuento
+            if (pxp.f_existe_parametro(p_tabla,'porcentaje_descuento')) then
+                v_porcentaje_descuento = v_parametros.porcentaje_descuento;
+            end if;
+                      
+            v_id_vendedor_medico = NULL;
+            if (pxp.f_existe_parametro(p_tabla,'id_vendedor_medico')) then
+                v_id_vendedor_medico = v_parametros.id_vendedor_medico;            
             end if;
             
             if (pxp.f_existe_parametro(p_tabla,'fecha_estimada_entrega')) then
@@ -315,14 +373,14 @@ BEGIN
 			fecha_mod = now(),
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai,
-			id_punto_venta = v_parametros.id_punto_venta
+			id_punto_venta = v_id_punto_venta,
+            id_vendedor_medico = v_parametros.id_vendedor_medico,
+            porcentaje_descuento = v_parametros.porcentaje_descuento,
+            comision = v_comision
 			where id_venta=v_parametros.id_venta;
 			
 			if (v_parametros.id_forma_pago != 0 ) then
-				if (v_parametros.monto_forma_pago = 0 ) then
-					raise exception 'El importe recibido no puede ser 0';
-				end if;
-                
+				               
                 delete from vef.tventa_forma_pago 
                 where id_venta = v_parametros.id_venta;
                 
@@ -380,6 +438,12 @@ BEGIN
 
 		begin
 			--Sentencia de la eliminacion
+            delete from vef.tventa_forma_pago
+            where id_venta=v_parametros.id_venta;
+            
+            delete from vef.tventa_detalle
+            where id_venta=v_parametros.id_venta;
+            
 			delete from vef.tventa
             where id_venta=v_parametros.id_venta;
                
@@ -448,6 +512,8 @@ BEGIN
 	elsif(p_transaccion='VF_VENVALI_MOD')then
 
 		begin
+        	 vef_estados_validar_fp = pxp.f_get_variable_global('vef_estados_validar_fp');
+             
 			select v.* ,sm.id_moneda as id_moneda_base,m.codigo  as moneda into v_venta
 			from vef.tventa v
 			inner join vef.tsucursal suc on suc.id_sucursal = v.id_sucursal
@@ -455,60 +521,63 @@ BEGIN
 			inner join param.tmoneda m on m.id_moneda = sm.id_moneda
 			where id_venta = v_parametros.id_venta;
 			
-			select count(*) into v_cantidad_fp
-            from vef.tventa_forma_pago
-            where id_venta =   v_parametros.id_venta;
-			
-			v_acumulado_fp = 0;
-			
-			for v_registros in (select vfp.id_venta_forma_pago, fp.id_moneda,vfp.monto_transaccion
-								from vef.tventa_forma_pago vfp
-								inner join vef.tforma_pago fp on fp.id_forma_pago = vfp.id_forma_pago								
-								where vfp.id_venta = v_parametros.id_venta)loop
-				if (v_registros.id_moneda != v_venta.id_moneda_base) then
-					v_monto_fp = param.f_get_tipo_cambio(v_registros.id_moneda,v_venta.fecha_reg::date,NULL) * v_registros.monto_transaccion;
-				else
-					v_monto_fp = v_registros.monto_transaccion;
-				end if;
-				
-				if (v_monto_fp >= v_venta.total_venta and v_cantidad_fp > 1) then
-					raise exception 'Se ha definido mas de una forma de pago, pero existe una que supera el valor de la venta(solo se requiere una forma de pago)';
-				end if;
-				
-				update vef.tventa_forma_pago set
-				monto = v_monto_fp,
-				cambio = (case when (v_monto_fp + v_acumulado_fp - v_venta.total_venta) > 0 then
-						 	(v_monto_fp + v_acumulado_fp - v_venta.total_venta)
-						 else
-						 	0
-						 end),
-				monto_mb_efectivo = (case when (v_monto_fp + v_acumulado_fp - v_venta.total_venta) > 0 then
-									 	v_monto_fp - (v_monto_fp + v_acumulado_fp - v_venta.total_venta)
-									 else
-									 	v_monto_fp
-									 end)
-				where id_venta_forma_pago = v_registros.id_venta_forma_pago;
-                v_acumulado_fp = v_acumulado_fp + v_monto_fp;
-			end loop;
-			
-            select sum(monto_mb_efectivo) into v_suma_fp
-            from vef.tventa_forma_pago
-            where id_venta =   v_parametros.id_venta;
+            if (v_venta.estado =ANY(string_to_array(vef_estados_validar_fp,',')))then
             
-            select sum(cantidad*precio) into v_suma_det
-            from vef.tventa_detalle
-            where id_venta =   v_parametros.id_venta;
-            
-            if (v_suma_fp < v_venta.total_venta) then
-            	raise exception 'El importe recibido es menor al valor de la venta';
-            end if;
-            
-            if (v_suma_fp > v_venta.total_venta) then
-            	raise exception 'El total de la venta no coincide con la división por forma de pago%',v_suma_fp;
-            end if;
-            
-            if (v_suma_det != v_venta.total_venta) then
-            	raise exception 'El total de la venta no coincide con la suma de los detalles';
+                select count(*) into v_cantidad_fp
+                from vef.tventa_forma_pago
+                where id_venta =   v_parametros.id_venta;
+    			
+                v_acumulado_fp = v_venta.a_cuenta;
+    			
+                for v_registros in (select vfp.id_venta_forma_pago, fp.id_moneda,vfp.monto_transaccion
+                                    from vef.tventa_forma_pago vfp
+                                    inner join vef.tforma_pago fp on fp.id_forma_pago = vfp.id_forma_pago								
+                                    where vfp.id_venta = v_parametros.id_venta)loop
+                    if (v_registros.id_moneda != v_venta.id_moneda_base) then
+                        v_monto_fp = param.f_get_tipo_cambio(v_registros.id_moneda,v_venta.fecha_reg::date,NULL) * v_registros.monto_transaccion;
+                    else
+                        v_monto_fp = v_registros.monto_transaccion;
+                    end if;
+    				
+                    if (v_monto_fp >= v_venta.total_venta and v_cantidad_fp > 1) then
+                        raise exception 'Se ha definido mas de una forma de pago, pero existe una que supera el valor de la venta(solo se requiere una forma de pago)';
+                    end if;
+    				
+                    update vef.tventa_forma_pago set
+                    monto = v_monto_fp,
+                    cambio = (case when (v_monto_fp + v_acumulado_fp - v_venta.total_venta) > 0 then
+                                (v_monto_fp + v_acumulado_fp - v_venta.total_venta)
+                             else
+                                0
+                             end),
+                    monto_mb_efectivo = (case when (v_monto_fp + v_acumulado_fp - v_venta.total_venta) > 0 then
+                                            v_monto_fp - (v_monto_fp + v_acumulado_fp - v_venta.total_venta)
+                                         else
+                                            v_monto_fp
+                                         end)
+                    where id_venta_forma_pago = v_registros.id_venta_forma_pago;
+                    v_acumulado_fp = v_acumulado_fp + v_monto_fp;
+                end loop;
+    			
+                select sum(monto_mb_efectivo) into v_suma_fp
+                from vef.tventa_forma_pago
+                where id_venta =   v_parametros.id_venta;
+                
+                select sum(cantidad*precio) into v_suma_det
+                from vef.tventa_detalle
+                where id_venta =   v_parametros.id_venta;
+                
+                if (v_suma_fp < v_venta.total_venta) then
+                    raise exception 'El importe recibido es menor al valor de la venta';
+                end if;
+                
+                if (v_suma_fp > v_venta.total_venta) then
+                    raise exception 'El total de la venta no coincide con la división por forma de pago%',v_suma_fp;
+                end if;
+                
+                if (v_suma_det != v_venta.total_venta) then
+                    raise exception 'El total de la venta no coincide con la suma de los detalles';
+                end if;
             end if;
             
             select sum(cambio) into v_suma_fp

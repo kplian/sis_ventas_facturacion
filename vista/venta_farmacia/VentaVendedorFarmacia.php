@@ -14,13 +14,16 @@ Phx.vista.VentaVendedorFarmacia = {
 	requireclase:'Phx.vista.VentaVendedor',
 	title:'Venta',
 	nombreVista: 'VentaVendedorFarmacia',
-	
+	formUrl : '../../../sis_ventas_facturacion/vista/venta_farmacia/FormVentaFarmacia.php',
+	formClass : 'FormVentaFarmacia',
 	constructor: function(config) {	
 		Phx.vista.VentaVendedorFarmacia.superclass.constructor.call(this,config);		
    },
    successGetVariables :function (response,request) {     				  		
   		this.addElements();
-		Phx.vista.VentaVendedorFarmacia.superclass.successGetVariables.call(this,response,request);  
+		Phx.vista.VentaVendedorFarmacia.superclass.successGetVariables.call(this,response,request); 
+		this.formUrl = '../../../sis_ventas_facturacion/vista/venta_farmacia/FormVentaFarmacia.php';
+        this.formClass = 'FormVentaFarmacia'; 
   },
    addElements : function () {
   	this.Atributos.push({

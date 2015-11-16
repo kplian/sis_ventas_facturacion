@@ -18,6 +18,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
     autoScroll: false,
     breset: false,
     labelSubmit: '<i class="fa fa-check"></i> Guardar',
+    
     constructor:function(config)
     {   
         
@@ -25,61 +26,109 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
         this.addEvents('successsave');
         
         this.buildComponentesDetalle();
+        
         this.buildDetailGrid();
+        
         this.buildGrupos();
+        console.log(config);
+        if(config.data.tipo_form == 'edit') {
+        	this.breset = true;
+        	this.labelReset= '<i class="fa fa-check"></i> Guardar como Nuevo';
+        	this.tooltipReset= '<b>Guarda la formula/paquete como si fuera un nuevo registro</b>';
+        	this.iconReset= '../../../lib/imagenes/print.gif';
+        	this.clsReset=  'bsave';
+        }
         
         Phx.vista.FormFormula.superclass.constructor.call(this,config);
         this.init();    
         this.iniciarEventos();
-        //this.iniciarEventosDetalle();
-        //this.onNew();
+        if(this.data.tipo_form == 'new'){
+        	this.onNew();
+        }
+        else{
+        	this.onEdit();
+        }
                 
     },
     buildComponentesDetalle: function(){
         this.detCmp = {
-                   'id_item': new Ext.form.ComboBox({
-                                            name : 'id_item',
-                                            fieldLabel : 'Item',
-                                            allowBlank : false,
-                                            msgTarget: 'title',
-                                            emptyText : 'Elija un Item...',
-                                            store : new Ext.data.JsonStore({
-                                                url : '../../sis_almacenes/control/Item/listarItemNotBase',
-                                                id : 'id_item',
-                                                root : 'datos',
-                                                sortInfo : {
-                                                    field : 'nombre',
-                                                    direction : 'ASC'
+        			'tipo': new Ext.form.ComboBox({
+                            name: 'tipo',
+                            fieldLabel: 'Tipo detalle',
+                            allowBlank:false,
+                            emptyText:'Tipo...',
+                            typeAhead: true,
+                            triggerAction: 'all',
+                            lazyRender:true,
+                            mode: 'local',
+                            gwidth: 150,
+                            store:['producto_servicio','item']
+                    }),
+                   'id_producto': new Ext.form.ComboBox({
+                                            name: 'id_producto',
+                                            fieldLabel: 'Producto/Servicio',
+                                            allowBlank: false,
+                                            emptyText: 'Productos...',
+                                            store: new Ext.data.JsonStore({
+                                                url: '../../sis_ventas_facturacion/control/SucursalProducto/listarItemsFormula',
+                                                id: 'id_producto',
+                                                root: 'datos',
+                                                sortInfo: {
+                                                    field: 'nombre',
+                                                    direction: 'ASC'
                                                 },
-                                                totalProperty : 'total',
-                                                fields : ['id_item', 'nombre', 'codigo', 'desc_clasificacion', 'codigo_unidad'],
-                                                remoteSort : true,
-                                                baseParams : {
-                                                    par_filtro : 'item.nombre#item.codigo#cla.nombre'
-                                                }
+                                                totalProperty: 'total',
+                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','unidad_medida'],
+                                                remoteSort: true,
+                                                baseParams: {par_filtro: 'todo.nombre'}
                                             }),
-                                            valueField : 'id_item',
-                                            displayField : 'nombre',                                           
-                                            qtip:'Seleccione un item',
-                                            tpl : '<tpl for="."><div class="x-combo-list-item"><p>Nombre: {nombre}</p><p>Código: {codigo}</p><p>Clasif.: {desc_clasificacion}</p></div></tpl>',
-                                            hiddenName : 'id_item',
-                                            forceSelection : true,
-                                            typeAhead : false,
-                                            triggerAction : 'all',
-                                            lazyRender : true,
-                                            mode : 'remote',
-                                            pageSize : 10,
-                                            queryDelay : 1000,                
-                                            minChars : 2,                                        
-                                            resizable: true
+                                            valueField: 'id_producto',
+                                            displayField: 'nombre_producto',
+                                            gdisplayField: 'nombre_producto',
+                                            hiddenName: 'id_producto',
+                                            forceSelection: true,
+                                            tpl : new Ext.XTemplate('<tpl for="."><div class="x-combo-list-item">',
+                                            '<p><b>Nombre:</b> {nombre_producto}</p><p><b>Unidad:</b> {unidad_medida}</p><p><b>Descripcion:</b> {descripcion}</p></div></tpl>'),
+                                            typeAhead: false,
+                                            triggerAction: 'all',
+                                            lazyRender: true,
+                                            mode: 'remote',
+                                            resizable:true,
+                                            pageSize: 15,
+                                            queryDelay: 1000,
+                                            anchor: '100%',
+                                            width : 250,
+                                            listWidth:'450',
+                                            minChars: 2 ,
+                                            disabled:true                                           
                                          }),                  
                     'cantidad': new Ext.form.NumberField({
-                                        name: 'cantidad_sol',
+                                        name: 'cantidad',
                                         msgTarget: 'title',
                                         fieldLabel: 'Cantidad',
                                         allowBlank: false,
                                         allowDecimals: false,
-                                        maxLength:10
+                                        maxLength:10,
+                                        enableKeyEvents : true
+                                        
+                                }),
+                    'precio_unitario': new Ext.form.NumberField({
+                                        name: 'precio_unitario',
+                                        msgTarget: 'title',
+                                        fieldLabel: 'P/U',
+                                        allowBlank: false,
+                                        allowDecimals: true,
+                                        maxLength:10,
+                                        readOnly :true
+                                }),
+                    'precio_total': new Ext.form.NumberField({
+                                        name: 'precio_total',
+                                        msgTarget: 'title',
+                                        fieldLabel: 'Total',
+                                        allowBlank: false,
+                                        allowDecimals: false,
+                                        maxLength:10,
+                                        readOnly :true
                                 })
                     
               }
@@ -87,6 +136,35 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
             
     }, 
     
+    iniciarEventos : function () {   	
+        
+        this.detCmp.tipo.on('select',function(c,r,i) {
+            this.cambiarCombo(r.data.field1);
+        },this); 
+        
+        this.detCmp.id_producto.on('select',function(c,r,i) {
+            this.detCmp.precio_unitario.setValue(Number(r.data.precio));
+            this.detCmp.precio_total.setValue(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()));
+        	
+        },this);
+        
+        this.detCmp.cantidad.on('keyup',function() {  
+            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
+        },this);        
+        
+    },
+    
+    cambiarCombo : function (tipo) {
+    	this.detCmp.id_producto.setDisabled(false);
+    	this.detCmp.id_producto.store.baseParams.tipo = tipo;    	
+    	this.detCmp.id_producto.modificado = true;
+    	this.detCmp.id_producto.reset();
+    },
+    
+    onNew: function(){      
+      this.accionFormulario = 'NEW'; 
+      
+  	},
     
     
     onCancelAdd: function(re,save){
@@ -94,8 +172,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
             this.mestore.remove(this.mestore.getAt(0));
         }
         
-        this.sw_init_add = false;
-        this.evaluaGrilla();
+        this.sw_init_add = false;        
     },
     onUpdateRegister: function(){
         this.sw_init_add = false;
@@ -104,10 +181,10 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
     onAfterEdit:function(re, o, rec, num){
         //set descriptins values ...  in combos boxs
         
-        var cmb_rec = this.detCmp['id_item'].store.getById(rec.get('id_item'));
+        var cmb_rec = this.detCmp['id_producto'].store.getById(rec.get('id_producto'));
         if(cmb_rec) {
             
-            rec.set('nombre_item', cmb_rec.get('nombre')); 
+            rec.set('nombre_producto', cmb_rec.get('nombre_producto')); 
         }        
         
     },
@@ -119,7 +196,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                         name: 'cantidad',
                         type: 'int'
                     }, {
-                        name: 'id_item',
+                        name: 'id_producto',
                         type: 'int'
                     }
                     ]);
@@ -129,10 +206,10 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                     id: 'id_formula_detalle',
                     root: 'datos',
                     totalProperty: 'total',
-                    fields: ['id_formula_detalle','id_item','id_formula', 'cantidad',
-                             'nombre_item'
+                    fields: ['id_formula_detalle','tipo','id_producto', 'cantidad',
+                             'nombre_producto','precio_unitario','precio_total'
                     ],remoteSort: true,
-                    baseParams: {dir:'ASC',sort:'id_formula_detalle',limit:'50',start:'0'}
+                    baseParams: {dir:'ASC',sort:'id_formula_detalle',limit:'100',start:'0'}
                 });
         
         this.editorDetail = new Ext.ux.grid.RowEditor({
@@ -141,7 +218,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                
             });            
         
-                
+        this.editorDetail.on('beforeedit', this.onInitAdd , this);         
         //al cancelar la edicion
         this.editorDetail.on('canceledit', this.onCancelAdd , this);
         
@@ -149,12 +226,6 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
         this.editorDetail.on('validateedit', this.onUpdateRegister, this);
         
         this.editorDetail.on('afteredit', this.onAfterEdit, this);
-        
-        
-        
-        
-        
-        
         
         this.megrid = new Ext.grid.GridPanel({
                     layout: 'fit',
@@ -173,7 +244,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                         width: '100',
                         handler: function() {                                
                                  var e = new Items({
-                                    id_item: undefined,
+                                    id_producto: undefined,
                                     cantidad: 0});
                                 
                                 this.editorDetail.stopEditing();
@@ -193,30 +264,55 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                             var s = this.megrid.getSelectionModel().getSelections();
                             for(var i = 0, r; r = s[i]; i++){
                                 this.mestore.remove(r);
-                            }
-                            this.evaluaGrilla();
+                            }                            
                         }
                     }],
             
                     columns: [
                     new Ext.grid.RowNumberer(),
                     {
-                        header: 'Item',
-                        dataIndex: 'id_item',
-                        width: 200,
+                        header: 'Tipo',
+                        dataIndex: 'tipo',
+                        width: 90,
+                        sortable: false,                        
+                        editor: this.detCmp.tipo 
+                    }, 
+                    {
+                        header: 'Producto/Servicio',
+                        dataIndex: 'id_producto',
+                        width: 350,
                         sortable: false,
-                        renderer:function(value, p, record){return String.format('{0}', record.data['nombre_item']);},
-                        editor: this.detCmp.id_item 
-                    },                    
+                        renderer:function(value, p, record){return String.format('{0}', record.data['nombre_producto']);},
+                        editor: this.detCmp.id_producto 
+                    },                   
                     {
                        
                         header: 'Cantidad',
                         dataIndex: 'cantidad',
                         align: 'center',
-                        width: 50,
+                        width: 100,
+                        align: 'right',
                         editor: this.detCmp.cantidad 
                     }]
                 });
+        
+    },
+    onInitAdd : function (r, i) {  
+    	
+        this.detCmp.id_producto.setDisabled(true);       
+        var record = this.megrid.store.getAt(i);
+        var recTem = new Array();
+        recTem['id_producto'] = record.data['id_producto'];
+        recTem['nombre_producto'] = record.data['nombre_producto'];
+        
+        this.detCmp.id_producto.store.add(new Ext.data.Record(this.arrayToObject(this.detCmp.id_producto.store.fields.keys,recTem), record.data['id_producto']));
+        this.detCmp.id_producto.store.commitChanges();
+        this.detCmp.id_producto.modificado = true;
+        
+        if (record.data.tipo != '' && record.data.tipo != undefined) {
+            
+            this.cambiarCombo(record.data.tipo);
+        }
     },
     buildGrupos: function(){
         this.Grupos = [{
@@ -287,6 +383,29 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
         
         
     },
+    loadValoresIniciales:function() 
+    {                
+       Phx.vista.FormVenta.superclass.loadValoresIniciales.call(this);
+    },
+    onReset:function(o){
+    	// Show a dialog using config options:
+		Ext.Msg.show({
+		   title:'Guardar?',
+		   msg: 'Esta seguro de guardar esta formula/paquete como una nueva?',
+		   buttons: Ext.Msg.YESNO,
+		   fn: function(a) {
+		   		if (a == 'yes'){
+		   			this.Cmp.id_formula.reset();
+					this.onSubmit(o);
+		   		}
+		   },
+		   
+		   scope : this,
+		   icon: Ext.MessageBox.QUESTION
+		});
+    	
+	},
+	
     onSubmit: function(o) {
         //  validar formularios
         var arra = [], i, me = this;
@@ -307,7 +426,38 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
         else{
             alert('no tiene ningun elemento en la formula')
         }
+    },   
+    
+    onEdit:function(){
+        
+    	this.accionFormulario = 'EDIT';  
+    	var recTem = new Array();
+        recTem['id_medico'] = this.data.datos_originales.data.id_medico;
+        recTem['primer_apellido'] = this.data.datos_originales.data.desc_medico;
+        
+        this.Cmp.id_medico.store.add(new Ext.data.Record(this.arrayToObject(this.Cmp.id_medico.store.fields.keys,recTem), this.data.datos_originales.id_medico));
+        this.Cmp.id_medico.store.commitChanges();
+        this.Cmp.id_medico.modificado = true;  
+        
+        var recTem = new Array();
+        recTem['id_unidad_medida'] = this.data.datos_originales.data.id_unidad_medida;
+        recTem['codigo'] = this.data.datos_originales.data.desc_unidad_medida;
+        
+        this.Cmp.id_unidad_medida.store.add(new Ext.data.Record(this.arrayToObject(this.Cmp.id_unidad_medida.store.fields.keys,recTem), this.data.datos_originales.id_unidad_medida));
+        this.Cmp.id_unidad_medida.store.commitChanges();
+        this.Cmp.id_unidad_medida.modificado = true; 
+        
+        	
+    	this.loadForm(this.data.datos_originales);    	
+    	
+        //load detalle de conceptos
+        this.mestore.baseParams.id_formula = this.Cmp.id_formula.getValue();
+        this.mestore.load();      	
+        
     },    
+    onNew: function(){    	
+    	this.accionFormulario = 'NEW';
+	}, 
     
     successSave:function(resp)
     {
@@ -323,7 +473,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
             config:{
                     labelSeparator:'',
                     inputType:'hidden',
-                    name: 'id_formulario'
+                    name: 'id_formula'
             },
             type:'Field',
             form:true 
@@ -434,7 +584,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                     }
                 }),
                 valueField : 'id_unidad_medida',
-                displayField : 'descripcion',                
+                displayField : 'codigo',                
                 hiddenName : 'id_unidad_medida',
                 forceSelection : true,
                 typeAhead : false,

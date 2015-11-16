@@ -23,6 +23,21 @@ class ACTMedico extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+    
+    function listarVendedorMedico(){
+        $this->objParam->defecto('ordenacion','id_vendedor_medico');
+
+        $this->objParam->defecto('dir_ordenacion','asc');
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODMedico','listarVendedorMedico');
+        } else{
+            $this->objFunc=$this->create('MODMedico');
+            
+            $this->res=$this->objFunc->listarVendedorMedico($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 				
 	function insertarMedico(){
 		$this->objFunc=$this->create('MODMedico');	

@@ -33,6 +33,9 @@ class MODPuntoVenta extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('codigo','varchar');
+		$this->captura('habilitar_comisiones','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -53,6 +56,8 @@ class MODPuntoVenta extends MODbase{
 		$this->setParametro('id_sucursal','id_sucursal','int4');
 		$this->setParametro('nombre','nombre','varchar');
 		$this->setParametro('descripcion','descripcion','text');
+		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('habilitar_comisiones','habilitar_comisiones','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -74,6 +79,8 @@ class MODPuntoVenta extends MODbase{
 		$this->setParametro('id_sucursal','id_sucursal','int4');
 		$this->setParametro('nombre','nombre','varchar');
 		$this->setParametro('descripcion','descripcion','text');
+		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('habilitar_comisiones','habilitar_comisiones','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

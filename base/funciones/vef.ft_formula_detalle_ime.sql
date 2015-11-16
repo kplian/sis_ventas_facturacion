@@ -30,6 +30,8 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_formula_detalle	integer;
+    v_id_concepto_ingas		integer;
+    v_id_item				INTEGER;
 			    
 BEGIN
 
@@ -46,9 +48,17 @@ BEGIN
 	if(p_transaccion='VF_FORDET_INS')then
 					
         begin
+        	if (v_parametros.tipo = 'item') then
+            	v_id_item = v_parametros.id_producto;
+                v_id_concepto_ingas = NULL;
+            else
+            	v_id_item = NULL;
+                v_id_concepto_ingas = v_parametros.id_producto;
+            end if;
         	--Sentencia de la insercion
         	insert into vef.tformula_detalle(
 			id_item,
+            id_concepto_ingas,
 			id_formula,
 			cantidad,
 			estado_reg,
@@ -57,7 +67,8 @@ BEGIN
 			fecha_mod,
 			id_usuario_mod
           	) values(
-			v_parametros.id_item,
+			v_id_item,
+            v_id_concepto_ingas,
 			v_parametros.id_formula,
 			v_parametros.cantidad_det,
 			'activo',

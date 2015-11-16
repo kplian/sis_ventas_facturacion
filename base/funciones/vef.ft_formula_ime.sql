@@ -101,8 +101,8 @@ BEGIN
 
 		begin
         
-        	if ((pxp.f_existe_parametro(p_tabla,'duplicar') =true and v_parametros.duplicar = 'no')
-            		or pxp.f_existe_parametro(p_tabla,'duplicar') =FALSE) then
+        	--if ((pxp.f_existe_parametro(p_tabla,'duplicar') =true and v_parametros.duplicar = 'no')
+            --		or pxp.f_existe_parametro(p_tabla,'duplicar') =FALSE) then
                   --Sentencia de la modificacion
                   update vef.tformula set
                   --id_tipo_presentacion = v_parametros.id_tipo_presentacion,
@@ -116,7 +116,7 @@ BEGIN
                   id_usuario_ai = v_parametros._id_usuario_ai,
                   usuario_ai = v_parametros._nombre_usuario_ai
                   where id_formula=v_parametros.id_formula;
-            else
+           /* else
             		--Sentencia de la insercion
                   insert into vef.tformula(
                   --id_tipo_presentacion,
@@ -173,7 +173,7 @@ BEGIN
                         );
                   end loop;
             
-            end if;
+            end if;*/
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Fórmula modificado(a)'); 
@@ -182,6 +182,28 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
             
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'VF_FORALLDET_ELI'
+ 	#DESCRIPCION:	Eliminacion de los detalles relacionados a una formula
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_FORALLDET_ELI')then
+
+		begin
+			--Sentencia de la eliminacion
+			delete from vef.tformula_detalle
+            where id_formula=v_parametros.id_formula;
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas detalle eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_formula',v_parametros.id_formula::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
 		end;
 
 	/*********************************    
@@ -195,6 +217,10 @@ BEGIN
 
 		begin
 			--Sentencia de la eliminacion
+            
+            delete from vef.tformula_detalle
+            where id_formula=v_parametros.id_formula;
+            
 			delete from vef.tformula
             where id_formula=v_parametros.id_formula;
                

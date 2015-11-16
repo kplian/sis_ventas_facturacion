@@ -122,7 +122,8 @@ BEGIN
 			id_usuario_ai,
 			fecha_mod,
 			id_usuario_mod,           
-            id_concepto_ingas
+            id_concepto_ingas,
+            requiere_descripcion
           	) values(
 			v_parametros.id_sucursal,
 			v_parametros.id_item,			
@@ -135,7 +136,8 @@ BEGIN
 			v_parametros._id_usuario_ai,
 			null,
 			null,            
-            v_id_concepto	
+            v_id_concepto,
+            v_parametros.requiere_descripcion	
 			)RETURNING id_sucursal_producto into v_id_sucursal_producto;
 			
 			--Definicion de la respuesta
@@ -247,7 +249,8 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai,
-            id_concepto_ingas = v_id_concepto
+            id_concepto_ingas = v_id_concepto,
+            requiere_descripcion = v_parametros.requiere_descripcion
 			where id_sucursal_producto=v_parametros.id_sucursal_producto;
                
 			--Definicion de la respuesta

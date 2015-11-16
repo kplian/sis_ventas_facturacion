@@ -261,7 +261,48 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                     },
             grid:true,
             form:true
-        },				
+        },	
+        {
+			config:{
+				name: 'id_lugar',
+				fieldLabel: 'Lugar',
+				allowBlank: false,
+				emptyText:'Lugar...',
+				store:new Ext.data.JsonStore(
+				{
+					url: '../../sis_parametros/control/Lugar/listarLugar',
+					id: 'id_lugar',
+					root: 'datos',
+					sortInfo:{
+						field: 'nombre',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_lugar','id_lugar_fk','codigo','nombre','tipo','sw_municipio','sw_impuesto','codigo_largo'],
+					// turn on remote sorting
+					remoteSort: true,
+					baseParams:{par_filtro:'lug.nombre',tipo:'departamento'}
+				}),
+				valueField: 'id_lugar',
+				displayField: 'nombre',
+				gdisplayField:'nombre_lugar',
+				hiddenName: 'id_lugar',
+    			triggerAction: 'all',
+    			lazyRender:true,
+				mode:'remote',
+				pageSize:50,
+				queryDelay:500,
+				anchor:"100%",
+				gwidth:150,
+				minChars:2,
+				renderer:function (value, p, record){return String.format('{0}', record.data['nombre_lugar']);}
+			},
+			type:'ComboBox',
+			filters:{pfiltro:'lug.nombre',type:'string'},
+			id_grupo:0,
+			grid:true,
+			form:true
+		},			
 		
         {
             config:{
@@ -398,6 +439,35 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:true
         },
+        
+        {
+            config:{
+                name: 'habilitar_comisiones',
+                fieldLabel: 'Habilitar Comisiones',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 130,
+                maxLength:2,
+                emptyText:'si/no...',                   
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',                                  
+               // displayField: 'descestilo',
+                store:['si','no']
+            },
+            type:'ComboBox',
+            //filters:{pfiltro:'promac.inicio',type:'string'},
+            id_grupo:1,
+            filters:{   
+                         type: 'list',
+                         pfiltro:'suc.habilitar_comisiones',
+                         options: ['si','no'],  
+                    },
+            grid:true,
+            form:true
+        },
+        
 		{
 			config:{
 				name: 'estado_reg',
@@ -534,13 +604,16 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
          }],
 	fields: [
 		{name:'id_sucursal', type: 'numeric'},
+		{name:'id_lugar', type: 'numeric'},
 		{name:'id_entidad', type: 'numeric'},
 		{name:'correo', type: 'string'},
 		{name:'nombre', type: 'string'},
+		{name:'nombre_lugar', type: 'string'},
 		{name:'telefono', type: 'string'},
 		{name:'direccion', type: 'string'},
 		{name:'lugar', type: 'string'},
 		{name:'tiene_precios_x_sucursal', type: 'string'},
+		{name:'habilitar_comisiones', type: 'string'},
 		{name:'plantilla_documento_factura', type: 'string'},
 		{name:'plantilla_documento_recibo', type: 'string'},
 		{name:'formato_comprobante', type: 'string'},		

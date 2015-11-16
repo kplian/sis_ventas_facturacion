@@ -17,13 +17,7 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.Formula.superclass.constructor.call(this,config);
 		this.init();
-		this.addButton('btnDuplicar', {
-                text : 'Duplicar',
-                iconCls : 'bduplicate',
-                disabled : true,
-                handler : this.onBtnDuplicar,
-                tooltip : '<b>Duplica fórmula seleccionada</b>'
-            });
+		
 		this.load({params:{start:0, limit:this.tam_pag}})
 	},
 			
@@ -392,13 +386,21 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	
-    south : {
+    /*south : {
             url : '../../../sis_ventas_facturacion/vista/formula_detalle/FormulaDetalle.php',
             title : 'Detalle',
             height : '50%',
             cls : 'FormulaDetalle'
-    },
+    },*/
     onButtonNew : function () {
+        //abrir formulario de solicitud
+        this.openForm('new');        
+    },
+    onButtonEdit : function () {
+        //abrir formulario de solicitud
+        this.openForm('edit', this.sm.getSelected());        
+    }, 
+    openForm : function (tipo, record) {
         //abrir formulario de solicitud
            var me = this;
            me.objSolForm = Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/formula/FormFormula.php',
@@ -407,7 +409,9 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
                                         modal:true,
                                         width:'60%',
                                         height:'90%'
-                                    }, {data:{objPadre: me}
+                                    }, {data:{objPadre: me,
+                                    		tipo_form : tipo,
+                                    		datos_originales: record}
                                     }, 
                                     this.idContenedor,
                                     'FormFormula',
@@ -438,23 +442,16 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
         var data = this.getSelectedData();
         var tb =this.tbar;
         Phx.vista.Formula.superclass.preparaMenu.call(this,n);
-        this.getBoton('btnDuplicar').enable();
+        
         return tb;
      }, 
      liberaMenu:function(){
         var tb = Phx.vista.Formula.superclass.liberaMenu.call(this);
-        this.getBoton('btnDuplicar').disable();
+        
         
        return tb;
    },
-   onBtnDuplicar : function () {
-       Phx.vista.Formula.superclass.onButtonEdit.call(this);
-       this.argumentExtraSubmit = {'duplicar' : 'si'};
-   },
-   onButtonEdit : function () {
-       Phx.vista.Formula.superclass.onButtonEdit.call(this);
-       this.argumentExtraSubmit = {'duplicar' : 'no'};
-   },
+   
     
     arrayDefaultColumHidden:['estado_reg','usuario_ai',
     'fecha_reg','fecha_mod','usr_reg','usr_mod','descripcion'],

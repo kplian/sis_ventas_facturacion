@@ -65,6 +65,21 @@ Phx.vista.PuntoVenta=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
+		{
+            config:{
+                name: 'codigo',
+                fieldLabel: 'Código',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:20
+            },
+                type:'TextField',
+                filters:{pfiltro:'puve.codigo',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:true
+        },
 			
 		{
 			config:{
@@ -96,6 +111,33 @@ Phx.vista.PuntoVenta=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+		{
+            config:{
+                name: 'habilitar_comisiones',
+                fieldLabel: 'Habilitar Comisiones',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 130,
+                maxLength:2,
+                emptyText:'si/no...',                   
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',                                  
+               // displayField: 'descestilo',
+                store:['si','no']
+            },
+            type:'ComboBox',
+            //filters:{pfiltro:'promac.inicio',type:'string'},
+            id_grupo:1,
+            filters:{   
+                         type: 'list',
+                         pfiltro:'puve.habilitar_comisiones',
+                         options: ['si','no'],  
+                    },
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'estado_reg',
@@ -215,6 +257,8 @@ Phx.vista.PuntoVenta=Ext.extend(Phx.gridInterfaz,{
 		{name:'estado_reg', type: 'string'},
 		{name:'id_sucursal', type: 'numeric'},
 		{name:'nombre', type: 'string'},
+		{name:'codigo', type: 'string'},
+		{name:'habilitar_comisiones', type: 'string'},
 		{name:'descripcion', type: 'string'},
 		{name:'id_usuario_reg', type: 'numeric'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},

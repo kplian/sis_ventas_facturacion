@@ -85,9 +85,30 @@ class MODFormula extends MODbase{
             ///////////////////////
             
             //Definicion de variables para ejecucion del procedimiento
-            $this->procedimiento = 'vef.ft_formula_ime';
-            $this->transaccion = 'VF_FORM_INS';
+            $this->procedimiento = 'vef.ft_formula_ime';            
             $this->tipo_procedimiento = 'IME';
+			
+			if ($this->aParam->getParametro('id_formula') != '') {
+				
+								
+				//Eliminar detalles
+				$this->transaccion = 'VF_FORALLDET_ELI';
+				$this->setParametro('id_formula','id_formula','int4');
+				//Ejecuta la instruccion
+	            $this->armarConsulta();
+	            $stmt = $link->prepare($this->consulta);         
+	            $stmt->execute();
+	            $result = $stmt->fetch(PDO::FETCH_ASSOC);             
+	            
+	            //recupera parametros devuelto depues de insertar ... (id_formula)
+	            $resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+	            if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
+	                throw new Exception("Error al ejecutar en la bd", 3);
+	            }
+				$this->transaccion = 'VF_FORM_MOD';
+			} else {
+				$this->transaccion = 'VF_FORM_INS';
+			}
             
             //Define los parametros para la funcion
             $this->setParametro('id_tipo_presentacion','id_tipo_presentacion','int4');
@@ -97,7 +118,6 @@ class MODFormula extends MODbase{
             $this->setParametro('cantidad_form','cantidad','int4');
             $this->setParametro('estado_reg','estado_reg','varchar');
             $this->setParametro('descripcion','descripcion','text');
-            
             
             //Ejecuta la instruccion
             $this->armarConsulta();
@@ -127,14 +147,16 @@ class MODFormula extends MODbase{
                 $this->transaccion='VF_FORDET_INS';
                 $this->tipo_procedimiento='IME';
                 //modifica los valores de las variables que mandaremos
-                $this->arreglo['id_item'] = $f['id_item'];
+                $this->arreglo['id_producto'] = $f['id_producto'];
+				$this->arreglo['tipo'] = $f['tipo'];
                 $this->arreglo['cantidad'] = $f['cantidad'];
                 $this->arreglo['id_formula'] = $id_formula;                
                 
                 //Define los parametros para la funcion
-                $this->setParametro('id_item', 'id_item', 'int4');
+                $this->setParametro('id_producto', 'id_producto', 'int4');
                 $this->setParametro('id_formula', 'id_formula', 'int4');
-                $this->setParametro('cantidad_det', 'cantidad', 'int4');                
+                $this->setParametro('cantidad_det', 'cantidad', 'int4'); 
+				$this->setParametro('tipo', 'tipo', 'varchar');                
                 
                 //Ejecuta la instruccion
                 $this->armarConsulta();

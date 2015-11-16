@@ -19,6 +19,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     breset: false,
     labelSubmit: '<i class="fa fa-check"></i> Guardar',
     storeFormaPago : false,
+    fwidth : '9%',
     constructor:function(config)
     {   
         Ext.apply(this,config);
@@ -48,6 +49,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	                displayField: 'nombre',
 	                gdisplayField: 'nombre_punto_venta',
 	                hiddenName: 'id_punto_venta',
+	                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Codigo:</b> {codigo}</p><p><b>Nombre:</b> {nombre}</p></div></tpl>',
 	                forceSelection: true,
 	                typeAhead: false,
 	                triggerAction: 'all',
@@ -67,6 +69,22 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	            grid: true,
 	            form: true
 	        });
+		}
+		if (this.data.objPadre.variables_globales.habilitar_comisiones == 'si') {  
+			this.Atributos.push({
+		            config:{
+		                name: 'comision',
+		                fieldLabel: 'Comisión',
+		                allowBlank: true,
+		                anchor: '80%',                
+		                maxLength:20,
+		                allowNegative:false
+		            },
+		                type:'NumberField',                
+		                id_grupo:0,                
+		                form:true,
+		                valorInicial:0
+		      });
 		}
 		this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
         this.addEvents('beforesave');
@@ -136,7 +154,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                                     direction: 'ASC'
                                                 },
                                                 totalProperty: 'total',
-                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico', 'precio'],
+                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio'],
                                                 remoteSort: true,
                                                 baseParams: {par_filtro: 'todo.nombre'}
                                             }),
@@ -161,6 +179,13 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                             minChars: 2 ,
                                             disabled:true                                           
                                          }),
+                    'descripcion': new Ext.form.TextField({
+                            name: 'descripcion',
+                            fieldLabel: 'Descripcion',                            
+                            allowBlank:true,                            
+                            gwidth: 150,
+                            disabled : true
+                    }),
                                       
                     'cantidad': new Ext.form.NumberField({
                                         name: 'cantidad',
@@ -177,9 +202,9 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                         msgTarget: 'title',
                                         fieldLabel: 'P/U',
                                         allowBlank: false,
-                                        allowDecimals: false,
+                                        allowDecimals: true,
                                         maxLength:10,
-                                        readOnly :true
+                                        enableKeyEvents : true
                                 }),
                     'precio_total': new Ext.form.NumberField({
                                         name: 'precio_total',
@@ -200,7 +225,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     	if (this.data.objPadre.variables_globales.vef_tiene_punto_venta != 'true') {  
 	        this.Cmp.id_sucursal.store.load({params:{start:0,limit:this.tam_pag}, 
 	           callback : function (r) {
-	           		console.log(r.getById(this.data.objPadre.variables_globales.id_sucursal));
+	           		
 	           		this.Cmp.id_sucursal.setValue(this.data.objPadre.variables_globales.id_sucursal);
 	           		this.detCmp.id_producto.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
 	                this.Cmp.id_sucursal.fireEvent('select',this.Cmp.id_sucursal, this.Cmp.id_sucursal.store.getById(this.data.objPadre.variables_globales.id_sucursal));	                   
@@ -211,7 +236,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {
 	        this.Cmp.id_punto_venta.store.load({params:{start:0,limit:this.tam_pag}, 
 	           callback : function (r) {
-	           		console.log(this.Cmp.id_punto_venta.store.getById(this.data.objPadre.variables_globales.id_punto_venta));
+	           		
 	                this.Cmp.id_punto_venta.setValue(this.data.objPadre.variables_globales.id_punto_venta);
 	           		this.detCmp.id_producto.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
 	                this.Cmp.id_punto_venta.fireEvent('select',this.Cmp.id_punto_venta, this.Cmp.id_punto_venta.store.getById(this.data.objPadre.variables_globales.id_punto_venta));   
@@ -220,13 +245,15 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	        });
 	    }
 	    
-	    this.Cmp.id_punto_venta.on('select',function(c,r,i) {
-	    	if (this.accionFormulario != 'EDIT') {
-            	this.Cmp.id_forma_pago.store.baseParams.defecto = 'si';
-           }
-            this.cargarFormaPago();
-            
-        },this);
+	    if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {  
+    	    this.Cmp.id_punto_venta.on('select',function(c,r,i) {
+    	    	if (this.accionFormulario != 'EDIT') {
+                	this.Cmp.id_forma_pago.store.baseParams.defecto = 'si';
+               }
+                this.cargarFormaPago();
+                
+            },this);
+        }
         
         this.Cmp.id_forma_pago.on('select',function(c,r,i) {
             if (r.data.registrar_tarjeta == 'si' || r.data.registrar_cc == 'si') {
@@ -269,22 +296,50 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         
         this.detCmp.tipo.on('select',function(c,r,i) {
             this.cambiarCombo(r.data.field1);
-        },this);       
+        },this);  
+        
+          
         
         this.Cmp.id_cliente.on('select',function(c,r,i) {
-            this.Cmp.nit.setValue(r.data.nit);            
+            if (r.data) {
+                this.Cmp.nit.setValue(r.data.nit);
+            } else {
+                this.Cmp.nit.setValue(r.nit);
+            }            
         },this);      
         
         
         this.detCmp.id_producto.on('select',function(c,r,i) {
             this.detCmp.precio_unitario.setValue(Number(r.data.precio));
             this.detCmp.precio_total.setValue(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()));
+        	
+        	if (r.data.requiere_descripcion == 'si') {
+        		
+        		this.habilitarDescripcion(true);
+        	} else {
+        		this.habilitarDescripcion(false);
+        	}
         },this);
         
         this.detCmp.cantidad.on('keyup',function() {  
             this.detCmp.precio_total.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
         },this);
-    },    
+        
+        this.detCmp.precio_unitario.on('keyup',function() {  
+            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
+        },this);
+    }, 
+    habilitarDescripcion : function(opcion) {
+    	
+    	if (opcion) {
+    		this.detCmp.descripcion.setDisabled(false);   
+    		this.detCmp.descripcion.allowBlank = false; 		
+    	} else {
+    		this.detCmp.descripcion.setDisabled(true);
+    		this.detCmp.descripcion.allowBlank = true; 
+    		this.detCmp.descripcion.reset();
+    	}	
+    }, 
     
     cambiarCombo : function (tipo) {
     	this.detCmp.id_producto.setDisabled(false);
@@ -292,13 +347,15 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     	if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') { 
     		this.detCmp.id_producto.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
     	} else {
-    		this.detCmp.id_sucursal.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
+    		this.detCmp.id_producto.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
     	}
     	this.detCmp.id_producto.modificado = true;
     	this.detCmp.id_producto.reset();
     },
     cargarFormaPago : function () {
-    	this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+        if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {  
+    	   this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+    	}
     	this.Cmp.id_forma_pago.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
     	
     	if (this.accionFormulario == 'EDIT' && this.Cmp.id_forma_pago.getValue() == '0') {
@@ -333,14 +390,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		            }, scope : this
 		        });
 		}
-    },
-    
-    onInitAdd: function(){
-    	if(this.data.readOnly===true){
-    		return false
-    	}
-    	
-    },
+    },    
     
     onCancelAdd: function(re,save){
         if(this.sw_init_add){
@@ -359,7 +409,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     onAfterEdit:function(re, o, rec, num){
         //set descriptins values ...  in combos boxs       
         
-        cmb_rec = this.detCmp['id_producto'].store.getById(rec.get('id_producto'));
+        var cmb_rec = this.detCmp['id_producto'].store.getById(rec.get('id_producto'));
         if(cmb_rec) {
             
             rec.set('nombre_producto', cmb_rec.get('nombre_producto')); 
@@ -369,18 +419,23 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     },
     evaluaRequistos: function(){
     	//valida que todos los requistosprevios esten completos y habilita la adicion en el grid
-     	var i = 0;
-    	sw = true,
-    	me =this;
-    	while( i < me.Componentes.length) {
-    		
-    		if(me.Componentes[i] &&!me.Componentes[i].isValid()){
-    		   sw = false;
-    		   //i = this.Componentes.length;
-    		}
-    		i++;
-    	}
-    	return sw
+     	//solo validar que tenga sucursal o punto de venta
+     	if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {
+     	      if (this.Cmp.id_punto_venta.getValue() != '' && this.Cmp.id_punto_venta.getValue() != undefined) {
+     	          return true;
+     	      } else {
+     	          return false;
+     	      }
+     	} else {
+     	      if (this.Cmp.id_sucursal.getValue() != '' && this.Cmp.id_sucursal.getValue() != undefined) {
+                  
+                  return true;
+              } else {
+                  
+                  return false;
+              }
+     	}
+     	
     },
     bloqueaRequisitos: function(sw){
     	this.Cmp.id_sucursal.setDisabled(sw);    	
@@ -421,9 +476,11 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                         {name:'nombre_producto', type: 'string'},
                         {name:'id_producto', type: 'numeric'},
                         {name:'tipo', type: 'string'},
+                        {name:'descripcion', type: 'string'},
+                        {name:'requiere_descripcion', type: 'string'},
                         {name:'estado_reg', type: 'string'},
                         {name:'cantidad', type: 'numeric'},
-                        {name:'precio', type: 'numeric'},
+                        {name:'precio_unitario', type: 'numeric'},
                         {name:'precio_total', type: 'numeric'},                        
                         {name:'id_usuario_ai', type: 'numeric'},
                         {name:'usuario_ai', type: 'string'},
@@ -462,8 +519,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                     region: 'center',
                     split: true,
                     border: false,
-                    plain: true,
-                    //autoHeight: true,
+                    plain: true,                    
                     plugins: [ this.editorDetail, this.summary],
                     stripeRows: true,
                     tbar: [{
@@ -529,7 +585,14 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                         sortable: false,
                         renderer:function(value, p, record){return String.format('{0}', record.data['nombre_producto']);},
                         editor: this.detCmp.id_producto 
-                    },                   
+                    },  
+                    {
+                        header: 'Descripción',
+                        dataIndex: 'descripcion',
+                        width: 300,
+                        sortable: false,                        
+                        editor: this.detCmp.descripcion 
+                    },                 
                     {
                        
                         header: 'Cantidad',
@@ -561,13 +624,31 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                     ]
                 });
     },
-    onInitAdd : function (r, i) {                
+    onInitAdd : function (r, i) {  
+    	if(this.data.readOnly===true){
+    		return false
+    	}      
+    	 
         this.detCmp.id_producto.setDisabled(true);       
-        record = this.megrid.store.getAt(i);
-        //alert(record.data.tipo);
+        var record = this.megrid.store.getAt(i);
+        var recTem = new Array();
+        recTem['id_producto'] = record.data['id_producto'];
+        recTem['nombre_producto'] = record.data['nombre_producto'];
+        
+        this.detCmp.id_producto.store.add(new Ext.data.Record(this.arrayToObject(this.detCmp.id_producto.store.fields.keys,recTem), record.data['id_producto']));
+        this.detCmp.id_producto.store.commitChanges();
+        this.detCmp.id_producto.modificado = true;
+        
         if (record.data.tipo != '' && record.data.tipo != undefined) {
-            //alert(this.detCmp.tipo.getValue());
+            
             this.cambiarCombo(record.data.tipo);
+        }
+        
+        if (record.data.requiere_descripcion == 'si') {
+            
+            this.habilitarDescripcion(true);
+        } else {
+        	this.habilitarDescripcion(false);
         }
     },
     buildGrupos: function(){
@@ -586,8 +667,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                             autoHeight: true,
                             collapseFirst : false,
                             collapsible: true,
-                            width: '100%',
-                            //autoHeight: true,
+                            width: '100%',                            
+                            autoHeight: true,
                             padding: '0 0 0 10',
                             items:[
                                    {
@@ -687,7 +768,9 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	           {name: 'tipo_tarjeta',     type: 'string'}
 	        ]
 		});
-		this.storeFormaPago.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+		if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {
+		  this.storeFormaPago.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+		}
 		this.storeFormaPago.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
 		this.storeFormaPago.baseParams.id_venta = this.Cmp.id_venta.getValue();
 		this.storeFormaPago.load({params:{start:0,limit:100}});
@@ -935,6 +1018,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 gdisplayField : 'nombre_sucursal',
                 displayField: 'nombre',                
                 hiddenName: 'id_sucursal',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Codigo:</b> {codigo}</p><p><b>Nombre:</b> {nombre}</p></div></tpl>',
                 forceSelection: true,
                 typeAhead: false,
                 triggerAction: 'all',
@@ -1116,16 +1200,21 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     	var datos_respuesta = JSON.parse(resp.responseText);
     	Phx.CP.loadingHide();
     	if ('cambio' in datos_respuesta.ROOT.datos) {
-    		Ext.Msg.show({
-			   title:'DEVOLUCION',
-			   msg: 'Debe devolver ' + datos_respuesta.ROOT.datos.cambio + ' al cliente',
-			   buttons: Ext.Msg.OK,
-			   fn: function () {			   	
-		        Phx.CP.getPagina(this.idContenedorPadre).reload();
-		        this.panel.close();
-			   },
-			   scope:this
-			});
+    	    if (datos_respuesta.ROOT.datos.cambio > 0) {
+        		Ext.Msg.show({
+    			   title:'DEVOLUCION',
+    			   msg: 'Debe devolver ' + datos_respuesta.ROOT.datos.cambio + ' al cliente',
+    			   buttons: Ext.Msg.OK,
+    			   fn: function () {			   	
+    		        Phx.CP.getPagina(this.idContenedorPadre).reload();
+    		        this.panel.close();
+    			   },
+    			   scope:this
+    			});
+    		} else {
+    		    Phx.CP.getPagina(this.idContenedorPadre).reload();
+                    this.panel.close();
+    		}
     		//Ext.Msg.alert('DEVOLUCION', 'Debe devolver ' + datos_respuesta.ROOT.datos.cambio + ' al cliente');
     	} else {
     		Phx.CP.getPagina(this.idContenedorPadre).reload();

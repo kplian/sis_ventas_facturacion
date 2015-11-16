@@ -73,10 +73,14 @@ BEGIN
 						,suc.plantilla_documento_recibo,
 						suc.formato_comprobante,
 						suc.direccion,
-						suc.lugar
+						suc.lugar,
+                        suc.habilitar_comisiones,
+                        suc.id_lugar,
+                        lug.nombre as nombre_lugar
 						from vef.tsucursal suc
 						inner join segu.tusuario usu1 on usu1.id_usuario = suc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = suc.id_usuario_mod
+                        left join param.tlugar lug on lug.id_lugar = suc.id_lugar
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -103,6 +107,7 @@ BEGIN
 					    from vef.tsucursal suc
 					    inner join segu.tusuario usu1 on usu1.id_usuario = suc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = suc.id_usuario_mod
+                        left join param.tlugar lug on lug.id_lugar = suc.id_lugar
 					    where ';
 			
 			--Definicion de la respuesta		    

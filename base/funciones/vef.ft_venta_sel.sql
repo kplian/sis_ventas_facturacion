@@ -152,7 +152,10 @@ BEGIN
                         	''''::varchar
                         else
                         	forpa.tipo_tarjeta::varchar
-                        end) as tipo_tarjeta
+                        end) as tipo_tarjeta,
+                        ven.porcentaje_descuento,
+                        ven.id_vendedor_medico,
+                        ven.comision
                         	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg

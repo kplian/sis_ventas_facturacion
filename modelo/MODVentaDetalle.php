@@ -26,7 +26,7 @@ class MODVentaDetalle extends MODbase{
 		$this->captura('tipo','varchar');
 		$this->captura('estado_reg','varchar');
 		$this->captura('cantidad','int4');
-		$this->captura('precio','numeric');		
+		$this->captura('precio_unitario','numeric');		
 		$this->captura('id_usuario_ai','int4');
 		$this->captura('usuario_ai','varchar');
 		$this->captura('fecha_reg','timestamp');
@@ -37,6 +37,12 @@ class MODVentaDetalle extends MODbase{
 		$this->captura('usr_mod','varchar');
         $this->captura('precio_total','numeric');        
         $this->captura('nombre_producto','varchar');
+        $this->captura('porcentaje_descuento','numeric');       
+        $this->captura('precio_total_sin_descuento','numeric');
+        $this->captura('id_vendedor_medico','varchar');
+        $this->captura('nombre_vendedor_medico','varchar');
+		$this->captura('requiere_descripcion','varchar');
+		$this->captura('descripcion','text');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

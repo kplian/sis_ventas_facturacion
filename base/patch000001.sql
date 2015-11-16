@@ -248,6 +248,8 @@ CREATE TABLE vef.tforma_pago (
   CONSTRAINT pk_tforma_pago__id_forma_pago PRIMARY KEY(id_forma_pago)
 ) INHERITS (pxp.tbase);
 
+DROP VIEW IF EXISTS vef.vcliente;
+
 ALTER TABLE vef.tcliente
   ALTER COLUMN nombres DROP NOT NULL;
   
@@ -303,3 +305,52 @@ ALTER TABLE vef.tventa_forma_pago
   ADD COLUMN tipo_tarjeta VARCHAR(10);
   
 /************************************F-SCP-JRR-VEF-0-20/09/2015*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-08/11/2015*************************************************/
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN precio_sin_descuento NUMERIC(18,2);
+  
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN porcentaje_descuento NUMERIC(5);
+  
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN id_vendedor INTEGER;
+  
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN id_medico INTEGER;
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN porcentaje_descuento NUMERIC(5);
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN id_vendedor_medico VARCHAR(30);
+
+ALTER TABLE vef.tsucursal_producto
+  ADD COLUMN requiere_descripcion VARCHAR(2);
+
+ALTER TABLE vef.tsucursal
+  ADD COLUMN habilitar_comisiones VARCHAR(2);
+  
+ALTER TABLE vef.tpunto_venta
+  ADD COLUMN habilitar_comisiones VARCHAR(2);
+  
+ALTER TABLE vef.tpunto_venta
+  ADD COLUMN codigo VARCHAR(20);
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN comision NUMERIC(18,2);
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN descripcion TEXT;
+
+ALTER TABLE vef.tformula_detalle
+  ADD COLUMN id_concepto_ingas INTEGER;
+
+ALTER TABLE vef.tformula_detalle
+  ALTER COLUMN id_item DROP NOT NULL;
+  
+ALTER TABLE vef.tsucursal
+  ADD COLUMN id_lugar INTEGER;
+
+/************************************F-SCP-JRR-VEF-0-08/11/2015*************************************************/

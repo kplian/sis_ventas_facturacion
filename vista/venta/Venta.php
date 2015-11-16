@@ -102,7 +102,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                        direction: 'ASC'
 	                    },
 	                    totalProperty: 'total',
-	                    fields: ['id_punto_venta', 'nombre', 'codigo'],
+	                    fields: ['id_punto_venta', 'nombre', 'codigo','habilitar_comisiones'],
 	                    remoteSort: true,
 	                    baseParams: {par_filtro: 'puve.nombre#puve.codigo'}
 	        });
@@ -118,7 +118,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_sucursal', 'nombre', 'codigo'],
+                    fields: ['id_sucursal', 'nombre', 'codigo','habilitar_comisiones'],
                     remoteSort: true,
                     baseParams: {filtro_usuario: 'si',par_filtro: 'suc.nombre#suc.codigo'}
                });
@@ -129,9 +129,11 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                if (r.length == 1 ) {   
 	                	if (this.variables_globales.vef_tiene_punto_venta === 'true') {                    
 	                    	this.variables_globales.id_punto_venta = r[0].data.id_punto_venta;
+	                    	this.variables_globales.habilitar_comisiones = r[0].data.habilitar_comisiones;
 	                    	this.store.baseParams.id_punto_venta = this.variables_globales.id_punto_venta;
 	                    } else {
 	                    	this.variables_globales.id_sucursal = r[0].data.id_sucursal;
+	                    	this.variables_globales.habilitar_comisiones = r[0].data.habilitar_comisiones;
 	                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
 	                    }
 	                    this.load({params:{start:0, limit:this.tam_pag}});  	                    
@@ -145,9 +147,10 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 						        mode: 'remote',
                 				pageSize: 15,
 						        triggerAction: 'all',
-						        valueField : 'id_punto_venta',
+						        valueField : value,
                 				displayField : 'nombre', 
 						        forceSelection: true,
+						        tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Codigo:</b> {codigo}</p><p><b>Nombre:</b> {nombre}</p></div></tpl>',
 						        allowBlank : false,
 						        anchor: '100%'
 						    });
@@ -183,6 +186,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 							                    	this.variables_globales.id_sucursal = combo2.getValue();
 							                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
 							                    }
+							                    this.variables_globales.habilitar_comisiones = combo2.store.getById(combo2.getValue()).data.habilitar_comisiones;
 							                    this.load({params:{start:0, limit:this.tam_pag}});
 						                	}
 						                },
@@ -209,7 +213,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	},
 	variables_globales : {
 		vef_tiene_punto_venta : 'false',
-		vef_tipo_venta_habilitado : 'producto_terminado,formula,servicio'
+		vef_tipo_venta_habilitado : 'producto_terminado,formula,servicio',
+		habilitar_comisiones : 'no'
 	},
 	diagramGantt : function (){            
             var data=this.sm.getSelected().data.id_proceso_wf;
@@ -442,6 +447,18 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
+                name: 'comision',
+                fieldLabel: 'Comisión',                          
+                gwidth: 120,
+                maxLength:5,
+                disabled:true
+            },
+                type:'NumberField', 
+                grid:true
+                
+        },
+        {
+            config:{
                 name: 'estado',
                 fieldLabel: 'Estado',                
                 gwidth: 100
@@ -572,6 +589,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_punto_venta', type: 'numeric'},
 		{name:'id_proceso_wf', type: 'numeric'},
 		{name:'id_forma_pago', type: 'numeric'},
+		{name:'porcentaje_descuento', type: 'numeric'},
+		{name:'id_vendedor_medico', type: 'string'},
 		{name:'forma_pago', type: 'string'},
 		{name:'numero_tarjeta', type: 'string'},
 		{name:'codigo_tarjeta', type: 'string'},
@@ -585,6 +604,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'nro_tramite', type: 'string'},
 		{name:'a_cuenta', type: 'numeric'},
 		{name:'total_venta', type: 'numeric'},
+		{name:'comision', type: 'numeric'},
 		{name:'fecha_estimada_entrega', type: 'date',dateFormat:'Y-m-d'},
 		{name:'usuario_ai', type: 'string'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
@@ -625,7 +645,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                                     'Formulario de Venta',
                                     {
                                         modal:true,
-                                        width:'80%',
+                                        width:'90%',
                                         height:'90%'
                                     }, {data:{objPadre : me,
                                     		tipo_form : tipo,

@@ -40,6 +40,7 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('descripcion_producto','text');
 		$this->captura('id_actividad_economica','integer');
 		$this->captura('nombre_actividad','varchar');
+		$this->captura('requiere_descripcion','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -66,7 +67,31 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('descripcion','text');
 		$this->captura('precio','numeric');			
 		$this->captura('medico','varchar');
+		$this->captura('requiere_descripcion','varchar');
 		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function listarItemsFormula(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_sucursal_producto_sel';
+		$this->transaccion='VF_PRODFORMU_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('tipo','tipo','varchar');
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_producto','integer');
+		$this->captura('tipo','varchar');
+		$this->captura('nombre_producto','varchar');		
+		$this->captura('descripcion','text');
+		$this->captura('unidad_medida','varchar'); 
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -91,6 +116,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo_producto','tipo_producto','varchar');
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
+		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -116,6 +142,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo_producto','tipo_producto','varchar');
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
+		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
