@@ -556,6 +556,16 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                                        
                         }
                     },{
+                        
+                        text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Formula/Paquete',
+                        scope:this,
+                        handler: function(){
+                        	if(this.evaluaRequistos() === true) { 
+                        		this.editorDetail.stopEditing(); 
+                            	this.armarFormularioFormula();
+                            }
+                        }
+                    },{
                         ref: '../removeBtn',
                         text: '<i class="fa fa-trash fa-lg"></i> Eliminar',
                         scope:this,
@@ -623,6 +633,96 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                     }
                     ]
                 });
+    },
+    armarFormularioFormula : function () {
+    	var comboFormula = new Ext.form.ComboBox(
+						    {
+						        typeAhead: false,
+						        fieldLabel: 'Paquete / Formula',
+						        allowBlank : false,						        
+						        store: new Ext.data.JsonStore({
+                                                url: '../../sis_ventas_facturacion/control/SucursalProducto/listarProductoServicioItem',
+                                                id: 'id_producto',
+                                                root: 'datos',
+                                                sortInfo: {
+                                                    field: 'nombre',
+                                                    direction: 'ASC'
+                                                },
+                                                totalProperty: 'total',
+                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio'],
+                                                remoteSort: true,
+                                                baseParams: {par_filtro: 'todo.nombre'}
+                                            }),
+                                valueField: 'id_producto',
+                                displayField: 'nombre_producto',
+                                gdisplayField: 'nombre_producto',
+                                hiddenName: 'id_producto',
+						        mode: 'remote',
+                				pageSize: 15,
+						        triggerAction: 'all',						         
+						        forceSelection: true,
+						        tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Nombre:</b> {nombre_producto}</p><p><b>Descripcion:</b> {descripcion}</p></div></tpl>',
+						        allowBlank : false,
+						        anchor: '100%'
+						    });
+		comboFormula.store.baseParams.tipo = 'formula';
+		comboFormula.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
+    	var formularioFormula = new Ext.form.FormPanel({				            
+	            items: [comboFormula],				            
+	            padding: true,
+	            bodyStyle:'padding:5px 5px 0',
+	            border: false,
+	            frame: false				            
+	        });
+	     
+	     var params = {
+                		'id_sucursal' : this.Cmp.id_sucursal.getValue()                		
+	                };
+	     
+	     if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') { 
+	     	params.id_punto_venta = this.Cmp.id_punto_venta.getValue(); 
+	     	comboFormula.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+	     }
+	     
+						 
+		 var VentanaFormula = new Ext.Window({
+	            title: 'Punto de Venta / Sucursal',
+	            modal: true,
+	            width: 300,
+	            height: 160,
+	            bodyStyle: 'padding:5px;',
+	            layout: 'fit',
+	            hidden: true,					            
+	            buttons: [
+	                {
+		                text: '<i class="fa fa-check"></i> Aceptar',
+		                handler: function () {
+		                	if (formularioFormula.getForm().isValid()) {
+		                		validado = true;		                		
+		                		VentanaFormula.close(); 
+		                		Ext.Ajax.request({
+					                url:'../../sis_ventas_facturacion/control/FormulaDetalle/listarFormulaDetalleParaInsercion',                
+					                params: params,
+					                success:this.successCargarFormula,
+					                failure: this.conexionFailure,					                
+					                timeout:this.timeout,
+					                scope:this
+					            });	  
+		                		//hacer ajax para obtener los datos a insertar en el detalle    		
+		                		
+		                	}
+		                },
+						scope: this
+	               }],
+	            items: formularioFormula,
+	            autoDestroy: true,
+	            closeAction: 'close'
+	        });
+	      VentanaFormula.show();
+    },
+    successCargarFormula : function (response,request) {
+    	var respuesta = JSON.parse(response.responseText);
+    	console.log(respuesta);
     },
     onInitAdd : function (r, i) {  
     	if(this.data.readOnly===true){
@@ -885,12 +985,12 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	                	var validado = true;
 	                	for(var i = 0; i < this.storeFormaPago.getTotalCount() ;i++) {
 	                		var fp = this.storeFormaPago.getAt(i);
-	                		if (fp.data.valor != "0" && fp.data.registrar_tarjeta == 'si' && (fp.data.numero_tarjeta == '' || fp.data.codigo_tarjeta == '' || fp.data.tipo_tarjeta == '')) {
+	                		if (fp.data.valor > 0 && fp.data.registrar_tarjeta == 'si' && (fp.data.numero_tarjeta == '' || fp.data.codigo_tarjeta == '' || fp.data.tipo_tarjeta == '')) {
 	                			validado = false;
 	                			alert('La forma de pago ' + fp.data.nombre + ' requiere el tipo, numero de tarjeta y codigo de autorización')
 	                		}
 	                		
-	                		if (fp.data.valor != "0" && fp.data.registrar_cc == 'si' && (fp.data.numero_tarjeta == '')) {
+	                		if (fp.data.valor > 0 && fp.data.registrar_cc == 'si' && (fp.data.numero_tarjeta == '')) {
 	                			validado = false;
 	                			alert('La forma de pago ' + fp.data.nombre + ' requiere el código de cuenta corriente');
 	                		}
@@ -994,7 +1094,19 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 id_grupo:0,                
                 form:true,
                 valorInicial:'0'
-        },          
+        }, 
+        {
+			config:{
+				name: 'observaciones',
+				fieldLabel: 'Observaciones',
+				allowBlank: true,
+				anchor: '80%'
+				
+			},
+				type:'TextArea',
+				id_grupo:0,				
+				form:true
+		},         
         {
             config: {
                 name: 'id_sucursal',
@@ -1197,24 +1309,23 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     
     successSave:function(resp)
     {
+    	
     	var datos_respuesta = JSON.parse(resp.responseText);
     	Phx.CP.loadingHide();
+    	console.log(datos_respuesta.ROOT.datos);
     	if ('cambio' in datos_respuesta.ROOT.datos) {
-    	    if (datos_respuesta.ROOT.datos.cambio > 0) {
-        		Ext.Msg.show({
-    			   title:'DEVOLUCION',
-    			   msg: 'Debe devolver ' + datos_respuesta.ROOT.datos.cambio + ' al cliente',
-    			   buttons: Ext.Msg.OK,
-    			   fn: function () {			   	
-    		        Phx.CP.getPagina(this.idContenedorPadre).reload();
-    		        this.panel.close();
-    			   },
-    			   scope:this
-    			});
-    		} else {
-    		    Phx.CP.getPagina(this.idContenedorPadre).reload();
-                    this.panel.close();
-    		}
+    	    
+    		Ext.Msg.show({
+			   title:'DEVOLUCION',
+			   msg: 'Debe devolver ' + datos_respuesta.ROOT.datos.cambio + ' al cliente',
+			   buttons: Ext.Msg.OK,
+			   fn: function () {			   	
+		        Phx.CP.getPagina(this.idContenedorPadre).reload();
+		        this.panel.close();
+			   },
+			   scope:this
+			});
+    		
     		//Ext.Msg.alert('DEVOLUCION', 'Debe devolver ' + datos_respuesta.ROOT.datos.cambio + ' al cliente');
     	} else {
     		Phx.CP.getPagina(this.idContenedorPadre).reload();

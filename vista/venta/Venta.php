@@ -138,6 +138,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                    }
 	                    this.load({params:{start:0, limit:this.tam_pag}});  	                    
 	                } else {
+	                	
 	                	var combo2 = new Ext.form.ComboBox(
 						    {
 						        typeAhead: false,
@@ -177,6 +178,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 						                handler: function () {
 						                	if (formularioInicio.getForm().isValid()) {
 						                		validado = true;
+						                		this.variables_globales.habilitar_comisiones = combo2.getStore().getById(combo2.getValue()).data.habilitar_comisiones;
 						                		VentanaInicio.close();
 						                		
 						                		if (this.variables_globales.vef_tiene_punto_venta === 'true') {                    
@@ -186,7 +188,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 							                    	this.variables_globales.id_sucursal = combo2.getValue();
 							                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
 							                    }
-							                    this.variables_globales.habilitar_comisiones = combo2.store.getById(combo2.getValue()).data.habilitar_comisiones;
+							                    
+							                    
 							                    this.load({params:{start:0, limit:this.tam_pag}});
 						                	}
 						                },
@@ -432,6 +435,20 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
             form: false
         },
         {
+			config:{
+				name: 'observaciones',
+				fieldLabel: 'Observaciones',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100
+			},
+				type:'TextArea',
+				filters:{pfiltro:'ven.observaciones',type:'string'},
+				id_grupo:0,
+				grid:true,
+				form:false
+		},
+        {
             config:{
                 name: 'monto_forma_pago',
                 fieldLabel: 'Importe Recibido',
@@ -593,6 +610,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_vendedor_medico', type: 'string'},
 		{name:'forma_pago', type: 'string'},
 		{name:'numero_tarjeta', type: 'string'},
+		{name:'observaciones', type: 'string'},
 		{name:'codigo_tarjeta', type: 'string'},
 		{name:'tipo_tarjeta', type: 'string'},
 		{name:'id_estado_wf', type: 'numeric'},
@@ -646,7 +664,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                                     {
                                         modal:true,
                                         width:'90%',
-                                        height:'90%'
+                                        height:'100%'
                                     }, {data:{objPadre : me,
                                     		tipo_form : tipo,
                                     		datos_originales: record}

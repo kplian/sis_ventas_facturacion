@@ -29,8 +29,11 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_formula	integer;
-    v_registros		record;
+	v_id_formula			integer;
+    v_registros				record;
+    v_id_medico				integer;
+    v_id_unidad_medida		integer;
+    v_cantidad				integer;
 			    
 BEGIN
 
@@ -47,6 +50,26 @@ BEGIN
 	if(p_transaccion='VF_FORM_INS')then
 					
         begin
+        	
+        	if (pxp.f_existe_parametro(p_tabla,'id_medico')) then
+                v_id_medico = v_parametros.id_medico;
+            else
+                v_id_medico = NULL;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'id_unidad_medida')) then
+                v_id_unidad_medida = v_parametros.id_unidad_medida;
+            else
+                v_id_unidad_medida = NULL;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'cantidad_form')) then
+                v_cantidad = v_parametros.cantidad_form;
+            else
+                v_cantidad = NULL;
+            end if;
+            
+            
         	--Sentencia de la insercion
         	insert into vef.tformula(
 			--id_tipo_presentacion,
@@ -64,10 +87,10 @@ BEGIN
 			id_usuario_mod
           	) values(
 			--v_parametros.id_tipo_presentacion,
-			v_parametros.id_unidad_medida,
-			v_parametros.id_medico,
+			v_id_unidad_medida,
+			v_id_medico,
 			v_parametros.nombre,
-			v_parametros.cantidad_form,
+			v_cantidad,
 			'activo',
 			v_parametros.descripcion,
 			v_parametros._nombre_usuario_ai,
@@ -76,9 +99,6 @@ BEGIN
 			v_parametros._id_usuario_ai,
 			null,
 			null
-							
-			
-			
 			)RETURNING id_formula into v_id_formula;
 			
 			--Definicion de la respuesta
@@ -100,16 +120,33 @@ BEGIN
 	elsif(p_transaccion='VF_FORM_MOD')then
 
 		begin
+        	if (pxp.f_existe_parametro(p_tabla,'id_medico')) then
+                v_id_medico = v_parametros.id_medico;
+            else
+                v_id_medico = NULL;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'id_unidad_medida')) then
+                v_id_unidad_medida = v_parametros.id_unidad_medida;
+            else
+                v_id_unidad_medida = NULL;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'cantidad_form')) then
+                v_cantidad = v_parametros.cantidad_form;
+            else
+                v_cantidad = NULL;
+            end if;
         
         	--if ((pxp.f_existe_parametro(p_tabla,'duplicar') =true and v_parametros.duplicar = 'no')
             --		or pxp.f_existe_parametro(p_tabla,'duplicar') =FALSE) then
                   --Sentencia de la modificacion
                   update vef.tformula set
                   --id_tipo_presentacion = v_parametros.id_tipo_presentacion,
-                  id_unidad_medida = v_parametros.id_unidad_medida,
-                  id_medico = v_parametros.id_medico,
+                  id_unidad_medida = v_id_unidad_medida,
+                  id_medico = v_id_medico,
                   nombre = v_parametros.nombre,
-                  cantidad = v_parametros.cantidad_form,
+                  cantidad = v_cantidad,
                   descripcion = v_parametros.descripcion,
                   fecha_mod = now(),
                   id_usuario_mod = p_id_usuario,

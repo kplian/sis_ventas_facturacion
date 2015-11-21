@@ -179,7 +179,9 @@ BEGIN
                 
 				v_join = '';
 				if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
-					v_join = 'inner join vef.tpunto_venta_producto pvp on pvp.id_sucursal_producto = sp.id_sucursal_producto';
+                	
+					v_join = 'inner join vef.tpunto_venta_producto pvp on pvp.id_sucursal_producto = sp.id_sucursal_producto and
+                    			pvp.estado_reg = ''activo'' and pvp.id_punto_venta = ' || v_parametros.id_punto_venta;
 				end if;
 				
 				v_consulta := 'with tabla_temporal as (
@@ -308,7 +310,9 @@ BEGIN
                 
 				v_join = '';
 				if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
-					v_join = 'inner join vef.tpunto_venta_producto pvp on pvp.id_sucursal_producto = sp.id_sucursal_producto';
+                	
+					v_join = 'inner join vef.tpunto_venta_producto pvp on pvp.id_sucursal_producto = sp.id_sucursal_producto and
+                    			pvp.estado_reg = ''activo'' and pvp.id_punto_venta = ' || v_parametros.id_punto_venta;
 				end if;
 				
 				v_consulta := 'with tabla_temporal as (

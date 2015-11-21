@@ -315,10 +315,10 @@ Phx.vista.FormVentaFarmacia = {
                         }
                     },{
                         
-                        text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Formula',
+                        text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Formula/Paquete',
                         scope:this,
                         handler: function(){
-                            alert('falta funcionalidad');
+                            this.armarFormularioFormula();
                         }
                     },{
                         ref: '../removeBtn',

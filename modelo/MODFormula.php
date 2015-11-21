@@ -115,12 +115,15 @@ class MODFormula extends MODbase{
             $this->setParametro('id_unidad_medida','id_unidad_medida','int4');
             $this->setParametro('id_medico','id_medico','int4');
             $this->setParametro('nombre','nombre','varchar');
-            $this->setParametro('cantidad_form','cantidad','int4');
+			if ($this->aParam->getParametro('cantidad') != '') {
+            	$this->setParametro('cantidad_form','cantidad','int4');
+			}
             $this->setParametro('estado_reg','estado_reg','varchar');
             $this->setParametro('descripcion','descripcion','text');
             
             //Ejecuta la instruccion
             $this->armarConsulta();
+			
             $stmt = $link->prepare($this->consulta);          
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);               

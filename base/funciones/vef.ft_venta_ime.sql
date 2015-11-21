@@ -210,7 +210,8 @@ BEGIN
 			id_punto_venta,
             id_vendedor_medico,
             porcentaje_descuento,
-            comision
+            comision,
+            observaciones
             
           	) values(
             v_id_venta,
@@ -232,7 +233,8 @@ BEGIN
 			v_id_punto_venta,
             v_id_vendedor_medico,
             v_porcentaje_descuento,
-            v_comision		
+            v_comision,
+            v_parametros.observaciones		
 			
 			) returning id_venta into v_id_venta;
 			
@@ -376,7 +378,8 @@ BEGIN
 			id_punto_venta = v_id_punto_venta,
             id_vendedor_medico = v_parametros.id_vendedor_medico,
             porcentaje_descuento = v_parametros.porcentaje_descuento,
-            comision = v_comision
+            comision = v_comision,
+            observaciones = v_observaciones
 			where id_venta=v_parametros.id_venta;
 			
 			if (v_parametros.id_forma_pago != 0 ) then

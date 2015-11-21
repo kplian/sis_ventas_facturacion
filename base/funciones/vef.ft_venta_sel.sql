@@ -155,7 +155,8 @@ BEGIN
                         end) as tipo_tarjeta,
                         ven.porcentaje_descuento,
                         ven.id_vendedor_medico,
-                        ven.comision
+                        ven.comision,
+                        ven.observaciones
                         	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg

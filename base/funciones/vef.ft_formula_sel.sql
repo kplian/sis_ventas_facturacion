@@ -66,10 +66,10 @@ BEGIN
                         sum(fd.cantidad * i.precio_ref)
 						from vef.tformula form
 						inner join segu.tusuario usu1 on usu1.id_usuario = form.id_usuario_reg
-						inner join vef.vmedico med on med.id_medico = form.id_medico
-						inner join param.tunidad_medida ume on ume.id_unidad_medida = form.id_unidad_medida						
+						left join vef.vmedico med on med.id_medico = form.id_medico
+						left join param.tunidad_medida ume on ume.id_unidad_medida = form.id_unidad_medida						
 						left join segu.tusuario usu2 on usu2.id_usuario = form.id_usuario_mod
-				        left join vef.tformula_detalle fd on fd.id_formula = form.id_formula
+				        inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula
                         left join alm.titem i on i.id_item = fd.id_item
                         where  ';
 			
@@ -114,8 +114,8 @@ BEGIN
 			v_consulta:='select count(id_formula)
 					    from vef.tformula form
 					    inner join segu.tusuario usu1 on usu1.id_usuario = form.id_usuario_reg
-					    inner join vef.vmedico med on med.id_medico = form.id_medico
-						inner join param.tunidad_medida ume on ume.id_unidad_medida = form.id_unidad_medida
+					    left join vef.vmedico med on med.id_medico = form.id_medico
+						left join param.tunidad_medida ume on ume.id_unidad_medida = form.id_unidad_medida
 						left join segu.tusuario usu2 on usu2.id_usuario = form.id_usuario_mod
 					    where ';
 			

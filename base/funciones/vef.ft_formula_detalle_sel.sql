@@ -23,10 +23,18 @@ $body$
 
 DECLARE
 
-	v_consulta    		varchar;
-	v_parametros  		record;
-	v_nombre_funcion   	text;
-	v_resp				varchar;
+	v_consulta    				varchar;
+	v_parametros  				record;
+	v_nombre_funcion   			text;
+	v_resp						varchar;
+    v_porcentaje_descuento		integer;
+    v_id_vendedor_medico		varchar;
+    v_nombre_vendedor_medico	varchar;
+    v_sucursal					record;
+    v_select_precio_item		varchar;
+    v_join						varchar;
+    v_id_vendedor				integer;
+    v_id_medico					integer;
 			    
 BEGIN
 
@@ -114,7 +122,125 @@ BEGIN
 			return v_consulta;
 
 		end;
-					
+    	/*********************************    
+        #TRANSACCION:  'VF_FORDETINS_SEL'
+        #DESCRIPCION:	Seleccion de detalle de formula para insercion a detalle de formulario de venta
+        #AUTOR:		admin	
+        #FECHA:		21-04-2015 13:16:56
+        ***********************************/
+
+	elsif(p_transaccion='VF_FORDETINS_SEL')then
+    	begin
+        	if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
+    			select suc.* into v_sucursal
+    			from vef.tpunto_venta pv
+    			inner join vef.tsucursal suc on suc.id_sucursal = pv.id_sucursal
+    			where pv.id_punto_venta = v_parametros.id_punto_venta;
+    		else
+    			select suc.* into v_sucursal
+    			from vef.tsucursal suc
+    			where suc.id_sucursal = v_parametros.id_sucursal;
+    			
+    		end if;
+            
+            --verificar si existe vendedor o medico
+            v_id_vendedor = NULL;
+            v_id_medico = NULL;
+            v_id_vendedor_medico = '';
+            v_nombre_vendedor_medico = '';
+            v_porcentaje_descuento = 0;
+            if (pxp.f_existe_parametro(p_tabla,'porcentaje_descuento')) then
+            	v_porcentaje_descuento = v_parametros.porcentaje_descuento;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'id_vendedor_medico')) then
+            	v_id_vendedor_medico = v_parametros.id_vendedor_medico;
+        		if (split_part(v_parametros.id_vendedor_medico,'_',2) = 'usuario') then
+                	v_id_vendedor =  split_part(v_parametros.id_vendedor_medico::text,'_'::text,1)::integer;
+                else
+                	v_id_medico =  split_part(v_parametros.id_vendedor_medico::text,'_'::text,1)::integer;
+                end if;
+        	end if;
+            
+            if (v_id_vendedor is not null) then
+            	select u.desc_persona into v_nombre_vendedor_medico
+                from segu.vusuario u
+                where id_usuario = v_id_vendedor;
+            end if;
+            
+            if (v_id_medico is not null) then
+            	select m.nombre_completo into v_nombre_vendedor_medico
+                from vef.vmedico m
+                where id_usuario = v_id_vendedor;
+            end if;
+            
+    		if (v_sucursal.tiene_precios_x_sucursal = 'si') then
+                v_select_precio_item = 'spi.precio';
+                v_join = ' 	left join alm.titem i on i.id_item = fd.id_item 
+                            left join vef.tsucursal_producto spi on spi.id_item = i.id_item 
+                                and spi.estado_reg = ''activo'' ';
+                
+            else
+                v_select_precio_item = 'i.precio_ref';
+                v_join = ' left join alm.titem i on i.id_item = fd.id_item ';
+            end if;
+                
+				v_consulta := '
+								select (case when fd.id_item is not null then
+                                      fd.id_item
+                                  when spc.id_sucursal_producto is not null then
+                                      spc.id_sucursal_producto						
+                                  end) as id_producto,
+								(case when fd.id_item is not null then
+                                      ''item''
+                                  when spc.id_sucursal_producto is not null then
+                                      ''servicio_producto''						
+                                  end)::varchar as tipo, 
+                                  
+                                (case when fd.id_item is not null then
+                                      i.nombre
+                                  when spc.id_sucursal_producto is not null then
+                                      cig.desc_ingas						
+                                  end)::varchar as nombre_producto, 
+                                  (case when fd.id_item is not null then
+                                      i.descripcion
+                                  when spc.id_sucursal_producto is not null then
+                                      cig.descripcion_larga						
+                                  end)::text as descripcion,
+                                  fd.cantidad, 
+                                  (case when fd.id_item is not null then 
+                                      ' || v_select_precio_item || '
+                                  else
+                                      spc.precio
+                                  end)::numeric as precio_unitario,
+                                  (fd.cantidad * (case when fd.id_item is not null then 
+                                      ' || v_select_precio_item || '
+                                  else
+                                      spc.precio
+                                  end))::numeric as precio_total_sin_descuento,
+                                  ' || v_porcentaje_descuento || '::integer as porcentaje_descuento,
+                                  (fd.cantidad * (case when fd.id_item is not null then 
+                                      ' || v_select_precio_item || '
+                                  else
+                                      spc.precio
+                                  end) * (100 - ' || v_porcentaje_descuento || ')/100)::numeric as precio_total,
+                                  ''' || v_id_vendedor_medico || '''::varchar as id_vendedor_medico,
+                                  ''' || v_nombre_vendedor_medico || '''::varchar as nombre_vendedor_medico
+								from vef.tformula form
+								left join vef.vmedico med on med.id_medico = form.id_medico
+								inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula
+                                left join param.tconcepto_ingas cig on cig.id_concepto_ingas = fd.id_concepto_ingas 
+                                left join vef.tsucursal_producto spc on spc.id_concepto_ingas = fd.id_concepto_ingas 
+                                	and spc.estado_reg = ''activo'' 
+                        		' || v_join || '
+								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo''';
+                
+                --Devuelve la respuesta
+                
+                raise notice '%',v_consulta;
+				return v_consulta;
+			
+		end;			
 	else
 					     
 		raise exception 'Transaccion inexistente';

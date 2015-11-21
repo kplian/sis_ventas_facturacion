@@ -56,6 +56,7 @@ class MODVenta extends MODbase{
         $this->captura('porcentaje_descuento','numeric');
         $this->captura('id_vendedor_medico','varchar');
 		$this->captura('comision','numeric');
+		$this->captura('observaciones','text');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -98,6 +99,7 @@ class MODVenta extends MODbase{
 		$this->setParametro('a_cuenta','a_cuenta','numeric');
 		$this->setParametro('total_venta','total_venta','numeric');
 		$this->setParametro('fecha_estimada_entrega','fecha_estimada_entrega','date');
+		$this->setParametro('observaciones','observaciones','text');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -179,6 +181,7 @@ class MODVenta extends MODbase{
             $this->setParametro('porcentaje_descuento','porcentaje_descuento','integer'); 
             $this->setParametro('id_vendedor_medico','id_vendedor_medico','varchar'); 
 			$this->setParametro('comision','comision','numeric'); 
+			$this->setParametro('observaciones','observaciones','text');
 			 
             
             

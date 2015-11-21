@@ -44,6 +44,40 @@ class MODFormulaDetalle extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+	function listarFormulaDetalleParaInsercion(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_formula_detalle_sel';
+		$this->transaccion='VF_FORDETINS_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setCount(false);
+		
+		$this->setParametro('id_sucursal','id_sucursal','int4');
+		$this->setParametro('id_punto_venta','id_punto_venta','int4');
+		$this->setParametro('id_vendedor_medico','id_vendedor_medico','varchar');
+		$this->setParametro('porcentaje_descuento','porcentaje_descuento','int4');
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_producto','int4');
+		$this->captura('tipo','varchar');
+		$this->captura('nombre_producto','varchar');
+		$this->captura('descripcion','text');
+		$this->captura('cantidad','numeric');
+		$this->captura('precio_unitario','numeric');
+		$this->captura('precio_total_sin_descuento','numeric');
+		$this->captura('porcentaje_descuento','integer');
+		$this->captura('precio_total','numeric');
+		$this->captura('id_vendedor_medico','varchar');
+		$this->captura('nombre_vendedor_medico','varchar');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 	function insertarFormulaDetalle(){
 		//Definicion de variables para ejecucion del procedimiento

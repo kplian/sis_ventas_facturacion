@@ -354,3 +354,18 @@ ALTER TABLE vef.tsucursal
   ADD COLUMN id_lugar INTEGER;
 
 /************************************F-SCP-JRR-VEF-0-08/11/2015*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-19/11/2015*************************************************/
+
+ALTER TABLE vef.tformula
+  ALTER COLUMN cantidad DROP NOT NULL;
+
+ALTER TABLE vef.tformula
+  ALTER COLUMN id_unidad_medida DROP NOT NULL;
+
+ALTER TABLE vef.tformula
+  ALTER COLUMN id_medico DROP NOT NULL;
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN observaciones TEXT;
+/************************************F-SCP-JRR-VEF-0-19/11/2015*************************************************/

@@ -57,7 +57,7 @@ BEGIN
 						vedet.tipo,
 						vedet.estado_reg,
 						vedet.cantidad,
-						vedet.precio,						
+						vedet.precio_sin_descuento,						
 						vedet.id_usuario_ai,
 						vedet.usuario_ai,
 						vedet.fecha_reg,
@@ -73,7 +73,29 @@ BEGIN
 							cig.desc_ingas
 						when vedet.id_formula is not null then
 							form.nombre
-						end) as nombre_producto
+						end) as nombre_producto,
+                        vedet.porcentaje_descuento,                       
+                        (vedet.precio_sin_descuento * vedet.cantidad)::numeric,
+                        (case when vedet.id_medico is not null then
+                        	vedet.id_medico || ''_medico''
+                         when vedet.id_vendedor is not null then
+                         	vedet.id_vendedor || ''_usuario''
+                         else
+                         	NULL
+                         end)::varchar as id_vendedor_medico,
+                         (case when vedet.id_medico is not null then
+                        	med.nombre_completo
+                         when vedet.id_vendedor is not null then
+                         	ven.desc_persona
+                         else
+                         	NULL
+                         end)::varchar as nombre_vendedor_medico,
+                         (case when vedet.id_sucursal_producto is not null then
+							sprod.requiere_descripcion
+						else
+							''no''::varchar
+						end) as requiere_descripcion,
+                        vedet.descripcion 
 						from vef.tventa_detalle vedet
 						inner join segu.tusuario usu1 on usu1.id_usuario = vedet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = vedet.id_usuario_mod
@@ -81,7 +103,9 @@ BEGIN
 						left join vef.tformula form on form.id_formula = vedet.id_formula
 						left join alm.titem item on item.id_item = vedet.id_item
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
-				        where  ';
+				        left join vef.vmedico med on med.id_medico = vedet.id_medico
+                        left join segu.vusuario ven on ven.id_usuario = vedet.id_vendedor
+                        where  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -111,7 +135,9 @@ BEGIN
 						left join vef.tformula form on form.id_formula = vedet.id_formula
 						left join alm.titem item on item.id_item = vedet.id_item
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
-					    where ';
+					    left join vef.tmedico med on med.id_medico = vedet.id_medico
+                        left join segu.vusuario ven on ven.id_usuario = vedet.id_vendedor
+                        where ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

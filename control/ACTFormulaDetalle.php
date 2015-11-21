@@ -27,6 +27,21 @@ class ACTFormulaDetalle extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function listarFormulaDetalleParaInsercion (){
+		$this->objParam->defecto('ordenacion','id_producto');
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+       
+        if ($this->objParam->getParametro('id_formula') != '') {
+            $this->objParam->addFiltro("fd.id_formula = ". $this->objParam->getParametro('id_formula'));
+        }  
+		
+		$this->objFunc=$this->create('MODFormulaDetalle');			
+		$this->res=$this->objFunc->listarFormulaDetalleParaInsercion($this->objParam);
+		
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 				
 	function insertarFormulaDetalle(){
 		$this->objFunc=$this->create('MODFormulaDetalle');	
