@@ -71,10 +71,10 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
 						(case  when fordet.id_item is not null then
-                        	item.nombre
+                        	item.codigo  || '' - '' ||  item.nombre
                         else
                         	cig.desc_ingas
-                        end) as nombre_producto,
+                        end)::varchar as nombre_producto,
                         (case  when fordet.id_item is not null then
                         	''item''::varchar
                         else
@@ -163,6 +163,7 @@ BEGIN
         	end if;
             
             if (v_id_vendedor is not null) then
+            
             	select u.desc_persona into v_nombre_vendedor_medico
                 from segu.vusuario u
                 where id_usuario = v_id_vendedor;
@@ -171,7 +172,7 @@ BEGIN
             if (v_id_medico is not null) then
             	select m.nombre_completo into v_nombre_vendedor_medico
                 from vef.vmedico m
-                where id_usuario = v_id_vendedor;
+                where id_medico = v_id_medico;
             end if;
             
     		if (v_sucursal.tiene_precios_x_sucursal = 'si') then
@@ -192,13 +193,15 @@ BEGIN
                                       spc.id_sucursal_producto						
                                   end) as id_producto,
 								(case when fd.id_item is not null then
-                                      ''item''
-                                  when spc.id_sucursal_producto is not null then
-                                      ''servicio_producto''						
+                                      ''producto_terminado''
+                                  when spc.id_sucursal_producto is not null and spc.tipo_producto = ''servicio'' then
+                                      ''servicio''	
+                                  when spc.id_sucursal_producto is not null and spc.tipo_producto = ''producto'' then
+                                      ''producto_terminado''							
                                   end)::varchar as tipo, 
                                   
                                 (case when fd.id_item is not null then
-                                      i.nombre
+                                      i.codigo  || '' - '' ||  i.nombre
                                   when spc.id_sucursal_producto is not null then
                                       cig.desc_ingas						
                                   end)::varchar as nombre_producto, 

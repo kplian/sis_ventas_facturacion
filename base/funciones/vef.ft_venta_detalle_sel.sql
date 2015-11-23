@@ -68,12 +68,12 @@ BEGIN
 						usu2.cuenta as usr_mod,
 						vedet.precio*vedet.cantidad,						
 						(case when vedet.id_item is not null then
-							item.nombre
+							item.codigo  || '' - '' ||  item.nombre
 						when vedet.id_sucursal_producto is not null then
 							cig.desc_ingas
 						when vedet.id_formula is not null then
 							form.nombre
-						end) as nombre_producto,
+						end)::varchar as nombre_producto,
                         vedet.porcentaje_descuento,                       
                         (vedet.precio_sin_descuento * vedet.cantidad)::numeric,
                         (case when vedet.id_medico is not null then

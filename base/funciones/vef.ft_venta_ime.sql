@@ -379,7 +379,7 @@ BEGIN
             id_vendedor_medico = v_parametros.id_vendedor_medico,
             porcentaje_descuento = v_parametros.porcentaje_descuento,
             comision = v_comision,
-            observaciones = v_observaciones
+            observaciones = v_parametros.observaciones
 			where id_venta=v_parametros.id_venta;
 			
 			if (v_parametros.id_forma_pago != 0 ) then
@@ -591,8 +591,9 @@ BEGIN
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
-            v_resp = pxp.f_agrega_clave(v_resp,'cambio',(v_suma_fp::varchar || ' ' || v_venta.moneda)::varchar);
-              
+            if (v_venta.estado =ANY(string_to_array(vef_estados_validar_fp,',')))then
+            	v_resp = pxp.f_agrega_clave(v_resp,'cambio',(v_suma_fp::varchar || ' ' || v_venta.moneda)::varchar);
+            end if;  
             --Devuelve la respuesta
             return v_resp;
 

@@ -221,6 +221,7 @@ Phx.vista.FormVentaFarmacia = {
                         {name:'tipo', type: 'string'},
                         {name:'estado_reg', type: 'string'},
                         {name:'cantidad', type: 'numeric'},
+                         {name:'descripcion', type: 'string'},
                         {name:'precio_unitario', type: 'numeric'},
                         {name:'precio_sin_descuento', type: 'numeric'}, 
                         {name:'precio_total_sin_descuento', type: 'numeric'}, 
@@ -349,11 +350,18 @@ Phx.vista.FormVentaFarmacia = {
                     {
                         header: 'Producto/Servicio',
                         dataIndex: 'id_producto',
-                        width: 350,
+                        width: 280,
                         sortable: false,
                         renderer:function(value, p, record){return String.format('{0}', record.data['nombre_producto']);},
                         editor: this.detCmp.id_producto 
-                    },                   
+                    },   
+                    {
+                        header: 'Descripción',
+                        dataIndex: 'descripcion',
+                        width: 230,
+                        sortable: false,                        
+                        editor: this.detCmp.descripcion 
+                    },                 
                     {
                        
                         header: 'Cantidad',
@@ -501,6 +509,60 @@ Phx.vista.FormVentaFarmacia = {
         
     },
     armarFormularioFormula : function () {
+    	var comboVendedor = new Ext.form.ComboBox( {
+                name: 'id_vendedor_medico',
+                fieldLabel: 'Vendedor/Medico',
+                allowBlank: false,
+                emptyText: 'Seleccione...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_ventas_facturacion/control/Medico/listarVendedorMedico',
+                    id: 'id_vendedor_medico',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'nombre',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_vendedor_medico', 'nombre_vendedor_medico', 'tipo'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'todo.nombre'}
+                }),
+                valueField: 'id_vendedor_medico',
+                displayField: 'nombre_vendedor_medico',
+                gdisplayField: 'id_vendedor_medico',
+                hiddenName: 'id_vendedor_medico',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Tipo:</b> {tipo}</p><p><b>Nombre:</b> {nombre_vendedor_medico}</p></div></tpl>',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,               
+                gwidth: 150,
+                minChars: 2
+            });
+        var recTem = new Array();
+        recTem['id_vendedor_medico'] = this.Cmp.id_vendedor_medico.getValue();
+        recTem['nombre_vendedor_medico'] = this.Cmp.id_vendedor_medico.getRawValue();
+        
+        comboVendedor.store.add(new Ext.data.Record(this.arrayToObject(comboVendedor.store.fields.keys,recTem), this.Cmp.id_vendedor_medico.getValue()));
+        comboVendedor.store.commitChanges(this.Cmp.id_vendedor_medico.getValue());
+        
+        comboVendedor.setValue(this.Cmp.id_vendedor_medico.getValue());
+        
+        
+        var porcentajeDescuento = new Ext.form.NumberField({
+                name: 'porcentaje_descuento',
+                fieldLabel: 'Porcentaje Descuento',
+                allowBlank: false,
+                anchor: '80%',
+                maxLength:3,
+                maxValue:100,
+                minValue:0,
+                allowDecimals:false
+        });
+        porcentajeDescuento.setValue(this.Cmp.porcentaje_descuento.getValue());
     	var comboFormula = new Ext.form.ComboBox(
 						    {
 						        typeAhead: false,
@@ -534,7 +596,7 @@ Phx.vista.FormVentaFarmacia = {
 		comboFormula.store.baseParams.tipo = 'formula';
 		comboFormula.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
     	var formularioFormula = new Ext.form.FormPanel({				            
-	            items: [comboFormula,this.Cmp.id_vendedor_medico,this.Cmp.porcentaje_descuento],				            
+	            items: [comboVendedor,porcentajeDescuento,comboFormula],				            
 	            padding: true,
 	            bodyStyle:'padding:5px 5px 0',
 	            border: false,
@@ -553,10 +615,10 @@ Phx.vista.FormVentaFarmacia = {
 	     
 						 
 		 var VentanaFormula = new Ext.Window({
-	            title: 'Punto de Venta / Sucursal',
+	            title: 'Agregar paquete/formula',
 	            modal: true,
-	            width: 300,
-	            height: 160,
+	            width: 350,
+	            height: 200,
 	            bodyStyle: 'padding:5px;',
 	            layout: 'fit',
 	            hidden: true,					            
@@ -567,8 +629,8 @@ Phx.vista.FormVentaFarmacia = {
 		                	if (formularioFormula.getForm().isValid()) {
 		                		validado = true;	
 		                		var nombre_formula = comboFormula.getRawValue(); 
-		                		params.id_vendedor_medico = this.Cmp.id_vendedor_medico.getValue();
-                				params.porcentaje_descuento = this.Cmp.porcentaje_descuento.getValue();              		
+		                		params.id_vendedor_medico = comboVendedor.getValue();
+                				params.porcentaje_descuento = porcentajeDescuento.getValue();              		
 		                		
 		                		Ext.Ajax.request({
 					                url:'../../sis_ventas_facturacion/control/FormulaDetalle/listarFormulaDetalleParaInsercion',                
@@ -605,6 +667,10 @@ Phx.vista.FormVentaFarmacia = {
 	        {name:'estado_reg', type: 'string'},
 	        {name:'cantidad', type: 'numeric'},
 	        {name:'precio_unitario', type: 'numeric'},
+	        {name:'precio_total_sin_descuento', type: 'numeric'},
+	        {name:'porcentaje_descuento', type: 'numeric'},
+	        {name:'id_vendedor_medico', type: 'string'},
+	        {name:'nombre_vendedor_medico', type: 'string'},
 	        {name:'precio_total', type: 'numeric'},                        
 	        {name:'id_usuario_ai', type: 'numeric'},
 	        {name:'usuario_ai', type: 'string'},
@@ -624,7 +690,11 @@ Phx.vista.FormVentaFarmacia = {
     			tipo : respuesta.datos[i].tipo,
     			cantidad : respuesta.datos[i].cantidad,
     			precio_unitario : respuesta.datos[i].precio_unitario,
-    			precio_total: respuesta.datos[i].precio_total 			
+    			precio_total: respuesta.datos[i].precio_total,
+    			precio_total_sin_descuento : respuesta.datos[i].precio_total_sin_descuento,
+    			porcentaje_descuento : respuesta.datos[i].porcentaje_descuento, 
+    			id_vendedor_medico : respuesta.datos[i].id_vendedor_medico, 
+    			nombre_vendedor_medico : respuesta.datos[i].nombre_vendedor_medico 			
     			
     		});
     		this.mestore.add(myNewRecord);

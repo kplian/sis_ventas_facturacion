@@ -144,7 +144,7 @@ BEGIN
 				if (v_sucursal.tiene_precios_x_sucursal = 'si') then
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
-											it.nombre, it.descripcion::text,sp.precio as precio,''''::varchar as medico,
+											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,sp.precio as precio,''''::varchar as medico,
                                             sp.requiere_descripcion
 									from alm.titem it 
 									inner join vef.tsucursal_producto sp on sp.id_item = it.id_item
@@ -154,7 +154,7 @@ BEGIN
 				else
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
-											it.nombre, it.descripcion::text,it.precio_ref as precio,''''::varchar as medico,
+											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,it.precio_ref as precio,''''::varchar as medico,
                                              ''''::varchar as requiere_descripcion
 									from alm.titem it 									
 									where it.estado_reg = ''activo'' and

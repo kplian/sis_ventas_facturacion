@@ -686,7 +686,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	     
 						 
 		 var VentanaFormula = new Ext.Window({
-	            title: 'Punto de Venta / Sucursal',
+	            title: 'Agregar paquete/formula',
 	            modal: true,
 	            width: 300,
 	            height: 160,
@@ -734,7 +734,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	        {name:'requiere_descripcion', type: 'string'},
 	        {name:'estado_reg', type: 'string'},
 	        {name:'cantidad', type: 'numeric'},
-	        {name:'precio_unitario', type: 'numeric'},
+	        {name:'precio_unitario', type: 'numeric'},	        
 	        {name:'precio_total', type: 'numeric'},                        
 	        {name:'id_usuario_ai', type: 'numeric'},
 	        {name:'usuario_ai', type: 'string'},
@@ -743,7 +743,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	        {name:'id_usuario_mod', type: 'numeric'},
 	        {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 	        {name:'usr_reg', type: 'string'},
-	        {name:'usr_mod', type: 'string'}
+	        {name:'usr_mod', type: 'string'} 
 		]);
 		
     	for (var i = 0; i < respuesta.datos.length; i++) {
@@ -754,7 +754,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     			tipo : respuesta.datos[i].tipo,
     			cantidad : respuesta.datos[i].cantidad,
     			precio_unitario : respuesta.datos[i].precio_unitario,
-    			precio_total: respuesta.datos[i].precio_total 			
+    			precio_total: respuesta.datos[i].precio_total		
     			
     		});
     		this.mestore.add(myNewRecord);
