@@ -449,7 +449,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     		this.bloqueaRequisitos(false);
     	} 
     },
-        
+            
     buildDetailGrid: function(){
         
         //cantidad,detalle,peso,totalo
@@ -698,7 +698,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		                text: '<i class="fa fa-check"></i> Aceptar',
 		                handler: function () {
 		                	if (formularioFormula.getForm().isValid()) {
-		                		validado = true;		                		
+		                		validado = true;	
+		                		var nombre_formula = comboFormula.getRawValue();                		
 		                		VentanaFormula.close(); 
 		                		Ext.Ajax.request({
 					                url:'../../sis_ventas_facturacion/control/FormulaDetalle/listarFormulaDetalleParaInsercion',                
@@ -706,6 +707,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 					                success:this.successCargarFormula,
 					                failure: this.conexionFailure,					                
 					                timeout:this.timeout,
+					                arguments : {'nombre_formula' : nombre_formula},
 					                scope:this
 					            });	  
 		                		//hacer ajax para obtener los datos a insertar en el detalle    		
@@ -722,7 +724,43 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     },
     successCargarFormula : function (response,request) {
     	var respuesta = JSON.parse(response.responseText);
-    	console.log(respuesta);
+    	var grillaRecord =  Ext.data.Record.create([
+		    {name:'id_venta_detalle', type: 'numeric'},
+	        {name:'id_venta', type: 'numeric'}, 
+	        {name:'nombre_producto', type: 'string'},
+	        {name:'id_producto', type: 'numeric'},
+	        {name:'tipo', type: 'string'},
+	        {name:'descripcion', type: 'string'},
+	        {name:'requiere_descripcion', type: 'string'},
+	        {name:'estado_reg', type: 'string'},
+	        {name:'cantidad', type: 'numeric'},
+	        {name:'precio_unitario', type: 'numeric'},
+	        {name:'precio_total', type: 'numeric'},                        
+	        {name:'id_usuario_ai', type: 'numeric'},
+	        {name:'usuario_ai', type: 'string'},
+	        {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+	        {name:'id_usuario_reg', type: 'numeric'},
+	        {name:'id_usuario_mod', type: 'numeric'},
+	        {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+	        {name:'usr_reg', type: 'string'},
+	        {name:'usr_mod', type: 'string'}
+		]);
+		
+    	for (var i = 0; i < respuesta.datos.length; i++) {
+    		var myNewRecord = new grillaRecord({
+    			nombre_producto : respuesta.datos[i].nombre_producto,
+    			descripcion : request.arguments.nombre_formula, 
+    			id_producto : respuesta.datos[i].id_producto,
+    			tipo : respuesta.datos[i].tipo,
+    			cantidad : respuesta.datos[i].cantidad,
+    			precio_unitario : respuesta.datos[i].precio_unitario,
+    			precio_total: respuesta.datos[i].precio_total 			
+    			
+    		});
+    		this.mestore.add(myNewRecord);
+    	}
+    	this.mestore.commitChanges();
+    	
     },
     onInitAdd : function (r, i) {  
     	if(this.data.readOnly===true){

@@ -74,6 +74,7 @@ class MODSucursalProducto extends MODbase{
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 		
+		
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

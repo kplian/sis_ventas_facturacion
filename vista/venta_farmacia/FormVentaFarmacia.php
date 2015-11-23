@@ -318,7 +318,10 @@ Phx.vista.FormVentaFarmacia = {
                         text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Formula/Paquete',
                         scope:this,
                         handler: function(){
-                            this.armarFormularioFormula();
+                        	if(this.evaluaRequistos() === true) { 
+                        		this.editorDetail.stopEditing(); 
+                            	this.armarFormularioFormula();
+                            }
                         }
                     },{
                         ref: '../removeBtn',
@@ -496,6 +499,138 @@ Phx.vista.FormVentaFarmacia = {
         this.detCmp.id_vendedor_medico.modificado = true;
         Phx.vista.FormVentaFarmacia.superclass.onInitAdd.call(this,r, i);      
         
+    },
+    armarFormularioFormula : function () {
+    	var comboFormula = new Ext.form.ComboBox(
+						    {
+						        typeAhead: false,
+						        fieldLabel: 'Paquete / Formula',
+						        allowBlank : false,						        
+						        store: new Ext.data.JsonStore({
+                                                url: '../../sis_ventas_facturacion/control/SucursalProducto/listarProductoServicioItem',
+                                                id: 'id_producto',
+                                                root: 'datos',
+                                                sortInfo: {
+                                                    field: 'nombre',
+                                                    direction: 'ASC'
+                                                },
+                                                totalProperty: 'total',
+                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio'],
+                                                remoteSort: true,
+                                                baseParams: {par_filtro: 'todo.nombre'}
+                                            }),
+                                valueField: 'id_producto',
+                                displayField: 'nombre_producto',
+                                gdisplayField: 'nombre_producto',
+                                hiddenName: 'id_producto',
+						        mode: 'remote',
+                				pageSize: 15,
+						        triggerAction: 'all',						         
+						        forceSelection: true,
+						        tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Nombre:</b> {nombre_producto}</p><p><b>Descripcion:</b> {descripcion}</p></div></tpl>',
+						        allowBlank : false,
+						        anchor: '100%'
+						    });
+		comboFormula.store.baseParams.tipo = 'formula';
+		comboFormula.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
+    	var formularioFormula = new Ext.form.FormPanel({				            
+	            items: [comboFormula,this.Cmp.id_vendedor_medico,this.Cmp.porcentaje_descuento],				            
+	            padding: true,
+	            bodyStyle:'padding:5px 5px 0',
+	            border: false,
+	            frame: false				            
+	        });
+	     
+	     var params = {
+                		'id_sucursal' : this.Cmp.id_sucursal.getValue()
+                		               		
+	                };
+	     
+	     if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') { 
+	     	params.id_punto_venta = this.Cmp.id_punto_venta.getValue(); 
+	     	comboFormula.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+	     }
+	     
+						 
+		 var VentanaFormula = new Ext.Window({
+	            title: 'Punto de Venta / Sucursal',
+	            modal: true,
+	            width: 300,
+	            height: 160,
+	            bodyStyle: 'padding:5px;',
+	            layout: 'fit',
+	            hidden: true,					            
+	            buttons: [
+	                {
+		                text: '<i class="fa fa-check"></i> Aceptar',
+		                handler: function () {
+		                	if (formularioFormula.getForm().isValid()) {
+		                		validado = true;	
+		                		var nombre_formula = comboFormula.getRawValue(); 
+		                		params.id_vendedor_medico = this.Cmp.id_vendedor_medico.getValue();
+                				params.porcentaje_descuento = this.Cmp.porcentaje_descuento.getValue();              		
+		                		
+		                		Ext.Ajax.request({
+					                url:'../../sis_ventas_facturacion/control/FormulaDetalle/listarFormulaDetalleParaInsercion',                
+					                params: params,
+					                success:this.successCargarFormula,
+					                failure: this.conexionFailure,					                
+					                timeout:this.timeout,
+					                arguments : {'nombre_formula' : nombre_formula},
+					                scope:this
+					            });	  
+					            VentanaFormula.close(); 
+		                		 		
+		                		
+		                	}
+		                },
+						scope: this
+	               }],
+	            items: formularioFormula,
+	            autoDestroy: true,
+	            closeAction: 'close'
+	        });
+	      VentanaFormula.show();
+    },
+    successCargarFormula : function (response,request) {
+    	var respuesta = JSON.parse(response.responseText);
+    	var grillaRecord =  Ext.data.Record.create([
+		    {name:'id_venta_detalle', type: 'numeric'},
+	        {name:'id_venta', type: 'numeric'}, 
+	        {name:'nombre_producto', type: 'string'},
+	        {name:'id_producto', type: 'numeric'},
+	        {name:'tipo', type: 'string'},
+	        {name:'descripcion', type: 'string'},
+	        {name:'requiere_descripcion', type: 'string'},
+	        {name:'estado_reg', type: 'string'},
+	        {name:'cantidad', type: 'numeric'},
+	        {name:'precio_unitario', type: 'numeric'},
+	        {name:'precio_total', type: 'numeric'},                        
+	        {name:'id_usuario_ai', type: 'numeric'},
+	        {name:'usuario_ai', type: 'string'},
+	        {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+	        {name:'id_usuario_reg', type: 'numeric'},
+	        {name:'id_usuario_mod', type: 'numeric'},
+	        {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+	        {name:'usr_reg', type: 'string'},
+	        {name:'usr_mod', type: 'string'}
+		]);
+		
+    	for (var i = 0; i < respuesta.datos.length; i++) {
+    		var myNewRecord = new grillaRecord({
+    			nombre_producto : respuesta.datos[i].nombre_producto,
+    			descripcion : request.arguments.nombre_formula, 
+    			id_producto : respuesta.datos[i].id_producto,
+    			tipo : respuesta.datos[i].tipo,
+    			cantidad : respuesta.datos[i].cantidad,
+    			precio_unitario : respuesta.datos[i].precio_unitario,
+    			precio_total: respuesta.datos[i].precio_total 			
+    			
+    		});
+    		this.mestore.add(myNewRecord);
+    	}
+    	this.mestore.commitChanges();
+    	
     },
   
    

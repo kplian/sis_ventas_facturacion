@@ -181,7 +181,7 @@ BEGIN
                                 and spi.estado_reg = ''activo'' ';
                 
             else
-                v_select_precio_item = 'i.precio_ref';
+                v_select_precio_item = 'coalesce (i.precio_ref,0)';
                 v_join = ' left join alm.titem i on i.id_item = fd.id_item ';
             end if;
                 

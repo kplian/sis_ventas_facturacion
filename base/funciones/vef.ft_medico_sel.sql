@@ -1,7 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_medico_sel"(	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+CREATE OR REPLACE FUNCTION vef.ft_medico_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_medico_sel
@@ -99,6 +103,76 @@ BEGIN
 			return v_consulta;
 
 		end;
+    
+    /*********************************    
+ 	#TRANSACCION:  'VF_VENMED_SEL'
+ 	#DESCRIPCION:	Consulta de datos de vendedor medico
+ 	#AUTOR:		admin	
+ 	#FECHA:		20-04-2015 11:17:42
+	***********************************/
+
+	elsif(p_transaccion='VF_VENMED_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='with medico as
+                              (select
+                              (med.id_medico || ''_medico'')::varchar as id_vendedor_medico,
+                              med.nombre_completo::varchar as nombre,
+                              ''medico''::varchar as tipo                           
+                              from vef.vmedico med
+            				union all
+                            	select
+                              (usu.id_usuario || ''_usuario'')::varchar as id_vendedor_medico,
+                              usu.desc_persona::varchar as nombre,
+                              ''vendedor''::varchar  as tipo                           
+                              from segu.vusuario usu)
+            			select todo.id_vendedor_medico,todo.nombre,todo.tipo
+                        from medico todo						
+                        where    ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'VF_VENMED_CONT'
+ 	#DESCRIPCION:	Consulta de conteo de vendedor medico
+ 	#AUTOR:		admin	
+ 	#FECHA:		20-04-2015 11:17:42
+	***********************************/
+
+	elsif(p_transaccion='VF_VENMED_CONT')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='with medico as
+                              (select
+                              (med.id_medico || ''_medico'')::varchar as id_vendedor_medico,
+                              med.nombre_completo::varchar as nombre,
+                              ''medico''::varchar                            
+                              from vef.vmedico med
+            				union all
+                            	select
+                              (usu.id_usuario || ''_usuario'')::varchar as id_vendedor_medico,
+                              usu.desc_persona::varchar as nombre,
+                              ''vendedor''::varchar                            
+                              from segu.vusuario usu)
+            			select count(todo.id_vendedor_medico)
+                        from medico todo						
+                        where    ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
 					
 	else
 					     
@@ -115,7 +189,9 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_medico_sel"(integer, integer, character varying, character varying) OWNER TO postgres;

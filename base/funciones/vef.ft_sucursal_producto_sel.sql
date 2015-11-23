@@ -221,7 +221,7 @@ BEGIN
                                         med.nombre_completo::varchar as medico,
                                         ''''::varchar as requiere_descripcion
 								from vef.tformula form
-								inner join vef.vmedico med on med.id_medico = form.id_medico
+								left join vef.vmedico med on med.id_medico = form.id_medico
 								inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula
                                 left join vef.tsucursal_producto spc on spc.id_concepto_ingas = fd.id_concepto_ingas 
                                 	and spc.estado_reg = ''activo'' 
@@ -352,7 +352,7 @@ BEGIN
                                         med.nombre_completo::varchar as medico,
                                         ''''::varchar as requiere_descripcion
 								from vef.tformula form
-								inner join vef.vmedico med on med.id_medico = form.id_medico
+								left join vef.vmedico med on med.id_medico = form.id_medico
 								inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula
                                 left join vef.tsucursal_producto spc on spc.id_concepto_ingas = fd.id_concepto_ingas 
                                 	and spc.estado_reg = ''activo'' 
