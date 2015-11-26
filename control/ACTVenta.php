@@ -77,6 +77,12 @@ class ACTVenta extends ACTbase{
 		$this->res=$this->objFunc->eliminarVenta($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function anularVenta(){
+			$this->objFunc=$this->create('MODVenta');	
+		$this->res=$this->objFunc->anularVenta($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
     
     function siguienteEstadoVenta(){
         $this->objFunc=$this->create('MODVenta');  

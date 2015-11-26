@@ -37,6 +37,7 @@ DECLARE
     v_respuesta			varchar;
     v_mostrar_alerts	varchar;
     v_alertas			text;
+    v_integrar_almacenes	varchar;
    
 	
     
@@ -48,10 +49,15 @@ BEGIN
       into v_venta
       from vef.tventa v
       where id_proceso_wf = p_id_proceso_wf;
-        
+     
+     select e.tipo_venta_producto into v_integrar_almacenes
+      from vef.tsucursal s
+      inner join param.tentidad e on e.id_entidad = s.id_entidad
+      where s.id_sucursal = v_venta.id_sucursal;
+              
      --significa que tiene productos terminados   
      IF ((p_codigo_estado = 'borrador' or p_codigo_estado = 'elaboracion') and 
-     		v_venta.id_movimiento is not null) THEN 
+     		v_venta.id_movimiento is not null and v_integrar_almacenes = 'si') THEN 
      	
         		
         		/*Obtener el funcionario del estado actual*/

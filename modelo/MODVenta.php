@@ -378,6 +378,24 @@ class MODVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function anularVenta(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VF_VENANU_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
     function siguienteEstadoVenta(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='vef.ft_venta_ime';

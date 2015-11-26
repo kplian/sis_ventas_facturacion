@@ -66,6 +66,8 @@ DECLARE
     v_porcentaje_descuento	integer;
     v_id_vendedor_medico	varchar;
     v_comision				numeric;
+    v_id_funcionario_inicio	integer;
+    
 			    
 BEGIN
 
@@ -166,6 +168,12 @@ BEGIN
         
         v_codigo_proceso = 'VEN-' || v_id_venta;
         	-- inciiar el tramite en el sistema de WF
+        
+        select f.id_funcionario into  v_id_funcionario_inicio
+        from segu.tusuario u
+        inner join orga.tfuncionario f on f.id_persona = u.id_persona
+        where u.id_usuario = p_id_usuario;
+        
        SELECT 
              ps_num_tramite ,
              ps_id_proceso_wf ,
@@ -183,7 +191,7 @@ BEGIN
              v_parametros._nombre_usuario_ai,
              v_id_gestion, 
              'VEN', 
-             NULL,
+             v_id_funcionario_inicio,
              NULL,
              NULL,
              v_codigo_proceso);
@@ -376,8 +384,8 @@ BEGIN
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai,
 			id_punto_venta = v_id_punto_venta,
-            id_vendedor_medico = v_parametros.id_vendedor_medico,
-            porcentaje_descuento = v_parametros.porcentaje_descuento,
+            id_vendedor_medico = v_id_vendedor_medico,
+            porcentaje_descuento = v_porcentaje_descuento,
             comision = v_comision,
             observaciones = v_parametros.observaciones
 			where id_venta=v_parametros.id_venta;
@@ -591,7 +599,7 @@ BEGIN
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
-            if (v_venta.estado =ANY(string_to_array(vef_estados_validar_fp,',')))then
+            if (v_venta.estado =ANY(string_to_array(vef_estados_validar_fp,',')) and v_suma_fp > 0)then
             	v_resp = pxp.f_agrega_clave(v_resp,'cambio',(v_suma_fp::varchar || ' ' || v_venta.moneda)::varchar);
             end if;  
             --Devuelve la respuesta
@@ -777,7 +785,84 @@ BEGIN
           -- Devuelve la respuesta
           return v_resp;
         
-     end; 	
+     end;
+    
+    /*********************************    
+ 	#TRANSACCION:  'VF_VENANU_MOD'
+ 	#DESCRIPCION:	Anulacion de Venta
+ 	#AUTOR:		RAC	
+ 	#FECHA:		19-02-2013 12:12:51
+	***********************************/
+
+	elsif(p_transaccion='VF_VENANU_MOD')then
+
+		begin
+          
+         
+          --obtenemos datos basicos
+            select 
+            	ven.id_estado_wf,
+            	ven.id_proceso_wf,
+            	ven.estado,            	
+                ven.id_venta,                
+                ven.nro_tramite
+            into
+            	v_registros            
+            from vef.tventa ven 
+            where ven.id_venta = v_parametros.id_venta;        
+            
+        
+			-- obtenemos el tipo del estado anulado
+            
+             select 
+              te.id_tipo_estado
+             into
+              v_id_tipo_estado
+             from wf.tproceso_wf pw 
+             inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso
+             inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = 'anulado'               
+             where pw.id_proceso_wf = v_registros.id_proceso_wf;
+               
+              
+             IF v_id_tipo_estado is NULL  THEN             
+                raise exception 'No se parametrizo es estado "anulado" para la venta';
+             END IF;
+             
+             select f.id_funcionario into  v_id_funcionario_inicio
+              from segu.tusuario u
+              inner join orga.tfuncionario f on f.id_persona = u.id_persona
+              where u.id_usuario = p_id_usuario;
+                          
+               -- pasamos la solicitud  al siguiente anulado
+           
+               v_id_estado_actual =  wf.f_registra_estado_wf(v_id_tipo_estado, 
+                                                           v_id_funcionario_inicio, 
+                                                           v_registros.id_estado_wf, 
+                                                           v_registros.id_proceso_wf,
+                                                           p_id_usuario,
+                                                           v_parametros._id_usuario_ai,
+                                                           v_parametros._nombre_usuario_ai,
+                                                           NULL,
+                                                           'Anulacion de venta');
+            
+             
+               -- actualiza estado en la solicitud
+              
+               update vef.tventa  set 
+                 id_estado_wf =  v_id_estado_actual,
+                 estado = 'anulado',
+                 id_usuario_mod=p_id_usuario,
+                 fecha_mod=now()
+               where id_venta  = v_parametros.id_venta;
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','venta anulada'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+             
+            --Devuelve la respuesta
+            return v_resp;
+
+		end; 	
          
 	else
      

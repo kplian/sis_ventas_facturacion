@@ -230,6 +230,21 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 timeout:this.timeout,
                 scope:this
             });        
+	},
+	anular : function () {
+		Phx.CP.loadingShow();
+        var rec=this.sm.getSelected();
+        
+        Ext.Ajax.request({
+            url:'../../sis_ventas_facturacion/control/Venta/anularVenta',
+            params:{                    
+                id_venta:  rec.data.id_venta
+                },
+            success:this.successSave,
+            failure: this.conexionFailure,            
+            timeout:this.timeout,
+            scope:this
+        });
 	},	
 	Atributos:[
 		{

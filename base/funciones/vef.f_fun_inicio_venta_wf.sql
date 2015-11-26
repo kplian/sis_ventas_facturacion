@@ -37,6 +37,7 @@ DECLARE
     v_respuesta			varchar;
     v_mostrar_alerts	varchar;
     v_alertas			text;
+    v_integrar_almacenes	varchar;
    
 	
     
@@ -48,11 +49,18 @@ BEGIN
       into v_venta
       from vef.tventa v
       where id_proceso_wf = p_id_proceso_wf;
+      
+      select e.tipo_venta_producto into v_integrar_almacenes
+      from vef.tsucursal s
+      inner join param.tentidad e on e.id_entidad = s.id_entidad
+      where s.id_sucursal = v_venta.id_sucursal;
+     
           
      --significa que tiene productos terminados   
-     IF (p_codigo_estado = 'entregado' and v_venta.estado = 'borrador') or 
-     	(p_codigo_estado = 'revision' and v_venta.estado = 'borrador') THEN              
-     	if (exists(select 1 from vef.tventa v
+     IF ((p_codigo_estado = 'entregado' and v_venta.estado = 'borrador' and v_integrar_almacenes = 'si') or 
+     	(p_codigo_estado = 'revision' and v_venta.estado = 'borrador' and v_integrar_almacenes = 'si')) THEN              
+     	raise exception 'llega';  
+        if (exists(select 1 from vef.tventa v
         					inner join vef.tventa_detalle vd on vd.id_venta = vd.id_venta
                             where v.id_proceso_wf = p_id_proceso_wf and vd.estado_reg = 'activo' and
                             vd.tipo = 'producto_terminado')) then
@@ -172,7 +180,7 @@ BEGIN
                     
         end if;      
             
-     elsif IF (p_codigo_estado = 'pendiente_entrga' and v_venta.estado = 'elaboracion')  THEN
+     elsif (p_codigo_estado = 'pendiente_entrga' and v_venta.estado = 'elaboracion' and v_integrar_almacenes = 'si')  THEN
      	if (exists(select 1 from vef.tventa v
         					inner join vef.tventa_detalle vd on vd.id_venta = vd.id_venta
                             where v.id_proceso_wf = p_id_proceso_wf and vd.estado_reg = 'activo' and
@@ -283,7 +291,7 @@ BEGIN
                         
         end if;       	        
      END IF;
-          
+         
         
     -- actualiza estado en la solicitud
     update vef.tventa  t set 
