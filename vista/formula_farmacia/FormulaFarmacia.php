@@ -17,13 +17,13 @@ Phx.vista.FormulaFarmacia = {
 	formUrl : '../../../sis_ventas_facturacion/vista/formula_farmacia/FormFormulaFarmacia.php',
 	formClass : 'FormFormulaFarmacia',
 	constructor: function(config) {	
-		Phx.vista.VentaVendedorFarmacia.superclass.constructor.call(this,config);		
+		Phx.vista.FormulaFarmacia.superclass.constructor.call(this,config);		
    },
    successGetVariables :function (response,request) {     				  		
   		this.addElements();
-		Phx.vista.VentaVendedorFarmacia.superclass.successGetVariables.call(this,response,request); 
-		this.formUrl = '../../../sis_ventas_facturacion/vista/venta_farmacia/FormVentaFarmacia.php';
-        this.formClass = 'FormVentaFarmacia'; 
+		Phx.vista.FormulaFarmacia.superclass.successGetVariables.call(this,response,request); 
+		this.formUrl = '../../../sis_ventas_facturacion/vista/formula_farmacia/FormFormulaFarmacia.php',
+        this.formClass = 'FormFormulaFarmacia'; 
   },
    addElements : function () {
   	this.Atributos.push({

@@ -1,11 +1,3 @@
-CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS varchar AS
-$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_venta_ime
@@ -595,6 +587,15 @@ BEGIN
             from vef.tventa_forma_pago
             where id_venta =   v_parametros.id_venta;
             
+            if (exists (select 1 
+            			from vef.tventa_detalle vd
+                        where (descripcion is not null and descripcion != '') or vd.tipo = 'formula' )) then
+            	
+            	update vef.tventa
+                set tiene_formula = 'si'
+                where id_venta =  v_parametros.id_venta;
+            
+            end if;
              
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada'); 
@@ -880,9 +881,3 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;

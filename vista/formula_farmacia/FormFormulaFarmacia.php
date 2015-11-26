@@ -9,15 +9,15 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.FormVentaFarmacia = {
-    require:'../../../sis_ventas_facturacion/vista/venta/FormVenta.php',
-	requireclase:'Phx.vista.FormVenta',
-	title:'Venta',
-	nombreVista: 'FormVentaFarmacia',
+Phx.vista.FormFormulaFarmacia = {
+    require:'../../../sis_ventas_facturacion/vista/formula/FormFormula.php',
+	requireclase:'Phx.vista.FormFormula',
+	title:'Formula',
+	nombreVista: 'FormFormulaFarmacia',
 	
 	constructor: function(config) {	
 		this.addElements();		   
-        Phx.vista.FormVentaFarmacia.superclass.constructor.call(this,config);        
+        Phx.vista.FormFormulaFarmacia.superclass.constructor.call(this,config);        
   },
   addElements : function () {
     
