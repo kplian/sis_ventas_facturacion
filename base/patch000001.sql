@@ -369,3 +369,25 @@ ALTER TABLE vef.tformula
 ALTER TABLE vef.tventa
   ADD COLUMN observaciones TEXT;
 /************************************F-SCP-JRR-VEF-0-19/11/2015*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-25/11/2015*************************************************/
+
+CREATE TABLE vef.tboleto (
+  id_boleto SERIAL,  
+  fecha DATE, 
+  id_punto_venta INTEGER,
+  numero VARCHAR (30) NOT NULL,
+  ruta VARCHAR (50) NOT NULL,   
+  monto NUMERIC(18,2),  
+  CONSTRAINT pk_tboleto__id_boleto PRIMARY KEY(id_boleto)
+) INHERITS (pxp.tbase);
+
+CREATE TABLE vef.tboleto_fp (
+  id_boleto_fp SERIAL,  
+  id_forma_pago INTEGER ,
+  id_boleto INTEGER,
+  monto NUMERIC(18,2),    
+  CONSTRAINT pk_tboleto_fp__id_boleto_fp PRIMARY KEY(id_boleto_fp)
+) INHERITS (pxp.tbase);
+
+/************************************F-SCP-JRR-VEF-0-25/11/2015*************************************************/

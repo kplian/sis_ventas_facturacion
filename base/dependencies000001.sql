@@ -290,3 +290,19 @@ ALTER TABLE ONLY vef.tformula_detalle
   
 
 /************************************F-DEP-JRR-VEF-0-08/11/2015*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-25/11/2015*************************************************/
+
+ALTER TABLE ONLY vef.tboleto
+    ADD CONSTRAINT fk_tboleto__id_punto_venta
+    FOREIGN KEY (id_punto_venta) REFERENCES vef.tpunto_venta(id_punto_venta); 
+    
+ALTER TABLE ONLY vef.tboleto_fp
+    ADD CONSTRAINT fk_tboleto_fp__id_boleto
+    FOREIGN KEY (id_boleto) REFERENCES vef.tboleto(id_boleto);
+    
+ALTER TABLE ONLY vef.tboleto_fp
+    ADD CONSTRAINT fk_tboleto_fp__id_forma_pago
+    FOREIGN KEY (id_forma_pago) REFERENCES vef.tforma_pago(id_forma_pago);  
+
+/************************************F-DEP-JRR-VEF-0-25/11/2015*************************************************/
