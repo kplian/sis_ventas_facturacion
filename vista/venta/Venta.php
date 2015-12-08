@@ -83,6 +83,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Venta.superclass.constructor.call(this,request.arguments);
 		this.formUrl = '../../../sis_ventas_facturacion/vista/venta/FormVenta.php';
 		this.formClass = 'FormVenta';
+		
 		this.init();
 		//this.load({params:{start:0, limit:this.tam_pag}});
 	}	,
@@ -281,12 +282,12 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
-                name: 'nro_tramite',
+                name: 'correlativo_venta',
                 fieldLabel: 'Nro',              
                 gwidth: 110
             },
                 type:'TextField',
-                filters:{pfiltro:'ven.nro_tramite',type:'string'},              
+                filters:{pfiltro:'ven.correlativo_venta',type:'string'},              
                 grid:true,
                 form:false,
                 bottom_filter: true
@@ -634,7 +635,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombre_sucursal', type: 'string'},
 		{name:'nombre_punto_venta', type: 'string'},
 		{name:'estado', type: 'string'},
-		{name:'nro_tramite', type: 'string'},
+		{name:'correlativo_venta', type: 'string'},
 		{name:'a_cuenta', type: 'numeric'},
 		{name:'total_venta', type: 'numeric'},
 		{name:'comision', type: 'numeric'},

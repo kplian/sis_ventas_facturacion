@@ -102,7 +102,7 @@ BEGIN
 						ven.id_proceso_wf,
 						ven.id_estado_wf,
 						ven.estado_reg,
-						ven.nro_tramite,
+						ven.correlativo_venta,
 						ven.a_cuenta,
 						ven.total_venta,
 						ven.fecha_estimada_entrega,
@@ -166,7 +166,7 @@ BEGIN
                         inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
                         left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
                         ' || v_join || '
-                        where  ' || v_filtro;
+                        where ven.estado_reg = ''activo'' and ' || v_filtro;
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -229,7 +229,7 @@ BEGIN
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
                         ' || v_join || '
-                        where  ' || v_filtro;
+                        where ven.estado_reg = ''activo'' and ' || v_filtro;
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -262,6 +262,8 @@ BEGIN
 						 	from vef.tsucursal_usuario 
 						 	where estado_reg = ''activo'' and id_usuario = ' || p_id_usuario || '
 						 	and id_sucursal is null and id_punto_venta is not null
+                         union all
+						 	select ''fecha'',to_char(now(),''DD/MM/YYYY'')::varchar
 						 ';
 			
 			--Definicion de la respuesta		    

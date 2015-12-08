@@ -17,7 +17,7 @@ Phx.vista.BoletoFp=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.BoletoFp.superclass.constructor.call(this,config);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		
 	},
 			
 	Atributos:[
@@ -32,90 +32,70 @@ Phx.vista.BoletoFp=Ext.extend(Phx.gridInterfaz,{
 			form:true 
 		},
 		{
-			config: {
-				name: 'id_boleto',
-				fieldLabel: 'id_boleto',
-				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'id_boleto',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
-				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				}
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_boleto'
 			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
+			type:'Field',
+			form:true 
 		},
+		
 		{
-			config: {
-				name: 'id_forma_pago',
-				fieldLabel: 'id_forma_pago',
+            config: {
+                name: 'id_forma_pago',
+                fieldLabel: 'Forma de Pago',
+                allowBlank: false,
+                emptyText: 'Forma de Pago...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_ventas_facturacion/control/FormaPago/listarFormaPago',
+                    id: 'id_forma_pago',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'nombre',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_forma_pago', 'nombre', 'desc_moneda','registrar_tarjeta','registrar_cc'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'forpa.nombre#mon.codigo'}
+                }),
+                valueField: 'id_forma_pago',
+                displayField: 'nombre',
+                gdisplayField: 'forma_pago',
+                hiddenName: 'id_forma_pago',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,               
+                gwidth: 200,
+                minChars: 2,
+                renderer : function(value, p, record) {
+                    return String.format('{0}', record.data['forma_pago']);
+                }
+            },
+            type: 'ComboBox',          
+            grid: true,
+            form: true
+        },
+        {
+			config:{
+				name: 'monto',
+				fieldLabel: 'Monto',
 				allowBlank: true,
-				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
-					id: 'id_',
-					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
-					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
-					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
-				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
-				hiddenName: 'id_forma_pago',
-				forceSelection: true,
-				typeAhead: false,
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 15,
-				queryDelay: 1000,
-				anchor: '100%',
+				anchor: '80%',
 				gwidth: 150,
-				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['desc_']);
-				}
+				maxLength:1179650
 			},
-			type: 'ComboBox',
-			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
-			grid: true,
-			form: true
+				type:'NumberField',
+				filters:{pfiltro:'bolfp.monto',type:'numeric'},
+				id_grupo:1,
+				grid:true,
+				form:true
 		},
 		{
 			config:{
@@ -132,21 +112,7 @@ Phx.vista.BoletoFp=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:false
 		},
-		{
-			config:{
-				name: 'monto',
-				fieldLabel: 'monto',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:1179650
-			},
-				type:'NumberField',
-				filters:{pfiltro:'bolfp.monto',type:'numeric'},
-				id_grupo:1,
-				grid:true,
-				form:true
-		},
+		
 		{
 			config:{
 				name: 'usr_reg',
@@ -240,6 +206,17 @@ Phx.vista.BoletoFp=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
+	onReloadPage:function(m, x){  		 
+		this.maestro=m;
+		this.store.baseParams.id_boleto = this.maestro.id_boleto;
+		
+		this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.maestro.id_punto_venta;
+		this.load({params:{start:0, limit:this.tam_pag}});
+	},
+	loadValoresIniciales: function() {    	
+        this.Cmp.id_boleto.setValue(this.maestro.id_boleto);            
+        Phx.vista.BoletoFp.superclass.loadValoresIniciales.call(this);
+   },
 	tam_pag:50,	
 	title:'Boleto Forma de Pago',
 	ActSave:'../../sis_ventas_facturacion/control/BoletoFp/insertarBoletoFp',
@@ -250,6 +227,7 @@ Phx.vista.BoletoFp=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_boleto_fp', type: 'numeric'},
 		{name:'id_boleto', type: 'numeric'},
 		{name:'id_forma_pago', type: 'numeric'},
+		{name:'forma_pago', type: 'string'},
 		{name:'estado_reg', type: 'string'},
 		{name:'monto', type: 'numeric'},
 		{name:'id_usuario_reg', type: 'numeric'},
@@ -267,7 +245,18 @@ Phx.vista.BoletoFp=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:true,
+	successSave: function(resp) {
+        Phx.CP.getPagina(this.idContenedorPadre).reload();
+        Phx.vista.BoletoFp.superclass.successSave.call(this,resp);
+    },
+    
+    successDel: function(resp) {
+        Phx.CP.getPagina(this.idContenedorPadre).reload();
+        Phx.vista.BoletoFp.superclass.successDel.call(this,resp);
+    },
+	
+	
 	}
 )
 </script>

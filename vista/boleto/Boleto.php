@@ -48,6 +48,7 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
     	},this);
     	
 		this.init();
+		this.iniciarEventos();
 		this.seleccionarPuntoVentaSucursal();
 		this.ultimo_valor = 930;
 		
@@ -168,19 +169,7 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'Field',
 			form:true 
-		},
-		{
-			//configuracion del componente
-			config:{
-					labelSeparator:'',
-					inputType:'hidden',
-					name: 'fecha',
-					format: 'd/m/Y',
-			},
-			type:'DateField',
-			form:true 
-		},
-		
+		},		
 		{
 			config:{
 				name: 'numero',
@@ -192,6 +181,7 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'TextField',
 				filters:{pfiltro:'bol.numero',type:'string'},
+				bottom_filter : true,
 				grid:true,
 				form:true
 		},
@@ -205,7 +195,8 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
 				maxLength:50
 			},
 				type:'TextArea',
-				filters:{pfiltro:'bol.ruta',type:'string'},				
+				filters:{pfiltro:'bol.ruta',type:'string'},	
+				bottom_filter : true,		
 				grid:true,
 				form:true
 		},
@@ -258,10 +249,10 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 150,
-				maxLength:1179650
+				maxLength:1179650,
+				enableKeyEvents : true
 			},
-				type:'NumberField',
-				filters:{pfiltro:'bol.monto',type:'numeric'},
+				type:'NumberField',				
 				grid:true,
 				form:true
 		},
@@ -383,6 +374,8 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
 	fields: [
 		{name:'id_boleto', type: 'numeric'},
 		{name:'id_punto_venta', type: 'numeric'},
+		{name:'id_forma_pago', type: 'numeric'},
+		{name:'forma_pago', type: 'string'},
 		{name:'numero', type: 'string'},
 		{name:'ruta', type: 'string'},
 		{name:'estado_reg', type: 'string'},
@@ -404,27 +397,85 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:true,
+	iniciarEventos : function() {
+		this.Cmp.monto.on('keyup',function(a , e) {  
+            if (e.getKey() == e.ENTER) {
+            	a.argument = {'news': true,
+		                        def: 'reset'}
+            	this.onSubmit(a,e);
+            }
+        },this);
+	},
 	loadValoresIniciales: function() {    	
         this.Cmp.numero.setValue(this.ultimo_valor);
-        this.Cmp.fecha.setValue(this.campo_fecha.getValue());
+        this.Cmp.id_punto_venta.setValue(this.id_punto_venta);
+               
         Phx.vista.Boleto.superclass.loadValoresIniciales.call(this);
    },
    onButtonNew: function() {
    		this.nuevo = true;
    		Phx.vista.Boleto.superclass.onButtonNew.call(this);
+   		this.Cmp.id_forma_pago.store.baseParams.defecto = 'si';
+   		this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.id_punto_venta;
+   		this.Cmp.id_forma_pago.allowBlank = false;
+		this.mostrarComponente(this.Cmp.id_forma_pago);
+		
+		this.Cmp.monto.allowBlank = true;
+		this.mostrarComponente(this.Cmp.monto);
+		
+   		this.Cmp.id_forma_pago.store.load({params:{start:0,limit:this.tam_pag}, 
+		           callback : function (r) {
+		           		
+	           			if (r.length == 1 ) {                       
+		                    this.Cmp.id_forma_pago.setValue(r[0].data.id_forma_pago); 
+		                    this.Cmp.id_forma_pago.fireEvent('select', this.Cmp.id_forma_pago,r[0],0);
+		                }
+		           		
+		                
+		                this.Cmp.id_forma_pago.store.baseParams.defecto = 'no';  
+		                this.Cmp.id_forma_pago.modificado = true;
+		                                
+		            }, scope : this
+		        });
    },
    onButtonEdit: function() {
    		this.nuevo = false;
-   		Phx.vista.Boleto.superclass.onButtonNew.call(this);
+   		Phx.vista.Boleto.superclass.onButtonEdit.call(this);
+   		if (this.sm.getSelected().data.forma_pago =='DIVIDIDO') {
+   			this.Cmp.id_forma_pago.reset();
+   			this.Cmp.id_forma_pago.allowBlank = true;
+   			this.ocultarComponente(this.Cmp.id_forma_pago);
+   			
+   			this.Cmp.monto.allowBlank = true;
+   			this.ocultarComponente(this.Cmp.monto);
+   		} else {   			
+   			this.Cmp.id_forma_pago.allowBlank = false;
+   			this.mostrarComponente(this.Cmp.id_forma_pago);
+   			
+   			this.Cmp.monto.allowBlank = true;
+   			this.mostrarComponente(this.Cmp.monto);
+   		}
    },
    onSubmit: function(o, x, force) {
+   		
    		if (this.nuevo) {
-   			this.ultimo_valor = this.ultimo_valor + 1;
+   			this.ultimo_valor = parseInt(this.Cmp.numero.getValue()) + 1;
    		}
-   		Phx.vista.Boleto.superclass.onButtonNew.call(this,o, x, force);
-   }
+   		Phx.vista.Boleto.superclass.onSubmit.call(this,o, x, force);
+   },
+   east : {
+            url : '../../../sis_ventas_facturacion/vista/boleto_fp/BoletoFp.php',
+            title : 'Formas de Pago',
+            width : '35%',
+            cls : 'BoletoFp'
+       },
    
-	}
+	
+	agregarArgsExtraSubmit: function() {
+    	this.argumentExtraSubmit.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');
+    }
+    }
+	
 )
 </script>
 		

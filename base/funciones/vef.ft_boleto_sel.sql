@@ -1,7 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_boleto_sel"(	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+CREATE OR REPLACE FUNCTION vef.ft_boleto_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_boleto_sel
@@ -45,8 +49,7 @@ BEGIN
 						bol.id_punto_venta,
 						bol.numero,
 						bol.ruta,
-						bol.estado_reg,
-						bol.monto,
+						bol.estado_reg,						
 						bol.fecha,
 						bol.id_usuario_ai,
 						bol.id_usuario_reg,
@@ -55,14 +58,44 @@ BEGIN
 						bol.id_usuario_mod,
 						bol.fecha_mod,
 						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod	
+						usu2.cuenta as usr_mod,
+                        (case when count(id_boleto_fp) > 1	then
+                        	NULL
+                        else
+                        	pxp.list(bolfp.id_forma_pago::text)
+                        end):: integer as id_forma_pago,
+                        (case when count(id_boleto_fp) > 1	then
+                        	''DIVIDIDO''
+                        else
+                        	pxp.list(fp.nombre)
+                        end):: varchar as forma_pago,
+                        sum(bolfp.monto) as monto
+                        
 						from vef.tboleto bol
 						inner join segu.tusuario usu1 on usu1.id_usuario = bol.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = bol.id_usuario_mod
-				        where  ';
+				        inner join vef.tboleto_fp bolfp on bolfp.id_boleto = bol.id_boleto
+                        inner join vef.tforma_pago fp on fp.id_forma_pago = bolfp.id_forma_pago 
+                        where  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta|| ' group by 
+            			bol.id_boleto,
+						bol.id_punto_venta,
+						bol.numero,
+						bol.ruta,
+						bol.estado_reg,						
+						bol.fecha,
+						bol.id_usuario_ai,
+						bol.id_usuario_reg,
+						bol.fecha_reg,
+						bol.usuario_ai,
+						bol.id_usuario_mod,
+						bol.fecha_mod,
+						usu1.cuenta,
+						usu2.cuenta';
+                        
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			--Devuelve la respuesta
@@ -110,7 +143,9 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_boleto_sel"(integer, integer, character varying, character varying) OWNER TO postgres;

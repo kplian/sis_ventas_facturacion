@@ -59,6 +59,9 @@ DECLARE
     v_id_vendedor_medico	varchar;
     v_comision				numeric;
     v_id_funcionario_inicio	integer;
+    v_codigo_tabla			varchar;
+    v_num_ven				varchar;
+    v_id_periodo			integer;
     
 			    
 BEGIN
@@ -76,6 +79,53 @@ BEGIN
 	if(p_transaccion='VF_VEN_INS')then
 					
         begin
+        --obtener correlativo
+        
+        select id_periodo into v_id_periodo from
+                        param.tperiodo per 
+                       where per.fecha_ini <= now()::date 
+                         and per.fecha_fin >=  now()::date
+                         limit 1 offset 0;
+    	
+        if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
+        	select pv.codigo into v_codigo_tabla
+            from vef.tpunto_venta pv
+            where id_punto_venta = v_parametros.id_punto_venta;
+        else
+        	select pv.codigo into v_codigo_tabla
+            from vef.tsucursal pv
+            where id_sucursal = v_parametros.id_sucursal;
+        end if;
+        
+        
+        -- obtener correlativo
+         v_num_ven =   param.f_obtener_correlativo(
+                  'VEN', 
+                   v_id_periodo,-- par_id, 
+                   NULL, --id_uo 
+                   NULL,    -- id_depto
+                   p_id_usuario, 
+                   'VEF', 
+                   NULL,
+                   0,
+                   0,
+                   (case when pxp.f_existe_parametro(p_tabla,'id_punto_venta') then
+                   		'vef.tpunto_venta'
+                   else
+                   		'vef.tsucursal'
+                   end),
+                   (case when pxp.f_existe_parametro(p_tabla,'id_punto_venta') then
+                   		v_parametros.id_punto_venta
+                   else
+                   		v_parametros.id_sucursal
+                   end),
+                   v_codigo_tabla                   
+                   );
+      
+        --fin obtener correlativo
+        IF (v_num_ven is NULL or v_num_ven ='') THEN
+           raise exception 'No se pudo obtener un numero correlativo para la venta consulte con el administrador';
+        END IF;
         
         if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
         	v_id_punto_venta = v_parametros.id_punto_venta;
@@ -211,7 +261,8 @@ BEGIN
             id_vendedor_medico,
             porcentaje_descuento,
             comision,
-            observaciones
+            observaciones,
+            correlativo_venta
             
           	) values(
             v_id_venta,
@@ -234,7 +285,8 @@ BEGIN
             v_id_vendedor_medico,
             v_porcentaje_descuento,
             v_comision,
-            v_parametros.observaciones		
+            v_parametros.observaciones,
+            v_num_ven		
 			
 			) returning id_venta into v_id_venta;
 			
@@ -447,7 +499,8 @@ BEGIN
             delete from vef.tventa_detalle
             where id_venta=v_parametros.id_venta;
             
-			delete from vef.tventa
+			update vef.tventa
+            set estado_reg = 'inactivo'
             where id_venta=v_parametros.id_venta;
                
             --Definicion de la respuesta
@@ -587,15 +640,6 @@ BEGIN
             from vef.tventa_forma_pago
             where id_venta =   v_parametros.id_venta;
             
-            if (exists (select 1 
-            			from vef.tventa_detalle vd
-                        where (descripcion is not null and descripcion != '') or vd.tipo = 'formula' )) then
-            	
-            	update vef.tventa
-                set tiene_formula = 'si'
-                where id_venta =  v_parametros.id_venta;
-            
-            end if;
              
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada'); 

@@ -13,6 +13,15 @@ class ACTBoleto extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_boleto');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if($this->objParam->getParametro('id_punto_venta') != '') {
+                $this->objParam->addFiltro(" bol.id_punto_venta = " . $this->objParam->getParametro('id_punto_venta'));
+        }
+		
+		if($this->objParam->getParametro('fecha') != '') {
+                $this->objParam->addFiltro(" bol.fecha = ''" . $this->objParam->getParametro('fecha')."''");
+        }
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODBoleto','listarBoleto');

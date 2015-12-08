@@ -29,7 +29,7 @@ class MODVenta extends MODbase{
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_estado_wf','int4');
 		$this->captura('estado_reg','varchar');
-		$this->captura('nro_tramite','varchar');
+		$this->captura('correlativo_venta','varchar');
 		$this->captura('a_cuenta','numeric');
 		$this->captura('total_venta','numeric');
 		$this->captura('fecha_estimada_entrega','date');

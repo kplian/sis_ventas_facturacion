@@ -25,7 +25,7 @@ class MODBoleto extends MODbase{
 		$this->captura('numero','varchar');
 		$this->captura('ruta','varchar');
 		$this->captura('estado_reg','varchar');
-		$this->captura('monto','numeric');
+		
 		$this->captura('fecha','date');
 		$this->captura('id_usuario_ai','int4');
 		$this->captura('id_usuario_reg','int4');
@@ -35,6 +35,10 @@ class MODBoleto extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		
+		$this->captura('id_forma_pago','int4');
+		$this->captura('forma_pago','varchar');
+		$this->captura('monto','numeric');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -55,6 +59,7 @@ class MODBoleto extends MODbase{
 		$this->setParametro('numero','numero','varchar');
 		$this->setParametro('ruta','ruta','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
+		$this->setParametro('id_forma_pago','id_forma_pago','int4');
 		$this->setParametro('monto','monto','numeric');
 		$this->setParametro('fecha','fecha','date');
 
@@ -78,6 +83,7 @@ class MODBoleto extends MODbase{
 		$this->setParametro('numero','numero','varchar');
 		$this->setParametro('ruta','ruta','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
+		$this->setParametro('id_forma_pago','id_forma_pago','int4');
 		$this->setParametro('monto','monto','numeric');
 		$this->setParametro('fecha','fecha','date');
 

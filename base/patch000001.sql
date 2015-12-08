@@ -374,19 +374,18 @@ ALTER TABLE vef.tventa
 
 CREATE TABLE vef.tboleto (
   id_boleto SERIAL,  
-  fecha DATE, 
-  id_punto_venta INTEGER,
+  fecha DATE NOT NULL, 
+  id_punto_venta INTEGER NOT NULL,
   numero VARCHAR (30) NOT NULL,
-  ruta VARCHAR (50) NOT NULL,   
-  monto NUMERIC(18,2),  
+  ruta VARCHAR (50) NOT NULL,     
   CONSTRAINT pk_tboleto__id_boleto PRIMARY KEY(id_boleto)
 ) INHERITS (pxp.tbase);
 
 CREATE TABLE vef.tboleto_fp (
   id_boleto_fp SERIAL,  
-  id_forma_pago INTEGER ,
-  id_boleto INTEGER,
-  monto NUMERIC(18,2),    
+  id_forma_pago INTEGER NOT NULL ,
+  id_boleto INTEGER NOT NULL,
+  monto NUMERIC(18,2) NOT NULL,    
   CONSTRAINT pk_tboleto_fp__id_boleto_fp PRIMARY KEY(id_boleto_fp)
 ) INHERITS (pxp.tbase);
 

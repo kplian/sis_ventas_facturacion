@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_boleto_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION vef.ft_boleto_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_boleto_ime
@@ -48,8 +51,7 @@ BEGIN
 			id_punto_venta,
 			numero,
 			ruta,
-			estado_reg,
-			monto,
+			estado_reg,			
 			fecha,
 			id_usuario_ai,
 			id_usuario_reg,
@@ -62,7 +64,7 @@ BEGIN
 			v_parametros.numero,
 			v_parametros.ruta,
 			'activo',
-			v_parametros.monto,
+			
 			v_parametros.fecha,
 			v_parametros._id_usuario_ai,
 			p_id_usuario,
@@ -74,6 +76,32 @@ BEGIN
 			
 			
 			)RETURNING id_boleto into v_id_boleto;
+            
+            --Sentencia de la insercion
+        	insert into vef.tboleto_fp(
+			id_boleto,
+			id_forma_pago,
+			monto,
+			estado_reg,						
+			id_usuario_ai,
+			id_usuario_reg,
+			fecha_reg,
+			usuario_ai,
+			id_usuario_mod,
+			fecha_mod
+          	) values(
+			v_id_boleto,
+			v_parametros.id_forma_pago,
+			v_parametros.monto,
+			'activo',
+			v_parametros._id_usuario_ai,
+			p_id_usuario,
+			now(),
+			v_parametros._nombre_usuario_ai,
+			null,
+			null
+			
+			); 
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Boleto almacenado(a) con exito (id_boleto'||v_id_boleto||')'); 
@@ -95,17 +123,27 @@ BEGIN
 
 		begin
 			--Sentencia de la modificacion
-			update vef.tboleto set
-			id_punto_venta = v_parametros.id_punto_venta,
+			update vef.tboleto set			
 			numero = v_parametros.numero,
 			ruta = v_parametros.ruta,
-			monto = v_parametros.monto,
-			fecha = v_parametros.fecha,
 			id_usuario_mod = p_id_usuario,
 			fecha_mod = now(),
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai
 			where id_boleto=v_parametros.id_boleto;
+            
+             if (pxp.f_existe_parametro(p_tabla,'id_forma_pago')) then
+             	if(v_parametros.id_forma_pago is not null) then
+                	update vef.tboleto_fp
+                      set id_forma_pago = v_parametros.id_forma_pago,
+                      monto = v_parametros.monto,
+                      id_usuario_mod = p_id_usuario,
+                      fecha_mod = now(),
+                      id_usuario_ai = v_parametros._id_usuario_ai,
+                      usuario_ai = v_parametros._nombre_usuario_ai
+                    where id_boleto=v_parametros.id_boleto;
+                end if;            
+            end if;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Boleto modificado(a)'); 
@@ -127,6 +165,10 @@ BEGIN
 
 		begin
 			--Sentencia de la eliminacion
+            
+            delete from vef.tboleto_fp
+            where id_boleto=v_parametros.id_boleto;
+            
 			delete from vef.tboleto
             where id_boleto=v_parametros.id_boleto;
                
@@ -155,7 +197,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_boleto_ime"(integer, integer, character varying, character varying) OWNER TO postgres;
