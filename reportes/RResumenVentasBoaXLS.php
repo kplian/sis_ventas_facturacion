@@ -249,148 +249,77 @@ class RResumenVentasBoaXLS
 	function imprimeDatosResumen(){
 		$datos = $this->objParam->getParametro('resumen');
 		
+		$this->docexcel->setActiveSheetIndex(0);
 		$config = $this->objParam->getParametro('conceptos');
 		$conceptos = array();
+		$this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(15);
+		$this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+		$this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(15);
+		$this->docexcel->getActiveSheet()->setCellValue('A3','DAY');
+		$this->docexcel->getActiveSheet()->setCellValue('B3','CREDIT CARD');
+		$this->docexcel->getActiveSheet()->setCellValue('C3','CASH');
 		for ($i = 0;$i < count($config);$i++) {
 									
 			$conceptos[$i] = $config [$i]['nombre'];
+			$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[$i+3])->setWidth(10);
+			$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$i+3].'3',$conceptos[$i]);
 		}
-		$fila = 5;
-		$sheetId = 0;
+		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[$i+3])->setWidth(12);
+		$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$i+3].'3','TOTAL');
+		$this->docexcel->getActiveSheet()->getStyle('A3:'.$this->equivalencias[$i+3].'3')->applyFromArray($this->styleTitulos2);
+		
+		$fila = 3;
+		
 		$fecha = '';
-		$boleto = '';
+		$total_cc = 0;
+		$total_cash = 0;
+		$total = 0;
 		$totales = array();
 		foreach ($datos as $key => $value) {
-			//si es distinta creamos una nueva hoja	
+			
 			if ($value['fecha'] != $fecha) {
-				$objFecha = DateTime::createFromFormat('Y-m-d', $value['fecha']);
-				$totales[$objFecha->format('dMy')] = array();	
-				if ($fila != 5){
-					$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 4].$fila,$total_boleto);
-					$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 5].$fila,$total_boleto_cash);
-					$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 6].$fila,$total_boleto_cc);
-					//TOTALES
-					$this->docexcel->getActiveSheet()->getStyle('A'.($fila + 2) .':'.$this->equivalencias[count($conceptos) + 6].($fila+2))->applyFromArray($this->styleTotal);
-					$this->docexcel->getActiveSheet()->getStyle("E". ($fila + 2).":" . $this->equivalencias[count($conceptos) + 6] . ($fila+2))->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00);
-					$this->docexcel->getActiveSheet()->getStyle("A". ($fila + 2).":" . $this->equivalencias[count($conceptos) + 6] . ($fila+2))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
-					$this->docexcel->getActiveSheet()->mergeCells('A'.($fila + 2) .':D'.($fila+2));
-					$this->docexcel->getActiveSheet()->setCellValue('A'.($fila + 2),'TOTAL');
-					
-					$this->docexcel->getActiveSheet()->
-							setCellValue($this->equivalencias[count($conceptos) + 4].($fila+2),'=SUM(' . $this->equivalencias[count($conceptos) + 4].'6:' . $this->equivalencias[count($conceptos) + 4] . $fila . ')');
-					$this->docexcel->getActiveSheet()->
-							setCellValue($this->equivalencias[count($conceptos) + 5].($fila+2),'=SUM(' . $this->equivalencias[count($conceptos) + 5].'6:' . $this->equivalencias[count($conceptos) + 5] . $fila . ')');
-					$this->docexcel->getActiveSheet()->
-							setCellValue($this->equivalencias[count($conceptos) + 6].($fila+2),'=SUM(' . $this->equivalencias[count($conceptos) + 6].'6:' . $this->equivalencias[count($conceptos) + 6] . $fila . ')');
-				
-					for ($i = 4;$i < 4 + count($conceptos);$i++) {
-						$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$i].($fila + 2),'=SUM(' . $this->equivalencias[$i]. "6:" . $this->equivalencias[$i].$fila . ')');
-					}
-				
+				$objFecha = DateTime::createFromFormat('Y-m-d', $value['fecha']);	
+				if ($fila != 3) {
+					$this->docexcel->getActiveSheet()->setCellValue('B'.$fila,$total_cc);
+					$this->docexcel->getActiveSheet()->setCellValue('C'.$fila,$total_cash);
+					$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 3].$fila,$total);
+					$total_cc = 0;
+					$total_cash = 0;
+					$total = 0;
 				}
-				$total_boleto = 0;
-				$total_boleto_cc = 0;
-				$total_boleto_cash = 0;
-				
-				
-				$fila = 5;
+				$fila++;			
 				$fecha = $value['fecha'];
-				
-				$sheetId++;
-				$this->docexcel->createSheet(NULL, $sheetId);	
-				$this->docexcel->setActiveSheetIndex($sheetId);	
-				$this->docexcel->getActiveSheet()->setTitle($objFecha->format('d M y'));	
-				$this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(15);
-				$this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(25);
-				$this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(20);
-				$this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
-				for ($i = 4;$i < 4 + count($conceptos);$i++) {
-									
-					$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[$i])->setWidth(10);
-				}
-				$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[$i])->setWidth(12);
-				$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[$i+1])->setWidth(12);
-				$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[$i+2])->setWidth(15);
-				
-				$this->docexcel->getActiveSheet()->getStyle('B2:D2')->applyFromArray($this->styleTitulos0);
-				if ($this->objParam->getParametro('punto_venta') != '') {
-					$this->docexcel->getActiveSheet()->setCellValue('B2','OFICINA ' . $this->objParam->getParametro('punto_venta'));
-				} else {
-					$this->docexcel->getActiveSheet()->setCellValue('B2','SUCURSAL ' . $this->objParam->getParametro('sucursal'));
-				}
-				$this->docexcel->getActiveSheet()->setCellValue('C2','FECHA');
-				$this->docexcel->getActiveSheet()->setCellValue('D2',$objFecha->format('d/m/Y'));
-				
-				$this->docexcel->getActiveSheet()->mergeCells('A3:'.$this->equivalencias[$i+2].'3');
-				$this->docexcel->getActiveSheet()->getRowDimension('3')->setRowHeight(30);
-									
-				$this->docexcel->getActiveSheet()->getStyle('A3')->applyFromArray($this->styleTitulos1);				
-				$this->docexcel->getActiveSheet()->setCellValue('A3','REPORTE DIARIO DETALLADO DE VENTAS');
-				
-				$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$i+2].'5')->applyFromArray($this->styleTitulos2);
-				$this->docexcel->getActiveSheet()->getStyle('A5:'.$this->equivalencias[$i+2].'5')->getAlignment()->setWrapText(true); 
-				$this->docexcel->getActiveSheet()->setCellValue('A5','NRO.');
-				$this->docexcel->getActiveSheet()->setCellValue('B5','NOMBRE PAX');
-				$this->docexcel->getActiveSheet()->setCellValue('C5','No TKT');
-				$this->docexcel->getActiveSheet()->setCellValue('D5','RUTA');
-				
-				for ($i = 4;$i < 4 + count($conceptos);$i++) {
-					$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$i].'5',$conceptos[$i-4]);
-				}
-				$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$i] . '5','TOTAL');
-				$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$i+1] . '5','CASH');
-				$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$i+2] . '5','CREDIT CARD');
-			}
-			if ($value['boleto'] != $boleto) {
-				if ($fila != 5){
-					$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 4].$fila,$total_boleto);
-					$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 5].$fila,$total_boleto_cash);
-					$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 6].$fila,$total_boleto_cc);
-				}
-				
-				$total_boleto = 0;
-				$total_boleto_cc = 0;
-				$total_boleto_cash = 0;
-				$fila++;
-				
-				$this->docexcel->getActiveSheet()->getStyle("A$fila:" . $this->equivalencias[count($conceptos) + 6] . $fila)->applyFromArray($this->styleDetalle);
-				$this->docexcel->getActiveSheet()->getStyle("E$fila:" . $this->equivalencias[count($conceptos) + 6] . $fila)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00);
-				$this->docexcel->getActiveSheet()->getStyle("E$fila:" . $this->equivalencias[count($conceptos) + 6] . $fila)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
-				
-				$boleto = $value['boleto'];
-				$this->docexcel->getActiveSheet()->setCellValue('A'.$fila,$value['correlativo']);
-				$this->docexcel->getActiveSheet()->setCellValue('B'.$fila,$value['pasajero']);
-				$this->docexcel->getActiveSheet()->setCellValue('C'.$fila,$value['boleto']);
-				$this->docexcel->getActiveSheet()->setCellValue('D'.$fila,$value['ruta']);
-				
+				$this->docexcel->getActiveSheet()->getStyle("A$fila:" . $this->equivalencias[count($conceptos) + 3] . $fila)->applyFromArray($this->styleDetalle);
+				$this->docexcel->getActiveSheet()->setCellValue('A'.$fila,$objFecha->format('d M'));	
 				
 			}
 			$pos = array_search($value['concepto'], $conceptos);
-			$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$pos + 4].$fila,$value['monto']);
-			$total_boleto += $value['monto'];
-			$total_boleto_cc += $value['monto_tarjeta'];
-			$total_boleto_cash += $value['monto_cash'];
+			$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$pos + 3].$fila,$value['monto']);
+			$total += $value['monto'];
+			$total_cc += $value['monto_tarjeta'];
+			$total_cash += $value['monto_cash'];	
+			
 		}
-		$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 4].$fila,$total_boleto);
-		$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 5].$fila,$total_boleto_cash);
-		$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 6].$fila,$total_boleto_cc);
+		$this->docexcel->getActiveSheet()->setCellValue('B'.$fila,$total_cc);
+		$this->docexcel->getActiveSheet()->setCellValue('C'.$fila,$total_cash);
+		$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[count($conceptos) + 3].$fila,$total);
 		
 		//TOTALES
-		$this->docexcel->getActiveSheet()->getStyle('A'.($fila+2) .':'.$this->equivalencias[count($conceptos) + 6].($fila+2))->applyFromArray($this->styleTotal);
-		$this->docexcel->getActiveSheet()->getStyle("E". ($fila + 2).":" . $this->equivalencias[count($conceptos) + 6] . ($fila+2))->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00);
-		$this->docexcel->getActiveSheet()->getStyle("A". ($fila + 2).":" . $this->equivalencias[count($conceptos) + 6] . ($fila+2))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
-		$this->docexcel->getActiveSheet()->mergeCells('A'.($fila + 2) .':D'.($fila+2));
+		$this->docexcel->getActiveSheet()->getStyle('A'.($fila+2) .':'.$this->equivalencias[count($conceptos) + 3].($fila+2))->applyFromArray($this->styleTotal);
+		$this->docexcel->getActiveSheet()->getStyle("B". ($fila + 2).":" . $this->equivalencias[count($conceptos) + 3] . ($fila+2))->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_NUMBER_00);
+		$this->docexcel->getActiveSheet()->getStyle("B". ($fila + 2).":" . $this->equivalencias[count($conceptos) + 3] . ($fila+2))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+		//$this->docexcel->getActiveSheet()->mergeCells('A'.($fila + 2) .':D'.($fila+2));
 		$this->docexcel->getActiveSheet()->setCellValue('A'.($fila + 2),'TOTAL');
 		
 		$this->docexcel->getActiveSheet()->
-				setCellValue($this->equivalencias[count($conceptos) + 4].($fila+2),'=SUM(' . $this->equivalencias[count($conceptos) + 4].'6:' . $this->equivalencias[count($conceptos) + 4] . $fila . ')');
+				setCellValue('B'.($fila+2),'=SUM(B4:B' . $fila . ')');
 		$this->docexcel->getActiveSheet()->
-				setCellValue($this->equivalencias[count($conceptos) + 5].($fila+2),'=SUM(' . $this->equivalencias[count($conceptos) + 5].'6:' . $this->equivalencias[count($conceptos) + 5] . $fila . ')');
+				setCellValue('C'.($fila+2),'=SUM(C4:C' . $fila . ')');
 		$this->docexcel->getActiveSheet()->
-				setCellValue($this->equivalencias[count($conceptos) + 6].($fila+2),'=SUM(' . $this->equivalencias[count($conceptos) + 6].'6:' . $this->equivalencias[count($conceptos) + 6] . $fila . ')');
-	
-		for ($i = 4;$i < 4 + count($conceptos);$i++) {
-			$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$i].($fila + 2),'=SUM(' . $this->equivalencias[$i]. "6:" . $this->equivalencias[$i].$fila . ')');
+				setCellValue($this->equivalencias[count($conceptos) + 3].($fila+2),'=SUM(' . $this->equivalencias[count($conceptos) + 3].'4:' . $this->equivalencias[count($conceptos) + 3] . $fila . ')');
+		
+		for ($i = 0;$i < count($conceptos);$i++) {
+			$this->docexcel->getActiveSheet()->setCellValue($this->equivalencias[$i + 3].($fila + 2),'=SUM(' . $this->equivalencias[$i + 3]. "4:" . $this->equivalencias[$i + 3].$fila . ')');
 		}
 		
 	}

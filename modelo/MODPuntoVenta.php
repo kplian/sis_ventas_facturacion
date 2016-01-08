@@ -35,6 +35,7 @@ class MODPuntoVenta extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('codigo','varchar');
 		$this->captura('habilitar_comisiones','varchar');
+		$this->captura('formato_comprobante','varchar');
 		
 		
 		//Ejecuta la instruccion

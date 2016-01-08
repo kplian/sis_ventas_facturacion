@@ -103,7 +103,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                        direction: 'ASC'
 	                    },
 	                    totalProperty: 'total',
-	                    fields: ['id_punto_venta', 'nombre', 'codigo','habilitar_comisiones'],
+	                    fields: ['id_punto_venta', 'nombre', 'codigo','habilitar_comisiones','formato_comprobante'],
 	                    remoteSort: true,
 	                    baseParams: {par_filtro: 'puve.nombre#puve.codigo'}
 	        });
@@ -119,7 +119,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_sucursal', 'nombre', 'codigo','habilitar_comisiones'],
+                    fields: ['id_sucursal', 'nombre', 'codigo','habilitar_comisiones','formato_comprobante'],
                     remoteSort: true,
                     baseParams: {filtro_usuario: 'si',par_filtro: 'suc.nombre#suc.codigo'}
                });
@@ -131,10 +131,12 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                	if (this.variables_globales.vef_tiene_punto_venta === 'true') {                    
 	                    	this.variables_globales.id_punto_venta = r[0].data.id_punto_venta;
 	                    	this.variables_globales.habilitar_comisiones = r[0].data.habilitar_comisiones;
+	                    	this.variables_globales.formato_comprobante = r[0].data.formato_comprobante;
 	                    	this.store.baseParams.id_punto_venta = this.variables_globales.id_punto_venta;
 	                    } else {
 	                    	this.variables_globales.id_sucursal = r[0].data.id_sucursal;
 	                    	this.variables_globales.habilitar_comisiones = r[0].data.habilitar_comisiones;
+	                    	this.variables_globales.formato_comprobante = r[0].data.formato_comprobante;
 	                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
 	                    }
 	                    this.load({params:{start:0, limit:this.tam_pag}});  	                    
@@ -180,6 +182,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 						                	if (formularioInicio.getForm().isValid()) {
 						                		validado = true;
 						                		this.variables_globales.habilitar_comisiones = combo2.getStore().getById(combo2.getValue()).data.habilitar_comisiones;
+						                		this.variables_globales.formato_comprobante = combo2.getStore().getById(combo2.getValue()).data.formato_comprobante;
 						                		VentanaInicio.close();
 						                		
 						                		if (this.variables_globales.vef_tiene_punto_venta === 'true') {                    
@@ -813,9 +816,10 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 			if (data) {
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({
-						url : '../../sis_ventas_facturacion/control/Venta/reporteNotaVenta',
+						url : '../../sis_ventas_facturacion/control/Venta/reporteFacturaRecibo',
 						params : {
-							'id_venta' : data.id_venta
+							'id_venta' : data.id_venta,
+							'formato_comprobante' : this.variables_globales.formato_comprobante
 						},
 						success : this.successExport,
 						failure : this.conexionFailure,
@@ -824,6 +828,23 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 					});
 			}
 	},
+	successExport: function (resp) {
+
+        Phx.CP.loadingHide();
+
+
+        //doc.write(texto);
+        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+		
+        //console.log(objRes.ROOT.datos[0].length)
+
+
+        var objetoDatos = (objRes.ROOT == undefined)?objRes.datos:objRes.ROOT.datos;
+        var wnd = window.open("about:blank", "", "_blank");
+		wnd.document.write(objetoDatos.html);
+
+
+    },
    
    onAntEstado:function(wizard,resp){
             Phx.CP.loadingShow(); 

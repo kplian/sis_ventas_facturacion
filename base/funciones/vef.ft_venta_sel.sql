@@ -397,6 +397,82 @@ BEGIN
 			return v_consulta;
 						
 		end;
+    /*********************************    
+ 	#TRANSACCION:  'VF_VENREP_SEL'
+ 	#DESCRIPCION:   Reporte de Recibo o Factura
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VENREP_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+						en.nombre,
+                        suc.direccion,
+                        suc.telefono,
+                        suc.lugar,
+                        lug.nombre as departamento_sucursal,
+                        to_char(ven.fecha_reg,''MM/DD/YYYY'')::varchar,
+                        ven.correlativo_venta,
+                        mon.codigo_internacional as moneda,
+                        ven.total_venta,                                              
+                        pxp.f_convertir_num_a_letra(ven.total_venta) as total_venta_literal,
+                        ven.observaciones,
+                        cli.nombre_factura
+                        	
+						from vef.tventa ven						
+				        inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join param.tentidad en on en.id_entidad = suc.id_entidad
+                        inner join param.tlugar lug on lug.id_lugar = suc.id_lugar
+                        inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal
+                        	and sucmon.tipo_moneda = ''moneda_base''
+                        inner join param.tmoneda mon on mon.id_moneda = sucmon.id_moneda
+                       where  id_venta = '||v_parametros.id_venta::varchar;
+			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'VF_VENDETREP_SEL'
+ 	#DESCRIPCION:   Reporte Detalle de Recibo o Factura
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VENDETREP_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='
+                        select												
+						(case when vedet.id_item is not null then
+							item.nombre
+						when vedet.id_sucursal_producto is not null then
+							cig.desc_ingas
+						when vedet.id_formula is not null then
+							form.nombre
+						end) as concepto,
+                        vedet.cantidad::numeric,   
+                        vedet.precio,
+                        vedet.precio*vedet.cantidad 
+						from vef.tventa_detalle vedet						
+						left join vef.tsucursal_producto sprod on sprod.id_sucursal_producto = vedet.id_sucursal_producto
+						left join vef.tformula form on form.id_formula = vedet.id_formula
+						left join alm.titem item on item.id_item = vedet.id_item
+                        left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
+				        			        
+                       where  id_venta = '||v_parametros.id_venta::varchar;
+			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
     				
 	else
 					     

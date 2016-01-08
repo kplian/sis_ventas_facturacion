@@ -194,9 +194,9 @@ BEGIN
                       where fp.codigo = ''EFESUS''
                   )
                   select v.fecha_reg::date as fecha,cig.desc_ingas,
-                  fpcc.monto_efectivo as precio_tarjeta,
-                  fpcash.monto_efectivo as precio_cash,                  
-                  vd.cantidad*vd.precio as monto
+                  sum(round(((coalesce(fpcc.monto_tarjeta,0)/v.total_venta)*vd.cantidad*vd.precio),2)) as precio_cc,
+                  sum(round(((coalesce(fpcash.monto_efectivo,0)/v.total_venta)*vd.cantidad*vd.precio),2)) as precio_cash,                 
+                  sum(vd.cantidad*vd.precio) as monto
                   from vef.tventa v
                   inner join vef.tventa_detalle vd 
                       on v.id_venta = vd.id_venta and vd.estado_reg = ''activo''
@@ -226,9 +226,9 @@ BEGIN
             )
              SELECT b.fecha, 
              ''TARIFA NETA''::varchar as concepto,
-             fpcc.monto_tarjeta as precio_tarjeta,
-             fpcash.monto_efectivo as precio_cash,
-             coalesce(fpcc.monto_tarjeta,0) + coalesce(fpcash.monto_efectivo,0) as monto
+             sum(coalesce(fpcc.monto_tarjeta,0)) as precio_tarjeta,
+             sum(coalesce(fpcash.monto_efectivo,0)) as precio_cash,
+             sum(coalesce(fpcc.monto_tarjeta,0) + coalesce(fpcash.monto_efectivo,0)) as monto
              
              from vef.tboleto b
              left join bol_forma_pago_cc fpcc 
@@ -238,7 +238,7 @@ BEGIN
              where ' || v_filtro || ' and 
              (b.fecha between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''')
              group by b.fecha)
-             order by fecha,boleto';     
+             order by fecha';     
 
 			--Devuelve la respuesta
 			return v_consulta;

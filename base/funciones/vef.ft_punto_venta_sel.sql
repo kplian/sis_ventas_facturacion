@@ -59,11 +59,13 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         puve.codigo,
-                        puve.habilitar_comisiones	
+                        puve.habilitar_comisiones,
+                        suc.formato_comprobante	
 						from vef.tpunto_venta puve
 						inner join segu.tusuario usu1 on usu1.id_usuario = puve.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = puve.id_usuario_mod
-				        where  ';
+				        inner join vef.tsucursal suc on suc.id_sucursal = puve.id_sucursal
+                        where  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -89,7 +91,8 @@ BEGIN
 					    from vef.tpunto_venta puve
 					    inner join segu.tusuario usu1 on usu1.id_usuario = puve.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = puve.id_usuario_mod
-					    where ';
+					    inner join vef.tsucursal suc on suc.id_sucursal = puve.id_sucursal
+                        where ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

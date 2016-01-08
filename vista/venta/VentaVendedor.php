@@ -97,12 +97,12 @@ Phx.vista.VentaVendedor = {
               this.getBoton('anular').enable();
                           
         } 
-               
+        this.getBoton('btnImprimir').enable();       
         this.getBoton('diagrama_gantt').enable(); 
         Phx.vista.VentaVendedor.superclass.preparaMenu.call(this);
     },
     liberaMenu:function()
-    {   
+    {   this.getBoton('btnImprimir').disable(); 
         this.getBoton('diagrama_gantt').disable();
         this.getBoton('anular').disable();        
         this.getBoton('sig_estado').disable();        

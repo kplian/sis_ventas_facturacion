@@ -7,6 +7,7 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
+include(dirname(__FILE__).'/../reportes/RFacturaRecibo.php');
 class ACTVenta extends ACTbase{    
 			
 	function listarVenta(){
@@ -180,6 +181,26 @@ class ACTVenta extends ACTbase{
 	        exit;
 	    }
     }
+	function reporteFacturaRecibo(){
+		$this->objFunc = $this->create('MODVenta');
+		$datos = array();
+		$this->res = $this->objFunc->listarReciboFactura($this->objParam);
+		$datos = $this->res->getDatos();
+		$datos = $datos[0];
+		
+		$this->objFunc = $this->create('MODVenta');
+		$this->res = $this->objFunc->listarReciboFacturaDetalle($this->objParam);
+		$datos['detalle'] = $this->res->getDatos();
+		
+		$reporte = new RFacturaRecibo();
+		$temp = array();
+		
+		$temp['html'] = $reporte->generarHtml($this->objParam->getParametro('formato_comprobante'),$datos);
+		$this->res->setDatos($temp);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+		
+
+	}
 			
 }
 

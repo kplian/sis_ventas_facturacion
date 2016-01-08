@@ -531,6 +531,62 @@ class MODVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+	function listarReciboFactura(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENREP_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+		
+		$this->setParametro('id_venta','id_venta','integer');
+
+		//Definicion de la lista del resultado del query
+		$this->captura('nombre_entidad','varchar');
+		$this->captura('direccion_sucursal','varchar');
+		$this->captura('telefono_sucursal','varchar');
+		$this->captura('lugar_sucursal','varchar');
+		$this->captura('departamento_sucursal','varchar');
+		$this->captura('fecha_venta','varchar');
+		$this->captura('nro_venta','varchar');
+		$this->captura('moneda_sucursal','varchar');
+		$this->captura('total_venta','numeric');		
+		$this->captura('total_venta_literal','varchar');
+		$this->captura('observaciones','text');	
+		$this->captura('cliente','varchar');		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function listarReciboFacturaDetalle(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENDETREP_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+				
+		$this->setParametro('id_venta','id_venta','integer');
+
+		//Definicion de la lista del resultado del query
+		$this->captura('concepto','varchar');
+		$this->captura('cantidad','numeric');
+		$this->captura('precio_unitario','numeric');
+		$this->captura('precio_total','numeric');		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>
