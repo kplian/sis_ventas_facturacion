@@ -51,8 +51,8 @@ a[href^="#"]:after, a[href^="javascript:"]:after {content: "";}
 
 /* Table */
 table { margin: 1px; text-align:left; }
-th { border-bottom: 1px solid #333;  font-weight: bold; }
-td { border-bottom: 1px solid #333; }
+/*th { border-bottom: 1px solid #333;  font-weight: bold; }
+td { border-bottom: 1px solid #333; }*/
 th,td { padding: 4px 10px 4px 0; }
 tfoot { /*font-style: italic;*/ }
 caption { background: #fff; margin-bottom:2em; text-align:left; }
