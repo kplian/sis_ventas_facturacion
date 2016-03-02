@@ -394,3 +394,25 @@ CREATE TABLE vef.tboleto_fp (
 ) INHERITS (pxp.tbase);
 
 /************************************F-SCP-JRR-VEF-0-25/11/2015*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-19/02/2016*************************************************/
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_dosificacion INTEGER;
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN nro_factura INTEGER;
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN fecha DATE NOT NULL;
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN excento NUMERIC(18,2) DEFAULT 0 NOT NULL;
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN tipo_factura VARCHAR(20) DEFAULT 'recibo' NOT NULL;
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN cod_control VARCHAR(15);
+  
+ /************************************F-SCP-JRR-VEF-0-19/02/2016*************************************************/

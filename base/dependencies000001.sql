@@ -306,3 +306,12 @@ ALTER TABLE ONLY vef.tboleto_fp
     FOREIGN KEY (id_forma_pago) REFERENCES vef.tforma_pago(id_forma_pago);  
 
 /************************************F-DEP-JRR-VEF-0-25/11/2015*************************************************/
+
+
+/************************************I-DEP-JRR-VEF-0-19/02/2016*************************************************/
+
+ALTER TABLE ONLY vef.tventa
+    ADD CONSTRAINT fk_tventa__id_dosificacion
+    FOREIGN KEY (id_dosificacion) REFERENCES vef.tdosificacion(id_dosificacion);
+
+/************************************F-DEP-JRR-VEF-0-19/02/2016*************************************************/

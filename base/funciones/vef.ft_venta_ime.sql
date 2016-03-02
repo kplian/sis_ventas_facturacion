@@ -70,6 +70,13 @@ DECLARE
     v_codigo_tabla			varchar;
     v_num_ven				varchar;
     v_id_periodo			integer;
+    v_tipo_factura			varchar;
+    v_fecha					date;
+    v_excento				numeric;
+    v_id_dosificacion		integer;
+    v_nro_factura			integer;
+    v_id_actividad_economica	integer;
+    v_dosificacion			record;
     
 			    
 BEGIN
@@ -103,6 +110,24 @@ BEGIN
         	select pv.codigo into v_codigo_tabla
             from vef.tsucursal pv
             where id_sucursal = v_parametros.id_sucursal;
+        end if;
+        
+        if (pxp.f_existe_parametro(p_tabla,'tipo_factura')) then
+        	v_tipo_factura = v_parametros.tipo_factura;
+        else
+        	v_tipo_factura = 'recibo';
+        end if;
+        v_excento = 0;
+        if (v_tipo_factura = 'recibo') THEN
+        	v_fecha = now()::date;
+        ELSIF(v_tipo_factura = 'manual') then
+        	v_fecha = v_parametros.fecha;
+            v_nro_factura = v_parametros.nro_factura;
+            v_excento = v_parametros.excento;
+            v_id_dosificacion = v_parametros.id_dosificacion;
+        else 
+        	v_fecha = now()::date;
+            v_excento = v_parametros.excento;
         end if;
         
         
@@ -270,7 +295,13 @@ BEGIN
             porcentaje_descuento,
             comision,
             observaciones,
-            correlativo_venta
+            correlativo_venta,
+            tipo_factura,
+            fecha,
+            nro_factura,
+            id_dosificacion,
+            excento
+            
             
           	) values(
             v_id_venta,
@@ -294,7 +325,12 @@ BEGIN
             v_porcentaje_descuento,
             v_comision,
             v_parametros.observaciones,
-            v_num_ven		
+            v_num_ven,
+            v_tipo_factura,
+            v_fecha,
+            v_nro_factura,
+            v_id_dosificacion,
+            v_excento		
 			
 			) returning id_venta into v_id_venta;
 			
@@ -368,6 +404,21 @@ BEGIN
 	        	v_id_sucursal = v_parametros.id_sucursal;
 	        end if;
             
+            if (pxp.f_existe_parametro(p_tabla,'tipo_factura')) then
+                v_tipo_factura = v_parametros.tipo_factura;
+            else
+                v_tipo_factura = 'recibo';
+            end if;
+            v_excento = 0;
+            IF(v_tipo_factura = 'manual') then
+                v_fecha = v_parametros.fecha;
+                v_nro_factura = v_parametros.nro_factura;
+                v_excento = v_parametros.excento;
+                v_id_dosificacion = v_parametros.id_dosificacion;
+            elsif (v_tipo_factura = 'computarizada')  then            
+                v_excento = v_parametros.excento;
+            end if;
+            
             if (pxp.f_existe_parametro(p_tabla,'a_cuenta')) then
                 v_a_cuenta = v_parametros.a_cuenta;
             else
@@ -439,7 +490,15 @@ BEGIN
             id_vendedor_medico = v_id_vendedor_medico,
             porcentaje_descuento = v_porcentaje_descuento,
             comision = v_comision,
-            observaciones = v_parametros.observaciones
+            observaciones = v_parametros.observaciones,
+            fecha = (case when v_fecha is null then 
+            			fecha 
+            		else
+                    	v_fecha
+                    end),
+            nro_factura = v_nro_factura,
+            id_dosificacion = v_id_dosificacion,
+            excento = v_excento
 			where id_venta=v_parametros.id_venta;
 			
 			if (v_parametros.id_forma_pago != 0 ) then
@@ -769,6 +828,12 @@ BEGIN
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
           where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
           
+          select v.*,s.id_entidad,e.nit into v_venta
+          from vef.tventa v
+          inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal 
+          inner join param.tentidad e on e.id_entidad = s.id_entidad
+          where v.id_proceso_wf = v_parametros.id_proceso_wf_act;
+          
            -- obtener datos tipo estado
                 
                 select
@@ -828,7 +893,67 @@ BEGIN
                                             v_parametros.id_proceso_wf_act, 
                                             v_codigo_estado_siguiente) THEN
                                             
-          END IF;         
+          END IF;  
+          
+          if (v_venta.tipo_factura = 'computarizada') then
+                if (EXISTS(	select 1
+                              from vef.tventa v
+                              where v.fecha > now()::date and v.tipo_factura = 'computarizada' and
+                              v.estado_reg = 'activo' and v.estado = 'finalizado'))THEN
+                  raise exception 'Existen facturas emitidas con fechas posterior a la actual. Por favor revise la fecha del sistema';
+                end if;
+                
+          		if ((select count(distinct id_actividad_economica)                	
+                    from param.tconcepto_ingas cig 
+                    where cig.id_entidad = v_venta.id_entidad and cig.estado_reg = 'activo') > 2) THEN
+                    
+                    if ((select count(distinct id_actividad_economica)                	
+                        from vef.tventa_detalle vd
+                        inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
+                        inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
+                        where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo') > 2) THEN
+                        
+                        raise exception 'No se puede facturar dos actividades economicas al mismo tiempo en la misma venta';
+                	
+                    else
+                    	select cig.id_actividad_economica into v_id_actividad_economica
+                        from vef.tventa_detalle vd
+                        inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
+                        inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
+                        where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo'
+                        limit 1 offset 0;
+                    end if;                
+                	
+                end if;
+                
+                select d.* into v_dosificacion
+                from vef.tdosificacion d
+                where d.estado_reg = 'activo' and d.fecha_inicio_emi <= v_venta.fecha and
+                d.fecha_limite >= v_venta.fecha and d.tipo = 'F' and d.tipo_generacion = 'computarizada' and
+                d.id_activida_economica = v_id_actividad_economica FOR UPDATE;
+                
+                if (v_dosificacion is null) then
+                	raise exception 'No existe una dosificacion activa para emitir la factura';
+                end if;
+                
+                update vef.tventa 
+                set id_dosificacion = v_dosificacion.id_dosificacion,
+                nro_factura = v_dosificacion.nro_siguiente,
+                fecha = now()::date,
+                cod_control = pxp.f_gen_cod_control(v_dosificacion.llave,
+                									v_dosificacion.nroaut,
+                                                    vdosificacion.nro_siguiente,
+                                                    v_venta.nit,
+                                                    to_char(now(),'YYYYMMDD'),
+                                                    round(v_venta.total_venta,0))
+                where id_venta = v_venta.id_venta;
+                
+                update vef.tdosificacion 
+                set nro_siguiente = nro_siguiente + 1
+                where id_dosificacion = v_dosificacion.id_dosificacion;     
+                
+                
+          end if;       
           
           -- si hay mas de un estado disponible  preguntamos al usuario
           v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado de la planilla)'); 

@@ -58,6 +58,11 @@ class MODVenta extends MODbase{
 		$this->captura('comision','numeric');
 		$this->captura('observaciones','text');
 		
+		$this->captura('fecha','date');
+		$this->captura('nro_factura','integer');
+		$this->captura('excento','numeric');
+		$this->captura('cod_control','varchar');		 
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
