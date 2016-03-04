@@ -187,6 +187,12 @@ class MODVenta extends MODbase{
             $this->setParametro('id_vendedor_medico','id_vendedor_medico','varchar'); 
 			$this->setParametro('comision','comision','numeric'); 
 			$this->setParametro('observaciones','observaciones','text');
+			
+			$this->setParametro('tipo_factura','tipo_factura','varchar'); 
+			$this->setParametro('fecha','fecha','date'); 
+            $this->setParametro('nro_factura','nro_factura','varchar'); 
+			$this->setParametro('id_dosificacion','id_dosificacion','integer'); 
+			$this->setParametro('excento','excento','numeric');
 			 
             
             

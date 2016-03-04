@@ -20,6 +20,8 @@ Phx.vista.VentaVendedor = {
         this.maestro=config.maestro;  
         Phx.vista.VentaVendedor.superclass.constructor.call(this,config);        
     } ,
+    arrayDefaultColumHidden:['estado_reg','usuario_ai',
+    'fecha_reg','fecha_mod','usr_reg','usr_mod','nro_factura','excento','fecha','cod_control','nroaut'],
     successGetVariables :function (response,request) {   
     	Phx.vista.VentaVendedor.superclass.successGetVariables.call(this,response,request);  				  		
   		this.store.baseParams.pes_estado = 'borrador';        

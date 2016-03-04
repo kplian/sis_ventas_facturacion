@@ -15,7 +15,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	constructor:function(config) {
 		
 		this.maestro=config.maestro;
-		
+		this.tipo_factura = 'recibo';
 		Ext.Ajax.request({
                 url:'../../sis_ventas_facturacion/control/Venta/getVariablesBasicas',                
                 params: {'prueba':'uno'},
@@ -103,7 +103,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                        direction: 'ASC'
 	                    },
 	                    totalProperty: 'total',
-	                    fields: ['id_punto_venta', 'nombre', 'codigo','habilitar_comisiones','formato_comprobante'],
+	                    fields: ['id_punto_venta', 'id_sucursal','nombre', 'codigo','habilitar_comisiones','formato_comprobante'],
 	                    remoteSort: true,
 	                    baseParams: {par_filtro: 'puve.nombre#puve.codigo'}
 	        });
@@ -186,7 +186,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 						                		VentanaInicio.close();
 						                		
 						                		if (this.variables_globales.vef_tiene_punto_venta === 'true') {                    
-							                    	this.variables_globales.id_punto_venta = combo2.getValue();
+							                    	this.variables_globales.id_punto_venta = combo2.getValue();							                    	
+							                    	this.variables_globales.id_sucursal = storeCombo.getById(combo2.getValue()).data.id_sucursal;
 							                    	this.store.baseParams.id_punto_venta = this.variables_globales.id_punto_venta;
 							                    } else {
 							                    	this.variables_globales.id_sucursal = combo2.getValue();
@@ -610,7 +611,54 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-		}
+		},
+		{
+            config:{
+                name: 'nro_factura',
+                fieldLabel: 'Nro Factura',              
+                gwidth: 110
+            },
+                type:'TextField',
+                filters:{pfiltro:'ven.nro_factura',type:'string'},              
+                grid:true,
+                form:false,
+                bottom_filter: true
+        },
+        {
+            config:{
+                name: 'fecha',
+                fieldLabel: 'Fecha Factura/Recibo',              
+                gwidth: 110,
+                format: 'd/m/Y', 
+				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+            },
+                type:'DateField',
+                filters:{pfiltro:'ven.fecha',type:'date'},              
+                grid:true,
+                form:false
+        },
+        {
+            config:{
+                name: 'excento',
+                fieldLabel: 'Imp Excento',              
+                gwidth: 110
+            },
+                type:'TextField',
+                filters:{pfiltro:'ven.excento',type:'numeric'},              
+                grid:true,
+                form:false
+        },
+        {
+            config:{
+                name: 'cod_control',
+                fieldLabel: 'Codigo Control',              
+                gwidth: 110
+            },
+                type:'TextField',
+                filters:{pfiltro:'ven.cod_control',type:'string'},              
+                grid:true,
+                form:false
+        },
 	],
 	tam_pag:50,	
 	title:'Ventas',
@@ -653,6 +701,11 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		{name:'nit', type: 'string'},
 		{name:'monto_forma_pago', type: 'numeric'},
+		{name:'nro_factura', type: 'string'},
+		{name:'cod_control', type: 'string'},
+		{name:'fecha', type: 'date'},
+		{name:'excento', type: 'numeric'},
+		{name:'nroaut', type: 'numeric'},
 		
 		
 	],
@@ -685,7 +738,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                                         width:'90%',
                                         height:'100%'
                                     }, {data:{objPadre : me,
-                                    		tipo_form : tipo,
+                                    		tipo_form : tipo,                                    		
                                     		datos_originales: record}
                                     }, 
                                     this.idContenedor,

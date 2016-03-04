@@ -86,6 +86,93 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		                valorInicial:0
 		      });
 		}
+		
+		if (this.data.objPadre.tipo_factura == 'computarizada' || this.data.objPadre.tipo_factura == 'manual'){
+			this.Atributos.push({
+		            config:{
+		                name: 'excento',
+		                fieldLabel: 'Excento',
+		                allowBlank: false,
+		                anchor: '80%',                
+		                maxLength:20,
+		                value : 0
+		            },
+		                type:'NumberField',                
+		                id_grupo:2,                
+		                form:true,
+		                valorInicial:'0'
+		      });
+		      
+		}
+		
+		if (this.data.objPadre.tipo_factura == 'manual') {
+			this.Atributos.push({
+				config:{
+					name: 'fecha',
+					fieldLabel: 'Fecha Factura',
+					allowBlank: false,
+					anchor: '80%',					
+					format: 'd/m/Y'
+								
+				},
+					type:'DateField',					
+					id_grupo:0,					
+					form:true
+			});
+			
+			this.Atributos.push({
+	            config: {
+	                name: 'id_dosificacion',
+	                fieldLabel: 'Dosificacion',
+	                allowBlank: false,
+	                emptyText: 'Elija un Dosi...',
+	                store: new Ext.data.JsonStore({
+	                    url: '../../sis_ventas_facturacion/control/Dosificacion/listarDosificacion',
+	                    id: 'id_dosificacion',
+	                    root: 'datos',
+	                    sortInfo: {
+	                        field: 'nroaut',
+	                        direction: 'ASC'
+	                    },
+	                    totalProperty: 'total',
+	                    fields: ['id_dosificacion', 'nroaut', 'desc_actividad_economica','inicial','final'],
+	                    remoteSort: true,
+	                    baseParams: {filtro_usuario: 'si',par_filtro: 'dos.nroaut'}
+	                }),
+	                valueField: 'id_dosificacion',
+	                displayField: 'nroaut',	               
+	                hiddenName: 'id_dosificacion',
+	                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Autorizacion:</b> {nroaut}</p><p><b>Actividad:</b> {desc_actividad_economica}</p></p><p><b>No Inicio:</b> {inicio}</p><p><b>No Final:</b> {final}</p></div></tpl>',
+	                forceSelection: true,
+	                typeAhead: false,
+	                triggerAction: 'all',
+	                lazyRender: true,
+	                mode: 'remote',
+	                pageSize: 15,
+	                queryDelay: 1000,               
+	                gwidth: 150,
+	                minChars: 2,
+	                disabled : true
+	            },
+	            type: 'ComboBox',
+	            id_grupo: 0,	            
+	            grid: false,
+	            form: true
+	        });
+	        this.Atributos.push({
+		            config:{
+		                name: 'nro_factura',
+		                fieldLabel: 'No Factura ',
+		                allowBlank: false,
+		                anchor: '80%',                
+		                maxLength:20
+		            },
+		                type:'NumberField',                
+		                id_grupo:0,                
+		                form:true
+		      });
+		}
+		
 		this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
         this.addEvents('beforesave');
         this.addEvents('successsave');
@@ -222,17 +309,20 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     }, 
     
     iniciarEventos : function () {
-    	if (this.data.objPadre.variables_globales.vef_tiene_punto_venta != 'true') {  
-	        this.Cmp.id_sucursal.store.load({params:{start:0,limit:this.tam_pag}, 
-	           callback : function (r) {
-	           		
-	           		this.Cmp.id_sucursal.setValue(this.data.objPadre.variables_globales.id_sucursal);
-	           		this.detCmp.id_producto.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
-	                this.Cmp.id_sucursal.fireEvent('select',this.Cmp.id_sucursal, this.Cmp.id_sucursal.store.getById(this.data.objPadre.variables_globales.id_sucursal));	                   
-	                                
-	            }, scope : this
-	        });
-	    }
+    	
+    	
+        this.Cmp.id_sucursal.store.load({params:{start:0,limit:this.tam_pag}, 
+           callback : function (r) {
+           		
+           		this.Cmp.id_sucursal.setValue(this.data.objPadre.variables_globales.id_sucursal);
+           		if (this.data.objPadre.variables_globales.vef_tiene_punto_venta != 'true') {  
+           			this.detCmp.id_producto.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
+                }
+                this.Cmp.id_sucursal.fireEvent('select',this.Cmp.id_sucursal, this.Cmp.id_sucursal.store.getById(this.data.objPadre.variables_globales.id_sucursal));	                   
+                                
+            }, scope : this
+        });
+	    
         if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {
 	        this.Cmp.id_punto_venta.store.load({params:{start:0,limit:this.tam_pag}, 
 	           callback : function (r) {
@@ -290,9 +380,31 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         	if (this.accionFormulario != 'EDIT') {
             	this.Cmp.id_forma_pago.store.baseParams.defecto = 'si';
             }
+            if (this.data.objPadre.tipo_factura == 'manual') {   
+            	this.Cmp.id_dosificacion.reset();         	
+            	this.Cmp.id_dosificacion.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
+            	this.Cmp.id_dosificacion.modificado = true;
+            }
             this.cargarFormaPago();
             
         },this);
+        
+        
+        if (this.data.objPadre.tipo_factura == 'manual') {
+	        this.Cmp.fecha.on('blur',function(c) {
+	        	
+	            if (this.data.objPadre.tipo_factura == 'manual') {
+	            	this.Cmp.id_dosificacion.reset();
+	            	this.Cmp.id_dosificacion.modificado = true;
+	            	this.Cmp.id_dosificacion.setDisabled(false);
+	            	this.Cmp.id_dosificacion.store.baseParams.fecha = this.Cmp.fecha.getValue().format('d/m/Y');
+	            	this.Cmp.id_dosificacion.store.baseParams.tipo = 'manual';
+	            }
+	            this.cargarFormaPago();
+	            
+	        },this);
+	    }      
+        
         
         this.detCmp.tipo.on('select',function(c,r,i) {
             this.cambiarCombo(r.data.field1);
@@ -355,9 +467,9 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     cargarFormaPago : function () {
         if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {  
     	   this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+    	} else {
+    		this.Cmp.id_forma_pago.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
     	}
-    	this.Cmp.id_forma_pago.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
-    	
     	if (this.accionFormulario == 'EDIT' && this.Cmp.id_forma_pago.getValue() == '0') {
     		this.ocultarComponente(this.Cmp.numero_tarjeta);
         	this.ocultarComponente(this.Cmp.codigo_tarjeta);
@@ -1133,6 +1245,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 form:true,
                 valorInicial:'0'
         }, 
+        
         {
 			config:{
 				name: 'observaciones',
@@ -1336,7 +1449,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                             	return String(value).replace(/&/g, "%26")
                             }
                             return value;
-                        })};
+                        }),
+                        'tipo_factura':this.data.objPadre.tipo_factura};
         if( i > 0 &&  !this.editorDetail.isVisible()){
              Phx.vista.FormVenta.superclass.onSubmit.call(this,o);
         }
