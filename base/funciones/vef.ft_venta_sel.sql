@@ -156,7 +156,12 @@ BEGIN
                         ven.porcentaje_descuento,
                         ven.id_vendedor_medico,
                         ven.comision,
-                        ven.observaciones
+                        ven.observaciones,
+                        ven.fecha,
+                        ven.nro_factura,
+                        ven.excento,
+                        ven.cod_control
+                        
                         	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
@@ -414,14 +419,29 @@ BEGIN
                         suc.telefono,
                         suc.lugar,
                         lug.nombre as departamento_sucursal,
-                        to_char(ven.fecha_reg,''MM/DD/YYYY'')::varchar,
+                        to_char(ven.fecha,''DD/MM/YYYY'')::varchar,
                         ven.correlativo_venta,
                         mon.codigo_internacional as moneda,
                         ven.total_venta,                                              
                         pxp.f_convertir_num_a_letra(ven.total_venta) as total_venta_literal,
                         ven.observaciones,
-                        cli.nombre_factura
-                        	
+                        cli.nombre_factura,
+                        suc.nombre,
+                        ven.nro_factura,
+                        dos.nroaut,
+                        cli.nit,
+                        ven.cod_control,
+                        to_char(dos.fecha_limite,''DD/MM/YYYY''),
+                        dos.glosa_impuestos,
+                        dos.glosa_empresa,
+                        en.pagina_entidad,
+                        ven.id_venta,
+                        to_char(now(),''HH24:MI:SS''),
+                        en.nit,
+                        (select pxp.list(nombre)
+                        from vef.tactividad_economica
+                        where id_actividad_economica =ANY(dos.id_activida_economica))::varchar,
+                        to_char(ven.fecha,''MM/DD/YYYY'')::varchar as fecha_venta_recibo
 						from vef.tventa ven						
 				        inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
@@ -430,6 +450,7 @@ BEGIN
                         inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal
                         	and sucmon.tipo_moneda = ''moneda_base''
                         inner join param.tmoneda mon on mon.id_moneda = sucmon.id_moneda
+                        left join vef.tdosificacion dos on dos.id_dosificacion = ven.id_dosificacion
                        where  id_venta = '||v_parametros.id_venta::varchar;
 			
 			

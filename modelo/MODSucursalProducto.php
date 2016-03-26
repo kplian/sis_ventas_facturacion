@@ -41,6 +41,8 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('id_actividad_economica','integer');
 		$this->captura('nombre_actividad','varchar');
 		$this->captura('requiere_descripcion','varchar');
+		$this->captura('id_moneda','integer');
+		$this->captura('desc_moneda','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -118,6 +120,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('tipo_producto','tipo_producto','varchar');
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
+		$this->setParametro('id_moneda','id_moneda','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -144,6 +147,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('tipo_producto','tipo_producto','varchar');
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
+		$this->setParametro('id_moneda','id_moneda','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

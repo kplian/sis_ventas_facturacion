@@ -35,6 +35,7 @@ DECLARE
     v_join						varchar;
     v_id_vendedor				integer;
     v_id_medico					integer;
+    v_filtro					varchar;
 			    
 BEGIN
 
@@ -131,14 +132,25 @@ BEGIN
 
 	elsif(p_transaccion='VF_FORDETINS_SEL')then
     	begin
+        	v_filtro = '';
         	if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
-    			select suc.* into v_sucursal
+    			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tpunto_venta pv
     			inner join vef.tsucursal suc on suc.id_sucursal = pv.id_sucursal
+    			inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal 
+    										and sucmon.tipo_moneda = 'moneda_base'
     			where pv.id_punto_venta = v_parametros.id_punto_venta;
+                
+                --anadir join de punto de venta producto
+                v_join = 'inner join vef.tpunto_venta_producto pvp on pvp.id_sucursal_producto = spc.id_sucursal_producto ';
+                
+                --anadir filtro de punto de venta
+                v_filtro = ' pvp.id_punto_venta = ' || v_parametros.id_punto_venta || ' and ';
     		else
-    			select suc.* into v_sucursal
+    			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tsucursal suc
+    			inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal 
+    										and sucmon.tipo_moneda = 'moneda_base'
     			where suc.id_sucursal = v_parametros.id_sucursal;
     			
     		end if;
@@ -177,13 +189,13 @@ BEGIN
             
     		if (v_sucursal.tiene_precios_x_sucursal = 'si') then
                 v_select_precio_item = 'spi.precio';
-                v_join = ' 	left join alm.titem i on i.id_item = fd.id_item 
+                v_join = v_join || ' 	left join alm.titem i on i.id_item = fd.id_item 
                             left join vef.tsucursal_producto spi on spi.id_item = i.id_item 
                                 and spi.estado_reg = ''activo'' ';
                 
             else
                 v_select_precio_item = 'coalesce (i.precio_ref,0)';
-                v_join = ' left join alm.titem i on i.id_item = fd.id_item ';
+                v_join = v_join || ' left join alm.titem i on i.id_item = fd.id_item ';
             end if;
                 
 				v_consulta := '
@@ -214,18 +226,18 @@ BEGIN
                                   (case when fd.id_item is not null then 
                                       ' || v_select_precio_item || '
                                   else
-                                      spc.precio
+                                      param.f_convertir_moneda(spc.id_moneda,' || v_sucursal.id_moneda || ',spc.precio,now()::date,''O'',2,NULL,''si'')
                                   end)::numeric as precio_unitario,
                                   (fd.cantidad * (case when fd.id_item is not null then 
                                       ' || v_select_precio_item || '
                                   else
-                                      spc.precio
+                                      param.f_convertir_moneda(spc.id_moneda,' || v_sucursal.id_moneda || ',spc.precio,now()::date,''O'',2,NULL,''si'')
                                   end))::numeric as precio_total_sin_descuento,
                                   ' || v_porcentaje_descuento || '::integer as porcentaje_descuento,
                                   (fd.cantidad * (case when fd.id_item is not null then 
                                       ' || v_select_precio_item || '
                                   else
-                                      spc.precio
+                                      param.f_convertir_moneda(spc.id_moneda,' || v_sucursal.id_moneda || ',spc.precio,now()::date,''O'',2,NULL,''si'')
                                   end) * (100 - ' || v_porcentaje_descuento || ')/100)::numeric as precio_total,
                                   ''' || v_id_vendedor_medico || '''::varchar as id_vendedor_medico,
                                   ''' || v_nombre_vendedor_medico || '''::varchar as nombre_vendedor_medico
@@ -236,9 +248,13 @@ BEGIN
                                 left join vef.tsucursal_producto spc on spc.id_concepto_ingas = fd.id_concepto_ingas 
                                 	and spc.estado_reg = ''activo'' 
                         		' || v_join || '
-								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo''';
+								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo'' and spc.id_sucursal = ' 
+                                || v_parametros.id_sucursal || ' and ' || v_filtro ;
                 
                 --Devuelve la respuesta
+                
+                
+                v_consulta:=v_consulta||v_parametros.filtro;
                 
                 raise notice '%',v_consulta;
 				return v_consulta;

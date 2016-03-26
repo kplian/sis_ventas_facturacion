@@ -156,7 +156,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 						        forceSelection: true,
 						        tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Codigo:</b> {codigo}</p><p><b>Nombre:</b> {nombre}</p></div></tpl>',
 						        allowBlank : false,
-						        anchor: '100%'
+						        anchor: '100%',
+						        resizable : true
 						    });
 						 
 						 var formularioInicio = new Ext.form.FormPanel({				            
@@ -170,7 +171,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 						 var VentanaInicio = new Ext.Window({
 					            title: 'Punto de Venta / Sucursal',
 					            modal: true,
-					            width: 300,
+					            width: 400,
 					            height: 160,
 					            bodyStyle: 'padding:5px;',
 					            layout: 'fit',
@@ -834,7 +835,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     successWizard:function(resp){
         var rec=this.sm.getSelected();
         
-        if (rec.data.estado == 'borrador') {
+        if (rec.data.estado == 'borrador' && this.tipo_factura != 'manual') {
             this.imprimirNota();
         }
         Phx.CP.loadingHide();

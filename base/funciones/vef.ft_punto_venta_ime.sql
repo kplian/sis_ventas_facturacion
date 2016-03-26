@@ -63,7 +63,8 @@ BEGIN
 			id_usuario_mod,
 			fecha_mod,
             codigo,
-            habilitar_comisiones
+            habilitar_comisiones,
+            tipo
           	) values(
 			'activo',
 			v_parametros.id_sucursal,
@@ -76,7 +77,8 @@ BEGIN
 			null,
 			null,
             v_parametros.codigo,
-            v_parametros.habilitar_comisiones
+            v_parametros.habilitar_comisiones,
+            v_parametros.tipo
 							
 			
 			
@@ -111,7 +113,8 @@ BEGIN
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai,
             codigo = v_parametros.codigo,
-            habilitar_comisiones = v_parametros.habilitar_comisiones
+            habilitar_comisiones = v_parametros.habilitar_comisiones,
+            tipo = v_parametros.tipo
 			where id_punto_venta=v_parametros.id_punto_venta;
                
 			--Definicion de la respuesta

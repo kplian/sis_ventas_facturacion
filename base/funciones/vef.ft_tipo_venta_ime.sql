@@ -77,6 +77,7 @@ DECLARE
     v_nro_factura			integer;
     v_id_actividad_economica	integer[];
     v_dosificacion			record;
+    v_tipo_base			varchar;
     
 			    
 BEGIN
@@ -117,10 +118,19 @@ BEGIN
         else
         	v_tipo_factura = 'recibo';
         end if;
+        
+        SELECT tv.tipo_base into v_tipo_base
+        from vef.ttipo_venta tv
+        where tv.codigo = v_tipo_factura and tv.estado_reg = 'activo';
+        
+        if (v_tipo_base is null) then
+        	raise exception 'No existe un tipo de venta con el codigo: % consulte con el administrador del sistema',v_tipo_factura;
+        end if;        
+        
         v_excento = 0;
-        if (v_tipo_factura = 'recibo') THEN
+        if (v_tipo_base = 'recibo') THEN
         	v_fecha = now()::date;
-        ELSIF(v_tipo_factura = 'manual') then
+        ELSIF(v_tipo_base = 'manual') then
         	v_fecha = v_parametros.fecha;
             v_nro_factura = v_parametros.nro_factura;
             v_excento = v_parametros.excento;
@@ -431,13 +441,22 @@ BEGIN
             else
                 v_tipo_factura = 'recibo';
             end if;
+            
+            SELECT tv.tipo_base into v_tipo_base
+        	from vef.ttipo_venta tv
+        	where tv.codigo = v_tipo_factura and tv.estado_reg = 'activo';
+            
+            if (v_tipo_base is null) then
+        		raise exception 'No existe un tipo de venta con el codigo: % consulte con el administrador del sistema',v_tipo_factura;
+       		end if; 
+            
             v_excento = 0;
-            IF(v_tipo_factura = 'manual') then
+            IF(v_tipo_base = 'manual') then
                 v_fecha = v_parametros.fecha;
                 v_nro_factura = v_parametros.nro_factura;
                 v_excento = v_parametros.excento;
                 v_id_dosificacion = v_parametros.id_dosificacion;
-            elsif (v_tipo_factura = 'computarizada')  then            
+            elsif (v_tipo_base = 'computarizada')  then            
                 v_excento = v_parametros.excento;
             end if;
             
@@ -855,10 +874,11 @@ BEGIN
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
           where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
           
-          select v.*,s.id_entidad,e.nit into v_venta
+          select v.*,s.id_entidad,e.nit,tv.tipo_base into v_venta
           from vef.tventa v
           inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal 
           inner join param.tentidad e on e.id_entidad = s.id_entidad
+          inner join vef.ttipo_venta tv on tv.codigo = v.tipo_factura and tv.estado_reg = 'activo'
           where v.id_proceso_wf = v_parametros.id_proceso_wf_act;
           
            -- obtener datos tipo estado
@@ -922,7 +942,7 @@ BEGIN
                                             
           END IF;  
           
-          if (v_venta.tipo_factura = 'computarizada') then
+          if (v_venta.tipo_base = 'computarizada') then
                 if (EXISTS(	select 1
                               from vef.tventa v
                               where v.fecha > now()::date and v.tipo_factura = 'computarizada' and
@@ -972,7 +992,7 @@ BEGIN
                  --validar que el nro de factura no supere el maximo nro de factura de la dosificaiocn
                 if (exists(	select 1 
                             from vef.tventa ven
-                            where ven.nro_factura =  v_dosificacion.nro_siguiente and dos.id_dosificacion = v_dosificacion.id_dosificacion)) then
+                            where ven.nro_factura =  v_dosificacion.nro_siguiente and ven.id_dosificacion = v_dosificacion.id_dosificacion)) then
                     raise exception 'El numero de factura ya existe para esta dosificacion. Por favor comuniquese con el administrador del sistema';
                 end if;
                 update vef.tventa 

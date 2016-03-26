@@ -58,7 +58,8 @@ BEGIN
           
      --significa que tiene productos terminados   
      IF ((p_codigo_estado = 'entregado' and v_venta.estado = 'borrador' and v_integrar_almacenes = 'si') or 
-     	(p_codigo_estado = 'revision' and v_venta.estado = 'borrador' and v_integrar_almacenes = 'si')) THEN              
+     	(p_codigo_estado = 'revision' and v_venta.estado = 'borrador' and v_integrar_almacenes = 'si')or 
+        (p_codigo_estado = 'finalizado' and v_venta.estado = 'borrador' and v_integrar_almacenes = 'si')) THEN              
      	raise exception 'llega';  
         if (exists(select 1 from vef.tventa v
         					inner join vef.tventa_detalle vd on vd.id_venta = vd.id_venta

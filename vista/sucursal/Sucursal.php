@@ -118,7 +118,8 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
             triggerAction: 'all',
             emptyText:'Entidad...',
             selectOnFocus:true,
-            width:135
+            width:135,
+            resizable : true
         }),
 			
 	Atributos:[

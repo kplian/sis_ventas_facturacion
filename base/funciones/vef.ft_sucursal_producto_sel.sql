@@ -71,13 +71,16 @@ BEGIN
                         cig.descripcion_larga,
                         acteco.id_actividad_economica,
                         acteco.nombre as nombre_actividad,
-                        sprod.requiere_descripcion	
+                        sprod.requiere_descripcion,
+                        sprod.id_moneda,
+                        mon.codigo_internacional as desc_moneda	
 						from vef.tsucursal_producto sprod
 						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						
 						left join segu.tusuario usu2 on usu2.id_usuario = sprod.id_usuario_mod
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
                         left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica
                         left join alm.titem item on item.id_item = sprod.id_item
+                        left join param.tmoneda mon on mon.id_moneda = sprod.id_moneda
 				        where  ';
 			
 			--Definicion de la respuesta
@@ -107,6 +110,7 @@ BEGIN
                         left join alm.titem item on item.id_item = sprod.id_item
 					    left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
 					    left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica
+                        left join param.tmoneda mon on mon.id_moneda = sprod.id_moneda
                         where ';
 			
 			--Definicion de la respuesta		    
@@ -126,15 +130,26 @@ BEGIN
 	elsif(p_transaccion='VF_PRODITEFOR_SEL')then
      				
     	begin
-    		
+    		v_where = '';
+            v_join = '';
     		if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
-    			select suc.* into v_sucursal
+    			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tpunto_venta pv
     			inner join vef.tsucursal suc on suc.id_sucursal = pv.id_sucursal
+    			inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal 
+    										and sucmon.tipo_moneda = 'moneda_base'
     			where pv.id_punto_venta = v_parametros.id_punto_venta;
+    			
+    			--anadir join de punto de venta producto
+                v_join = 'left join vef.tpunto_venta_producto pvp on pvp.id_sucursal_producto = sp.id_sucursal_producto and pvp.estado_reg = ''activo''  ';
+                
+                --anadir filtro de punto de venta
+                v_where = ' and pvp.id_punto_venta = ' || v_parametros.id_punto_venta || '  ';
     		else
-    			select suc.* into v_sucursal
+    			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tsucursal suc
+    			inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal 
+    										and sucmon.tipo_moneda = 'moneda_base'
     			where suc.id_sucursal = v_parametros.id_sucursal;
     			
     		end if;
@@ -144,7 +159,9 @@ BEGIN
 				if (v_sucursal.tiene_precios_x_sucursal = 'si') then
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
-											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,sp.precio as precio,''''::varchar as medico,
+											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,
+                                            param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+                                            ''''::varchar as medico,
                                             sp.requiere_descripcion
 									from alm.titem it 
 									inner join vef.tsucursal_producto sp on sp.id_item = it.id_item
@@ -170,44 +187,39 @@ BEGIN
 			elsif (v_parametros.tipo = 'producto_terminado' or v_parametros.tipo = 'servicio') then
 				
                 if (v_parametros.tipo = 'producto_terminado') then
-					v_where = 'sp.tipo_producto = ''producto''';
+					v_where = v_where || ' and  sp.tipo_producto = ''producto''';
 					v_select = '''producto_terminado''::varchar as tipo';
 				else
-					v_where = 'sp.tipo_producto = ''servicio''';
+					v_where = v_where || ' and sp.tipo_producto = ''servicio''';
 					v_select = '''servicio''::varchar as tipo';
-				end if;
-                
-				v_join = '';
-				if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
-                	
-					v_join = 'inner join vef.tpunto_venta_producto pvp on pvp.id_sucursal_producto = sp.id_sucursal_producto and
-                    			pvp.estado_reg = ''activo'' and pvp.id_punto_venta = ' || v_parametros.id_punto_venta;
-				end if;
+				end if;			
 				
 				v_consulta := 'with tabla_temporal as (
 									select sp.id_sucursal_producto as id_producto, ' || v_select || ' ,
-											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,sp.precio as precio,''''::varchar as medico,
+											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,
+											param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+											''''::varchar as medico,
                                             sp.requiere_descripcion
 									from vef.tsucursal_producto sp
 									' || v_join || '
 									inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sp.id_concepto_ingas
 									where sp.estado_reg = ''activo'' and cig.estado_reg = ''activo'' and
-									sp.id_sucursal = ' || v_sucursal.id_sucursal || ' and ' || v_where ||'
+									sp.id_sucursal = ' || v_sucursal.id_sucursal || v_where ||'
 									)';
 			
 			else
 			--Formulas o paquetes
             	v_having = '' ;            	
-                v_having = 'having array_remove (array_agg(fd.id_concepto_ingas),NULL) <@ array_remove (array_agg(spc.id_concepto_ingas),NULL)';
+                v_having = 'having array_remove (array_agg(fd.id_concepto_ingas),NULL) <@ array_remove (array_agg(sp.id_concepto_ingas),NULL)';
 				if (v_sucursal.tiene_precios_x_sucursal = 'si') then
                 	v_select_precio_item = 'spi.precio';
-                	v_join = ' 	left join alm.titem i on i.id_item = fd.id_item 
+                	v_join = v_join || ' 	left join alm.titem i on i.id_item = fd.id_item 
                     			left join vef.tsucursal_producto spi on spi.id_item = i.id_item 
                                 	and spi.estado_reg = ''activo'' ';
                 	v_having = v_having || ' and array_remove (array_agg(fd.id_item),NULL) <@ array_remove (array_agg(spi.id_item),NULL)';
                 else
                 	v_select_precio_item = 'i.precio_ref';
-                	v_join = ' left join alm.titem i on i.id_item = fd.id_item ';
+                	v_join = v_join || ' left join alm.titem i on i.id_item = fd.id_item ';
                 end if;
                 
 				v_consulta := 'with tabla_temporal as (
@@ -216,17 +228,17 @@ BEGIN
                                         sum(fd.cantidad * (case when fd.id_item is not null then 
                                         						' || v_select_precio_item || '
                                         					else
-                                                            	spc.precio
+                                                            	sp.precio
                                                             end))::numeric as precio,
                                         med.nombre_completo::varchar as medico,
                                         ''''::varchar as requiere_descripcion
 								from vef.tformula form
 								left join vef.vmedico med on med.id_medico = form.id_medico
 								inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula
-                                left join vef.tsucursal_producto spc on spc.id_concepto_ingas = fd.id_concepto_ingas 
-                                	and spc.estado_reg = ''activo'' 
+                                left join vef.tsucursal_producto sp on sp.id_concepto_ingas = fd.id_concepto_ingas 
+                                	and sp.estado_reg = ''activo'' 
                         		' || v_join || '
-								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo''
+								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo'' ' || v_where || '
 								group by form.id_formula,
 								form.nombre, form.descripcion,
 								med.nombre_completo
@@ -258,14 +270,26 @@ BEGIN
      				
     	begin
     		
+    		v_where = '';
+            v_join = '';
     		if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
-    			select suc.* into v_sucursal
+    			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tpunto_venta pv
     			inner join vef.tsucursal suc on suc.id_sucursal = pv.id_sucursal
+    			inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal 
+    										and sucmon.tipo_moneda = 'moneda_base'
     			where pv.id_punto_venta = v_parametros.id_punto_venta;
+    			
+    			--anadir join de punto de venta producto
+                v_join = 'left join vef.tpunto_venta_producto pvp on pvp.id_sucursal_producto = sp.id_sucursal_producto and pvp.estado_reg = ''activo''  ';
+                
+                --anadir filtro de punto de venta
+                v_where = ' and pvp.id_punto_venta = ' || v_parametros.id_punto_venta || '  ';
     		else
-    			select suc.* into v_sucursal
+    			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tsucursal suc
+    			inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal 
+    										and sucmon.tipo_moneda = 'moneda_base'
     			where suc.id_sucursal = v_parametros.id_sucursal;
     			
     		end if;
@@ -275,7 +299,9 @@ BEGIN
 				if (v_sucursal.tiene_precios_x_sucursal = 'si') then
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
-											it.nombre, it.descripcion::text,sp.precio as precio,''''::varchar as medico,
+											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,
+                                            param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+                                            ''''::varchar as medico,
                                             sp.requiere_descripcion
 									from alm.titem it 
 									inner join vef.tsucursal_producto sp on sp.id_item = it.id_item
@@ -285,8 +311,8 @@ BEGIN
 				else
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
-											it.nombre, it.descripcion::text,it.precio_ref as precio,''''::varchar as medico,
-                                            ''''::varchar as requiere_descripcion
+											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,it.precio_ref as precio,''''::varchar as medico,
+                                             ''''::varchar as requiere_descripcion
 									from alm.titem it 									
 									where it.estado_reg = ''activo'' and
 									(select s.clasificaciones_para_venta 
@@ -301,44 +327,39 @@ BEGIN
 			elsif (v_parametros.tipo = 'producto_terminado' or v_parametros.tipo = 'servicio') then
 				
                 if (v_parametros.tipo = 'producto_terminado') then
-					v_where = 'sp.tipo_producto = ''producto''';
+					v_where = v_where || ' and  sp.tipo_producto = ''producto''';
 					v_select = '''producto_terminado''::varchar as tipo';
 				else
-					v_where = 'sp.tipo_producto = ''servicio''';
+					v_where = v_where || ' and sp.tipo_producto = ''servicio''';
 					v_select = '''servicio''::varchar as tipo';
-				end if;
-                
-				v_join = '';
-				if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
-                	
-					v_join = 'inner join vef.tpunto_venta_producto pvp on pvp.id_sucursal_producto = sp.id_sucursal_producto and
-                    			pvp.estado_reg = ''activo'' and pvp.id_punto_venta = ' || v_parametros.id_punto_venta;
-				end if;
+				end if;			
 				
 				v_consulta := 'with tabla_temporal as (
 									select sp.id_sucursal_producto as id_producto, ' || v_select || ' ,
-											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,sp.precio as precio,''''::varchar as medico,
+											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,
+											param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+											''''::varchar as medico,
                                             sp.requiere_descripcion
 									from vef.tsucursal_producto sp
 									' || v_join || '
 									inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sp.id_concepto_ingas
 									where sp.estado_reg = ''activo'' and cig.estado_reg = ''activo'' and
-									sp.id_sucursal = ' || v_sucursal.id_sucursal || ' and ' || v_where ||'
+									sp.id_sucursal = ' || v_sucursal.id_sucursal || v_where ||'
 									)';
 			
 			else
 			--Formulas o paquetes
             	v_having = '' ;            	
-                v_having = 'having array_remove (array_agg(fd.id_concepto_ingas),NULL) <@ array_remove (array_agg(spc.id_concepto_ingas),NULL)';
+                v_having = 'having array_remove (array_agg(fd.id_concepto_ingas),NULL) <@ array_remove (array_agg(sp.id_concepto_ingas),NULL)';
 				if (v_sucursal.tiene_precios_x_sucursal = 'si') then
                 	v_select_precio_item = 'spi.precio';
-                	v_join = ' 	left join alm.titem i on i.id_item = fd.id_item 
+                	v_join = v_join || ' 	left join alm.titem i on i.id_item = fd.id_item 
                     			left join vef.tsucursal_producto spi on spi.id_item = i.id_item 
                                 	and spi.estado_reg = ''activo'' ';
                 	v_having = v_having || ' and array_remove (array_agg(fd.id_item),NULL) <@ array_remove (array_agg(spi.id_item),NULL)';
                 else
                 	v_select_precio_item = 'i.precio_ref';
-                	v_join = ' left join alm.titem i on i.id_item = fd.id_item ';
+                	v_join = v_join || ' left join alm.titem i on i.id_item = fd.id_item ';
                 end if;
                 
 				v_consulta := 'with tabla_temporal as (
@@ -347,17 +368,17 @@ BEGIN
                                         sum(fd.cantidad * (case when fd.id_item is not null then 
                                         						' || v_select_precio_item || '
                                         					else
-                                                            	spc.precio
+                                                            	sp.precio
                                                             end))::numeric as precio,
                                         med.nombre_completo::varchar as medico,
                                         ''''::varchar as requiere_descripcion
 								from vef.tformula form
 								left join vef.vmedico med on med.id_medico = form.id_medico
 								inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula
-                                left join vef.tsucursal_producto spc on spc.id_concepto_ingas = fd.id_concepto_ingas 
-                                	and spc.estado_reg = ''activo'' 
+                                left join vef.tsucursal_producto sp on sp.id_concepto_ingas = fd.id_concepto_ingas 
+                                	and sp.estado_reg = ''activo'' 
                         		' || v_join || '
-								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo''
+								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo'' ' || v_where || '
 								group by form.id_formula,
 								form.nombre, form.descripcion,
 								med.nombre_completo

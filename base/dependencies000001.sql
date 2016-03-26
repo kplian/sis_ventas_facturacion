@@ -313,5 +313,22 @@ ALTER TABLE ONLY vef.tboleto_fp
 ALTER TABLE ONLY vef.tventa
     ADD CONSTRAINT fk_tventa__id_dosificacion
     FOREIGN KEY (id_dosificacion) REFERENCES vef.tdosificacion(id_dosificacion);
+    
+ALTER TABLE ONLY vef.tpunto_venta_producto
+    ADD CONSTRAINT fk_tpunto_venta_producto__id_punto_venta
+    FOREIGN KEY (id_punto_venta) REFERENCES vef.tpunto_venta(id_punto_venta);
+    
+ALTER TABLE ONLY vef.tpunto_venta_producto
+    ADD CONSTRAINT fk_tpunto_venta_producto__id_sucursal_producto
+    FOREIGN KEY (id_sucursal_producto) REFERENCES vef.tsucursal_producto(id_sucursal_producto);
 
 /************************************F-DEP-JRR-VEF-0-19/02/2016*************************************************/
+
+
+/************************************I-DEP-JRR-VEF-0-14/03/2016*************************************************/
+
+ALTER TABLE ONLY vef.tsucursal_producto
+    ADD CONSTRAINT fk_tsucursal_producto__id_moneda
+    FOREIGN KEY (id_moneda) REFERENCES param.tmoneda(id_moneda);
+  
+/************************************F-DEP-JRR-VEF-0-14/03/2016*************************************************/

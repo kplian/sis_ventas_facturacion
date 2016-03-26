@@ -112,6 +112,31 @@ Phx.vista.PuntoVenta=Ext.extend(Phx.gridInterfaz,{
 				form:true
 		},
 		{
+			config : {
+				name : 'tipo',
+				fieldLabel : 'Tipo',
+				anchor : '90%',
+				tinit : false,
+				allowBlank : false,
+				origen : 'CATALOGO',
+				gdisplayField : 'tipo',
+				gwidth : 200,
+				anchor : '100%',
+				baseParams : {
+					cod_subsistema : 'VEF',
+					catalogo_tipo : 'tipo_punto_venta'
+				}
+			},
+			type : 'ComboRec',
+			id_grupo : 0,
+			filters : {
+				pfiltro : 'puve.tipo',
+				type : 'string'
+			},
+			grid : true,
+			form : true
+		},
+		{
             config:{
                 name: 'habilitar_comisiones',
                 fieldLabel: 'Habilitar Comisiones',
@@ -255,6 +280,7 @@ Phx.vista.PuntoVenta=Ext.extend(Phx.gridInterfaz,{
 	fields: [
 		{name:'id_punto_venta', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
+		{name:'tipo', type: 'string'},
 		{name:'id_sucursal', type: 'numeric'},
 		{name:'nombre', type: 'string'},
 		{name:'codigo', type: 'string'},

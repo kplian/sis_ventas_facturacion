@@ -9,11 +9,10 @@ body {
 width:100% !important;
 margin:0 !important;
 padding:0 !important;
-line-height: 0.80;
-font-family: Garamond,"Times New Roman", serif; 
+font-family: Tahoma,"Helvetica Neue",Helvetica,Arial,sans-serif; 
 color: #000; 
 background: none; 
-font-size: 14pt; }
+}
 
 /* Headings */
 h1,h2,h3,h4,h5,h6 { page-break-after:avoid; }

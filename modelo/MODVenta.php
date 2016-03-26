@@ -65,6 +65,7 @@ class MODVenta extends MODbase{
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+		
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta
@@ -553,7 +554,7 @@ class MODVenta extends MODbase{
 		$this->setParametro('id_venta','id_venta','integer');
 
 		//Definicion de la lista del resultado del query
-		$this->captura('nombre_entidad','varchar');
+		$this->captura('nombre_entidad','varchar');		
 		$this->captura('direccion_sucursal','varchar');
 		$this->captura('telefono_sucursal','varchar');
 		$this->captura('lugar_sucursal','varchar');
@@ -564,7 +565,22 @@ class MODVenta extends MODbase{
 		$this->captura('total_venta','numeric');		
 		$this->captura('total_venta_literal','varchar');
 		$this->captura('observaciones','text');	
-		$this->captura('cliente','varchar');		
+		$this->captura('cliente','varchar');	
+		
+		$this->captura('nombre_sucursal','varchar');//nuevo	
+		$this->captura('numero_factura','integer');//nuevo
+		$this->captura('autorizacion','varchar');//nuevo
+		$this->captura('nit_cliente','varchar');//nuevo	
+		$this->captura('codigo_control','varchar');//nuevo	
+		$this->captura('fecha_limite_emision','text');//nuevo
+		$this->captura('glosa_impuestos','varchar');//nuevo	
+		$this->captura('glosa_empresa','varchar');//nuevo	
+		$this->captura('pagina_entidad','varchar');//nuevo			
+		$this->captura('id','integer');//nuevo
+		$this->captura('hora','text');//nuevo
+		$this->captura('nit_entidad','varchar');//nuevo	
+		$this->captura('actividades','varchar');
+		$this->captura('fecha_venta_recibo','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

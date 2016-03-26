@@ -771,7 +771,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                 hiddenName: 'id_producto',
 						        mode: 'remote',
                 				pageSize: 15,
-						        triggerAction: 'all',						         
+						        triggerAction: 'all',
+						        resizable:true,						         
 						        forceSelection: true,
 						        tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Nombre:</b> {nombre_producto}</p><p><b>Descripcion:</b> {descripcion}</p></div></tpl>',
 						        allowBlank : false,
@@ -800,7 +801,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		 var VentanaFormula = new Ext.Window({
 	            title: 'Agregar paquete/formula',
 	            modal: true,
-	            width: 300,
+	            width: 400,
 	            height: 160,
 	            bodyStyle: 'padding:5px;',
 	            layout: 'fit',
@@ -813,6 +814,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		                		validado = true;	
 		                		var nombre_formula = comboFormula.getRawValue();                		
 		                		VentanaFormula.close(); 
+		                		params['id_formula'] = comboFormula.getValue();   
+		                		console.log(params);
 		                		Ext.Ajax.request({
 					                url:'../../sis_ventas_facturacion/control/FormulaDetalle/listarFormulaDetalleParaInsercion',                
 					                params: params,
@@ -878,7 +881,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     	if(this.data.readOnly===true){
     		return false
     	}      
-    	 
+    	
         this.detCmp.id_producto.setDisabled(true);       
         var record = this.megrid.store.getAt(i);
         var recTem = new Array();

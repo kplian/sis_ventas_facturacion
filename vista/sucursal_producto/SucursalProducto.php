@@ -259,7 +259,27 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                     },
             grid:true,
             form:true
-        },		
+        },	
+        
+        {
+            config:{
+                name:'id_moneda',
+                origen:'MONEDA',
+                 allowBlank:false,
+                fieldLabel:'Moneda',
+                gdisplayField:'desc_moneda',//mapea al store del grid
+                gwidth:50,
+                 renderer:function (value, p, record){return String.format('{0}', record.data['desc_moneda']);}
+             },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{   
+                pfiltro:'mon.codigo',
+                type:'string'
+            },
+            grid:true,
+            form:true
+          },  	
          
 		{
 			config:{
@@ -427,6 +447,8 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_sucursal_producto', type: 'numeric'},
 		{name:'id_concepto_ingas', type: 'numeric'},
 		{name:'id_actividad_economica', type: 'numeric'},
+		{name:'id_moneda', type: 'numeric'},
+		{name:'desc_moneda', type: 'string'},
 		{name:'id_sucursal', type: 'numeric'},
 		{name:'id_item', type: 'numeric'},
 		{name:'nombre_item', type: 'string'},
