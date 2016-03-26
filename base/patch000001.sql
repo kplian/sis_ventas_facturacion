@@ -420,7 +420,7 @@ CREATE TABLE vef.tpunto_venta_producto (
   id_punto_venta INTEGER NOT NULL,
   id_sucursal_producto INTEGER NOT NULL,
   CONSTRAINT pk_tpunto_venta_producto PRIMARY KEY(id_punto_venta_producto)
-) INHERITS (pxp.tbase)
+) INHERITS (pxp.tbase);
   
  /************************************F-SCP-JRR-VEF-0-19/02/2016*************************************************/
 
@@ -445,7 +445,7 @@ CREATE TABLE vef.ttipo_venta (
   codigo_relacion_contable VARCHAR(100),
   tipo_base VARCHAR(40),
   CONSTRAINT pk_ttipo_venta PRIMARY KEY(id_tipo_venta)
-) INHERITS (pxp.tbase)
+) INHERITS (pxp.tbase);
 
 CREATE TABLE vef.tproceso_venta (
   id_proceso_venta SERIAL,

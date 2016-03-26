@@ -85,7 +85,6 @@ ALTER TABLE ONLY vef.tventa_detalle
 
 
     
-select pxp.f_insert_testructura_gui ('VEF', 'SISTEMA');
 
 CREATE OR REPLACE VIEW vef.vmedico(
     id_usuario_reg,
