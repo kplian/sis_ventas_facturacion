@@ -65,3 +65,18 @@ INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "des
 VALUES (42, E'vef_tipo_venta_habilitado', E'servicio', E'variable global para definir que tipos de venta estaran habilitados');
 
 /***********************************F-DAT-JRR-VEF-0-06/10/2015*****************************************/
+
+
+/***********************************I-DAT-JRR-VEF-0-28/03/2016*****************************************/
+
+INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (83, NULL, E'2016-03-22 16:34:15.546', NULL, E'activo', NULL, E'NULL', 1, E'computarizada', E'Computarizada', E'VENTA', E'computarizada');
+
+INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (83, NULL, E'2016-03-22 16:34:48.414', NULL, E'activo', NULL, E'NULL', 2, E'manual', E'Manual', E'VENTA', E'manual');
+
+INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (83, NULL, E'2016-03-22 16:35:03.413', NULL, E'activo', NULL, E'NULL', 3, E'recibo', E'Recibo', E'VENTA', E'recibo');
+
+
+/***********************************F-DAT-JRR-VEF-0-28/03/2016*****************************************/
