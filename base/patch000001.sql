@@ -455,6 +455,6 @@ CREATE TABLE vef.tproceso_venta (
   id_int_comprobante INTEGER,
   tipos VARCHAR[],
   CONSTRAINT pk_tproceso_venta PRIMARY KEY(id_proceso_venta)
-) INHERITS (pxp.tbase)
+) INHERITS (pxp.tbase);
   
 /************************************F-SCP-JRR-VEF-0-22/03/2016*************************************************/
