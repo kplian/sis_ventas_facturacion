@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -87,7 +89,9 @@ BEGIN
                       movimiento,                  
                       id_entidad,
                       descripcion_larga,
-                      id_actividad_economica
+                      id_actividad_economica,
+                      id_unidad_medida,
+                      nandina
                     )
                     VALUES (
                       p_id_usuario,                  
@@ -104,7 +108,9 @@ BEGIN
                       'recurso',                  
                       v_id_entidad,
                       v_parametros.descripcion_producto,
-                      v_parametros.id_actividad_economica
+                      v_parametros.id_actividad_economica,
+                      v_parametros.id_unidad_medida,
+                      v_parametros.nandina
                     ) returning id_concepto_ingas into v_id_concepto;
                 end if;
             end if;
@@ -188,7 +194,9 @@ BEGIN
                       end),
                       id_entidad = v_id_entidad,
                       descripcion_larga = v_parametros.descripcion_producto,
-                      id_actividad_economica = v_parametros.id_actividad_economica
+                      id_actividad_economica = v_parametros.id_actividad_economica,
+                      id_unidad_medida = v_parametros.id_unidad_medida,
+                      nandina = v_parametros.nandina
                     where id_concepto_ingas = v_id_concepto;
                 else 
                     
@@ -201,7 +209,9 @@ BEGIN
                           end),
                           id_entidad = v_id_entidad,
                           descripcion_larga = v_parametros.descripcion_producto,
-                      id_actividad_economica = v_parametros.id_actividad_economica
+                          id_actividad_economica = v_parametros.id_actividad_economica,
+                          id_unidad_medida = v_parametros.id_unidad_medida,
+                          nandina = v_parametros.nandina
                         where id_concepto_ingas = v_id_concepto;
                     else                    
                     
@@ -219,7 +229,9 @@ BEGIN
                           movimiento,                  
                           id_entidad,
                           descripcion_larga,
-                          id_actividad_economica
+                          id_actividad_economica,
+                          id_unidad_medida,
+                          nandina
                         )
                         VALUES (
                           p_id_usuario,                  
@@ -236,7 +248,9 @@ BEGIN
                           'recurso',                  
                           v_id_entidad,
                           v_parametros.descripcion_producto,
-                          v_parametros.id_actividad_economica
+                          v_parametros.id_actividad_economica,
+                          v_parametros.id_unidad_medida,
+                          v_parametros.nandina
                         ) returning id_concepto_ingas into v_id_concepto;
                     end if;
                 end if;

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -73,20 +75,26 @@ BEGIN
                         acteco.nombre as nombre_actividad,
                         sprod.requiere_descripcion,
                         sprod.id_moneda,
-                        mon.codigo_internacional as desc_moneda	
-						from vef.tsucursal_producto sprod
+                        mon.codigo_internacional as desc_moneda,
+                        um.id_unidad_medida,
+                        um.codigo as desc_unidad_medida,
+                        cig.nandina
+			
+                        
+                        from vef.tsucursal_producto sprod
 						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						
 						left join segu.tusuario usu2 on usu2.id_usuario = sprod.id_usuario_mod
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
                         left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica
                         left join alm.titem item on item.id_item = sprod.id_item
                         left join param.tmoneda mon on mon.id_moneda = sprod.id_moneda
-				        where  ';
+                        left join param.tunidad_medida um on um.id_unidad_medida = cig.id_unidad_medida
+				        where ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+            raise notice '%', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -105,13 +113,14 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_sucursal_producto)
 					    from vef.tsucursal_producto sprod
-					    inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg					    
+						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						
 						left join segu.tusuario usu2 on usu2.id_usuario = sprod.id_usuario_mod
+                        left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
+                        left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica
                         left join alm.titem item on item.id_item = sprod.id_item
-					    left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
-					    left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica
                         left join param.tmoneda mon on mon.id_moneda = sprod.id_moneda
-                        where ';
+                        left join param.tunidad_medida um on um.id_unidad_medida = cig.id_unidad_medida
+				        where  ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

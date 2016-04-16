@@ -44,6 +44,12 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('id_moneda','integer');
 		$this->captura('desc_moneda','varchar');
 		
+		$this->captura('id_unidad_medida','INTEGER');
+		$this->captura('desc_unidad_medida','VARCHAR');
+		$this->captura('nandina','VARCHAR');
+		
+		
+		 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -121,6 +127,10 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 		$this->setParametro('id_moneda','id_moneda','integer');
+		
+		$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
+		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
+		$this->setParametro('nandina','nandina','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -148,6 +158,10 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 		$this->setParametro('id_moneda','id_moneda','integer');
+		
+		$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
+		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
+		$this->setParametro('nandina','nandina','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
