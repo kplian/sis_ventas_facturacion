@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -42,6 +44,8 @@ DECLARE
     v_porcentaje_descuento		integer;
     v_id_vendedor				integer;
     v_id_medico					integer;
+    v_registros					record;
+    v_total						numeric;
     
 	
 			    
@@ -131,9 +135,22 @@ BEGIN
 			
 			)RETURNING id_venta_detalle into v_id_venta_detalle;
 			
-            update vef.tventa
-            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta)
             
+            --recupera datos de la venta
+            
+            select
+             *
+            into 
+             v_registros
+            from vef.tventa v
+            where v.id_venta = v_parametros.id_venta;
+            
+            
+            v_total = COALESCE(v_registros.transporte_fob ,0)  + COALESCE(v_registros.seguros_fob ,0)+ COALESCE(v_registros.otros_fob ,0) + COALESCE(v_registros.transporte_cif ,0) +  COALESCE(v_registros.seguros_cif ,0) + COALESCE(v_registros.otros_cif ,0);
+            
+           
+            update vef.tventa
+            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta) + v_total
             where id_venta = v_parametros.id_venta;
 			
             --Definicion de la respuesta
@@ -156,64 +173,9 @@ BEGIN
 
 		begin
         	v_tiene_formula = 'no';
-			if (v_parametros.tipo = 'formula') then
-        		v_tiene_formula = 'si';
-        		select sum(i.precio_ref*fd.cantidad) into v_precio
-        		from vef.tformula_detalle fd
-        		inner join alm.titem i on i.id_item = fd.id_item
-        		where fd.id_formula = v_parametros.id_formula and fd.estado_reg = 'activo';
-        		
-        	
-        	elsif (v_parametros.tipo = 'servicio') then
-        		select sp.precio into v_precio
-        		from vef.tsucursal_producto sp 
-        		where sp.id_sucursal_producto = v_parametros.id_sucursal_producto;
-        	else
-        		select tiene_precios_x_sucursal,sp.precio into v_sucursal_define_precio, v_precio
-        		from vef.tventa v
-        		inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal
-        		left join vef.tsucursal_producto sp on sp.id_sucursal = s.id_sucursal 
-        		where v.id_venta = v_parametros.id_venta and sp.id_item = v_parametros.id_item;
-        		
-        		if (v_sucursal_define_precio = 'si') then
-        			if (v_precio is null) then
-        				raise exception 'El item seleccionado no tiene precio definido en la sucursal';
-        			end if;
-        		else
-        			select precio_ref into v_precio
-        			from alm.titem i
-        			where i.id_item = v_parametros.id_item;
-        			if (v_precio is null) then
-        				raise exception 'El item seleccionado no tiene precio referencial';
-        			end if;
-        			
-        		
-        		end if;        		
-        	
-        	end if;
-        	
-			--Sentencia de la modificacion
-			update vef.tventa_detalle set
-			id_venta = v_parametros.id_venta,
-			id_item = v_parametros.id_item,
-			id_sucursal_producto = v_parametros.id_sucursal_producto,
-			id_formula = v_parametros.id_formula,
-			tipo = v_parametros.tipo,
-			cantidad = v_parametros.cantidad_det,
-			precio = v_precio,
-			sw_porcentaje_formula = v_parametros.sw_porcentaje_formula,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai,
-            descripcion = v_parametros.descripcion
-			where id_venta_detalle=v_parametros.id_venta_detalle;
+			
+            raise exception 'deprecado, no se usa mas';
             
-            update vef.tventa
-            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta),
-            tiene_formula = v_tiene_formula
-            where id_venta = v_parametros.id_venta;
-               
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de Venta modificado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_venta_detalle',v_parametros.id_venta_detalle::varchar);
@@ -245,10 +207,23 @@ BEGIN
             if (exists (select 1 from vef.tventa_detalle where id_venta = v_id_venta
             				and tipo = 'formula')) then
            		v_tiene_formula = 'si';
-            end if;           
+            end if; 
+            
+            
+            --recupera datos de la venta
+            
+            select
+             *
+            into 
+             v_registros
+            from vef.tventa v
+            where v.id_venta = v_parametros.id_venta;
+            
+            
+            v_total = COALESCE(v_registros.transporte_fob ,0)  + COALESCE(v_registros.seguros_fob ,0)+ COALESCE(v_registros.otros_fob ,0) + COALESCE(v_registros.transporte_cif ,0) +  COALESCE(v_registros.seguros_cif ,0) + COALESCE(v_registros.otros_cif ,0);
             
             update vef.tventa
-            set total_venta = coalesce((select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_id_venta),0),
+            set total_venta = coalesce((select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_id_venta),0) + v_total,
             tiene_formula = v_tiene_formula
             where id_venta = v_id_venta;
                

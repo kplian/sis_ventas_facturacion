@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -160,7 +162,18 @@ BEGIN
                         ven.fecha,
                         ven.nro_factura,
                         ven.excento,
-                        ven.cod_control
+                        ven.cod_control,
+                        
+                        
+                        ven.id_moneda,
+                        ven.total_venta_msuc,
+                        ven.transporte_fob,
+                        ven.seguros_fob,
+                        ven.otros_fob,
+                        ven.transporte_cif,
+                        ven.seguros_cif,
+                        ven.otros_cif
+                        
                         
                         	
 						from vef.tventa ven

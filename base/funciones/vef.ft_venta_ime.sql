@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -77,7 +79,10 @@ DECLARE
     v_nro_factura			integer;
     v_id_actividad_economica	integer[];
     v_dosificacion			record;
-    v_tipo_base			varchar;
+    v_tipo_base				varchar;
+    v_id_moneda_venta		integer;
+    v_id_moneda_suc			integer;
+    v_total_venta_ms		numeric;
     
 			    
 BEGIN
@@ -128,9 +133,17 @@ BEGIN
         end if;        
         
         v_excento = 0;
+        
+        
+     
+       
+        
         if (v_tipo_base = 'recibo') THEN
         	v_fecha = now()::date;
         ELSIF(v_tipo_base = 'manual') then
+        
+       
+         
         	v_fecha = v_parametros.fecha;
             v_nro_factura = v_parametros.nro_factura;
             v_excento = v_parametros.excento;
@@ -157,10 +170,23 @@ BEGIN
             			where dos.fecha_limite < v_parametros.fecha and dos.id_dosificacion = v_parametros.id_dosificacion)) then
             	raise exception 'La fecha de la factura supera la fecha limite de emision de la dosificacion';
             end if;
-        else 
-        	v_fecha = now()::date;
-            v_excento = v_parametros.excento;
+        
+       ELSE 
+        
+            IF   v_tipo_factura = 'computarizadaexpo'  THEN
+              v_fecha = v_parametros.fecha;
+            ELSE
+        	  v_fecha = now()::date;
+              v_excento = v_parametros.excento;
+            END IF;
+            
         end if;
+        
+      
+        
+       --raise exception 'pasa ... %',v_tipo_base ;
+             
+        
         if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
         	v_id_punto_venta = v_parametros.id_punto_venta;
         else
@@ -332,7 +358,16 @@ BEGIN
             fecha,
             nro_factura,
             id_dosificacion,
-            excento
+            excento,
+            
+            id_moneda,
+            transporte_fob,
+            seguros_fob,
+            otros_fob,
+            transporte_cif,
+            seguros_cif,
+            otros_cif,
+            tipo_cambio_venta
             
             
           	) values(
@@ -362,7 +397,17 @@ BEGIN
             v_fecha,
             v_nro_factura,
             v_id_dosificacion,
-            v_excento		
+            v_excento,
+            
+            
+            v_parametros.id_moneda,
+            v_parametros.transporte_fob,
+            v_parametros.seguros_fob,
+            v_parametros.otros_fob,
+            v_parametros.transporte_cif,
+            v_parametros.seguros_cif,
+            v_parametros.otros_cif,
+            v_parametros.tipo_cambio_venta		
 			
 			) returning id_venta into v_id_venta;
 			
@@ -678,12 +723,28 @@ BEGIN
 		begin
         	 vef_estados_validar_fp = pxp.f_get_variable_global('vef_estados_validar_fp');
             --obtener datos de la venta y la moneda base 
-			select v.* ,sm.id_moneda as id_moneda_base,m.codigo  as moneda into v_venta
+			
+            select 
+                 v.* ,
+                 sm.id_moneda as id_moneda_base,
+                 m.codigo  as moneda 
+              into 
+                 v_venta
 			from vef.tventa v
 			inner join vef.tsucursal suc on suc.id_sucursal = v.id_sucursal
 			inner join vef.tsucursal_moneda sm on suc.id_sucursal = sm.id_sucursal and sm.tipo_moneda = 'moneda_base'
 			inner join param.tmoneda m on m.id_moneda = sm.id_moneda
-			where id_venta = v_parametros.id_venta;
+            where id_venta = v_parametros.id_venta;
+            
+            --si es venta de exportacion operamos con la moneda especificada por el usuario
+            IF  v_venta.tipo_factura = 'computarizadaexpo' THEN            
+              v_id_moneda_venta = v_venta.id_moneda;             
+            ELSE
+              v_id_moneda_venta = v_venta.id_moneda_base;              
+            END IF;
+            
+            v_id_moneda_suc = v_venta.id_moneda_base;
+            
 			
             --si es un estado para validar la forma de pago
             if (v_venta.estado =ANY(string_to_array(vef_estados_validar_fp,',')))then
@@ -701,9 +762,13 @@ BEGIN
                                     where vfp.id_venta = v_parametros.id_venta)loop
                     --si la moneda de la forma de pago es distinta a al moneda base de la sucursal convertimos a moneda base
                     
-                    if (v_registros.id_moneda != v_venta.id_moneda_base) then
+                    if (v_registros.id_moneda != v_id_moneda_venta) then
                     
-                        v_monto_fp = param.f_convertir_moneda(v_registros.id_moneda,v_venta.id_moneda_base,v_registros.monto_transaccion,now()::date,'O',2,NULL,'si');
+                        IF  v_venta.tipo_cambio_venta is not null THEN
+                          v_monto_fp = param.f_convertir_moneda(v_registros.id_moneda,v_id_moneda_venta,v_registros.monto_transaccion,v_venta.fecha::date,'CUS',2, v_venta.tipo_cambio_venta,'si');
+                        ELSE
+                          v_monto_fp = param.f_convertir_moneda(v_registros.id_moneda,v_id_moneda_venta,v_registros.monto_transaccion,v_venta.fecha::date,'O',2,NULL,'si');
+                        END IF;
                     else
                         v_monto_fp = v_registros.monto_transaccion;
                     end if;
@@ -736,6 +801,11 @@ BEGIN
                 from vef.tventa_detalle
                 where id_venta =   v_parametros.id_venta;
                 
+                
+                v_suma_det = COALESCE(v_suma_det,0) + COALESCE(v_venta.transporte_fob ,0)  + COALESCE(v_venta.seguros_fob ,0)+ COALESCE(v_venta.otros_fob ,0) + COALESCE(v_venta.transporte_cif ,0) +  COALESCE(v_venta.seguros_cif ,0) + COALESCE(v_venta.otros_cif ,0);
+            
+                
+                
                 if (v_suma_fp < v_venta.total_venta) then
                     raise exception 'El importe recibido es menor al valor de la venta';
                 end if;
@@ -753,13 +823,32 @@ BEGIN
             from vef.tventa_forma_pago
             where id_venta =   v_parametros.id_venta;
             
+      
+            
+            --calcula el total de la venta en moenda de la sucursal
+            
+             IF  v_venta.tipo_cambio_venta is not null THEN
+                 v_total_venta_ms = param.f_convertir_moneda(v_id_moneda_venta,v_id_moneda_suc,v_venta.total_venta,v_venta.fecha,'CUS',2, v_venta.tipo_cambio_venta,'si');
+             ELSE
+                v_total_venta_ms = param.f_convertir_moneda(v_id_moneda_venta,v_id_moneda_suc,v_registros.monto_transaccion,v_venta.fecha::date,'O',2,NULL,'si');
+             END IF;
+            
+          
+            update vef.tventa v set
+              total_venta_msuc = v_total_venta_ms
+            where v.id_venta = v_parametros.id_venta;           
+            
+            
+             
              
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+            	
             if (v_venta.estado =ANY(string_to_array(vef_estados_validar_fp,',')) and v_suma_fp > 0)then
             	v_resp = pxp.f_agrega_clave(v_resp,'cambio',(v_suma_fp::varchar || ' ' || v_venta.moneda)::varchar);
-            end if;  
+            end if; 
+             
             --Devuelve la respuesta
             return v_resp;
 

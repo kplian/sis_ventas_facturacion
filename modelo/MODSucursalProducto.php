@@ -67,6 +67,9 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('id_sucursal','id_sucursal','int4');
 		$this->setParametro('id_punto_venta','id_punto_venta','int4');
+		
+		$this->setParametro('tipo_cambio_venta','tipo_cambio_venta','numeric');
+		$this->setParametro('id_moneda','id_moneda','int4');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_producto','integer');

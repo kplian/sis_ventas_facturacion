@@ -20,6 +20,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     labelSubmit: '<i class="fa fa-check"></i> Guardar',
     storeFormaPago : false,
     fwidth : '9%',
+    cantidadAllowDecimals: false,
     constructor:function(config)
     {   
         Ext.apply(this,config);
@@ -105,7 +106,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		      
 		}
 		
-		if (this.data.objPadre.tipo_factura == 'manual') {
+		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadaexpo') {
 			this.Atributos.push({
 				config:{
 					name: 'fecha',
@@ -119,7 +120,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 					id_grupo:0,					
 					form:true
 			});
-			
+	  }		
+	 if (this.data.objPadre.tipo_factura == 'manual') {	
 			this.Atributos.push({
 	            config: {
 	                name: 'id_dosificacion',
@@ -213,6 +215,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     },
     
     buildComponentesDetalle: function(){
+        var  me = this;
         this.detCmp = {
                     'tipo': new Ext.form.ComboBox({
                             name: 'tipo',
@@ -279,7 +282,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                         msgTarget: 'title',
                                         fieldLabel: 'Cantidad',
                                         allowBlank: false,
-                                        allowDecimals: false,
+                                        allowDecimals: me.cantidadAllowDecimals,
                                         maxLength:10,
                                         enableKeyEvents : true
                                         
@@ -527,7 +530,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             rec.set('nombre_producto', cmb_rec.get('nombre_producto')); 
         }
                      
-        
+       
     },
     evaluaRequistos: function(){
     	//valida que todos los requistosprevios esten completos y habilita la adicion en el grid
@@ -1260,7 +1263,35 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 				type:'TextArea',
 				id_grupo:0,				
 				form:true
-		},         
+		},  
+		{
+	            config:{
+	                name:'id_moneda',
+	                origen:'MONEDA',
+	                allowBlank:false,
+	                fieldLabel:'Moneda',
+	                gdisplayField:'desc_moneda',
+	                gwidth:100,
+	                width:250
+	             },
+	            type:'ComboRec',
+	            id_grupo:0,
+	            form:false
+	    },
+        {
+            config:{
+                name: 'tipo_cambio_venta',
+                fieldLabel: 'Tipo Cambio',
+                allowBlank: false,
+                allowNegative: false,
+                anchor: '80%'
+                
+            },
+                type:'NumberField',                
+                id_grupo:0,                
+                form:false,
+                valorInicial:'0'
+        },      
         {
             config: {
                 name: 'id_sucursal',
@@ -1403,6 +1434,136 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 type:'TextField',                
                 id_grupo:2,                
                 form:true
+        },
+        {
+            config:{
+                name: 'valor_bruto',
+                fieldLabel: 'Valor Bruto',
+                allowBlank: false,
+                width: 150, 
+                readOnly: true,               
+                maxLength: 20
+                
+            },
+                type:'NumberField',
+                valorInicial: 0,                
+                id_grupo: 3,                
+                form: false
+        },
+        {
+            config:{
+                name: 'transporte_fob',
+                fieldLabel: 'Trasporte FOB',
+                allowBlank: false,
+                width: 150,                 
+                maxLength: 20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 3,  
+                valorInicial: 0,               
+                form: false
+        },
+        {
+            config:{
+                name: 'seguros_fob',
+                fieldLabel: 'Seguros FOB',
+                allowBlank: false,
+                width: 150,                
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 3,
+                valorInicial: 0,                 
+                form: false
+        },
+        {
+            config:{
+                name: 'otros_fob',
+                fieldLabel: 'Otros FOB',
+                allowBlank: false,
+                width: 150,                 
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 3, 
+                valorInicial: 0,                  
+                form: false
+        },
+        {
+            config:{
+                name: 'total_fob',
+                fieldLabel: 'TOTAL F.O.B',
+                allowBlank: false,
+                readOnly: true,
+                width: 150,                
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 3, 
+                                
+                valorInicial: 0,               
+                form: false
+        },
+        {
+            config:{
+                name: 'transporte_cif',
+                fieldLabel: 'Trasporte CIF',
+                allowBlank: false,
+                width: 150,               
+                maxLength: 20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 4,                 
+                valorInicial: 0,                
+                form: false
+        },
+        {
+            config:{
+                name: 'seguros_cif',
+                fieldLabel: 'Seguros CIF',
+                allowBlank: false,
+                width: 150,                
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 4,                 
+                valorInicial: 0,               
+                form: false
+        },
+        {
+            config:{
+                name: 'otros_cif',
+                fieldLabel: 'Otros CIF',
+                allowBlank: false,
+                width: 150,               
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 4,                 
+                valorInicial: 0,               
+                form: false
+        },
+        {
+            config:{
+                name: 'total_cif',
+                fieldLabel: 'TOTAL CIF',
+                allowBlank: false,
+                readOnly: true,
+                width: 150,                
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 4,                 
+                valorInicial: 0,               
+                form: false
         }
            
           
@@ -1454,6 +1615,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                             return value;
                         }),
                         'tipo_factura':this.data.objPadre.tipo_factura};
+        
         if( i > 0 &&  !this.editorDetail.isVisible()){
              Phx.vista.FormVenta.superclass.onSubmit.call(this,o);
         }

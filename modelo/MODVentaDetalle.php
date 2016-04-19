@@ -25,7 +25,7 @@ class MODVentaDetalle extends MODbase{
 		$this->captura('id_producto','int4');		
 		$this->captura('tipo','varchar');
 		$this->captura('estado_reg','varchar');
-		$this->captura('cantidad','int4');
+		$this->captura('cantidad','numeric');
 		$this->captura('precio_unitario','numeric');		
 		$this->captura('id_usuario_ai','int4');
 		$this->captura('usuario_ai','varchar');
@@ -65,7 +65,7 @@ class MODVentaDetalle extends MODbase{
 		$this->setParametro('id_formula','id_formula','int4');
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
-		$this->setParametro('cantidad_det','cantidad','int4');
+		$this->setParametro('cantidad_det','cantidad','numeric');
 		$this->setParametro('precio','precio','numeric');
 		$this->setParametro('sw_porcentaje_formula','sw_porcentaje_formula','varchar');
 
@@ -91,7 +91,7 @@ class MODVentaDetalle extends MODbase{
 		$this->setParametro('id_formula','id_formula','int4');
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
-		$this->setParametro('cantidad_det','cantidad','int4');
+		$this->setParametro('cantidad_det','cantidad','numeric');
 		$this->setParametro('precio','precio','numeric');
 		$this->setParametro('sw_porcentaje_formula','sw_porcentaje_formula','varchar');
 

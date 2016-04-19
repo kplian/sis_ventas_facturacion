@@ -35,6 +35,9 @@ DECLARE
 	v_select			varchar;
     v_select_precio_item		varchar;
     v_having			varchar;
+    v_id_moneda_venta	integer;
+    v_tipo_cambio_venta		numeric;
+    v_tipo					varchar;
 			    
 BEGIN
 
@@ -162,6 +165,17 @@ BEGIN
     			where suc.id_sucursal = v_parametros.id_sucursal;
     			
     		end if;
+            
+             if (pxp.f_existe_parametro(p_tabla,'id_moneda')) then
+              v_id_moneda_venta =  v_parametros.id_moneda;
+              v_tipo_cambio_venta =  v_parametros.tipo_cambio_venta;
+              v_tipo = 'CUS';
+            else
+              v_id_moneda_venta = v_sucursal.id_moneda;
+              v_tipo = 'O';
+              v_tipo_cambio_venta = NULL;
+            end if;
+           
     		
     		--Items si se integra con almacenes
     		if (v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'true') then
@@ -169,7 +183,7 @@ BEGIN
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
 											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,
-                                            param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+                                            param.f_convertir_moneda(sp.id_moneda,' ||v_id_moneda_venta  || ',sp.precio,now()::date,'''||v_tipo||''',2,'||COALESCE(v_tipo_cambio_venta::varchar,'NULL')||',''si'') as precio,
                                             ''''::varchar as medico,
                                             sp.requiere_descripcion
 									from alm.titem it 
@@ -206,7 +220,7 @@ BEGIN
 				v_consulta := 'with tabla_temporal as (
 									select sp.id_sucursal_producto as id_producto, ' || v_select || ' ,
 											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,
-											param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+											param.f_convertir_moneda(sp.id_moneda,' || v_id_moneda_venta || ',sp.precio,now()::date,'''||v_tipo||''',2,'||COALESCE(v_tipo_cambio_venta::varchar,'NULL')||',''si'') as precio,
 											''''::varchar as medico,
                                             sp.requiere_descripcion
 									from vef.tsucursal_producto sp
@@ -309,7 +323,7 @@ BEGIN
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
 											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,
-                                            param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+                                            1 as precio,
                                             ''''::varchar as medico,
                                             sp.requiere_descripcion
 									from alm.titem it 
@@ -346,7 +360,7 @@ BEGIN
 				v_consulta := 'with tabla_temporal as (
 									select sp.id_sucursal_producto as id_producto, ' || v_select || ' ,
 											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,
-											param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+											1 as precio,
 											''''::varchar as medico,
                                             sp.requiere_descripcion
 									from vef.tsucursal_producto sp

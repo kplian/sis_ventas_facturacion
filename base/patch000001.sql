@@ -457,4 +457,100 @@ CREATE TABLE vef.tproceso_venta (
   CONSTRAINT pk_tproceso_venta PRIMARY KEY(id_proceso_venta)
 ) INHERITS (pxp.tbase);
   
-/************************************F-SCP-JRR-VEF-0-22/03/2016*************************************************/
+/************************************F-SCP-JRR-VEF-0-22/03/2016*************************************************/ç
+
+
+
+/************************************I-SCP-RAC-VEF-0-16/04/2016*************************************************/ç
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_moneda INTEGER;
+
+COMMENT ON COLUMN vef.tventa.id_moneda
+IS 'moneda de la venta';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN total_venta_msuc NUMERIC(18,2);
+
+COMMENT ON COLUMN vef.tventa.total_venta_msuc
+IS 'total venta en la moneda de la sucursal';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN transporte_fob NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.transporte_fob
+IS 'transporte fob para exportacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN seguros_fob NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.seguros_fob
+IS 'seguros fob para exportacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN otros_fob NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.otros_fob
+IS 'otros fob para exportacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN transporte_cif NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.transporte_cif
+IS 'trasporte cif para exportacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN seguros_cif NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.seguros_cif
+IS 'seguros cif para exportacion';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN otros_cif NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN cantidad TYPE NUMERIC;
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN tipo_cambio_venta NUMERIC DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.tipo_cambio_venta
+IS 'solo si la trasaccion se define en una moneda diferetne de la base';
+
+
+/************************************F-SCP-RAC-VEF-0-16/04/2016*************************************************/ç
+
+
+
+
+

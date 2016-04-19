@@ -12,10 +12,14 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 
+	formUrl:'../../../sis_ventas_facturacion/vista/venta/FormVenta.php',
+	formClass :'FormVenta',
+    tipo_factura:'recibo',
+	
 	constructor:function(config) {
 		
 		this.maestro=config.maestro;
-		this.tipo_factura = 'recibo';
+		
 		Ext.Ajax.request({
                 url:'../../sis_ventas_facturacion/control/Venta/getVariablesBasicas',                
                 params: {'prueba':'uno'},
@@ -81,9 +85,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		this.seleccionarPuntoVentaSucursal();
 		//llama al constructor de la clase padre
 		Phx.vista.Venta.superclass.constructor.call(this,request.arguments);
-		this.formUrl = '../../../sis_ventas_facturacion/vista/venta/FormVenta.php';
-		this.formClass = 'FormVenta';
-		
+				
 		this.init();
 		//this.load({params:{start:0, limit:this.tam_pag}});
 	}	,
@@ -707,6 +709,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha', type: 'date'},
 		{name:'excento', type: 'numeric'},
 		{name:'nroaut', type: 'numeric'},
+		'id_moneda','total_venta_msuc','transporte_fob','seguros_fob',
+		'otros_fob','transporte_cif','seguros_cif','otros_cif'
 		
 		
 	],

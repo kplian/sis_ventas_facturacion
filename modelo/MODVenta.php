@@ -61,7 +61,15 @@ class MODVenta extends MODbase{
 		$this->captura('fecha','date');
 		$this->captura('nro_factura','integer');
 		$this->captura('excento','numeric');
-		$this->captura('cod_control','varchar');		 
+		$this->captura('cod_control','varchar');		
+		$this->captura('id_moneda','integer');
+        $this->captura('total_venta_msuc','numeric');
+        $this->captura('transporte_fob','numeric');
+        $this->captura('seguros_fob','numeric');
+        $this->captura('otros_fob','numeric');
+        $this->captura('transporte_cif','numeric');
+        $this->captura('seguros_cif','numeric');
+        $this->captura('otros_cif','numeric');	 
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -194,8 +202,20 @@ class MODVenta extends MODbase{
             $this->setParametro('nro_factura','nro_factura','varchar'); 
 			$this->setParametro('id_dosificacion','id_dosificacion','integer'); 
 			$this->setParametro('excento','excento','numeric');
-			 
-            
+			
+			$this->setParametro('id_moneda','id_moneda','int4');
+			$this->setParametro('tipo_cambio_venta','tipo_cambio_venta','numeric');
+			$this->setParametro('total_venta_msuc','total_venta_msuc','numeric');
+			$this->setParametro('transporte_fob','transporte_fob','numeric');
+			$this->setParametro('seguros_fob','seguros_fob','numeric');
+			$this->setParametro('otros_fob','otros_fob','numeric');
+			$this->setParametro('transporte_cif','transporte_cif','numeric');
+			$this->setParametro('seguros_cif','seguros_cif','numeric');
+			$this->setParametro('otros_cif','otros_cif','numeric');
+			
+			
+			
+             
             
             //Ejecuta la instruccion
             $this->armarConsulta();
@@ -245,7 +265,7 @@ class MODVenta extends MODbase{
                 $this->setParametro('id_formula','id_formula','int4');
                 $this->setParametro('tipo','tipo','varchar');
                 $this->setParametro('estado_reg','estado_reg','varchar');
-                $this->setParametro('cantidad_det','cantidad','int4');
+                $this->setParametro('cantidad_det','cantidad','numeric');
                 $this->setParametro('precio','precio','numeric');
                 $this->setParametro('sw_porcentaje_formula','sw_porcentaje_formula','varchar');  
                 $this->setParametro('porcentaje_descuento','porcentaje_descuento','int4');             
