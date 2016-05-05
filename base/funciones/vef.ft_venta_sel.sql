@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -118,7 +116,7 @@ BEGIN
 						usu2.cuenta as usr_mod,
                         ven.estado,
                         cli.nombre_factura,
-                        suc.nombre,
+                        suc.nombre as nombre_sucursal,
                         cli.nit,
                         puve.id_punto_venta,
                         puve.nombre as nombre_punto_venta,
@@ -172,8 +170,9 @@ BEGIN
                         ven.otros_fob,
                         ven.transporte_cif,
                         ven.seguros_cif,
-                        ven.otros_cif
-                        
+                        ven.otros_cif,
+                        ven.tipo_cambio_venta,
+                        mon.moneda as desc_moneda
                         
                         	
 						from vef.tventa ven
@@ -183,6 +182,7 @@ BEGIN
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
                         left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
+                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
                         ' || v_join || '
                         where ven.estado_reg = ''activo'' and ' || v_filtro;
 			
@@ -246,6 +246,7 @@ BEGIN
 					    inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
+                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
                         ' || v_join || '
                         where ven.estado_reg = ''activo'' and ' || v_filtro;
 			
@@ -454,15 +455,33 @@ BEGIN
                         (select pxp.list(nombre)
                         from vef.tactividad_economica
                         where id_actividad_economica =ANY(dos.id_activida_economica))::varchar,
-                        to_char(ven.fecha,''MM/DD/YYYY'')::varchar as fecha_venta_recibo
-						from vef.tventa ven						
-				        inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+                        to_char(ven.fecha,''MM/DD/YYYY'')::varchar as fecha_venta_recibo,
+
+                        tc.direccion,
+                        ven.tipo_cambio_venta,
+                        ven.total_venta_msuc,
+                        pxp.f_convertir_num_a_letra(ven.total_venta_msuc) as total_venta_msuc_literal,
+                        mven.codigo,
+                        mon.moneda,
+                        mven.moneda,
+                        ven.transporte_fob,
+                        ven.seguros_fob,
+                        ven.otros_fob,
+                        ven.transporte_cif,
+                        ven.seguros_cif,
+                        ven.otros_cif,
+                        (to_char(ven.fecha,''DD'')::integer || '' de '' ||param.f_literal_periodo(to_char(ven.fecha,''MM'')::integer) || '' de '' || to_char(ven.fecha,''YYYY''))::varchar as fecha_literal,
+			(select count(*) from vef.ttipo_descripcion td where td.estado_reg = ''activo'' and td.id_sucursal = suc.id_sucursal)::integer as descripciones 
+			from vef.tventa ven						
+			inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+			inner join vef.tcliente tc on tc.id_cliente = cli.id_cliente
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         inner join param.tentidad en on en.id_entidad = suc.id_entidad
                         inner join param.tlugar lug on lug.id_lugar = suc.id_lugar
                         inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal
                         	and sucmon.tipo_moneda = ''moneda_base''
                         inner join param.tmoneda mon on mon.id_moneda = sucmon.id_moneda
+                        inner join param.tmoneda mven on mven.id_moneda = ven.id_moneda
                         left join vef.tdosificacion dos on dos.id_dosificacion = ven.id_dosificacion
                        where  id_venta = '||v_parametros.id_venta::varchar;
 			
@@ -493,14 +512,49 @@ BEGIN
 						end) as concepto,
                         vedet.cantidad::numeric,   
                         vedet.precio,
-                        vedet.precio*vedet.cantidad 
+                        vedet.precio*vedet.cantidad,
+                        um.codigo,
+                        cig.nandina,
+                        vedet.bruto,
+                        vedet.ley,
+                        vedet.kg_fino
 						from vef.tventa_detalle vedet						
 						left join vef.tsucursal_producto sprod on sprod.id_sucursal_producto = vedet.id_sucursal_producto
 						left join vef.tformula form on form.id_formula = vedet.id_formula
 						left join alm.titem item on item.id_item = vedet.id_item
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
+                        left join param.tunidad_medida um on um.id_unidad_medida = vedet.id_unidad_medida
 				        			        
                        where  id_venta = '||v_parametros.id_venta::varchar;
+			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+
+	/*********************************    
+ 	#TRANSACCION:  'VF_VENDESREP_SEL'
+ 	#DESCRIPCION:   Reporte Descripciones de Recibo o Factura
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VENDESREP_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='
+                        select												
+						td.nombre,
+						td.columna,
+						td.fila,
+						vd.valor
+						from vef.tvalor_descripcion vd						
+						inner join vef.ttipo_descripcion td on td.id_tipo_descripcion = vd.id_tipo_descripcion
+								        
+                       where  vd.id_venta = '||v_parametros.id_venta::varchar||'
+                       order by td.columna,td.fila asc';
 			
 			
 			--Devuelve la respuesta

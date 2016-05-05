@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -70,7 +72,9 @@ BEGIN
 			direccion,
 			lugar,
             habilitar_comisiones,
-            id_lugar
+            id_lugar,
+            tipo_interfaz,
+            id_depto
           	) values(
 			v_parametros.correo,
 			v_parametros.nombre,
@@ -93,7 +97,9 @@ BEGIN
 			v_parametros.direccion,
 			v_parametros.lugar,
             v_parametros.habilitar_comisiones,		
-			v_parametros.id_lugar
+			v_parametros.id_lugar,
+            string_to_array(v_parametros.tipo_interfaz, ','),
+            v_parametros.id_depto
 			)RETURNING id_sucursal into v_id_sucursal;
 			
 			--Definicion de la respuesta
@@ -134,7 +140,9 @@ BEGIN
 			direccion = v_parametros.direccion,
 			lugar = v_parametros.lugar,
             habilitar_comisiones = v_parametros.habilitar_comisiones,
-            id_lugar = v_parametros.id_lugar
+            id_lugar = v_parametros.id_lugar,
+            tipo_interfaz = string_to_array(v_parametros.tipo_interfaz, ','),
+            id_depto = v_parametros.id_depto
 			where id_sucursal=v_parametros.id_sucursal;
                
 			--Definicion de la respuesta

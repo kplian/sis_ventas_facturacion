@@ -44,6 +44,14 @@ class MODVentaDetalle extends MODbase{
 		$this->captura('requiere_descripcion','varchar');
 		$this->captura('descripcion','text');
 		
+		$this->captura('bruto','varchar');  
+		$this->captura('ley','varchar');  
+		$this->captura('kg_fino','varchar');
+		
+		$this->captura('id_unidad_medida','integer');
+		$this->captura('codigo_unidad_medida','varchar');  
+		    
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

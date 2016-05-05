@@ -331,3 +331,15 @@ ALTER TABLE ONLY vef.tsucursal_producto
     FOREIGN KEY (id_moneda) REFERENCES param.tmoneda(id_moneda);
   
 /************************************F-DEP-JRR-VEF-0-14/03/2016*************************************************/
+
+
+/************************************I-DEP-JRR-VEF-0-02/05/2016*************************************************/
+
+ALTER TABLE ONLY vef.ttipo_venta
+    ADD CONSTRAINT fk_ttipo_venta__id_plantilla
+    FOREIGN KEY (id_plantilla) REFERENCES param.tplantilla(id_plantilla);
+
+ALTER TABLE ONLY vef.tsucursal
+    ADD CONSTRAINT fk_tsucursal__id_depto
+    FOREIGN KEY (id_depto) REFERENCES param.tdepto(id_depto);
+/************************************F-DEP-JRR-VEF-0-02/05/2016*************************************************/

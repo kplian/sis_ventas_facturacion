@@ -175,6 +175,27 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                 form:true
         },
         {
+   			config:{
+   				name:'id_depto',
+   				 hiddenName: 'id_depto',
+   				 //url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
+	   				origen:'DEPTO',
+	   				allowBlank:false,
+	   				fieldLabel: 'Depto',
+	   				gdisplayField:'desc_depto',//dibuja el campo extra de la consulta al hacer un inner join con orra tabla
+	   				width:250,
+   			        gwidth:180,
+	   				baseParams:{tipo_filtro:'DEPTO_UO',estado:'activo',codigo_subsistema:'VEF'},//parametros adicionales que se le pasan al store
+	      			renderer:function (value, p, record){return String.format('{0}', record.data['nombre_depto']);}
+   			},
+   			//type:'TrigguerCombo',
+   			type:'ComboRec',
+   			id_grupo:0,
+   			filters:{pfiltro:'depto.nombre',type:'string'},
+   		    grid:true,
+   			form:true
+       	},	
+        {
             config:{
                 name: 'telefono',
                 fieldLabel: 'Telefono',
@@ -468,6 +489,43 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+        {
+            config: {
+                name: 'tipo_interfaz',
+                fieldLabel: 'Interfaces',
+                qtip:'Configurar en que interfaces aparece esta sucursal',
+                allowBlank: true,
+                emptyText: 'Interfaz..',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                pageSize: 20,
+                store:new Ext.data.ArrayStore({
+	        	fields: ['ID', 'valor'],
+	        	data :	[
+		        	        ['VentaVendedorComputarizada','Factura Computariza'],
+		        	        ['VentaVendedorExportacion','Factura de Exportación'],	
+							['VentaVendedorManual','Factura de manual'],
+							['VentaVendedorExportacionMin','Factura  Minera de Exportación'],
+							['VentaVendedorMin','Factura Computariza Minera'],	
+						]	        				
+	    		}),
+	    		valueField:'ID',
+				displayField:'valor',
+                queryDelay: 100,
+                anchor: '100%',
+                gwidth: 120,
+                enableMultiSelect:true,
+                minChars: 2
+            },
+            type:'AwesomeCombo',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        
         
 		{
 			config:{
@@ -598,16 +656,24 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
               cls:'SucursalUsuario'
          },
           { 
-          url:'../../../sis_ventas_facturacion/vista/sucursal_almacen/SucursalAlmacen.php',
-          title:'Almacenes', 
-          height:'50%',
-          cls:'SucursalAlmacen'
+          url: '../../../sis_ventas_facturacion/vista/sucursal_almacen/SucursalAlmacen.php',
+          title: 'Almacenes', 
+          height: '50%',
+          cls: 'SucursalAlmacen'
+         },
+          { 
+          url: '../../../sis_ventas_facturacion/vista/tipo_descripcion/TipoDescripcion.php',
+          title: 'Tipos de Atributos', 
+          height: '50%',
+          cls: 'TipoDescripcion'
          }],
 	fields: [
 		{name:'id_sucursal', type: 'numeric'},
 		{name:'id_lugar', type: 'numeric'},
+		{name:'id_depto', type: 'numeric'},
 		{name:'id_entidad', type: 'numeric'},
 		{name:'correo', type: 'string'},
+		{name:'nombre_depto', type: 'string'},
 		{name:'nombre', type: 'string'},
 		{name:'nombre_lugar', type: 'string'},
 		{name:'telefono', type: 'string'},
@@ -631,7 +697,7 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'},'tipo_interfaz'
 		
 	],
 	sortInfo:{

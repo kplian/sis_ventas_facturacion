@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_cliente_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION vef.ft_cliente_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_cliente_ime
@@ -45,44 +50,44 @@ BEGIN
         begin
         	--Sentencia de la insercion
         	insert into vef.tcliente(
-			correo,
-			telefono_fijo,
-			estado_reg,
-			segundo_apellido,
-			nombre_factura,
-			primer_apellido,
-			telefono_celular,
-			nit,
-			otros_correos,
-			otros_telefonos,
-			nombres,
-			id_usuario_reg,
-			fecha_reg,
-			usuario_ai,
-			id_usuario_ai,
-			id_usuario_mod,
-			fecha_mod
+                correo,
+                telefono_fijo,
+                estado_reg,
+                segundo_apellido,
+                nombre_factura,
+                primer_apellido,
+                telefono_celular,
+                nit,
+                otros_correos,
+                otros_telefonos,
+                nombres,
+                id_usuario_reg,
+                fecha_reg,
+                usuario_ai,
+                id_usuario_ai,
+                id_usuario_mod,
+                fecha_mod,
+                direccion
           	) values(
-			v_parametros.correo,
-			v_parametros.telefono_fijo,
-			'activo',
-			v_parametros.segundo_apellido,
-			v_parametros.nombre_factura,
-			v_parametros.primer_apellido,
-			v_parametros.telefono_celular,
-			v_parametros.nit,
-			v_parametros.otros_correos,
-			v_parametros.otros_telefonos,
-			v_parametros.nombres,
-			p_id_usuario,
-			now(),
-			v_parametros._nombre_usuario_ai,
-			v_parametros._id_usuario_ai,
-			null,
-			null
+                v_parametros.correo,
+                v_parametros.telefono_fijo,
+                'activo',
+                v_parametros.segundo_apellido,
+                v_parametros.nombre_factura,
+                v_parametros.primer_apellido,
+                v_parametros.telefono_celular,
+                v_parametros.nit,
+                v_parametros.otros_correos,
+                v_parametros.otros_telefonos,
+                v_parametros.nombres,
+                p_id_usuario,
+                now(),
+                v_parametros._nombre_usuario_ai,
+                v_parametros._id_usuario_ai,
+                null,
+                null,
+                v_parametros.direccion
 							
-			
-			
 			)RETURNING id_cliente into v_id_cliente;
 			
 			--Definicion de la respuesta
@@ -106,20 +111,21 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update vef.tcliente set
-			correo = v_parametros.correo,
-			telefono_fijo = v_parametros.telefono_fijo,
-			segundo_apellido = v_parametros.segundo_apellido,
-			nombre_factura = v_parametros.nombre_factura,
-			primer_apellido = v_parametros.primer_apellido,
-			telefono_celular = v_parametros.telefono_celular,
-			nit = v_parametros.nit,
-			otros_correos = v_parametros.otros_correos,
-			otros_telefonos = v_parametros.otros_telefonos,
-			nombres = v_parametros.nombres,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+              correo = v_parametros.correo,
+              telefono_fijo = v_parametros.telefono_fijo,
+              segundo_apellido = v_parametros.segundo_apellido,
+              nombre_factura = v_parametros.nombre_factura,
+              primer_apellido = v_parametros.primer_apellido,
+              telefono_celular = v_parametros.telefono_celular,
+              nit = v_parametros.nit,
+              otros_correos = v_parametros.otros_correos,
+              otros_telefonos = v_parametros.otros_telefonos,
+              nombres = v_parametros.nombres,
+              id_usuario_mod = p_id_usuario,
+              fecha_mod = now(),
+              id_usuario_ai = v_parametros._id_usuario_ai,
+              usuario_ai = v_parametros._nombre_usuario_ai,
+              direccion = v_parametros.direccion
 			where id_cliente=v_parametros.id_cliente;
                
 			--Definicion de la respuesta
@@ -170,7 +176,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_cliente_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

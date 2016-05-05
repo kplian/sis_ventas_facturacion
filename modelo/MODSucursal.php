@@ -49,6 +49,10 @@ class MODSucursal extends MODbase{
 		$this->captura('habilitar_comisiones','varchar');
 		$this->captura('id_lugar','int4');
 		$this->captura('nombre_lugar','varchar');
+		$this->captura('tipo_interfaz','text');
+		
+		$this->captura('id_depto','int4');		
+		$this->captura('nombre_depto','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -83,7 +87,9 @@ class MODSucursal extends MODbase{
 		$this->setParametro('lugar','lugar','varchar');
 		$this->setParametro('habilitar_comisiones','habilitar_comisiones','varchar');
 		$this->setParametro('id_lugar','id_lugar','integer');
-
+		$this->setParametro('tipo_interfaz','tipo_interfaz','text');
+		
+		$this->setParametro('id_depto','id_depto','integer');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -117,6 +123,9 @@ class MODSucursal extends MODbase{
 		$this->setParametro('lugar','lugar','varchar');
 		$this->setParametro('habilitar_comisiones','habilitar_comisiones','varchar');
 		$this->setParametro('id_lugar','id_lugar','integer');
+		$this->setParametro('tipo_interfaz','tipo_interfaz','text');
+		
+		$this->setParametro('id_depto','id_depto','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

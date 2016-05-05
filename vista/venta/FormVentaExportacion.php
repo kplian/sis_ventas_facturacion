@@ -37,17 +37,18 @@ Phx.vista.FormVentaExportacion = {
 	    
 		      
 	    Phx.vista.FormVentaExportacion.superclass.constructor.call(this,config);
-	    
-	    this.Cmp.valor_bruto.setValue(0);
-	    this.Cmp.transporte_fob.setValue(0);
-	    this.Cmp.seguros_fob.setValue(0);
-	    this.Cmp.otros_fob.setValue(0);
-	    this.Cmp.total_fob.setValue(0);
-	    this.Cmp.transporte_cif.setValue(0);
-	    this.Cmp.seguros_cif.setValue(0);
-	    this.Cmp.otros_cif.setValue(0);	    
-	    this.Cmp.total_cif.setValue(0);
-	    this.Cmp.fecha.setValue(new Date);
+	    if (this.accionFormulario != 'EDIT') {
+		    this.Cmp.valor_bruto.setValue(0);
+		    this.Cmp.transporte_fob.setValue(0);
+		    this.Cmp.seguros_fob.setValue(0);
+		    this.Cmp.otros_fob.setValue(0);
+		    this.Cmp.total_fob.setValue(0);
+		    this.Cmp.transporte_cif.setValue(0);
+		    this.Cmp.seguros_cif.setValue(0);
+		    this.Cmp.otros_cif.setValue(0);	    
+		    this.Cmp.total_cif.setValue(0);
+		    this.Cmp.fecha.setValue(new Date);
+	    }
 	    
 	    this.eventosExtras();
 	                   
@@ -211,8 +212,6 @@ Phx.vista.FormVentaExportacion = {
     	total_cif = total_cif + this.Cmp.seguros_cif.getValue();
     	total_cif = total_cif + this.Cmp.otros_cif.getValue();
     	this.Cmp.total_cif.setValue(total_cif);
-    	
-    	
     },
     evaluaRequistos: function(){
     	//valida que todos los requistosprevios esten completos y habilita la adicion en el grid
@@ -230,7 +229,10 @@ Phx.vista.FormVentaExportacion = {
     	return sw
     },
     bloqueaRequisitos: function(sw){
-    	this.Cmp.id_sucursal.setDisabled(sw); 
+    	
+    	if (this.accionFormulario != 'EDIT') {
+    	    this.Cmp.id_sucursal.setDisabled(sw); 
+    	}
     	this.Cmp.tipo_cambio_venta.setDisabled(sw);
     	this.Cmp.id_moneda.setDisabled(sw);   	
     	this.cargarDatosMaestro();
@@ -245,6 +247,29 @@ Phx.vista.FormVentaExportacion = {
         this.detCmp.id_producto.store.baseParams.id_moneda = this.Cmp.id_moneda.getValue();
         this.detCmp.id_producto.modificado = true;
     	
+    },
+    
+    onEdit:function(){
+        var me = this;
+    	this.accionFormulario = 'EDIT';    	
+    	this.loadForm(me.data.datos_originales);    	
+    	
+        //load detalle de conceptos
+        this.mestore.baseParams.id_venta = me.Cmp.id_venta.getValue();
+       
+        this.mestore.on('load',function(){
+         	 var tmp = this.summary.getData()
+             this.Cmp.valor_bruto.setValue(tmp.precio_total);
+             this.Cmp.valor_bruto.fireEvent('change',this.Cmp.valor_bruto)
+         },this);
+         
+        this.mestore.load();
+        this.crearStoreFormaPago();  
+        this.Cmp.id_moneda.disable();
+        this.Cmp.tipo_cambio_venta.disable();
+        this.Cmp.fecha.disable();  
+        this.Cmp.id_sucursal.disable(); 	
+        
     },
     
 	

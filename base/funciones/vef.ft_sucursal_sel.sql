@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -76,13 +78,19 @@ BEGIN
 						suc.lugar,
                         suc.habilitar_comisiones,
                         suc.id_lugar,
-                        lug.nombre as nombre_lugar
-						from vef.tsucursal suc
+                        lug.nombre as nombre_lugar,
+                        array_to_string(suc.tipo_interfaz,'','') as tipo_interfaz,
+                        dep.id_depto,
+                        dep.nombre	as nombre_depto			
+                        from vef.tsucursal suc
 						inner join segu.tusuario usu1 on usu1.id_usuario = suc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = suc.id_usuario_mod
                         left join param.tlugar lug on lug.id_lugar = suc.id_lugar
+                        left join param.tdepto dep on dep.id_depto = suc.id_depto
 				        where  ';
 			
+           
+            
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
@@ -108,6 +116,7 @@ BEGIN
 					    inner join segu.tusuario usu1 on usu1.id_usuario = suc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = suc.id_usuario_mod
                         left join param.tlugar lug on lug.id_lugar = suc.id_lugar
+                        left join param.tdepto dep on dep.id_depto = suc.id_depto
 					    where ';
 			
 			--Definicion de la respuesta		    

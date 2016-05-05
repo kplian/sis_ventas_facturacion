@@ -279,6 +279,674 @@ class RFacturaRecibo
 											
 				</body>
 				</html>';
+			} else if ($codigo_reporte == 'FACEXPORTCARTA') {
+				setlocale(LC_ALL,"es_ES@euro","es_ES","esp");
+				$html = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+					   "http://www.w3.org/TR/html4/strict.dtd">
+					<html>
+					<head>
+						<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+						<title>sis_ventas_facturacion</title>
+						<meta name="author" content="kplian">
+						    
+					
+					  <link rel="stylesheet" href="../../../sis_ventas_facturacion/control/print_carta.css" type="text/css"  charset="utf-8">
+					  
+					</head>';
+				
+					
+				$html .= '<body>
+				<center>
+				<table style="height: 130px;" width="605">
+					<tbody>
+						<tr>
+							<td>
+								<table style="height: 130px;" width="180">
+									<tbody>
+										<tr>
+											<td style="text-align:center;padding:0; margin:0;" align="center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img style="display: block;margin:0;padding:0" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcR4JrU1ZMiUWEmvaLNv3039T1HHyg3DlQtl6GJS350Y97HDXRFA" alt="logo" width="60" height="60" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong><br />' . $datos['direccion_sucursal'] . '<br />' . $datos['telefono_sucursal'] . '<br />' . $datos['lugar_sucursal'] . '</td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+							<td style="text-align: left;" width="172">
+								<table style="height: 74px;" width="172">
+									<tbody>
+										<tr>
+											<td style="text-align: left;"><strong>NIT:</strong></td>
+											<td style="text-align: left;">' . $datos['nit_entidad'] . '</td>
+										</tr>
+										<tr>
+											<td><strong>FACTURA:</strong></td>
+											<td>' . $datos['numero_factura'] . '</td>
+										</tr>
+										<tr>
+											<td><strong>AUTORIZACION:</strong></td>
+											<td>' . $datos['autorizacion'] . '</td>
+										</tr>
+										<tr>
+											<td style="text-align: center;" colspan="2">
+												<h3>&nbsp;<strong>ORIGINAL</strong></h3>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<h2 style="text-align: center;">FACTURA COMERCIAL DE EXPORTACION</h2>
+				<h3 style="text-align: center;">SIN DERECHO A CREDITO FISCAL</h3>
+				<table style="border: thin solid black;" width="645">
+					<tbody>
+						<tr>
+							<td>Lugar y Fecha</td>
+							<td><strong>' . $datos['departamento_sucursal'] . ', ' . $datos['fecha_literal'] . ';</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Nombre</td>
+							<td><strong>' . $datos['cliente'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Direccion del Importador</td>
+							<td><strong>' . $datos['direccion_cliente'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>NIT</td>
+							<td><strong>' . $datos['nit_cliente'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Incoterm-Puerto Destino</td>
+							<td><strong>' . $datos['observaciones'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Moneda de la Transaccion comercial&nbsp;</td>
+							<td><strong>' . $datos['desc_moneda_venta'] . '</strong></td>
+							<td>Tipo de Cambio<strong>:' . $datos['tipo_cambio_venta'] . '</strong></td>
+						</tr>
+						<tr>
+							<td style="border-top: thin solid black;" colspan="3">
+								<h3 style="text-align: center;">DETALLE&nbsp;</h3>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<table style="border-collapse: collapse; height: 33px;" width="645">
+					<tbody>
+						<tr>
+							<td style="text-align: center; border: thin solid black;" width="8%"><strong>ITEM</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="14%"><strong>NANDINA</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="32%"><strong>DESCRIPCION</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>CANTIDAD</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>UNIDAD DE MEDIDA</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="12%"><strong>PRECIO UNITARIO</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="14%"><strong>SUBTOTAL</strong></td>
+						</tr>';
+					$valor_bruto = 0;
+					
+					foreach ($datos['detalle'] as $item_detalle) {
+						$valor_bruto += $item_detalle['precio_total']; 
+						$html .= '<tr>
+							<td style="text-align: right; border: thin solid black;">1</td>
+							<td style="border: thin solid black;">' . $item_detalle['nandina'] . '</td>
+							<td style="border: thin solid black;">' . $item_detalle['concepto'] . '</td>
+							<td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', '') . '</td>
+							<td style="border: thin solid black;">' . $item_detalle['unidad_medida'] . '</td>
+							<td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', '') . '</td>
+							<td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', '') . '</td>
+						</tr>';
+					}
+					$html .= '	
+					</tbody>
+				</table>
+				<table style="border-collapse: collapse;" width="645">
+					<tbody>
+						<tr>
+							<td width="53.5%">&nbsp;</td>
+							<td width="32.5%"><strong>VALOR BRUTO/Gross Value  ' . $datos['moneda_venta'] . ':</strong></td>
+							<td style="text-align: right;" width="14%"><strong>' . number_format($valor_bruto, 2, '.', '') . '</strong></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Gastos de Transporte FOB</td>
+							<td style="text-align: right;">' . number_format($datos['transporte_fob'], 2, '.', '') . '</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Gatos de Seguro FOB</td>
+							<td style="text-align: right;">' . number_format($datos['seguros_fob'], 2, '.', '') . '</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Otros FOB</td>
+							<td style="text-align: right;">' . number_format($datos['otros_fob'], 2, '.', '') . '</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td><strong>Total FOB Frontera</strong></td>
+							<td style="text-align: right;"><strong>' . number_format($valor_bruto + $datos['transporte_fob'] + $datos['seguros_fob'] + $datos['otros_fob'], 2, '.', '') . '</strong></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Transporte Internacional</td>
+							<td style="text-align: right;">' . number_format($datos['transporte_cif'], 2, '.', '') . '</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Seguros Internacional&nbsp;</td>
+							<td style="text-align: right;">' . number_format($datos['seguros_cif'], 2, '.', '') . '</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Otros Internacional&nbsp;</td>
+							<td style="text-align: right;">' . number_format($datos['otros_cif'], 2, '.', '') . '</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td style="border: thin solid black;"><strong>TOTAL ' . $datos['moneda_venta'] . '</strong></td>
+							<td style="text-align: right; border: thin solid black;"><strong>' . number_format($datos['total_venta'], 2, '.', '') . '</strong></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td style="border: thin solid black;"><strong>TOTAL ' . $datos['moneda_sucursal'] . '</strong></td>
+							<td style="text-align: right; border: thin solid black;"><strong>' . number_format($datos['total_venta_msuc'], 2, '.', '') . '</strong></td>
+						</tr>
+					</tbody>
+				</table>
+				<p>Son : <strong>' . $datos['total_venta_literal'] . ' ' . $datos['desc_moneda_venta'] . '</strong></p>
+				<p>Son : <strong>' . $datos['total_venta_msuc_literal'] . ' ' . $datos['desc_moneda_sucursal'] . '</strong></p>
+				<table width="605">
+					<tbody>
+						<tr>
+							<td style="text-align:left;" width="50%">&nbsp;C&oacute;digo de Control : <strong>' . $datos['codigo_control'] . '</strong></td>
+							<td style="text-align:right; width="50%">&nbsp;Fecha L&iacute;mite de Emisi&oacute;n : <strong>' . $datos['fecha_limite_emision'] . '</strong></td>
+						</tr>
+					</tbody>
+				</table>
+				<p>&nbsp;</p>
+				<p style="text-align: center;"><strong>' . $datos['glosa_impuestos'] . '</strong></p>
+				<p style="text-align: center;"><strong>' . $datos['glosa_empresa'] . '</strong></p>
+				<script language="VBScript">
+						Sub Print()
+						       OLECMDID_PRINT = 6
+						       OLECMDEXECOPT_DONTPROMPTUSER = 2
+						       OLECMDEXECOPT_PROMPTUSER = 1
+						       call WB.ExecWB(OLECMDID_PRINT, OLECMDEXECOPT_DONTPROMPTUSER,1)
+						End Sub
+						document.write "<object ID="WB" WIDTH=0 HEIGHT=0 CLASSID="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2"></object>"
+						</script>
+						
+						<script type="text/javascript"> 
+						setTimeout(function(){
+							 self.print();							 
+							}, 1000);
+						
+						setTimeout(function(){
+							 self.close();							 
+							}, 2000);						
+						</script>                                                                                   
+                                </body>
+                                </html>';
+			} else if ($codigo_reporte == 'FACEXPORTMIN') {
+				setlocale(LC_ALL,"es_ES@euro","es_ES","esp");
+				$html = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+					   "http://www.w3.org/TR/html4/strict.dtd">
+					<html>
+					<head>
+						<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+						<title>sis_ventas_facturacion</title>
+						<meta name="author" content="kplian">
+						    
+					
+					  <link rel="stylesheet" href="../../../sis_ventas_facturacion/control/print_carta.css" type="text/css"  charset="utf-8">
+					  
+					</head>
+					<center><body>';
+				
+				if ($datos['estado'] == 'borrador') {
+					$pagina = '	<div id="watermark-borrador"></div>';
+				} else if ($datos['estado'] == 'anulado') {
+					$pagina = '	<div id="watermark-anulado"></div>';
+				} else {
+					$pagina = '';
+				}	
+				$pagina .= '
+				<div id="watermark"></div>
+				<table style="height: 130px;" width="750">
+					<tbody>
+						<tr>
+							<td>
+								<table style="height: 130px;" width="180">
+									<tbody>
+										<tr>
+											<td style="text-align:center;padding:0; margin:0;" align="center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img style="display: block;margin:0;padding:0" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcR4JrU1ZMiUWEmvaLNv3039T1HHyg3DlQtl6GJS350Y97HDXRFA" alt="logo" width="60" height="60" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong><br />' . $datos['direccion_sucursal'] . '<br />' . $datos['telefono_sucursal'] . '<br />' . $datos['lugar_sucursal'] . '</td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+							<td style="text-align: left;" width="172">
+								<table style="height: 74px;" width="172">
+									<tbody>
+										<tr>
+											<td style="text-align: left;"><strong>NIT:</strong></td>
+											<td style="text-align: left;">' . $datos['nit_entidad'] . '</td>
+										</tr>
+										<tr>
+											<td><strong>FACTURA:</strong></td>
+											<td>' . $datos['numero_factura'] . '</td>
+										</tr>
+										<tr>
+											<td><strong>AUTORIZACION:</strong></td>
+											<td>' . $datos['autorizacion'] . '</td>
+										</tr>
+										<tr>
+											<td style="text-align: center;" colspan="2">
+												<h3>&nbsp;<strong>ORIGINAL</strong></h3>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<h2 style="text-align: center;">FACTURA COMERCIAL DE EXPORTACION</h2>
+				<h3 style="text-align: center;">SIN DERECHO A CREDITO FISCAL</h3>
+				<table style="border: thin solid black;" width="750">
+					<tbody>
+						<tr>
+							<td>Lugar y Fecha</td>
+							<td><strong>' . $datos['departamento_sucursal'] . ', ' . $datos['fecha_literal'] . ';</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Nombre</td>
+							<td><strong>' . $datos['cliente'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Direccion del Importador</td>
+							<td><strong>' . $datos['direccion_cliente'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>NIT</td>
+							<td><strong>' . $datos['nit_cliente'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Incoterm-Puerto Destino</td>
+							<td><strong>' . $datos['observaciones'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Moneda de la Transaccion comercial&nbsp;</td>
+							<td><strong>' . $datos['desc_moneda_venta'] . '</strong></td>
+							<td>Tipo de Cambio<strong>:' . $datos['tipo_cambio_venta'] . '</strong></td>
+						</tr>
+						<tr>
+							<td style="border-top: thin solid black;" colspan="3">
+								<h3 style="text-align: center;">DESCRIPCION&nbsp;</h3>
+							</td>
+						</tr>						
+					</tbody>
+				</table>
+				<table style="border:thin solid black ;border-collapse: collapse; height: 33px;" width="750">
+					<tbody>
+						<tr>
+							<td width="35%">'; 
+							$i = 1;
+							$pagina.= $datos['detalle_descripcion'][0]['nombre'];
+							while ($datos['detalle_descripcion'][$i]['columna'] == 1){
+								$pagina.= '<br>' . $datos['detalle_descripcion'][$i]['nombre'];
+								$i++;
+							}
+							$pagina .= '</td>
+							<td style="text-align: right;" width="15%">'; 
+							$i = 1;
+							$pagina.= $datos['detalle_descripcion'][0]['valor'].'&nbsp;';
+							while ($datos['detalle_descripcion'][$i]['columna'] == 1){
+								$pagina.= '<br>' . $datos['detalle_descripcion'][$i]['valor'].'&nbsp;';
+								$i++;
+							}
+							$pagina .= '</td>
+							<td  width="35%">'; 
+							$j = $i;
+							$pagina.= $datos['detalle_descripcion'][$i]['nombre'];
+							$i++;
+							while ($datos['detalle_descripcion'][$i]['columna'] == 2){
+								$pagina.= '<br>' . $datos['detalle_descripcion'][$i]['nombre'];
+								$i++;
+							}
+							$pagina .= '</td>
+							<td style="text-align: right;" width="15%">'; 
+							$pagina.= $datos['detalle_descripcion'][$j]['valor'].'&nbsp;';
+							$i = $j + 1;
+							
+							while ($datos['detalle_descripcion'][$i]['columna'] == 2){
+								$pagina.= '<br>' . $datos['detalle_descripcion'][$i]['valor'].'&nbsp;';
+								$i++;
+							}
+							$pagina .= '</td>
+						</tr>
+					</tbody>
+					</table>
+					<table style="border:thin solid black ;border-collapse: collapse; height: 33px;" width="750">
+					<tbody>
+						<tr>							
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Partida</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="28%"><strong>Mineral</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Bruto</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Ley Mineral</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Peso Fino[Kg]</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Peso Fino</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Cotizacion Mineral</strong></td>
+																					
+							<td style="text-align: center; border: thin solid black;" width="12%"><strong>Subtotal</strong></td>
+						</tr>';
+					$valor_bruto = 0;
+					
+					foreach ($datos['detalle'] as $item_detalle) {
+						$valor_bruto += $item_detalle['precio_total']; 
+						$pagina .= '<tr>							
+							<td style="border-bottom: thin solid black;">' . $item_detalle['nandina'] . '</td>
+							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] . '</td>
+							<td style="text-align: right;border-bottom: thin solid black;">' . $item_detalle['bruto'] . '</td>
+							<td style="text-align: right;border-bottom: thin solid black;">' . $item_detalle['ley'] . '</td>
+							<td style="text-align: right;border-bottom: thin solid black;">' . $item_detalle['kg_fino'] . '</td>
+							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', '') . ' ' . $item_detalle['unidad_medida'] . '</td>
+							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', '') . '</td>							
+							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', '') . '</td>
+						</tr>';
+					}
+					$pagina .= '	
+					</tbody>
+				</table>
+				<table style="border-collapse: collapse;" width="750">
+					<tbody>
+						<tr>
+							<td width="53.5%">&nbsp;</td>
+							<td width="32.5%"><strong>VALOR BRUTO/Gross Value  ' . $datos['moneda_venta'] . ':</strong></td>
+							<td style="text-align: right;" width="14%"><strong>' . number_format($valor_bruto, 2, '.', '') . '</strong></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Gastos de Transporte FOB</td>
+							<td style="text-align: right;">' . number_format($datos['transporte_fob'], 2, '.', '') . '</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Gatos de Seguro FOB</td>
+							<td style="text-align: right;">' . number_format($datos['seguros_fob'], 2, '.', '') . '</td>
+						</tr>';
+						if ($datos['otros_fob'] > 0) {
+							$pagina .= '<tr>
+								<td>&nbsp;</td>
+								<td>Otros FOB</td>
+								<td style="text-align: right;">' . number_format($datos['otros_fob'], 2, '.', '') . '</td>
+							</tr>';
+						}
+						$pagina .= '<tr>
+							<td>&nbsp;</td>
+							<td><strong>Total FOB Frontera</strong></td>
+							<td style="text-align: right;"><strong>' . number_format($valor_bruto + $datos['transporte_fob'] + $datos['seguros_fob'] + $datos['otros_fob'], 2, '.', '') . '</strong></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Transporte Internacional</td>
+							<td style="text-align: right;">' . number_format($datos['transporte_cif'], 2, '.', '') . '</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>Seguros Internacional&nbsp;</td>
+							<td style="text-align: right;">' . number_format($datos['seguros_cif'], 2, '.', '') . '</td>
+						</tr>';
+						if ($datos['otros_cif'] > 0) {
+							$pagina .= '<tr>
+								<td>&nbsp;</td>
+								<td>Otros Internacional&nbsp;</td>
+								<td style="text-align: right;">' . number_format($datos['otros_cif'], 2, '.', '') . '</td>
+							</tr>';
+						}
+						$pagina .= '<tr>
+							<td>&nbsp;</td>
+							<td style="border: thin solid black;"><strong>TOTAL ' . $datos['moneda_venta'] . '</strong></td>
+							<td style="text-align: right; border: thin solid black;"><strong>' . number_format($datos['total_venta'], 2, '.', '') . '</strong></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td style="border: thin solid black;"><strong>TOTAL ' . $datos['moneda_sucursal'] . '</strong></td>
+							<td style="text-align: right; border: thin solid black;"><strong>' . number_format($datos['total_venta_msuc'], 2, '.', '') . '</strong></td>
+						</tr>
+					</tbody>
+				</table>
+				<p>Son : <strong>' . $datos['total_venta_literal'] . ' ' . $datos['desc_moneda_venta'] . '</strong></p>
+				<p>Son : <strong>' . $datos['total_venta_msuc_literal'] . ' ' . $datos['desc_moneda_sucursal'] . '</strong></p>
+				<table width="605">
+					<tbody>
+						<tr>
+							<td style="text-align:left;" width="50%">&nbsp;C&oacute;digo de Control : <strong>' . $datos['codigo_control'] . '</strong></td>
+							<td style="text-align:right; width="50%">&nbsp;Fecha L&iacute;mite de Emisi&oacute;n : <strong>' . $datos['fecha_limite_emision'] . '</strong></td>
+						</tr>
+					</tbody>
+				</table>				
+				<p style="text-align: center;"><strong>' . $datos['glosa_impuestos'] . '<br>
+				' . $datos['glosa_empresa'] . '</strong></p>';
+				
+				$html .= $pagina;
+				if ($datos['estado'] == 'finalizado') {
+					$pagina = str_replace('<h3>&nbsp;<strong>ORIGINAL</strong></h3>', '<h3>&nbsp;<strong>COPIA CONTABILIDAD</strong></h3>', $pagina);
+					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
+					
+					$pagina = str_replace('<h3>&nbsp;<strong>COPIA CONTABILIDAD</strong></h3>', '<h3>&nbsp;<strong>COPIA TESORERIA</strong></h3>', $pagina);
+					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
+					
+					$pagina = str_replace('<h3>&nbsp;<strong>COPIA TESORERIA</strong></h3>', '<h3>&nbsp;<strong>COPIA ARCHIVO</strong></h3>', $pagina);
+					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
+				}
+				$html .= '<script language="VBScript">
+						Sub Print()
+						       OLECMDID_PRINT = 6
+						       OLECMDEXECOPT_DONTPROMPTUSER = 2
+						       OLECMDEXECOPT_PROMPTUSER = 1
+						       call WB.ExecWB(OLECMDID_PRINT, OLECMDEXECOPT_DONTPROMPTUSER,1)
+						End Sub
+						document.write "<object ID="WB" WIDTH=0 HEIGHT=0 CLASSID="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2"></object>"
+						</script>
+						
+						<script type="text/javascript"> 
+						';
+				if ($datos['estado'] == 'finalizado') {
+					$html .= '
+							setTimeout(function(){
+								 self.print();							 
+								}, 1000);
+							
+							setTimeout(function(){
+								 self.close();							 
+								}, 2000);';
+				}
+				$html .= '				
+						</script>                                                                                   
+                                </body>
+                                </html>';
+			} else if ($codigo_reporte == 'FACMEDIACAR') {
+				$cadena_qr = 	$datos['nit_entidad'] . '|' . 
+						$datos['numero_factura'] . '|' . 
+						$datos['autorizacion'] . '|' . 
+						$datos['fecha_venta'] . '|' . 
+						$datos['total_venta'] . '|' . 
+						$datos['total_venta'] . '|' . 
+						$datos['codigo_control'] . '|' . 
+						$datos['nit_cliente'] . '|0.00|0.00|0.00|0.00';
+						
+				$barcodeobj = new TCPDF2DBarcode($cadena_qr, 'QRCODE,H');
+				
+				setlocale(LC_ALL,"es_ES@euro","es_ES","esp");
+				$html = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+					   "http://www.w3.org/TR/html4/strict.dtd">
+					<html>
+					<head>
+						<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+						<title>sis_ventas_facturacion</title>
+						<meta name="author" content="kplian">
+						    
+					
+					  <link rel="stylesheet" href="../../../sis_ventas_facturacion/control/print_media_carta.css" type="text/css"  charset="utf-8">
+					  
+					</head>';
+				
+					
+				$html .= '<center>
+				<table style="height: 130px;" width="605">
+					<tbody>
+						<tr>
+							<td>
+								<table style="height: 130px;" width="180">
+									<tbody>
+										<tr>
+											<td style="text-align:center;padding:0; margin:0;" align="center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img style="display: block;margin:0;padding:0" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcR4JrU1ZMiUWEmvaLNv3039T1HHyg3DlQtl6GJS350Y97HDXRFA" alt="logo" width="60" height="60" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong><br />' . $datos['direccion_sucursal'] . '<br />' . $datos['telefono_sucursal'] . '<br />' . $datos['lugar_sucursal'] . '</td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+							<td style="text-align: left;" width="172">
+								<table style="height: 74px;" width="172">
+									<tbody>
+										<tr>
+											<td style="text-align: left;"><strong>NIT:</strong></td>
+											<td style="text-align: left;">' . $datos['nit_entidad'] . '</td>
+										</tr>
+										<tr>
+											<td><strong>FACTURA:</strong></td>
+											<td>' . $datos['numero_factura'] . '</td>
+										</tr>
+										<tr>
+											<td><strong>AUTORIZACION:</strong></td>
+											<td>' . $datos['autorizacion'] . '</td>
+										</tr>
+										<tr>
+											<td style="text-align: center;" colspan="2">
+												<h3>&nbsp;<strong>ORIGINAL</strong></h3></br>
+												'.$datos['actividades'].'	
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<h2 style="text-align: center;">FACTURA</h2>				
+				<table style="border: thin solid black;" width="645">
+					<tbody>
+						<tr>
+							<td>Lugar y Fecha</td>
+							<td><strong>' . $datos['departamento_sucursal'] . ', ' . $datos['fecha_literal'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>Señor(es):</td>
+							<td><strong>' . $datos['cliente'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>						
+						<tr>
+							<td>NIT/CI</td>
+							<td><strong>' . $datos['nit_cliente'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>						
+						<tr>
+							<td style="border-top: thin solid black;" colspan="3">
+								<h3 style="text-align: center;">DETALLE&nbsp;</h3>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<table style="border:thin solid black ;border-collapse: collapse; height: 33px;" width="645">
+					<tbody>
+						<tr>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>ITEM</strong></td>							
+							<td style="text-align: center; border: thin solid black;" width="40%"><strong>DESCRIPCION</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="15%"><strong>CANTIDAD</strong></td>							
+							<td style="text-align: center; border: thin solid black;" width="15%"><strong>PRECIO UNITARIO</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="20%"><strong>SUBTOTAL</strong></td>
+						</tr>';
+					$valor_bruto = 0;
+					$i = 1;
+					foreach ($datos['detalle'] as $item_detalle) {
+						$valor_bruto += $item_detalle['precio_total']; 
+						$html .= '<tr>
+							<td style="text-align: right; border-bottom: thin solid black;">'.$i.'</td>							
+							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] . '</td>
+							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', '') . '</td>
+							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', '') . '</td>
+							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', '') . '</td>
+						</tr>';
+						$i++;
+					}
+					$html .= '	
+					</tbody>
+				</table>
+				<table style="border-collapse: collapse;" width="645">
+					<tbody>
+						<tr>
+							<td width="53.5%">&nbsp;</td>
+							<td width="32.5%"><strong>TOTAL  ' . $datos['moneda_venta'] . ':</strong></td>
+							<td style="text-align: right;" width="14%"><strong>' . number_format($datos['total_venta_msuc'], 2, '.', '') . '</strong></td>
+						</tr>						
+					</tbody>
+				</table>
+				<p>Son : <strong>' . $datos['total_venta_msuc_literal'] . ' ' . $datos['desc_moneda_sucursal'] . '</strong></p>
+				<table width="605">
+					<tbody>
+						<tr>
+							<td style="text-align:left;" width="50%">&nbsp;C&oacute;digo de Control : <strong>' . $datos['codigo_control'] . '</strong></br>
+							&nbsp;Fecha L&iacute;mite de Emisi&oacute;n : <strong>' . $datos['fecha_limite_emision'] . '</strong>
+							</td>
+							<td width="50%"><div align="center">
+								    '.$barcodeobj->getBarcodeSVGcode(2, 2, 'black').'
+								</div></td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<p style="text-align: center;"><strong>' . $datos['glosa_impuestos'] . '</strong></p>
+				<p style="text-align: center;"><strong>' . $datos['glosa_empresa'] . '</strong></p>
+				<script language="VBScript">
+						Sub Print()
+						       OLECMDID_PRINT = 6
+						       OLECMDEXECOPT_DONTPROMPTUSER = 2
+						       OLECMDEXECOPT_PROMPTUSER = 1
+						       call WB.ExecWB(OLECMDID_PRINT, OLECMDEXECOPT_DONTPROMPTUSER,1)
+						End Sub
+						document.write "<object ID="WB" WIDTH=0 HEIGHT=0 CLASSID="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2"></object>"
+						</script>
+						
+						<script type="text/javascript"> 
+						setTimeout(function(){
+							 self.print();							 
+							}, 1000);
+						
+						/*setTimeout(function(){
+							 self.close();							 
+							}, 2000);*/						
+						</script>                                                                                   
+                                </body>
+                                </html>';
 			}
 			
 			return $html;

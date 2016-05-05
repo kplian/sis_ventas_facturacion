@@ -47,6 +47,12 @@ DECLARE
     v_registros					record;
     v_total						numeric;
     
+    v_bruto						varchar;
+    v_ley						varchar;
+    v_kg_fino					varchar;
+    v_descripcion				varchar;
+    v_id_unidad_medida			integer;
+    
 	
 			    
 BEGIN
@@ -92,6 +98,36 @@ BEGIN
                 end if;
         	end if;
             
+            
+            if (pxp.f_existe_parametro(p_tabla,'descripcion')) then
+               v_descripcion =  v_parametros.descripcion;
+            else
+               v_descripcion = '';
+            end if;
+            
+            v_bruto = 0;
+            v_ley = 0;
+            v_kg_fino = 0;
+            if (pxp.f_existe_parametro(p_tabla,'bruto')) then
+               v_bruto = v_parametros.bruto;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'ley')) then
+               v_ley = v_parametros.ley;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'kg_fino')) then
+               v_kg_fino = v_parametros.kg_fino;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'id_unidad_medida')) then
+            
+               v_id_unidad_medida = v_parametros.id_unidad_medida;
+            end if;
+            
+            
+           
+            
            
         	--Sentencia de la insercion
         	insert into vef.tventa_detalle(
@@ -111,7 +147,11 @@ BEGIN
             porcentaje_descuento,
             id_vendedor,
             id_medico,
-            descripcion
+            descripcion,
+            bruto,
+            ley,
+            kg_fino,
+            id_unidad_medida
           	) values(
 			v_parametros.id_venta,
 			v_id_item,
@@ -120,7 +160,7 @@ BEGIN
 			v_parametros.tipo,
 			'activo',
 			v_parametros.cantidad_det,
-			v_parametros.precio - (v_parametros.precio * v_porcentaje_descuento / 100),
+			round(v_parametros.precio - (v_parametros.precio * v_porcentaje_descuento / 100),2),
 			now(),
 			p_id_usuario,
 			null,
@@ -129,7 +169,11 @@ BEGIN
             v_porcentaje_descuento,
             v_id_vendedor,
             v_id_medico,
-            v_parametros.descripcion
+            v_descripcion,
+            v_bruto,
+            v_ley,
+            v_kg_fino,
+            v_id_unidad_medida
 							
 			
 			
@@ -150,7 +194,7 @@ BEGIN
             
            
             update vef.tventa
-            set total_venta = (select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta) + v_total
+            set total_venta = round((select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta) + v_total,2)
             where id_venta = v_parametros.id_venta;
 			
             --Definicion de la respuesta

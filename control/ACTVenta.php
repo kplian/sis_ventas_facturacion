@@ -185,8 +185,15 @@ class ACTVenta extends ACTbase{
 		$this->objFunc = $this->create('MODVenta');
 		$datos = array();
 		$this->res = $this->objFunc->listarReciboFactura($this->objParam);
+		
 		$datos = $this->res->getDatos();
 		$datos = $datos[0];
+		
+		if ($datos['cantidad_descripciones'] > 0){
+			$this->objFunc = $this->create('MODVenta');
+			$this->res = $this->objFunc->listarReciboFacturaDescripcion($this->objParam);
+			$datos['detalle_descripcion'] = $this->res->getDatos();
+		}
 		
 		$this->objFunc = $this->create('MODVenta');
 		$this->res = $this->objFunc->listarReciboFacturaDetalle($this->objParam);

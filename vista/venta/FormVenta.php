@@ -106,7 +106,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		      
 		}
 		
-		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadaexpo') {
+		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadaexpo'|| this.data.objPadre.tipo_factura == 'computarizadamin'|| this.data.objPadre.tipo_factura == 'computarizadaexpomin') {
 			this.Atributos.push({
 				config:{
 					name: 'fecha',
@@ -311,6 +311,25 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             
     }, 
     
+    iniciarEventosProducto:function(){
+    	this.detCmp.id_producto.on('select',function(c,r,i) {
+            this.detCmp.precio_unitario.setValue(Number(r.data.precio));
+            
+            var tmp = this.roundTwo(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()))
+            this.detCmp.precio_total.setValue(tmp);
+        	
+        	
+        	
+        	if (r.data.requiere_descripcion == 'si') {        		
+        		this.habilitarDescripcion(true);
+        	} else {
+        		this.habilitarDescripcion(false);
+        	}
+        },this);
+    	
+    },
+    
+    
     iniciarEventos : function () {
     	
     	
@@ -424,36 +443,34 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         },this);      
         
         
-        this.detCmp.id_producto.on('select',function(c,r,i) {
-            this.detCmp.precio_unitario.setValue(Number(r.data.precio));
-            this.detCmp.precio_total.setValue(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()));
-        	
-        	if (r.data.requiere_descripcion == 'si') {
-        		
-        		this.habilitarDescripcion(true);
-        	} else {
-        		this.habilitarDescripcion(false);
-        	}
-        },this);
+        this.iniciarEventosProducto();
         
         this.detCmp.cantidad.on('keyup',function() {  
-            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
+            this.detCmp.precio_total.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
         },this);
         
         this.detCmp.precio_unitario.on('keyup',function() {  
-            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
+            this.detCmp.precio_total.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
         },this);
     }, 
+    
+    roundTwo: function(can){
+    	 return  Math.round(can*Math.pow(10,2))/Math.pow(10,2);
+    },
+    
     habilitarDescripcion : function(opcion) {
     	
-    	if (opcion) {
-    		this.detCmp.descripcion.setDisabled(false);   
-    		this.detCmp.descripcion.allowBlank = false; 		
-    	} else {
-    		this.detCmp.descripcion.setDisabled(true);
-    		this.detCmp.descripcion.allowBlank = true; 
-    		this.detCmp.descripcion.reset();
-    	}	
+    	if(this.detCmp.descripcion){
+	    	if (opcion) {
+	    		this.detCmp.descripcion.setDisabled(false);   
+	    		this.detCmp.descripcion.allowBlank = false; 		
+	    	} else {
+	    		this.detCmp.descripcion.setDisabled(true);
+	    		this.detCmp.descripcion.allowBlank = true; 
+	    		this.detCmp.descripcion.reset();
+	    	}	
+    	}
+    		
     }, 
     
     cambiarCombo : function (tipo) {
@@ -626,7 +643,11 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         //al cancelar la edicion
         this.editorDetail.on('validateedit', this.onUpdateRegister, this);
         
-        this.editorDetail.on('afteredit', this.onAfterEdit, this);        
+        this.editorDetail.on('afteredit', this.onAfterEdit, this);  
+        
+        
+        //eventos de rror en los combos  
+        this.detCmp.id_producto.store.on('exception', this.conexionFailure);    
         
         this.megrid = new Ext.grid.GridPanel({
                     layout: 'fit',

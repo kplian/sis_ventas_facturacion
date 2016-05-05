@@ -13,6 +13,11 @@ class ACTSucursal extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_sucursal');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if($this->objParam->getParametro('nombreVista') != '') {
+                $this->objParam->addFiltro(" ''".$this->objParam->getParametro('nombreVista')."'' =ANY (tipo_interfaz)");
+        }
+        
         
         if($this->objParam->getParametro('filtro_usuario') != '') {
                 $this->objParam->addFiltro(" (1 in (select id_rol 
@@ -25,7 +30,8 @@ class ACTSucursal extends ACTbase{
         if($this->objParam->getParametro('id_entidad') != '') {
                 $this->objParam->addFiltro(" suc.id_entidad = " . $this->objParam->getParametro('id_entidad'));
         }
-        
+		
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODSucursal','listarSucursal');

@@ -60,7 +60,7 @@ BEGIN
                     v_id_concepto = v_parametros.nombre_producto;
                     
                     if (exists (select 1 from vef.tsucursal_producto
-                    			where id_concepto_ingas = v_id_concepto and estado_reg = 'activo'))  then
+                    			where id_concepto_ingas = v_id_concepto and estado_reg = 'activo' and id_sucursal = v_parametros.id_sucursal))  then
                     	raise exception 'El producto o servicio ya se encuentra registrado en esta sucursal';
                     end if;
                     

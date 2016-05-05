@@ -101,6 +101,52 @@ Phx.vista.TipoVenta=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+		{
+	            config:{
+	                name: 'id_plantilla',
+	                fieldLabel: 'Tipo Documento',
+	                allowBlank: false,
+	                emptyText:'Elija una plantilla...',
+	                store:new Ext.data.JsonStore(
+	                {
+	                    url: '../../sis_parametros/control/Plantilla/listarPlantilla',
+	                    id: 'id_plantilla',
+	                    root:'datos',
+	                    sortInfo:{
+	                        field:'desc_plantilla',
+	                        direction:'ASC'
+	                    },
+	                    totalProperty:'total',
+	                    fields: ['id_plantilla','nro_linea','desc_plantilla','tipo',
+	                    'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
+	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice'],
+	                    remoteSort: true,
+	                    baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
+	                }),
+	                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_plantilla}</p></div></tpl>',
+	                valueField: 'id_plantilla',
+	                hiddenValue: 'id_plantilla',
+	                displayField: 'desc_plantilla',
+	                gdisplayField:'desc_plantilla',
+	                listWidth:'280',
+	                forceSelection:true,
+	                typeAhead: false,
+	                triggerAction: 'all',
+	                lazyRender:true,
+	                mode:'remote',
+	                pageSize:20,
+	                queryDelay:500,
+	               
+	                gwidth: 250,
+	                minChars:2
+	            },
+	            type:'ComboBox',
+	            filters:{pfiltro:'pla.desc_plantilla',type:'string'},
+	            id_grupo: 0,
+	            grid: true,
+	            bottom_filter: true,
+	            form: false
+	        },
 		
 		
 		{
@@ -220,7 +266,9 @@ Phx.vista.TipoVenta=Ext.extend(Phx.gridInterfaz,{
 	id_store:'id_tipo_venta',
 	fields: [
 		{name:'id_tipo_venta', type: 'numeric'},
+		{name:'id_plantilla', type: 'numeric'},
 		{name:'codigo_relacion_contable', type: 'string'},
+		{name:'desc_plantilla', type: 'string'},
 		{name:'nombre', type: 'string'},
 		{name:'tipo_base', type: 'string'},
 		{name:'estado_reg', type: 'string'},
