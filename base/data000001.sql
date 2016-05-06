@@ -88,3 +88,28 @@ VALUES (E'vef_integracion_lcv', E'si', E'Si el sistema de ventas se integra con 
 
 
 /***********************************F-DAT-JRR-VEF-0-30/04/2016*****************************************/
+
+
+/***********************************I-DAT-RAC-VEF-0-05/05/2016*****************************************/
+
+
+----------------------------------
+--COPY LINES TO data.sql FILE  
+---------------------------------
+
+select pxp.f_insert_tgui ('Venta Computarizada Exportación', 'Factura de Exportación', 'VEFACEX', 'si', 5, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacion.php', 3, '', 'VentaVendedorExportacion', 'VEF');
+select pxp.f_insert_tgui ('Exportación Minera', 'Factura de exportación para mineria', 'EXPOMIN', 'si', 7, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacionMin.php', 3, '', 'VentaVendedorExportacionMin', 'VEF');
+select pxp.f_insert_tgui ('Computarizada minera', 'Computarizada minera', 'COMMIN', 'si', 8, 'sis_ventas_facturacion/vista/venta/VentaVendedorMin.php', 3, '', 'VentaVendedorMin', 'VEF');
+----------------------------------
+--COPY LINES TO dependencies.sql FILE  
+---------------------------------
+
+select pxp.f_insert_testructura_gui ('VEFACEX', 'VENCARP');
+select pxp.f_insert_testructura_gui ('EXPOMIN', 'VENCARP');
+select pxp.f_insert_testructura_gui ('COMMIN', 'VENCARP');
+
+/***********************************F-DAT-RAC-VEF-0-05/05/2016*****************************************/
+
+
+
+
