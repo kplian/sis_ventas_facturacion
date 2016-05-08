@@ -1,3 +1,11 @@
+CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_venta_ime
@@ -1424,3 +1432,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;
