@@ -79,11 +79,17 @@ BEGIN
         	
         	v_codigo_trans = 'CONTA_DCV_INS';
         --si existe se modifica
-        else
+        else        
         	v_codigo_trans = 'CONTA_DCV_MOD';
         end if;
 	 else
-     	v_codigo_trans = 'CONTA_DCV_INS';
+     	if (v_id_doc_compra_venta is null) then
+        	
+        	v_codigo_trans = 'CONTA_DCV_INS';
+        --si existe se modifica
+        else        
+        	v_codigo_trans = 'CONTA_DCV_MOD';
+        end if;
 		v_codigo_tipo_compra_venta = 'A';
 	 end if;     
 	 
@@ -162,7 +168,8 @@ BEGIN
                                 'importe_retgar',
                                 'importe_neto',
                                 'id_auxiliar',
-                                'id_doc_compra_venta'],
+                                'id_doc_compra_venta',
+                                'id_tipo_compra_venta'],
             				ARRAY[	coalesce(v_parametros._nombre_usuario_ai,''),
                                 coalesce(v_parametros._id_usuario_ai::varchar,''),
                                 'si',--'revisado',
@@ -177,7 +184,7 @@ BEGIN
                                 coalesce(v_venta.nroaut,''), --'nro_autorizacion',
                                 (v_venta.total_venta_msuc * v_iva)::varchar,--'importe_iva',
                                 '0',--'importe_descuento',
-                                (v_venta.total_venta_msuc * v_ice)::varchar,--'importe_doc',
+                                (v_venta.total_venta_msuc )::varchar,--'importe_doc',
                                 'no',--'sw_contabilizar',
                                 'vef.tventa',--'tabla_origen',
                                 'validado',--'estado',
@@ -197,7 +204,8 @@ BEGIN
                                 '0',--'importe_retgar',
                                 (v_venta.total_venta_msuc - (v_venta.total_venta_msuc * v_descuento_porc))::varchar,--'importe_neto',--
                                 '',--'id_auxiliar',
-                                coalesce(v_id_doc_compra_venta::varchar,'')--id_doc_compra_venta
+                                coalesce(v_id_doc_compra_venta::varchar,''),--id_doc_compra_venta
+                                v_id_tipo_compra_venta::varchar
                                 ],
                             ARRAY['varchar',
                                 'integer',	
@@ -232,6 +240,7 @@ BEGIN
                                 'numeric',
                                 'numeric',
                                 'numeric',
+                                'integer',
                                 'integer',
                                 'integer']
                             );

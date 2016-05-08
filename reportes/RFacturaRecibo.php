@@ -519,7 +519,7 @@ class RFacturaRecibo
 					$pagina = '';
 				}	
 				$pagina .= '
-				<div id="watermark"></div>
+				
 				<table style="height: 130px;" width="750">
 					<tbody>
 						<tr>
@@ -670,23 +670,30 @@ class RFacturaRecibo
 							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', '') . '</td>
 						</tr>';
 					}
+					if ($datos['estado'] == 'borrador') {
+						$estado = 'BORRADOR';
+					} else if ($datos['estado'] == 'anulado') {
+						$estado = 'ANULADO';
+					} else {
+						$estado = '';
+					}
 					$pagina .= '	
-					</tbody>
+					</tbody> 
 				</table>
 				<table style="border-collapse: collapse;" width="750">
 					<tbody>
 						<tr>
-							<td width="53.5%">&nbsp;</td>
+							<td style="text-align: center;" width="53.5%" rowspan="3"><br><h1><strong>' . $estado . '</strong></h1></td>
 							<td width="32.5%"><strong>VALOR BRUTO/Gross Value  ' . $datos['moneda_venta'] . ':</strong></td>
 							<td style="text-align: right;" width="14%"><strong>' . number_format($valor_bruto, 2, '.', '') . '</strong></td>
 						</tr>
 						<tr>
-							<td>&nbsp;</td>
+							
 							<td>Gastos de Transporte FOB</td>
 							<td style="text-align: right;">' . number_format($datos['transporte_fob'], 2, '.', '') . '</td>
 						</tr>
 						<tr>
-							<td>&nbsp;</td>
+							
 							<td>Gatos de Seguro FOB</td>
 							<td style="text-align: right;">' . number_format($datos['seguros_fob'], 2, '.', '') . '</td>
 						</tr>';
@@ -743,7 +750,9 @@ class RFacturaRecibo
 				</table>				
 				<p style="text-align: center;"><strong>' . $datos['glosa_impuestos'] . '<br>
 				' . $datos['glosa_empresa'] . '</strong></p>';
-				
+				if ($datos['estado'] == 'anulado') {
+					$pagina = str_replace('<h3>&nbsp;<strong>ORIGINAL</strong></h3>', '<h3>&nbsp;<strong>ORIGINAL</strong><br><strong>ANULADO</strong></h3>', $pagina);
+				}
 				$html .= $pagina;
 				if ($datos['estado'] == 'finalizado') {
 					$pagina = str_replace('<h3>&nbsp;<strong>ORIGINAL</strong></h3>', '<h3>&nbsp;<strong>COPIA CONTABILIDAD</strong></h3>', $pagina);
@@ -808,7 +817,18 @@ class RFacturaRecibo
 					</head>';
 				
 					
-				$html .= '<center>
+				$html .= '<center><body>';
+				
+				if ($datos['estado'] == 'borrador') {
+					$pagina = '	<div id="watermark-borrador"></div>';
+				} else if ($datos['estado'] == 'anulado') {
+					$pagina = '	<div id="watermark-anulado"></div>';
+				} else {
+					$pagina = '';
+				}	
+				
+				$pagina .= '
+			
 				<table style="height: 130px;" width="605">
 					<tbody>
 						<tr>
@@ -889,7 +909,7 @@ class RFacturaRecibo
 					$i = 1;
 					foreach ($datos['detalle'] as $item_detalle) {
 						$valor_bruto += $item_detalle['precio_total']; 
-						$html .= '<tr>
+						$pagina .= '<tr>
 							<td style="text-align: right; border-bottom: thin solid black;">'.$i.'</td>							
 							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] . '</td>
 							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', '') . '</td>
@@ -898,13 +918,20 @@ class RFacturaRecibo
 						</tr>';
 						$i++;
 					}
-					$html .= '	
+					if ($datos['estado'] == 'borrador') {
+						$estado = 'BORRADOR';
+					} else if ($datos['estado'] == 'anulado') {
+						$estado = 'ANULADO';
+					} else {
+						$estado = '';
+					}
+					$pagina .= '	
 					</tbody>
 				</table>
 				<table style="border-collapse: collapse;" width="645">
 					<tbody>
 						<tr>
-							<td width="53.5%">&nbsp;</td>
+							<td width="53.5%" style="text-align:center;"><br><h1><strong>' . $estado . '</strong></h1></td>
 							<td width="32.5%"><strong>TOTAL  ' . $datos['moneda_venta'] . ':</strong></td>
 							<td style="text-align: right;" width="14%"><strong>' . number_format($datos['total_venta_msuc'], 2, '.', '') . '</strong></td>
 						</tr>						
@@ -925,7 +952,22 @@ class RFacturaRecibo
 				</table>
 				
 				<p style="text-align: center;"><strong>' . $datos['glosa_impuestos'] . '</strong></p>
-				<p style="text-align: center;"><strong>' . $datos['glosa_empresa'] . '</strong></p>
+				<p style="text-align: center;"><strong>' . $datos['glosa_empresa'] . '</strong></p>';
+				
+				
+				$html .= $pagina;
+				if ($datos['estado'] == 'finalizado') {
+					$pagina = str_replace('<h3>&nbsp;<strong>ORIGINAL</strong></h3>', '<h3>&nbsp;<strong>COPIA CONTABILIDAD</strong></h3>', $pagina);
+					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
+					
+					$pagina = str_replace('<h3>&nbsp;<strong>COPIA CONTABILIDAD</strong></h3>', '<h3>&nbsp;<strong>COPIA TESORERIA</strong></h3>', $pagina);
+					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
+					
+					$pagina = str_replace('<h3>&nbsp;<strong>COPIA TESORERIA</strong></h3>', '<h3>&nbsp;<strong>COPIA ARCHIVO</strong></h3>', $pagina);
+					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
+				}
+
+				$html .= '
 				<script language="VBScript">
 						Sub Print()
 						       OLECMDID_PRINT = 6
@@ -937,13 +979,18 @@ class RFacturaRecibo
 						</script>
 						
 						<script type="text/javascript"> 
-						setTimeout(function(){
-							 self.print();							 
-							}, 1000);
-						
-						/*setTimeout(function(){
-							 self.close();							 
-							}, 2000);*/						
+						';
+						if ($datos['estado'] == 'finalizado') {
+							$html .= '
+									setTimeout(function(){
+										 self.print();							 
+										}, 1000);
+									
+									setTimeout(function(){
+										 self.close();							 
+										}, 2000);';
+						}
+						$html .= '					
 						</script>                                                                                   
                                 </body>
                                 </html>';

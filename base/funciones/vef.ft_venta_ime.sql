@@ -1,13 +1,3 @@
---------------- SQL ---------------
-
-CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS varchar AS
-$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_venta_ime
@@ -955,7 +945,11 @@ BEGIN
             
             --si es factura comercial de exportacion generamos el numero de factura y validamos la fecha
             IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN 
-                    
+                    IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin') THEN
+                    	update vef.tventa v set
+			              excento = total_venta_msuc - ((transporte_cif * tipo_cambio_venta) + (seguros_cif * tipo_cambio_venta) + (otros_cif * tipo_cambio_venta))
+			            where v.id_venta = v_parametros.id_venta;
+                    END IF;
                     -- si es eidicion ya tendremos un numeor de factura que no debemos cambiar
                     IF  v_venta.nro_factura is null THEN
                     
@@ -1009,9 +1003,7 @@ BEGIN
                             set nro_siguiente = nro_siguiente + 1
                            where id_dosificacion = v_dosificacion.id_dosificacion;
 			   			
-                    		if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si') then
-                                v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'INS',v_parametros.id_venta);
-                            end if;	
+                    		
                    
                    ELSE
                           --validar que la actividad economica no varie con respecto la insertada inicialmente que la fecha n   
@@ -1088,7 +1080,9 @@ BEGIN
             
             
             END IF;
-             
+            if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si') then
+                v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'INS',v_parametros.id_venta);
+            end if;	 
              
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada'); 
@@ -1212,10 +1206,10 @@ BEGIN
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
           where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
           
-          select v.*,s.id_entidad,e.nit,tv.tipo_base into v_venta
+          select v.*,s.id_entidad,c.nit,tv.tipo_base into v_venta
           from vef.tventa v
           inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal 
-          inner join param.tentidad e on e.id_entidad = s.id_entidad
+          inner join vef.tcliente c on c.id_cliente = v.id_cliente
           inner join vef.ttipo_venta tv on tv.codigo = v.tipo_factura and tv.estado_reg = 'activo'
           where v.id_proceso_wf = v_parametros.id_proceso_wf_act;
           
@@ -1263,14 +1257,7 @@ BEGIN
                                                              v_tipo_noti,
                                                              v_titulo);
                 
-          /*update vef.tventa  t set 
-             id_estado_wf =  v_id_estado_actual,
-             estado = v_codigo_estado_siguiente,
-             id_usuario_mod=p_id_usuario,
-             fecha_mod=now()                   
-          where id_proceso_wf = v_parametros.id_proceso_wf_act; 
-          */
-          
+                   
           IF  vef.f_fun_inicio_venta_wf(p_id_usuario, 
            									v_parametros._id_usuario_ai, 
                                             v_parametros._nombre_usuario_ai, 
@@ -1355,9 +1342,7 @@ BEGIN
                      into  v_dosificacion 
                      from  vef.tdosificacion d where d.id_dosificacion = v_venta.id_dosificacion;
                      
-                    
-                     
-                       
+                    	                       
                       --la factura de exportacion no altera la fecha 
                       update vef.tventa  set 
                         cod_control = pxp.f_gen_cod_control(v_dosificacion.llave,
@@ -1370,15 +1355,6 @@ BEGIN
                 
                 
                 END IF;
-		
-                
-                
-                
-                
-                
-                   
-                
-                
           end if;  
           
           --inserta o modifical el libro de ventas
@@ -1448,9 +1424,3 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;

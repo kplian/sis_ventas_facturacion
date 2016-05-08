@@ -343,3 +343,14 @@ ALTER TABLE ONLY vef.tsucursal
     ADD CONSTRAINT fk_tsucursal__id_depto
     FOREIGN KEY (id_depto) REFERENCES param.tdepto(id_depto);
 /************************************F-DEP-JRR-VEF-0-02/05/2016*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-08/05/2016*************************************************/
+
+ALTER TABLE ONLY vef.tvalor_descripcion
+    ADD CONSTRAINT fk_tvalor_descripcion__id_venta
+    FOREIGN KEY (id_venta) REFERENCES vef.tventa(id_venta);
+
+ALTER TABLE ONLY vef.tvalor_descripcion
+    ADD CONSTRAINT fk_tvalor_descripcion__id_tipo_descripcion
+    FOREIGN KEY (id_tipo_descripcion) REFERENCES vef.ttipo_descripcion(id_tipo_descripcion);
+/************************************F-DEP-JRR-VEF-0-08/05/2016*************************************************/

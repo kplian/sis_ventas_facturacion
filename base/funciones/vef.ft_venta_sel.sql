@@ -471,8 +471,9 @@ BEGIN
                         ven.seguros_cif,
                         ven.otros_cif,
                         (to_char(ven.fecha,''DD'')::integer || '' de '' ||param.f_literal_periodo(to_char(ven.fecha,''MM'')::integer) || '' de '' || to_char(ven.fecha,''YYYY''))::varchar as fecha_literal,
-			(select count(*) from vef.ttipo_descripcion td where td.estado_reg = ''activo'' and td.id_sucursal = suc.id_sucursal)::integer as descripciones 
-			from vef.tventa ven						
+			(select count(*) from vef.ttipo_descripcion td where td.estado_reg = ''activo'' and td.id_sucursal = suc.id_sucursal)::integer as descripciones, 
+			ven.estado
+            from vef.tventa ven						
 			inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
 			inner join vef.tcliente tc on tc.id_cliente = cli.id_cliente
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
