@@ -75,7 +75,7 @@ VALUES (1,E'computarizada', E'Computarizada', E'VENTA', E'computarizada');
 INSERT INTO vef.ttipo_venta ("id_usuario_reg", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
 VALUES (1,E'manual', E'Manual', E'VENTA', E'manual');
 
-INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+INSERT INTO vef.ttipo_venta ("id_usuario_reg", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
 VALUES (1, E'recibo', E'Recibo', E'VENTA', E'recibo');
 
 
