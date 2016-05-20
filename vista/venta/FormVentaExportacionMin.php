@@ -30,9 +30,11 @@ Phx.vista.FormVentaExportacionMin = {
 	    this.Atributos[this.getIndAtributo('transporte_cif')].form=true; 
 	    this.Atributos[this.getIndAtributo('seguros_cif')].form=true; 
 	    this.Atributos[this.getIndAtributo('otros_cif')].form=true; 
+	    this.Atributos[this.getIndAtributo('otros_cif')].config.fieldLabel = 'Gastos Portuarios';
 	    this.Atributos[this.getIndAtributo('total_cif')].form=true; 	    
 	    this.Atributos[this.getIndAtributo('observaciones')].config.fieldLabel='ICOTERM y Puerto Destino'; 
 	    this.Atributos[this.getIndAtributo('observaciones')].type = 'TextField';
+	    this.Atributos[this.getIndAtributo('descripcion_bulto')].form=true; 
 	    
 	    
 		      
@@ -379,7 +381,7 @@ Phx.vista.FormVentaExportacionMin = {
                                         name: 'cantidad',
                                         msgTarget: 'title',
                                         fieldLabel: 'Cantidad',
-                                        
+                                        decimalPrecision : 6,
                                         allowBlank: false,
                                         allowDecimals: me.cantidadAllowDecimals,
                                         maxLength:10,
@@ -393,7 +395,7 @@ Phx.vista.FormVentaExportacionMin = {
                                         fieldLabel: 'P/U',
                                         allowBlank: false,
                                         allowDecimals: true,
-                                        maxLength:10,
+                                        decimalPrecision : 6,
                                         enableKeyEvents : true
                                 }),
                     
@@ -403,7 +405,6 @@ Phx.vista.FormVentaExportacionMin = {
                                         fieldLabel: 'Total',
                                         allowBlank: false,
                                         allowDecimals: false,
-                                        maxLength:10,
                                         readOnly :true
                                 })
                     
@@ -618,6 +619,7 @@ Phx.vista.FormVentaExportacionMin = {
                     region: 'center',
                     split: true,
                     border: false,
+                    loadMask : true,
                     plain: true,                    
                     plugins: [ this.editorDetail, this.summary],
                     stripeRows: true,

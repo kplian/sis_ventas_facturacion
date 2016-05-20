@@ -29,6 +29,10 @@ class ACTVenta extends ACTbase{
 			$this->objParam->addFiltro(" ven.id_sucursal = ". $this->objParam->getParametro('id_sucursal'));
 		}
 		
+		if ($this->objParam->getParametro('tipo_factura') != '') {
+			$this->objParam->addFiltro(" ven.tipo_factura = ''". $this->objParam->getParametro('tipo_factura')."''");
+		}
+		
 		if ($this->objParam->getParametro('id_punto_venta') != '') {
 			$this->objParam->addFiltro(" ven.id_punto_venta = ". $this->objParam->getParametro('id_punto_venta'));
 		}

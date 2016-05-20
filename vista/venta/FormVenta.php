@@ -60,6 +60,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	                queryDelay: 1000,               
 	                gwidth: 150,
 	                minChars: 2,
+	                disabled:true,
 	                renderer : function(value, p, record) {
 	                    return String.format('{0}', record.data['nombre_punto_venta']);
 	                }
@@ -283,7 +284,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                         fieldLabel: 'Cantidad',
                                         allowBlank: false,
                                         allowDecimals: me.cantidadAllowDecimals,
-                                        maxLength:10,
+                                        decimalPrecision : 6,
                                         enableKeyEvents : true
                                         
                                 }),
@@ -293,7 +294,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                         fieldLabel: 'P/U',
                                         allowBlank: false,
                                         allowDecimals: true,
-                                        maxLength:10,
+                                        decimalPrecision : 6,
                                         enableKeyEvents : true
                                 }),
                     'precio_total': new Ext.form.NumberField({
@@ -470,6 +471,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	    		this.detCmp.descripcion.reset();
 	    	}	
     	}
+    	
+    	console.log('opcion', opcion, this.detCmp.descripcion)
     		
     }, 
     
@@ -655,6 +658,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                     region: 'center',
                     split: true,
                     border: false,
+                    loadMask : true,
                     plain: true,                    
                     plugins: [ this.editorDetail, this.summary],
                     stripeRows: true,
@@ -1293,7 +1297,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	                fieldLabel:'Moneda',
 	                gdisplayField:'desc_moneda',
 	                gwidth:100,
-	                width:250
+				    anchor: '80%'
 	             },
 	            type:'ComboRec',
 	            id_grupo:0,
@@ -1343,13 +1347,28 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 lazyRender: true,
                 mode: 'remote',
                 pageSize: 15,
-                queryDelay: 1000,                
+                queryDelay: 1000, 
+                disabled:true,               
                 minChars: 2
             },
             type: 'ComboBox',
             id_grupo: 1,            
             form: true
-        },  
+        },
+        {
+			config:{
+				name: 'descripcion_bulto',
+				fieldLabel: 'Bultos',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 100
+			},
+				type:'TextArea',
+				filters:{pfiltro:'ven.descripcion_bulto',type:'string'},
+				id_grupo: 1,     
+				grid:true,
+				form:false
+		},  
         {
             config: {
                 name: 'id_forma_pago',

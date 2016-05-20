@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -93,7 +95,9 @@ DECLARE
     v_seguros_cif			numeric;
     v_otros_cif				numeric;
     v_tipo_cambio_venta		numeric;
-    v_es_fin			varchar;	
+    v_es_fin				varchar;
+    v_valor_bruto			numeric;
+    v_descripcion_bulto		varchar;	
     
 			    
 BEGIN
@@ -244,10 +248,9 @@ BEGIN
            raise exception 'No se pudo obtener un numero correlativo para la venta consulte con el administrador';
         END IF;
         
-        
-        
         v_porcentaje_descuento = 0;
-        --verificar si existe porcentaje de descuento
+        
+        --  verificar si existe porcentaje de descuento
         if (pxp.f_existe_parametro(p_tabla,'porcentaje_descuento')) then
             v_porcentaje_descuento = v_parametros.porcentaje_descuento;
         end if;
@@ -359,6 +362,8 @@ BEGIN
             v_transporte_cif = v_parametros.transporte_cif;
             v_seguros_cif = v_parametros.seguros_cif;
             v_otros_cif = v_parametros.otros_cif;
+            v_valor_bruto = v_parametros.valor_bruto;
+            v_descripcion_bulto = v_parametros.descripcion_bulto;
        end if;
        
        if (pxp.f_existe_parametro(p_tabla,'tipo_cambio_venta')) then 
@@ -406,7 +411,9 @@ BEGIN
             transporte_cif,
             seguros_cif,
             otros_cif,
-            tipo_cambio_venta
+            tipo_cambio_venta,
+            valor_bruto,
+            descripcion_bulto
             
             
           	) values(
@@ -446,7 +453,10 @@ BEGIN
             COALESCE(v_transporte_cif,0),
             COALESCE(v_seguros_cif,0),
             COALESCE(v_otros_cif,0),
-            COALESCE(v_tipo_cambio_venta,0)		
+            COALESCE(v_tipo_cambio_venta,0)	,
+            COALESCE(v_valor_bruto,0),
+            v_descripcion_bulto
+            	
 			
 			) returning id_venta into v_id_venta;
 			
@@ -558,6 +568,9 @@ BEGIN
                   v_transporte_cif = v_parametros.transporte_cif;
                   v_seguros_cif = v_parametros.seguros_cif;
                   v_otros_cif = v_parametros.otros_cif;
+                  v_descripcion_bulto = v_parametros.descripcion_bulto;
+                  v_valor_bruto = v_parametros.valor_bruto;
+                  
             end if;
             
              
@@ -675,7 +688,9 @@ BEGIN
               transporte_cif = COALESCE(v_transporte_cif,0),
               seguros_cif = COALESCE(v_seguros_cif,0),
               otros_cif = COALESCE(v_otros_cif,0),
-              tipo_cambio_venta = COALESCE(v_tipo_cambio_venta,1)
+              tipo_cambio_venta = COALESCE(v_tipo_cambio_venta,1),
+              valor_bruto = COALESCE(v_valor_bruto,0),
+              descripcion_bulto = v_descripcion_bulto
             
             
 			where id_venta=v_parametros.id_venta;
@@ -916,12 +931,15 @@ BEGIN
                 where id_venta =   v_parametros.id_venta;
                 
                 
-                v_suma_det = COALESCE(v_suma_det,0) + COALESCE(v_venta.transporte_fob ,0)  + COALESCE(v_venta.seguros_fob ,0)+ COALESCE(v_venta.otros_fob ,0) + COALESCE(v_venta.transporte_cif ,0) +  COALESCE(v_venta.seguros_cif ,0) + COALESCE(v_venta.otros_cif ,0);
-            
                
+                IF v_parametros.tipo_factura != 'computarizadaexpo' THEN
+                   v_suma_det = COALESCE(v_suma_det,0) + COALESCE(v_venta.transporte_fob ,0)  + COALESCE(v_venta.seguros_fob ,0)+ COALESCE(v_venta.otros_fob ,0) + COALESCE(v_venta.transporte_cif ,0) +  COALESCE(v_venta.seguros_cif ,0) + COALESCE(v_venta.otros_cif ,0);
+                END IF;
+             
+             
                 
                 if (v_suma_fp < v_venta.total_venta) then
-                    raise exception 'El importe recibido es menor al valor de la venta';
+                    raise exception 'El importe recibido es menor al valor de la venta, falta %', v_venta.total_venta - v_suma_fp;
                 end if;
                 
                 if (v_suma_fp > v_venta.total_venta) then
@@ -955,7 +973,7 @@ BEGIN
             IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN 
                     IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin') THEN
                     	update vef.tventa v set
-			              excento = total_venta_msuc - ((transporte_cif * tipo_cambio_venta) + (seguros_cif * tipo_cambio_venta) + (otros_cif * tipo_cambio_venta))
+			              excento = total_venta_msuc
 			            where v.id_venta = v_parametros.id_venta;
                     END IF;
                     -- si es eidicion ya tendremos un numeor de factura que no debemos cambiar
@@ -1191,6 +1209,7 @@ BEGIN
 	***********************************/
 
 	elseif(p_transaccion='VEF_SIGEVE_IME')then   
+        
         begin
         	
            /*   PARAMETROS

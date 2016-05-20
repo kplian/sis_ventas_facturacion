@@ -73,6 +73,12 @@ class MODVenta extends MODbase{
 		$this->captura('tipo_cambio_venta','numeric');
 		
 		$this->captura('desc_moneda','varchar');
+		$this->captura('valor_bruto','numeric');
+		$this->captura('descripcion_bulto','varchar');
+		
+		
+		
+		
 		
 			 
 		
@@ -88,7 +94,7 @@ class MODVenta extends MODbase{
 	function getVariablesBasicas(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='vef.ft_venta_sel';
-		$this->transaccion='VF_VENCONF_SEL';
+		$this->transaccion='VF_VENCONFBAS_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion		
 		$this->setCount(false);
 
@@ -217,6 +223,8 @@ class MODVenta extends MODbase{
 			$this->setParametro('transporte_cif','transporte_cif','numeric');
 			$this->setParametro('seguros_cif','seguros_cif','numeric');
 			$this->setParametro('otros_cif','otros_cif','numeric');
+			$this->setParametro('valor_bruto','valor_bruto','numeric');
+			$this->setParametro('descripcion_bulto','descripcion_bulto','varchar');
 			
 			
 			
@@ -284,7 +292,8 @@ class MODVenta extends MODbase{
 				$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
 				$this->setParametro('bruto','bruto','varchar');
 				$this->setParametro('ley','ley','varchar');
-				$this->setParametro('kg_fino','kg_fino','varchar'); 
+				$this->setParametro('kg_fino','kg_fino','varchar');
+				$this->setParametro('tipo_factura','tipo_factura','varchar');  
 				
                 
                 //Ejecuta la instruccion
@@ -326,7 +335,8 @@ class MODVenta extends MODbase{
 					$this->setParametro('numero_tarjeta','numero_tarjeta','varchar'); 
 					$this->setParametro('codigo_tarjeta','codigo_tarjeta','varchar'); 
 					$this->setParametro('tipo_tarjeta','tipo_tarjeta','varchar'); 
-	                $this->setParametro('valor','valor','numeric');                              
+	                $this->setParametro('valor','valor','numeric');
+					$this->setParametro('tipo_factura','tipo_factura','varchar');                                
 	                
 	                //Ejecuta la instruccion
 	                $this->armarConsulta();
@@ -348,6 +358,7 @@ class MODVenta extends MODbase{
 			$this->procedimiento = 'vef.ft_venta_ime';
 			$this->transaccion = 'VF_VENVALI_MOD';
 			$this->setParametro('id_venta','id_venta','int4');
+			$this->setParametro('tipo_factura','tipo_factura','varchar'); 
 			//Ejecuta la instruccion
             $this->armarConsulta();
             $stmt = $link->prepare($this->consulta);          
@@ -494,7 +505,7 @@ class MODVenta extends MODbase{
 	function listarNotaVentaDet(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='vef.ft_venta_sel';
-		$this->transaccion='VF_NOTAVEND_SEL';
+		$this->transaccion='VF_NOTAVENDV_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		
 		
@@ -533,7 +544,7 @@ class MODVenta extends MODbase{
     function listarNotaVenta(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='vef.ft_venta_sel';
-		$this->transaccion='VF_NOTVEN_SEL';
+		$this->transaccion='VF_NOTVENV_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		$this->setCount(false);
 		$this->setParametro('id_venta','id_venta','int4');
@@ -638,6 +649,9 @@ class MODVenta extends MODbase{
 		$this->captura('cantidad_descripciones','integer');
 		$this->captura('estado','varchar');
 		
+		$this->captura('valor_bruto','numeric');
+		$this->captura('descripcion_bulto','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -668,6 +682,7 @@ class MODVenta extends MODbase{
 		$this->captura('bruto','varchar');	
 		$this->captura('ley','varchar');	
 		$this->captura('kg_fino','varchar');	
+		$this->captura('descripcion','text');	
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

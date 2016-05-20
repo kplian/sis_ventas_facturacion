@@ -20,11 +20,9 @@ class ACTSucursal extends ACTbase{
         
         
         if($this->objParam->getParametro('filtro_usuario') != '') {
-                $this->objParam->addFiltro(" (1 in (select id_rol 
-                                                from segu.tusuario_rol ur 
-                                                where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " )) or (
+                $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
                                                 " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
-                                                vef.tsucursal_usuario sucusu where suc.id_sucursal = sucusu.id_sucursal)) ");
+                                                vef.tsucursal_usuario sucusu where suc.id_sucursal = sucusu.id_sucursal))) ");
         }
         
         if($this->objParam->getParametro('id_entidad') != '') {

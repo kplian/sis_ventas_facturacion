@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -81,7 +79,8 @@ BEGIN
                         lug.nombre as nombre_lugar,
                         array_to_string(suc.tipo_interfaz,'','') as tipo_interfaz,
                         dep.id_depto,
-                        dep.nombre	as nombre_depto			
+                        dep.nombre	as nombre_depto	,
+                        suc.nombre_comprobante		
                         from vef.tsucursal suc
 						inner join segu.tusuario usu1 on usu1.id_usuario = suc.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = suc.id_usuario_mod

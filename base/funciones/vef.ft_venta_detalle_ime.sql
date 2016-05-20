@@ -12,7 +12,7 @@ $body$
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_venta_detalle_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'vef.tventa_detalle'
- AUTOR: 		 (admin)
+ AUTOR: 		(admin)
  FECHA:	        01-06-2015 09:21:07
  COMENTARIOS:	
 ***************************************************************************
@@ -27,6 +27,7 @@ DECLARE
 
 	v_nro_requerimiento    		integer;
 	v_parametros           		record;
+    v_tmp						record;
 	v_id_requerimiento     		integer;
 	v_resp		            	varchar;
 	v_nombre_funcion        	text;
@@ -75,12 +76,13 @@ BEGIN
         		v_id_formula = v_parametros.id_producto;        	
         	elsif (v_parametros.tipo = 'servicio' or 
         		(v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'false'))then
-        		        		
         		v_id_sucursal_producto = v_parametros.id_producto;
         	else        		
         		v_id_item =  v_parametros.id_producto;       	
         	end if;
+            
             v_porcentaje_descuento = 0;
+            
             --verificar si existe porcentaje de descuento
             if (pxp.f_existe_parametro(p_tabla,'porcentaje_descuento')) then
         		v_porcentaje_descuento = v_parametros.porcentaje_descuento;
@@ -120,63 +122,55 @@ BEGIN
                v_kg_fino = v_parametros.kg_fino;
             end if;
             
-            if (pxp.f_existe_parametro(p_tabla,'id_unidad_medida')) then
-            
+            if (pxp.f_existe_parametro(p_tabla,'id_unidad_medida')) then            
                v_id_unidad_medida = v_parametros.id_unidad_medida;
             end if;
             
-            
-           
-            
-           
-        	--Sentencia de la insercion
+            --Sentencia de la insercion
         	insert into vef.tventa_detalle(
-			id_venta,
-			id_item,
-			id_sucursal_producto,
-			id_formula,
-			tipo,
-			estado_reg,
-			cantidad,
-			precio,
-			fecha_reg,
-			id_usuario_reg,
-			id_usuario_mod,
-			fecha_mod,
-            precio_sin_descuento,
-            porcentaje_descuento,
-            id_vendedor,
-            id_medico,
-            descripcion,
-            bruto,
-            ley,
-            kg_fino,
-            id_unidad_medida
+                id_venta,
+                id_item,
+                id_sucursal_producto,
+                id_formula,
+                tipo,
+                estado_reg,
+                cantidad,
+                precio,
+                fecha_reg,
+                id_usuario_reg,
+                id_usuario_mod,
+                fecha_mod,
+                precio_sin_descuento,
+                porcentaje_descuento,
+                id_vendedor,
+                id_medico,
+                descripcion,
+                bruto,
+                ley,
+                kg_fino,
+            	id_unidad_medida
           	) values(
-			v_parametros.id_venta,
-			v_id_item,
-			v_id_sucursal_producto,
-			v_id_formula,
-			v_parametros.tipo,
-			'activo',
-			v_parametros.cantidad_det,
-			round(v_parametros.precio - (v_parametros.precio * v_porcentaje_descuento / 100),2),
-			now(),
-			p_id_usuario,
-			null,
-			null,
-            v_parametros.precio,
-            v_porcentaje_descuento,
-            v_id_vendedor,
-            v_id_medico,
-            v_descripcion,
-            v_bruto,
-            v_ley,
-            v_kg_fino,
-            v_id_unidad_medida
-							
-			
-			
+                v_parametros.id_venta,
+                v_id_item,
+                v_id_sucursal_producto,
+                v_id_formula,
+                v_parametros.tipo,
+                'activo',
+                v_parametros.cantidad_det,
+                round(v_parametros.precio - (v_parametros.precio * v_porcentaje_descuento / 100),6),
+                now(),
+                p_id_usuario,
+                null,
+                null,
+                v_parametros.precio,
+                v_porcentaje_descuento,
+                v_id_vendedor,
+                v_id_medico,
+                v_descripcion,
+                v_bruto,
+                v_ley,
+                v_kg_fino,
+                v_id_unidad_medida
 			)RETURNING id_venta_detalle into v_id_venta_detalle;
 			
             
@@ -190,11 +184,18 @@ BEGIN
             where v.id_venta = v_parametros.id_venta;
             
             
-            v_total = COALESCE(v_registros.transporte_fob ,0)  + COALESCE(v_registros.seguros_fob ,0)+ COALESCE(v_registros.otros_fob ,0) + COALESCE(v_registros.transporte_cif ,0) +  COALESCE(v_registros.seguros_cif ,0) + COALESCE(v_registros.otros_cif ,0);
+            select precio, cantidad into  v_tmp 
+            from vef.tventa_detalle 
+            where id_venta = v_parametros.id_venta;
             
-           
+            IF v_parametros.tipo_factura != 'computarizadaexpo' THEN
+               v_total = COALESCE(v_registros.transporte_fob ,0)  + COALESCE(v_registros.seguros_fob ,0)+ COALESCE(v_registros.otros_fob ,0) + COALESCE(v_registros.transporte_cif ,0) +  COALESCE(v_registros.seguros_cif ,0) + COALESCE(v_registros.otros_cif ,0);
+            ELSE
+                v_total = 0; --en la factura comun de exportacion el detalle ya incluye los precios fob y cif
+            END IF;
+            
             update vef.tventa
-            set total_venta = round((select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta) + v_total,2)
+             set total_venta = round((select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta) + v_total,2)
             where id_venta = v_parametros.id_venta;
 			
             --Definicion de la respuesta

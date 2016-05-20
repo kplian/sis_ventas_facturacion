@@ -26,7 +26,7 @@ div#watermark-borrador {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background: url('http://excel.facilparami.com/ejemplos/borrador.jpg') center center no-repeat;
+    background: url('../../../sis_ventas_facturacion/reportes/borrador.jpg') center center no-repeat;
     pointer-events: none;
 }
 
@@ -35,7 +35,7 @@ div#watermark-anulado {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background: url('http://excel.facilparami.com/ejemplos/borrador.jpg') center center no-repeat;
+    background: url('../../../sis_ventas_facturacion/reportes/anulado.jpg') center center no-repeat;
     pointer-events: none;
 }
 

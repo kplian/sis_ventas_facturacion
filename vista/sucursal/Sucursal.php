@@ -174,6 +174,23 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:true
         },
+        
+        {
+            config:{
+                name: 'nombre_comprobante',
+                fieldLabel: 'Nombre en Comprobante',
+                qtip:'El nombre de la sucursal tal como se mostrara en el comprobante de venta. Debe incluir el nombre de la empresa',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 230,
+                maxLength:200
+            },
+                type:'TextField',
+                filters:{pfiltro:'suc.nombre_comprobante',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:true
+        },
         {
    			config:{
    				name:'id_depto',
@@ -675,6 +692,7 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 		{name:'correo', type: 'string'},
 		{name:'nombre_depto', type: 'string'},
 		{name:'nombre', type: 'string'},
+		{name:'nombre_comprobante', type: 'string'},
 		{name:'nombre_lugar', type: 'string'},
 		{name:'telefono', type: 'string'},
 		{name:'direccion', type: 'string'},

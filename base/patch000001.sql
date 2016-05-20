@@ -706,3 +706,55 @@ ALTER TABLE vef.tsucursal
 /************************************F-SCP-RAC-VEF-0-29/04/2016*************************************************/ç
 
 
+
+
+/************************************I-SCP-RAC-VEF-0-12/05/2016*************************************************/ç
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN precio TYPE NUMERIC(18,6);
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN precio_sin_descuento TYPE NUMERIC(18,6);
+  
+  
+
+/************************************F-SCP-RAC-VEF-0-12/05/2016*************************************************/ç
+
+/************************************I-SCP-JRR-VEF-0-12/05/2016*************************************************/ç
+
+ALTER TABLE vef.tsucursal
+  ADD COLUMN nombre_comprobante VARCHAR ;
+  
+COMMENT ON COLUMN vef.tsucursal.nombre_comprobante
+IS 'El nombre de la sucursal tal como se mostrara en el comprobante de venta. Debe incluir el nombre de la empresa';
+
+/************************************F-SCP-JRR-VEF-0-12/05/2016*************************************************/ç
+
+
+
+/************************************I-SCP-RAC-VEF-0-16/05/2016*************************************************/ç
+
+
+ALTER TABLE vef.tventa
+  ADD COLUMN valor_bruto NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.valor_bruto
+IS 'valor de los materiales';
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN descripcion_bulto VARCHAR(1000) DEFAULT '' NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.descripcion_bulto
+IS 'descripon de bultos en exportacion';
+
+
+/************************************F-SCP-RAC-VEF-0-16/05/2016*************************************************/ç
+
+
+

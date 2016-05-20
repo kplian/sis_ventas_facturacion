@@ -142,6 +142,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                    	this.variables_globales.formato_comprobante = r[0].data.formato_comprobante;
 	                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
 	                    }
+	                    this.store.baseParams.tipo_factura = this.tipo_factura;
 	                    this.load({params:{start:0, limit:this.tam_pag}});  	                    
 	                } else {
 	                	
@@ -198,7 +199,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 							                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
 							                    }
 							                    
-							                    
+							                    this.store.baseParams.tipo_factura = this.tipo_factura;
 							                    this.load({params:{start:0, limit:this.tam_pag}});
 						                	}
 						                },
@@ -607,7 +608,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'excento', type: 'numeric'},
 		{name:'nroaut', type: 'numeric'},
 		'id_moneda','total_venta_msuc','transporte_fob','seguros_fob',
-		'otros_fob','transporte_cif','seguros_cif','otros_cif','tipo_cambio_venta','desc_moneda'
+		'otros_fob','transporte_cif','seguros_cif','otros_cif','tipo_cambio_venta','desc_moneda','valor_bruto','descripcion_bulto'
 		
 		
 	],
