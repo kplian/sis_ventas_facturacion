@@ -17,6 +17,11 @@ class ACTVenta extends ACTbase{
         if ($this->objParam->getParametro('pes_estado') != '') {
             if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
                 $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
+            }elseif ($this->objParam->getParametro('pes_estado') == 'finalizado') {
+                $this->objParam->addFiltro(" ven.estado in( ''finalizado'', ''anulado'') ");
+				if ($this->objParam->getParametro('interfaz') == 'vendedor') {
+					$this->objParam->addFiltro(" ven.fecha_reg::date = now()::date");
+				}
             } else {
                 if ($this->objParam->getParametro('historico') != 'si') {
                     $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
@@ -31,10 +36,6 @@ class ACTVenta extends ACTbase{
 		
 		if ($this->objParam->getParametro('id_punto_venta') != '') {
 			$this->objParam->addFiltro(" ven.id_punto_venta = ". $this->objParam->getParametro('id_punto_venta'));
-		}
-		
-		if ($this->objParam->getParametro('fecha') != '') {
-			$this->objParam->addFiltro(" ven.fecha_reg::date = ''". $this->objParam->getParametro('fecha')."''");
 		}
 		
 		 

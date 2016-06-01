@@ -43,6 +43,8 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('requiere_descripcion','varchar');
 		$this->captura('id_moneda','integer');
 		$this->captura('desc_moneda','varchar');
+		$this->captura('contabilizable','varchar');
+		$this->captura('excento','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -70,6 +72,8 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('precio','numeric');			
 		$this->captura('medico','varchar');
 		$this->captura('requiere_descripcion','varchar');
+		$this->captura('contabilizable','varchar');
+		$this->captura('excento','varchar');
 		
 		
 		//Ejecuta la instruccion
@@ -121,6 +125,8 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 		$this->setParametro('id_moneda','id_moneda','integer');
+		$this->setParametro('contabilizable','contabilizable','varchar');
+		$this->setParametro('excento','excento','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -148,6 +154,8 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 		$this->setParametro('id_moneda','id_moneda','integer');
+		$this->setParametro('contabilizable','contabilizable','varchar');
+		$this->setParametro('excento','excento','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

@@ -410,15 +410,34 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             this.cambiarCombo(r.data.field1);
         },this);  
         
-          
-        
         this.Cmp.id_cliente.on('select',function(c,r,i) {
             if (r.data) {
                 this.Cmp.nit.setValue(r.data.nit);
             } else {
                 this.Cmp.nit.setValue(r.nit);
             }            
+        },this);  
+        
+        this.Cmp.nit.on('focus',function(c) {
+        	this.Cmp.id_cliente.reset();
         },this);      
+        
+        this.Cmp.nit.on('blur',function(c) {
+        	
+        	if (this.Cmp.nit.getValue() != '') {        		
+        		this.Cmp.id_cliente.store.baseParams.nit = this.Cmp.nit.getValue();
+            	this.Cmp.id_cliente.store.load({params:{start:0,limit:this.tam_pag}, 
+		           callback : function (r) {
+		           		this.Cmp.id_cliente.store.baseParams.nit = '';
+		           		if (r.length == 1) {
+		           			this.Cmp.id_cliente.setValue(r[0].data.id_cliente);
+		           			//this.Cmp.id_cliente.fireEvent('select',this.Cmp.id_cliente, this.Cmp.id_cliente.store.getById(r[0].data.id_cliente));
+		           		}          	                   
+		                                
+		            }, scope : this
+		        });
+		    }        
+        },this);          
         
         
         this.detCmp.id_producto.on('select',function(c,r,i) {
@@ -1189,6 +1208,18 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             form:true 
         },
         {
+            config:{
+                name: 'nit',
+                fieldLabel: 'NIT',
+                allowBlank: false,
+                anchor: '80%',                
+                maxLength:20
+            },
+                type:'TextField',                
+                id_grupo:0,                
+                form:true
+        }, 
+        {
             config : {
                 name : 'id_cliente',
                 fieldLabel : 'Cliente',
@@ -1235,19 +1266,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             id_grupo : 0,            
             form : true
         },
-        {
-            config:{
-                name: 'nit',
-                fieldLabel: 'NIT',
-                allowBlank: false,
-                anchor: '80%',                
-                maxLength:20
-            },
-                type:'TextField',                
-                id_grupo:0,                
-                form:true,
-                valorInicial:'0'
-        }, 
+        
         
         {
 			config:{

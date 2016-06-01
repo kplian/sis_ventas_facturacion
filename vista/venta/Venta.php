@@ -289,10 +289,19 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'correlativo_venta',
                 fieldLabel: 'Nro',              
-                gwidth: 110
+                gwidth: 110,
+                renderer: function(value,c,r){  
+                	
+                	if (r.data.estado == 'anulado') {
+                		return String.format('{0}', '<p><font color="red">' + value + '</font></p>');
+                	} else {
+                		return value;
+                	}  
+                    
+                }
             },
                 type:'TextField',
-                filters:{pfiltro:'ven.correlativo_venta',type:'string'},              
+                filters:{pfiltro:'ven.correlativo_venta',type:'string'},                            
                 grid:true,
                 form:false,
                 bottom_filter: true

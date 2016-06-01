@@ -211,7 +211,7 @@ CREATE TABLE vef.tdosificacion (
   fecha_dosificacion DATE NOT NULL,  
   fecha_inicio_emi DATE,
   fecha_limite DATE,  
-  id_actividad_economica INTEGER[] NOT NULL,
+  id_activida_economica INTEGER[] NOT NULL,
   glosa_impuestos VARCHAR(150),  
   glosa_empresa VARCHAR(150),  
   nro_siguiente INTEGER,
@@ -458,3 +458,22 @@ CREATE TABLE vef.tproceso_venta (
 ) INHERITS (pxp.tbase);
   
 /************************************F-SCP-JRR-VEF-0-22/03/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-29/03/2016*************************************************/
+
+ALTER TABLE vef.tsucursal_producto
+  ADD COLUMN contabilizable VARCHAR(2) DEFAULT 'no' NOT NULL;
+  
+ALTER TABLE vef.tsucursal_producto
+  ADD COLUMN excento VARCHAR(2) DEFAULT 'no' NOT NULL;
+  
+CREATE TABLE vef.tventa_boleto (
+  id_venta_boleto SERIAL,
+  id_venta INTEGER NOT NULL,
+  id_boleto INTEGER,
+  nro_boleto VARCHAR(20) NOT NULL,
+  monto_moneda_susursal NUMERIC(18,2),  
+  CONSTRAINT pk_tventa_boleto PRIMARY KEY(id_venta_boleto)
+) INHERITS (pxp.tbase);
+  
+/************************************F-SCP-JRR-VEF-0-29/03/2016*************************************************/

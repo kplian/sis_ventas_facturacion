@@ -214,13 +214,25 @@ class RFacturaRecibo
 					$html.='<tr><td colspan="4"></td></tr>';
 					$html.='</tbody>
 					    <tfoot>
-					    
 					    <tr>
 					    	<td colspan="2" align="left"><b>Total General</b> <hr/></td>
 					    	<td colspan="2" align="right"> <b>' .$datos['moneda_sucursal'].' '.number_format($datos['total_venta'], 2, '.', ',').'</b><hr/></td>
-					    </tr>
-					    <tr>
+					    </tr>';
+						
+					if ($datos['total_venta'] > $datos['sujeto_credito']) {
+						$html .= '<tr>
+					    	<td colspan="2" align="left"><b>Sujeto a credito fiscal</b> <hr/></td>
+					    	<td colspan="2" align="right"> <b>' .$datos['moneda_sucursal'].' '.number_format($datos['sujeto_credito'], 2, '.', ',').'</b><hr/></td>
+					    </tr>';
+					}
+					
+					    
+					    
+					$html .=' <tr>
 						    <td colspan="4">Son: '.$datos['total_venta_literal']. ' '.$datos['moneda_sucursal'].' </td>						    
+						</tr>
+						<tr>
+						    <td colspan="4">OBS: '.$datos['observaciones'].' </td>						    
 						</tr>
 						<tr>
 						    <td colspan="4"><b>Código de control: '.$datos['codigo_control'].'</b></td>

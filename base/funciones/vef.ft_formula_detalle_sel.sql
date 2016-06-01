@@ -240,7 +240,8 @@ BEGIN
                                       param.f_convertir_moneda(spc.id_moneda,' || v_sucursal.id_moneda || ',spc.precio,now()::date,''O'',2,NULL,''si'')
                                   end) * (100 - ' || v_porcentaje_descuento || ')/100)::numeric as precio_total,
                                   ''' || v_id_vendedor_medico || '''::varchar as id_vendedor_medico,
-                                  ''' || v_nombre_vendedor_medico || '''::varchar as nombre_vendedor_medico
+                                  ''' || v_nombre_vendedor_medico || '''::varchar as nombre_vendedor_medico,
+                                  spc.contabilizable, spc.excento
 								from vef.tformula form
 								left join vef.vmedico med on med.id_medico = form.id_medico
 								inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula

@@ -21,6 +21,8 @@ class MODVenta extends MODbase{
 		
 
 		$this->setParametro('historico','historico','varchar');
+		$this->setParametro('id_sucursal','id_sucursal','integer');
+		$this->setParametro('id_punto_venta','id_punto_venta','integer');
 
 		//Definicion de la lista del resultado del query
 		$this->captura('id_venta','int4');
@@ -562,7 +564,8 @@ class MODVenta extends MODbase{
 		$this->captura('fecha_venta','varchar');
 		$this->captura('nro_venta','varchar');
 		$this->captura('moneda_sucursal','varchar');
-		$this->captura('total_venta','numeric');		
+		$this->captura('total_venta','numeric');
+		$this->captura('sujeto_credito','numeric');		
 		$this->captura('total_venta_literal','varchar');
 		$this->captura('observaciones','text');	
 		$this->captura('cliente','varchar');	

@@ -176,7 +176,7 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+			raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -422,7 +422,8 @@ BEGIN
                         to_char(ven.fecha,''DD/MM/YYYY'')::varchar,
                         ven.correlativo_venta,
                         mon.codigo_internacional as moneda,
-                        ven.total_venta,                                              
+                        ven.total_venta,    
+                        ven.total_venta - coalesce(ven.excento,0),                                              
                         pxp.f_convertir_num_a_letra(ven.total_venta) as total_venta_literal,
                         ven.observaciones,
                         cli.nombre_factura,

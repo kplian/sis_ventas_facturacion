@@ -78,7 +78,8 @@ DECLARE
     v_id_actividad_economica	integer[];
     v_dosificacion			record;
     v_tipo_base			varchar;
-    
+    v_cantidad			integer;
+    v_tipo_usuario		varchar;
 			    
 BEGIN
 
@@ -685,6 +686,41 @@ BEGIN
 			inner join param.tmoneda m on m.id_moneda = sm.id_moneda
 			where id_venta = v_parametros.id_venta;
 			
+			--Validar que solo haya conceptos contabilizables o no contabilizables
+			select count(distinct sp.contabilizable) into v_cantidad
+			from vef.tventa_detalle vd
+			left join vef.tsucursal_producto sp on sp.id_sucursal_producto = vd.id_sucursal_producto
+			where vd.id_venta = v_parametros.id_venta;
+			
+			
+			if (v_cantidad > 1) then
+				raise exception 'No puede utilizar conceptos contabilizables y no contabilizables en la misma venta';
+			end if;
+			
+			
+			select count(*) into v_cantidad
+			from vef.tventa_detalle vd			
+			left join vef.tsucursal_producto sp on sp.id_sucursal_producto = vd.id_sucursal_producto
+			where vd.id_venta = v_parametros.id_venta and sp.excento= 'si';
+			
+			
+			
+			--Validar que si hay un concepto con excento el importe excento no sea 0
+			if (v_cantidad > 0 and v_venta.excento = 0) then
+				raise exception 'Tiene un concepto que requiere un importe excento y el importe excento para esta venta es 0';
+			end if;
+			
+			--Validar que si el excento no es 0 que haya un concepto que tenga excento
+			if (v_cantidad = 0 and v_venta.excento > 0) then
+				raise exception 'No tiene ningun concepto que requiera excento. El excento no puede ser mayor a 0 para esta venta';
+			end if;
+			
+			--Validar que el excento no es mayor que el valor total de la venta
+			
+			if (v_venta.excento >= v_venta.total_venta) then
+				raise exception 'El importe excento no puede ser mayor o igual al total de la venta';
+			end if;
+			
             --si es un estado para validar la forma de pago
             if (v_venta.estado =ANY(string_to_array(vef_estados_validar_fp,',')))then
             	
@@ -1034,6 +1070,29 @@ BEGIN
 	elsif(p_transaccion='VF_VENANU_MOD')then
 
 		begin
+        
+        --obtener el tipo de usuario, la fecha de venta, etc
+        
+        select id_venta,fecha,id_sucursal,id_punto_venta into v_venta
+        from vef.tventa v
+        where v.id_venta = v_parametros.id_venta;
+        
+        v_tipo_usuario = 'vendedor';
+        
+        if (v_venta.id_punto_venta is null) then 
+            select  su.tipo_usuario into v_tipo_usuario
+            from vef.tsucursal_usuario su
+            where id_sucursal = v_venta.id_sucursal;
+        else
+        	select  su.tipo_usuario into v_tipo_usuario
+            from vef.tsucursal_usuario su
+            where su.id_punto_venta = v_venta.id_punto_venta;
+        end if;
+        
+        if ((v_tipo_usuario = 'vendedor' and v_venta.fecha != now()::date) or p_administrador != 1) then
+        	raise exception 'La venta solo puede ser anulada el mismo dia o por un administrador';
+        end if;
+        
           
          
           --obtenemos datos basicos
@@ -1062,7 +1121,7 @@ BEGIN
                
               
              IF v_id_tipo_estado is NULL  THEN             
-                raise exception 'No se parametrizo es estado "anulado" para la venta';
+                raise exception 'No se parametrizo el estado "anulado" para la venta';
              END IF;
              
              select f.id_funcionario into  v_id_funcionario_inicio

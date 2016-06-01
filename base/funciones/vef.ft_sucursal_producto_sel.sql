@@ -73,7 +73,9 @@ BEGIN
                         acteco.nombre as nombre_actividad,
                         sprod.requiere_descripcion,
                         sprod.id_moneda,
-                        mon.codigo_internacional as desc_moneda	
+                        mon.codigo_internacional as desc_moneda,
+                        sprod.contabilizable,
+                        sprod.excento	
 						from vef.tsucursal_producto sprod
 						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						
 						left join segu.tusuario usu2 on usu2.id_usuario = sprod.id_usuario_mod
@@ -161,7 +163,7 @@ BEGIN
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
 											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,
                                             param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
-                                            ''''::varchar as medico,
+                                            ''''::varchar as medico,''''::varchar as contabilizable,''''::varchar as excento
                                             sp.requiere_descripcion
 									from alm.titem it 
 									inner join vef.tsucursal_producto sp on sp.id_item = it.id_item
@@ -172,7 +174,7 @@ BEGIN
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
 											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,it.precio_ref as precio,''''::varchar as medico,
-                                             ''''::varchar as requiere_descripcion
+                                             ''''::varchar as requiere_descripcion,''''::varchar as contabilizable,''''::varchar as excento
 									from alm.titem it 									
 									where it.estado_reg = ''activo'' and
 									(select s.clasificaciones_para_venta 
@@ -199,7 +201,7 @@ BEGIN
 											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,
 											param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
 											''''::varchar as medico,
-                                            sp.requiere_descripcion
+                                            sp.requiere_descripcion,sp.contabilizable,sp.excento
 									from vef.tsucursal_producto sp
 									' || v_join || '
 									inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sp.id_concepto_ingas
@@ -231,7 +233,7 @@ BEGIN
                                                             	sp.precio
                                                             end))::numeric as precio,
                                         med.nombre_completo::varchar as medico,
-                                        ''''::varchar as requiere_descripcion
+                                        ''''::varchar as requiere_descripcion,''''::varchar as contabilizable,''''::varchar as excento
 								from vef.tformula form
 								left join vef.vmedico med on med.id_medico = form.id_medico
 								inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula
@@ -246,7 +248,7 @@ BEGIN
 			
 			end if;
 			v_consulta = v_consulta ||	' 	select todo.id_producto,todo.tipo,todo.nombre,
-													todo.descripcion,todo.precio,todo.medico,todo.requiere_descripcion
+													todo.descripcion,todo.precio,todo.medico,todo.requiere_descripcion,todo.contabilizable,todo.excento
 											from tabla_temporal todo
 											where ';
 			
