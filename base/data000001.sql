@@ -52,31 +52,64 @@ select pxp.f_insert_testructura_gui ('VFVENTA', 'VENCARP');
 
 
 /***********************************I-DAT-JRR-VEF-0-06/10/2015*****************************************/
-INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "descripcion")
-VALUES (43, E'vef_estados_validar_fp', E'borrador', E'variable global para definir los estados en los q se valida la forma de pago');
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES ( E'vef_estados_validar_fp', E'borrador', E'variable global para definir los estados en los q se valida la forma de pago');
 
-INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "descripcion")
-VALUES (44, E'vef_integracion_almacenes', E'false', E'variable global para definir si el sistema de ventas se integrara con el de almacenes para obtener listadod e items');
+INSERT INTO pxp.variable_global ( "variable", "valor", "descripcion")
+VALUES ( E'vef_integracion_almacenes', E'false', E'variable global para definir si el sistema de ventas se integrara con el de almacenes para obtener listadod e items');
 
-INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "descripcion")
-VALUES (41, E'vef_tiene_punto_venta', E'false', E'variable global para definir si las ventas se manejaran a nivel sucursal o a nivel punto de venta');
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES ( E'vef_tiene_punto_venta', E'false', E'variable global para definir si las ventas se manejaran a nivel sucursal o a nivel punto de venta');
 
-INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "descripcion")
-VALUES (42, E'vef_tipo_venta_habilitado', E'servicio', E'variable global para definir que tipos de venta estaran habilitados');
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_tipo_venta_habilitado', E'servicio', E'variable global para definir que tipos de venta estaran habilitados');
 
 /***********************************F-DAT-JRR-VEF-0-06/10/2015*****************************************/
 
 
 /***********************************I-DAT-JRR-VEF-0-28/03/2016*****************************************/
 
-INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
-VALUES (83, NULL, E'2016-03-22 16:34:15.546', NULL, E'activo', NULL, E'NULL', 1, E'computarizada', E'Computarizada', E'VENTA', E'computarizada');
+INSERT INTO vef.ttipo_venta ("id_usuario_reg",  "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (1,E'computarizada', E'Computarizada', E'VENTA', E'computarizada');
 
-INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
-VALUES (83, NULL, E'2016-03-22 16:34:48.414', NULL, E'activo', NULL, E'NULL', 2, E'manual', E'Manual', E'VENTA', E'manual');
+INSERT INTO vef.ttipo_venta ("id_usuario_reg", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (1,E'manual', E'Manual', E'VENTA', E'manual');
 
-INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
-VALUES (83, NULL, E'2016-03-22 16:35:03.413', NULL, E'activo', NULL, E'NULL', 3, E'recibo', E'Recibo', E'VENTA', E'recibo');
+INSERT INTO vef.ttipo_venta ("id_usuario_reg", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (1, E'recibo', E'Recibo', E'VENTA', E'recibo');
 
 
 /***********************************F-DAT-JRR-VEF-0-28/03/2016*****************************************/
+
+/***********************************I-DAT-JRR-VEF-0-30/04/2016*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_integracion_lcv', E'si', E'Si el sistema de ventas se integra con el libro de compras y ventas de contabilidad');
+
+
+/***********************************F-DAT-JRR-VEF-0-30/04/2016*****************************************/
+
+
+/***********************************I-DAT-RAC-VEF-0-05/05/2016*****************************************/
+
+
+----------------------------------
+--COPY LINES TO data.sql FILE  
+---------------------------------
+
+select pxp.f_insert_tgui ('Venta Computarizada Exportación', 'Factura de Exportación', 'VEFACEX', 'si', 5, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacion.php', 3, '', 'VentaVendedorExportacion', 'VEF');
+select pxp.f_insert_tgui ('Exportación Minera', 'Factura de exportación para mineria', 'EXPOMIN', 'si', 7, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacionMin.php', 3, '', 'VentaVendedorExportacionMin', 'VEF');
+select pxp.f_insert_tgui ('Computarizada minera', 'Computarizada minera', 'COMMIN', 'si', 8, 'sis_ventas_facturacion/vista/venta/VentaVendedorMin.php', 3, '', 'VentaVendedorMin', 'VEF');
+----------------------------------
+--COPY LINES TO dependencies.sql FILE  
+---------------------------------
+
+select pxp.f_insert_testructura_gui ('VEFACEX', 'VENCARP');
+select pxp.f_insert_testructura_gui ('EXPOMIN', 'VENCARP');
+select pxp.f_insert_testructura_gui ('COMMIN', 'VENCARP');
+
+/***********************************F-DAT-RAC-VEF-0-05/05/2016*****************************************/
+
+
+
+

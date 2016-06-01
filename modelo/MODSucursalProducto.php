@@ -44,8 +44,8 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('id_moneda','integer');
 		$this->captura('desc_moneda','varchar');
 		
-		$this->captura('id_unidad_medida','INTEGER');
-		$this->captura('desc_unidad_medida','VARCHAR');
+		$this->captura('id_unidad_medida','integer');
+		$this->captura('desc_unidad_medida','varchar');
 		$this->captura('nandina','VARCHAR');
 		
 		
@@ -67,6 +67,9 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('id_sucursal','id_sucursal','int4');
 		$this->setParametro('id_punto_venta','id_punto_venta','int4');
+		
+		$this->setParametro('tipo_cambio_venta','tipo_cambio_venta','numeric');
+		$this->setParametro('id_moneda','id_moneda','int4');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_producto','integer');
@@ -76,6 +79,8 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('precio','numeric');			
 		$this->captura('medico','varchar');
 		$this->captura('requiere_descripcion','varchar');
+		$this->captura('id_unidad_medida','integer');
+		$this->captura('codigo_unidad_medida','varchar');
 		
 		
 		//Ejecuta la instruccion

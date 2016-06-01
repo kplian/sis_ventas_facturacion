@@ -61,7 +61,26 @@ class MODVenta extends MODbase{
 		$this->captura('fecha','date');
 		$this->captura('nro_factura','integer');
 		$this->captura('excento','numeric');
-		$this->captura('cod_control','varchar');		 
+		$this->captura('cod_control','varchar');		
+		$this->captura('id_moneda','integer');
+        $this->captura('total_venta_msuc','numeric');
+        $this->captura('transporte_fob','numeric');
+        $this->captura('seguros_fob','numeric');
+        $this->captura('otros_fob','numeric');
+        $this->captura('transporte_cif','numeric');
+        $this->captura('seguros_cif','numeric');
+        $this->captura('otros_cif','numeric');
+		$this->captura('tipo_cambio_venta','numeric');
+		
+		$this->captura('desc_moneda','varchar');
+		$this->captura('valor_bruto','numeric');
+		$this->captura('descripcion_bulto','varchar');
+		
+		
+		
+		
+		
+			 
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -75,7 +94,7 @@ class MODVenta extends MODbase{
 	function getVariablesBasicas(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='vef.ft_venta_sel';
-		$this->transaccion='VF_VENCONF_SEL';
+		$this->transaccion='VF_VENCONFBAS_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion		
 		$this->setCount(false);
 
@@ -194,8 +213,22 @@ class MODVenta extends MODbase{
             $this->setParametro('nro_factura','nro_factura','varchar'); 
 			$this->setParametro('id_dosificacion','id_dosificacion','integer'); 
 			$this->setParametro('excento','excento','numeric');
-			 
-            
+			
+			$this->setParametro('id_moneda','id_moneda','int4');
+			$this->setParametro('tipo_cambio_venta','tipo_cambio_venta','numeric');
+			$this->setParametro('total_venta_msuc','total_venta_msuc','numeric');
+			$this->setParametro('transporte_fob','transporte_fob','numeric');
+			$this->setParametro('seguros_fob','seguros_fob','numeric');
+			$this->setParametro('otros_fob','otros_fob','numeric');
+			$this->setParametro('transporte_cif','transporte_cif','numeric');
+			$this->setParametro('seguros_cif','seguros_cif','numeric');
+			$this->setParametro('otros_cif','otros_cif','numeric');
+			$this->setParametro('valor_bruto','valor_bruto','numeric');
+			$this->setParametro('descripcion_bulto','descripcion_bulto','varchar');
+			
+			
+			
+             
             
             //Ejecuta la instruccion
             $this->armarConsulta();
@@ -236,7 +269,12 @@ class MODVenta extends MODbase{
                 $this->arreglo['porcentaje_descuento'] = $f['porcentaje_descuento'];
                 $this->arreglo['id_vendedor_medico'] = $f['id_vendedor_medico'];
 				$this->arreglo['descripcion'] = $f['descripcion'];
-                $this->arreglo['id_venta'] = $id_venta;                
+                $this->arreglo['id_venta'] = $id_venta;  
+				
+				$this->arreglo['bruto'] = $f['bruto'];
+				$this->arreglo['ley'] = $f['ley'];
+				$this->arreglo['kg_fino'] = $f['kg_fino'];
+				$this->arreglo['id_unidad_medida'] = $f['id_unidad_medida'];               
                 
                 //Define los parametros para la funcion
                 $this->setParametro('id_venta','id_venta','int4');
@@ -245,12 +283,18 @@ class MODVenta extends MODbase{
                 $this->setParametro('id_formula','id_formula','int4');
                 $this->setParametro('tipo','tipo','varchar');
                 $this->setParametro('estado_reg','estado_reg','varchar');
-                $this->setParametro('cantidad_det','cantidad','int4');
+                $this->setParametro('cantidad_det','cantidad','numeric');
                 $this->setParametro('precio','precio','numeric');
                 $this->setParametro('sw_porcentaje_formula','sw_porcentaje_formula','varchar');  
                 $this->setParametro('porcentaje_descuento','porcentaje_descuento','int4');             
                 $this->setParametro('id_vendedor_medico','id_vendedor_medico','varchar');
-				$this->setParametro('descripcion','descripcion','text'); 
+				$this->setParametro('descripcion','descripcion','text');
+				$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
+				$this->setParametro('bruto','bruto','varchar');
+				$this->setParametro('ley','ley','varchar');
+				$this->setParametro('kg_fino','kg_fino','varchar');
+				$this->setParametro('tipo_factura','tipo_factura','varchar');  
+				
                 
                 //Ejecuta la instruccion
                 $this->armarConsulta();
@@ -291,7 +335,8 @@ class MODVenta extends MODbase{
 					$this->setParametro('numero_tarjeta','numero_tarjeta','varchar'); 
 					$this->setParametro('codigo_tarjeta','codigo_tarjeta','varchar'); 
 					$this->setParametro('tipo_tarjeta','tipo_tarjeta','varchar'); 
-	                $this->setParametro('valor','valor','numeric');                              
+	                $this->setParametro('valor','valor','numeric');
+					$this->setParametro('tipo_factura','tipo_factura','varchar');                                
 	                
 	                //Ejecuta la instruccion
 	                $this->armarConsulta();
@@ -313,6 +358,7 @@ class MODVenta extends MODbase{
 			$this->procedimiento = 'vef.ft_venta_ime';
 			$this->transaccion = 'VF_VENVALI_MOD';
 			$this->setParametro('id_venta','id_venta','int4');
+			$this->setParametro('tipo_factura','tipo_factura','varchar'); 
 			//Ejecuta la instruccion
             $this->armarConsulta();
             $stmt = $link->prepare($this->consulta);          
@@ -459,7 +505,7 @@ class MODVenta extends MODbase{
 	function listarNotaVentaDet(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='vef.ft_venta_sel';
-		$this->transaccion='VF_NOTAVEND_SEL';
+		$this->transaccion='VF_NOTAVENDV_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		
 		
@@ -498,7 +544,7 @@ class MODVenta extends MODbase{
     function listarNotaVenta(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='vef.ft_venta_sel';
-		$this->transaccion='VF_NOTVEN_SEL';
+		$this->transaccion='VF_NOTVENV_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		$this->setCount(false);
 		$this->setParametro('id_venta','id_venta','int4');
@@ -561,7 +607,7 @@ class MODVenta extends MODbase{
 		$this->captura('departamento_sucursal','varchar');
 		$this->captura('fecha_venta','varchar');
 		$this->captura('nro_venta','varchar');
-		$this->captura('moneda_sucursal','varchar');
+		$this->captura('moneda_sucursal','varchar');//codigo
 		$this->captura('total_venta','numeric');		
 		$this->captura('total_venta_literal','varchar');
 		$this->captura('observaciones','text');	
@@ -582,9 +628,35 @@ class MODVenta extends MODbase{
 		$this->captura('actividades','varchar');
 		$this->captura('fecha_venta_recibo','varchar');
 		
+		$this->captura('direccion_cliente','varchar');
+		$this->captura('tipo_cambio_venta','numeric');
+		$this->captura('total_venta_msuc','numeric');
+		$this->captura('total_venta_msuc_literal','varchar');
+		$this->captura('moneda_venta','varchar');//codigo
+		$this->captura('desc_moneda_sucursal','varchar');//nombre
+		$this->captura('desc_moneda_venta','varchar');//nombre
+		
+		$this->captura('transporte_fob','numeric');
+		$this->captura('seguros_fob','numeric');
+		$this->captura('otros_fob','numeric');
+		
+		$this->captura('transporte_cif','numeric');
+		$this->captura('seguros_cif','numeric');
+		$this->captura('otros_cif','numeric');
+		
+		$this->captura('fecha_literal','varchar');
+		
+		$this->captura('cantidad_descripciones','integer');
+		$this->captura('estado','varchar');
+		
+		$this->captura('valor_bruto','numeric');
+		$this->captura('descripcion_bulto','varchar');
+		
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		
+	     
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta
@@ -604,11 +676,41 @@ class MODVenta extends MODbase{
 		$this->captura('concepto','varchar');
 		$this->captura('cantidad','numeric');
 		$this->captura('precio_unitario','numeric');
-		$this->captura('precio_total','numeric');		
+		$this->captura('precio_total','numeric');	
+		$this->captura('unidad_medida','varchar');
+		$this->captura('nandina','varchar');	
+		$this->captura('bruto','varchar');	
+		$this->captura('ley','varchar');	
+		$this->captura('kg_fino','varchar');	
+		$this->captura('descripcion','text');	
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+
+		$this->ejecutarConsulta();
 		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function listarReciboFacturaDescripcion(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENDESREP_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+				
+		$this->setParametro('id_venta','id_venta','integer');
+
+		//Definicion de la lista del resultado del query
+		$this->captura('nombre','varchar');
+		$this->captura('columna','numeric');
+		$this->captura('fila','numeric');
+		$this->captura('valor','varchar');			
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta

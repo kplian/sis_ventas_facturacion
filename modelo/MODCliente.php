@@ -40,6 +40,7 @@ class MODCliente extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('direccion','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -51,9 +52,9 @@ class MODCliente extends MODbase{
 			
 	function insertarCliente(){
 		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='vef.ft_cliente_ime';
-		$this->transaccion='VF_CLI_INS';
-		$this->tipo_procedimiento='IME';
+		$this->procedimiento = 'vef.ft_cliente_ime';
+		$this->transaccion = 'VF_CLI_INS';
+		$this->tipo_procedimiento = 'IME';
 				
 		//Define los parametros para la funcion
 		$this->setParametro('correo','correo','varchar');
@@ -67,6 +68,7 @@ class MODCliente extends MODbase{
 		$this->setParametro('otros_correos','otros_correos','varchar');
 		$this->setParametro('otros_telefonos','otros_telefonos','varchar');
 		$this->setParametro('nombres','nombres','varchar');
+		$this->setParametro('direccion','direccion','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -95,6 +97,7 @@ class MODCliente extends MODbase{
 		$this->setParametro('otros_correos','otros_correos','varchar');
 		$this->setParametro('otros_telefonos','otros_telefonos','varchar');
 		$this->setParametro('nombres','nombres','varchar');
+		$this->setParametro('direccion','direccion','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

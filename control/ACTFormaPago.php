@@ -18,7 +18,10 @@ class ACTFormaPago extends ACTbase{
 		
 		if($this->objParam->getParametro('defecto') == 'si') {
                 $this->objParam->addFiltro(" forpa.defecto = ''si''");
-				$filtro_adicional = " and tipo_moneda = ''moneda_base''";
+				//$filtro_adicional = " and tipo_moneda = ''moneda_base''";
+				$this->objParam->addFiltro(" forpa.id_entidad in (select id_entidad 
+                												from vef.tsucursal
+                												where id_sucursal = " . $this->objParam->getParametro('id_sucursal') ." )");
         }
 		
 		if($this->objParam->getParametro('id_sucursal') != '') {

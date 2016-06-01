@@ -20,6 +20,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     labelSubmit: '<i class="fa fa-check"></i> Guardar',
     storeFormaPago : false,
     fwidth : '9%',
+    cantidadAllowDecimals: false,
     constructor:function(config)
     {   
         Ext.apply(this,config);
@@ -59,6 +60,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	                queryDelay: 1000,               
 	                gwidth: 150,
 	                minChars: 2,
+	                disabled:true,
 	                renderer : function(value, p, record) {
 	                    return String.format('{0}', record.data['nombre_punto_venta']);
 	                }
@@ -105,7 +107,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		      
 		}
 		
-		if (this.data.objPadre.tipo_factura == 'manual') {
+		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadaexpo'|| this.data.objPadre.tipo_factura == 'computarizadamin'|| this.data.objPadre.tipo_factura == 'computarizadaexpomin') {
 			this.Atributos.push({
 				config:{
 					name: 'fecha',
@@ -119,7 +121,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 					id_grupo:0,					
 					form:true
 			});
-			
+	  }		
+	 if (this.data.objPadre.tipo_factura == 'manual') {	
 			this.Atributos.push({
 	            config: {
 	                name: 'id_dosificacion',
@@ -213,6 +216,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     },
     
     buildComponentesDetalle: function(){
+        var  me = this;
         this.detCmp = {
                     'tipo': new Ext.form.ComboBox({
                             name: 'tipo',
@@ -279,8 +283,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                         msgTarget: 'title',
                                         fieldLabel: 'Cantidad',
                                         allowBlank: false,
-                                        allowDecimals: false,
-                                        maxLength:10,
+                                        allowDecimals: me.cantidadAllowDecimals,
+                                        decimalPrecision : 6,
                                         enableKeyEvents : true
                                         
                                 }),
@@ -290,7 +294,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                         fieldLabel: 'P/U',
                                         allowBlank: false,
                                         allowDecimals: true,
-                                        maxLength:10,
+                                        decimalPrecision : 6,
                                         enableKeyEvents : true
                                 }),
                     'precio_total': new Ext.form.NumberField({
@@ -307,6 +311,25 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             
             
     }, 
+    
+    iniciarEventosProducto:function(){
+    	this.detCmp.id_producto.on('select',function(c,r,i) {
+            this.detCmp.precio_unitario.setValue(Number(r.data.precio));
+            
+            var tmp = this.roundTwo(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()))
+            this.detCmp.precio_total.setValue(tmp);
+        	
+        	
+        	
+        	if (r.data.requiere_descripcion == 'si') {        		
+        		this.habilitarDescripcion(true);
+        	} else {
+        		this.habilitarDescripcion(false);
+        	}
+        },this);
+    	
+    },
+    
     
     iniciarEventos : function () {
     	
@@ -421,36 +444,36 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         },this);      
         
         
-        this.detCmp.id_producto.on('select',function(c,r,i) {
-            this.detCmp.precio_unitario.setValue(Number(r.data.precio));
-            this.detCmp.precio_total.setValue(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()));
-        	
-        	if (r.data.requiere_descripcion == 'si') {
-        		
-        		this.habilitarDescripcion(true);
-        	} else {
-        		this.habilitarDescripcion(false);
-        	}
-        },this);
+        this.iniciarEventosProducto();
         
         this.detCmp.cantidad.on('keyup',function() {  
-            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
+            this.detCmp.precio_total.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
         },this);
         
         this.detCmp.precio_unitario.on('keyup',function() {  
-            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
+            this.detCmp.precio_total.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
         },this);
     }, 
+    
+    roundTwo: function(can){
+    	 return  Math.round(can*Math.pow(10,2))/Math.pow(10,2);
+    },
+    
     habilitarDescripcion : function(opcion) {
     	
-    	if (opcion) {
-    		this.detCmp.descripcion.setDisabled(false);   
-    		this.detCmp.descripcion.allowBlank = false; 		
-    	} else {
-    		this.detCmp.descripcion.setDisabled(true);
-    		this.detCmp.descripcion.allowBlank = true; 
-    		this.detCmp.descripcion.reset();
-    	}	
+    	if(this.detCmp.descripcion){
+	    	if (opcion) {
+	    		this.detCmp.descripcion.setDisabled(false);   
+	    		this.detCmp.descripcion.allowBlank = false; 		
+	    	} else {
+	    		this.detCmp.descripcion.setDisabled(true);
+	    		this.detCmp.descripcion.allowBlank = true; 
+	    		this.detCmp.descripcion.reset();
+	    	}	
+    	}
+    	
+    	console.log('opcion', opcion, this.detCmp.descripcion)
+    		
     }, 
     
     cambiarCombo : function (tipo) {
@@ -527,7 +550,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             rec.set('nombre_producto', cmb_rec.get('nombre_producto')); 
         }
                      
-        
+       
     },
     evaluaRequistos: function(){
     	//valida que todos los requistosprevios esten completos y habilita la adicion en el grid
@@ -623,7 +646,11 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         //al cancelar la edicion
         this.editorDetail.on('validateedit', this.onUpdateRegister, this);
         
-        this.editorDetail.on('afteredit', this.onAfterEdit, this);        
+        this.editorDetail.on('afteredit', this.onAfterEdit, this);  
+        
+        
+        //eventos de rror en los combos  
+        this.detCmp.id_producto.store.on('exception', this.conexionFailure);    
         
         this.megrid = new Ext.grid.GridPanel({
                     layout: 'fit',
@@ -631,6 +658,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                     region: 'center',
                     split: true,
                     border: false,
+                    loadMask : true,
                     plain: true,                    
                     plugins: [ this.editorDetail, this.summary],
                     stripeRows: true,
@@ -1260,7 +1288,35 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 				type:'TextArea',
 				id_grupo:0,				
 				form:true
-		},         
+		},  
+		{
+	            config:{
+	                name:'id_moneda',
+	                origen:'MONEDA',
+	                allowBlank:false,
+	                fieldLabel:'Moneda',
+	                gdisplayField:'desc_moneda',
+	                gwidth:100,
+				    anchor: '80%'
+	             },
+	            type:'ComboRec',
+	            id_grupo:0,
+	            form:false
+	    },
+        {
+            config:{
+                name: 'tipo_cambio_venta',
+                fieldLabel: 'Tipo Cambio',
+                allowBlank: false,
+                allowNegative: false,
+                anchor: '80%'
+                
+            },
+                type:'NumberField',                
+                id_grupo:0,                
+                form:false,
+                valorInicial:'0'
+        },      
         {
             config: {
                 name: 'id_sucursal',
@@ -1291,13 +1347,28 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 lazyRender: true,
                 mode: 'remote',
                 pageSize: 15,
-                queryDelay: 1000,                
+                queryDelay: 1000, 
+                disabled:true,               
                 minChars: 2
             },
             type: 'ComboBox',
             id_grupo: 1,            
             form: true
-        },  
+        },
+        {
+			config:{
+				name: 'descripcion_bulto',
+				fieldLabel: 'Bultos',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 100
+			},
+				type:'TextArea',
+				filters:{pfiltro:'ven.descripcion_bulto',type:'string'},
+				id_grupo: 1,     
+				grid:true,
+				form:false
+		},  
         {
             config: {
                 name: 'id_forma_pago',
@@ -1403,6 +1474,136 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 type:'TextField',                
                 id_grupo:2,                
                 form:true
+        },
+        {
+            config:{
+                name: 'valor_bruto',
+                fieldLabel: 'Valor Bruto',
+                allowBlank: false,
+                width: 150, 
+                readOnly: true,               
+                maxLength: 20
+                
+            },
+                type:'NumberField',
+                valorInicial: 0,                
+                id_grupo: 3,                
+                form: false
+        },
+        {
+            config:{
+                name: 'transporte_fob',
+                fieldLabel: 'Trasporte FOB',
+                allowBlank: false,
+                width: 150,                 
+                maxLength: 20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 3,  
+                valorInicial: 0,               
+                form: false
+        },
+        {
+            config:{
+                name: 'seguros_fob',
+                fieldLabel: 'Seguros FOB',
+                allowBlank: false,
+                width: 150,                
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 3,
+                valorInicial: 0,                 
+                form: false
+        },
+        {
+            config:{
+                name: 'otros_fob',
+                fieldLabel: 'Otros FOB',
+                allowBlank: false,
+                width: 150,                 
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 3, 
+                valorInicial: 0,                  
+                form: false
+        },
+        {
+            config:{
+                name: 'total_fob',
+                fieldLabel: 'TOTAL F.O.B',
+                allowBlank: false,
+                readOnly: true,
+                width: 150,                
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 3, 
+                                
+                valorInicial: 0,               
+                form: false
+        },
+        {
+            config:{
+                name: 'transporte_cif',
+                fieldLabel: 'Trasporte CIF',
+                allowBlank: false,
+                width: 150,               
+                maxLength: 20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 4,                 
+                valorInicial: 0,                
+                form: false
+        },
+        {
+            config:{
+                name: 'seguros_cif',
+                fieldLabel: 'Seguros CIF',
+                allowBlank: false,
+                width: 150,                
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 4,                 
+                valorInicial: 0,               
+                form: false
+        },
+        {
+            config:{
+                name: 'otros_cif',
+                fieldLabel: 'Otros CIF',
+                allowBlank: false,
+                width: 150,               
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 4,                 
+                valorInicial: 0,               
+                form: false
+        },
+        {
+            config:{
+                name: 'total_cif',
+                fieldLabel: 'TOTAL CIF',
+                allowBlank: false,
+                readOnly: true,
+                width: 150,                
+                maxLength:20
+                
+            },
+                type:'NumberField',                
+                id_grupo: 4,                 
+                valorInicial: 0,               
+                form: false
         }
            
           
@@ -1454,6 +1655,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                             return value;
                         }),
                         'tipo_factura':this.data.objPadre.tipo_factura};
+        
         if( i > 0 &&  !this.editorDetail.isVisible()){
              Phx.vista.FormVenta.superclass.onSubmit.call(this,o);
         }

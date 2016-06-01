@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -24,7 +26,9 @@ $body$
 DECLARE
 
 	v_nro_requerimiento    	integer;
+	v_res					varchar;
 	v_parametros           	record;
+    v_reg_tipo_desc			record;
 	v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
@@ -77,7 +81,23 @@ DECLARE
     v_nro_factura			integer;
     v_id_actividad_economica	integer[];
     v_dosificacion			record;
-    v_tipo_base			varchar;
+    v_tipo_base				varchar;
+    v_id_moneda_venta		integer;
+    v_id_moneda_suc			integer;
+    v_total_venta_ms		numeric;
+    v_fecha_venta 			date;
+    v_nombre_ae				varchar;
+    v_id_activida_economica		integer;
+    v_transporte_fob		numeric;    
+    v_seguros_fob			numeric;
+    v_otros_fob				numeric;
+    v_transporte_cif		numeric;
+    v_seguros_cif			numeric;
+    v_otros_cif				numeric;
+    v_tipo_cambio_venta		numeric;
+    v_es_fin				varchar;
+    v_valor_bruto			numeric;
+    v_descripcion_bulto		varchar;	
     
 			    
 BEGIN
@@ -112,6 +132,15 @@ BEGIN
             from vef.tsucursal pv
             where id_sucursal = v_parametros.id_sucursal;
         end if;
+
+        if (pxp.f_existe_parametro(p_tabla,'id_moneda')) then
+        	v_id_moneda_venta = v_parametros.id_moneda;
+        else
+        	select sm.id_moneda into v_id_moneda_venta
+        	from vef.tsucursal_moneda sm
+        	where sm.id_sucursal = v_parametros.id_sucursal 
+			and sm.estado_reg = 'activo' and sm.tipo_moneda = 'moneda_base';
+        end if;
         
         if (pxp.f_existe_parametro(p_tabla,'tipo_factura')) then
         	v_tipo_factura = v_parametros.tipo_factura;
@@ -128,9 +157,17 @@ BEGIN
         end if;        
         
         v_excento = 0;
+        
+        
+     
+       
+        
         if (v_tipo_base = 'recibo') THEN
         	v_fecha = now()::date;
         ELSIF(v_tipo_base = 'manual') then
+        
+       
+         
         	v_fecha = v_parametros.fecha;
             v_nro_factura = v_parametros.nro_factura;
             v_excento = v_parametros.excento;
@@ -157,10 +194,25 @@ BEGIN
             			where dos.fecha_limite < v_parametros.fecha and dos.id_dosificacion = v_parametros.id_dosificacion)) then
             	raise exception 'La fecha de la factura supera la fecha limite de emision de la dosificacion';
             end if;
-        else 
-        	v_fecha = now()::date;
-            v_excento = v_parametros.excento;
+        
+       ELSE 
+        
+              IF   v_tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin')  THEN
+                 -- la fecha es abierta
+                  v_fecha = v_parametros.fecha;
+                    
+             ELSE
+        	  v_fecha = now()::date;
+              v_excento = v_parametros.excento;
+            END IF;
+            
         end if;
+        
+      
+        
+       --raise exception 'pasa ... %',v_tipo_base ;
+             
+        
         if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
         	v_id_punto_venta = v_parametros.id_punto_venta;
         else
@@ -196,10 +248,9 @@ BEGIN
            raise exception 'No se pudo obtener un numero correlativo para la venta consulte con el administrador';
         END IF;
         
-        
-        
         v_porcentaje_descuento = 0;
-        --verificar si existe porcentaje de descuento
+        
+        --  verificar si existe porcentaje de descuento
         if (pxp.f_existe_parametro(p_tabla,'porcentaje_descuento')) then
             v_porcentaje_descuento = v_parametros.porcentaje_descuento;
         end if;
@@ -302,10 +353,29 @@ BEGIN
              NULL,
              NULL,
              v_codigo_proceso);
+             
+             
+       if (pxp.f_existe_parametro(p_tabla,'transporte_fob')) then
+        	v_transporte_fob = v_parametros.transporte_fob;
+            v_seguros_fob = v_parametros.seguros_fob;
+            v_otros_fob = v_parametros.otros_fob;
+            v_transporte_cif = v_parametros.transporte_cif;
+            v_seguros_cif = v_parametros.seguros_cif;
+            v_otros_cif = v_parametros.otros_cif;
+            v_valor_bruto = v_parametros.valor_bruto;
+            v_descripcion_bulto = v_parametros.descripcion_bulto;
+       end if;
+       
+       if (pxp.f_existe_parametro(p_tabla,'tipo_cambio_venta')) then 
+          v_tipo_cambio_venta = v_parametros.tipo_cambio_venta;
+       end if;
+       
+       
+         
             
              
-        	--Sentencia de la insercion
-        	insert into vef.tventa(
+      --Sentencia de la insercion
+      insert into vef.tventa(
             id_venta,
 			id_cliente,
 			id_sucursal,
@@ -332,7 +402,18 @@ BEGIN
             fecha,
             nro_factura,
             id_dosificacion,
-            excento
+            excento,
+            
+            id_moneda,
+            transporte_fob,
+            seguros_fob,
+            otros_fob,
+            transporte_cif,
+            seguros_cif,
+            otros_cif,
+            tipo_cambio_venta,
+            valor_bruto,
+            descripcion_bulto
             
             
           	) values(
@@ -362,7 +443,20 @@ BEGIN
             v_fecha,
             v_nro_factura,
             v_id_dosificacion,
-            v_excento		
+            v_excento,
+            
+            
+            v_id_moneda_venta,            
+	        COALESCE(v_transporte_fob,0),
+            COALESCE(v_seguros_fob,0),
+            COALESCE(v_otros_fob,0),
+            COALESCE(v_transporte_cif,0),
+            COALESCE(v_seguros_cif,0),
+            COALESCE(v_otros_cif,0),
+            COALESCE(v_tipo_cambio_venta,0)	,
+            COALESCE(v_valor_bruto,0),
+            COALESCE(v_descripcion_bulto,'')
+            	
 			
 			) returning id_venta into v_id_venta;
 			
@@ -401,7 +495,9 @@ BEGIN
 					v_parametros.tipo_tarjeta
 				);
 			end if;
-			
+            
+            
+            
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas almacenado(a) con exito (id_venta'||v_id_venta||')'); 
@@ -422,11 +518,15 @@ BEGIN
 	elsif(p_transaccion='VF_VEN_MOD')then
 
 		begin
-        	if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
+        	
+            
+            if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
                 v_id_punto_venta = v_parametros.id_punto_venta;
             else
                 v_id_punto_venta = NULL;
             end if;
+            
+            SELECT * into v_venta FROM vef.tventa v where v.id_venta = v_parametros.id_venta;  
         	
 			if (v_id_punto_venta is not null) then
 	        	select id_sucursal into v_id_sucursal
@@ -451,14 +551,54 @@ BEGIN
        		end if; 
             
             v_excento = 0;
+            
+            if (pxp.f_existe_parametro(p_tabla,'id_moneda')) then
+                v_id_moneda_venta = v_parametros.id_moneda;
+            else
+                select sm.id_moneda into v_id_moneda_venta
+                from vef.tsucursal_moneda sm
+                where sm.id_sucursal = v_parametros.id_sucursal 
+                and sm.estado_reg = 'activo' and sm.tipo_moneda = 'moneda_base';
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'transporte_fob')) then
+                  v_transporte_fob = v_parametros.transporte_fob;
+                  v_seguros_fob = v_parametros.seguros_fob;
+                  v_otros_fob = v_parametros.otros_fob;
+                  v_transporte_cif = v_parametros.transporte_cif;
+                  v_seguros_cif = v_parametros.seguros_cif;
+                  v_otros_cif = v_parametros.otros_cif;
+                  v_descripcion_bulto = v_parametros.descripcion_bulto;
+                  v_valor_bruto = v_parametros.valor_bruto;
+                  
+            end if;
+            
+             
+            if (pxp.f_existe_parametro(p_tabla,'tipo_cambio_venta')) then 
+                v_tipo_cambio_venta = v_parametros.tipo_cambio_venta;
+            end if;
+            
+            
             IF(v_tipo_base = 'manual') then
                 v_fecha = v_parametros.fecha;
                 v_nro_factura = v_parametros.nro_factura;
                 v_excento = v_parametros.excento;
                 v_id_dosificacion = v_parametros.id_dosificacion;
+            
             elsif (v_tipo_base = 'computarizada')  then            
-                v_excento = v_parametros.excento;
+                
+                IF   v_tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin')  THEN
+                    v_fecha = v_parametros.fecha;
+                    v_nro_factura = v_venta.nro_factura;
+                    v_id_dosificacion = v_venta.id_dosificacion;
+                    
+                ELSE
+        	        v_excento = v_parametros.excento;
+                END IF;
+           
             end if;
+            
+            
             
             if (pxp.f_existe_parametro(p_tabla,'a_cuenta')) then
                 v_a_cuenta = v_parametros.a_cuenta;
@@ -519,28 +659,43 @@ BEGIN
 	        
 			--Sentencia de la modificacion
 			update vef.tventa set
-			id_cliente = v_id_cliente,
-			id_sucursal = v_id_sucursal,
-			a_cuenta = v_a_cuenta,
-			fecha_estimada_entrega = v_fecha_estimada_entrega,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now(),
-			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai,
-			id_punto_venta = v_id_punto_venta,
-            id_vendedor_medico = v_id_vendedor_medico,
-            porcentaje_descuento = v_porcentaje_descuento,
-            comision = v_comision,
-            observaciones = v_parametros.observaciones,
-            fecha = (case when v_fecha is null then 
-            			fecha 
-            		else
-                    	v_fecha
-                    end),
-            nro_factura = v_nro_factura,
-            id_dosificacion = v_id_dosificacion,
-            excento = v_excento
+              id_cliente = v_id_cliente,
+              id_sucursal = v_id_sucursal,
+              a_cuenta = v_a_cuenta,
+              fecha_estimada_entrega = v_fecha_estimada_entrega,
+              id_usuario_mod = p_id_usuario,
+              fecha_mod = now(),
+              id_usuario_ai = v_parametros._id_usuario_ai,
+              usuario_ai = v_parametros._nombre_usuario_ai,
+              id_punto_venta = v_id_punto_venta,
+              id_vendedor_medico = v_id_vendedor_medico,
+              porcentaje_descuento = v_porcentaje_descuento,
+              comision = v_comision,
+              observaciones = v_parametros.observaciones,
+              fecha = (case when v_fecha is null then 
+                          fecha 
+                      else
+                          v_fecha
+                      end),
+              nro_factura = v_nro_factura,
+              id_dosificacion = v_id_dosificacion,
+              excento = v_excento,
+              
+              id_moneda = v_id_moneda_venta,
+              transporte_fob = COALESCE(v_transporte_fob,0),
+              seguros_fob = COALESCE(v_seguros_fob,0),
+              otros_fob = COALESCE(v_otros_fob,0),
+              transporte_cif = COALESCE(v_transporte_cif,0),
+              seguros_cif = COALESCE(v_seguros_cif,0),
+              otros_cif = COALESCE(v_otros_cif,0),
+              tipo_cambio_venta = COALESCE(v_tipo_cambio_venta,1),
+              valor_bruto = COALESCE(v_valor_bruto,0),
+              descripcion_bulto = COALESCE(v_descripcion_bulto,'')
+            
+            
 			where id_venta=v_parametros.id_venta;
+            
+            
 			
 			if (v_parametros.id_forma_pago != 0 ) then
 				               
@@ -600,17 +755,35 @@ BEGIN
 	elsif(p_transaccion='VF_VEN_ELI')then
 
 		begin
-			--Sentencia de la eliminacion
-            delete from vef.tventa_forma_pago
-            where id_venta=v_parametros.id_venta;
+			
             
-            delete from vef.tventa_detalle
-            where id_venta=v_parametros.id_venta;
+             select 
+                v.* 
+             into 
+              v_registros  from vef.tventa v 
+            where v.id_venta = v_parametros.id_venta;
             
-			update vef.tventa
-            set estado_reg = 'inactivo'
-            where id_venta=v_parametros.id_venta;
-               
+            
+            
+            IF  v_registros.tipo_factura not in  ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
+            
+              
+                
+                --Sentencia de la eliminacion
+                delete from vef.tventa_forma_pago
+                where id_venta=v_parametros.id_venta;
+                
+                delete from vef.tventa_detalle
+                where id_venta=v_parametros.id_venta;
+                
+                update vef.tventa
+                set estado_reg = 'inactivo'
+                where id_venta=v_parametros.id_venta;
+            ELSE
+				v_res = vef.f_anula_venta(p_administrador,p_id_usuario,p_tabla, v_registros.id_proceso_wf,v_registros.id_estado_wf, v_parametros.id_venta);
+            
+            END IF;   
+            
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas eliminado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
@@ -678,12 +851,29 @@ BEGIN
 		begin
         	 vef_estados_validar_fp = pxp.f_get_variable_global('vef_estados_validar_fp');
             --obtener datos de la venta y la moneda base 
-			select v.* ,sm.id_moneda as id_moneda_base,m.codigo  as moneda into v_venta
+			
+            select 
+                 v.* ,
+                 sm.id_moneda as id_moneda_base,
+                 m.codigo  as moneda ,
+                 v.id_dosificacion as id_dosificacion_venta
+              into 
+                 v_venta
 			from vef.tventa v
 			inner join vef.tsucursal suc on suc.id_sucursal = v.id_sucursal
 			inner join vef.tsucursal_moneda sm on suc.id_sucursal = sm.id_sucursal and sm.tipo_moneda = 'moneda_base'
 			inner join param.tmoneda m on m.id_moneda = sm.id_moneda
-			where id_venta = v_parametros.id_venta;
+            where id_venta = v_parametros.id_venta;
+            
+            --si es venta de exportacion operamos con la moneda especificada por el usuario
+            IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin') THEN            
+              v_id_moneda_venta = v_venta.id_moneda;             
+            ELSE
+              v_id_moneda_venta = v_venta.id_moneda_base;              
+            END IF;
+            
+            v_id_moneda_suc = v_venta.id_moneda_base;
+            
 			
             --si es un estado para validar la forma de pago
             if (v_venta.estado =ANY(string_to_array(vef_estados_validar_fp,',')))then
@@ -701,9 +891,13 @@ BEGIN
                                     where vfp.id_venta = v_parametros.id_venta)loop
                     --si la moneda de la forma de pago es distinta a al moneda base de la sucursal convertimos a moneda base
                     
-                    if (v_registros.id_moneda != v_venta.id_moneda_base) then
+                    if (v_registros.id_moneda != v_id_moneda_venta) then
                     
-                        v_monto_fp = param.f_convertir_moneda(v_registros.id_moneda,v_venta.id_moneda_base,v_registros.monto_transaccion,now()::date,'O',2,NULL,'si');
+                        IF  v_venta.tipo_cambio_venta is not null THEN
+                          v_monto_fp = param.f_convertir_moneda(v_registros.id_moneda,v_id_moneda_venta,v_registros.monto_transaccion,v_venta.fecha::date,'CUS',2, v_venta.tipo_cambio_venta,'si');
+                        ELSE
+                          v_monto_fp = param.f_convertir_moneda(v_registros.id_moneda,v_id_moneda_venta,v_registros.monto_transaccion,v_venta.fecha::date,'O',2,NULL,'si');
+                        END IF;
                     else
                         v_monto_fp = v_registros.monto_transaccion;
                     end if;
@@ -728,16 +922,24 @@ BEGIN
                     v_acumulado_fp = v_acumulado_fp + v_monto_fp;
                 end loop;
     			
-                select sum(monto_mb_efectivo) into v_suma_fp
+                select sum(round(monto_mb_efectivo,2)) into v_suma_fp
                 from vef.tventa_forma_pago
                 where id_venta =   v_parametros.id_venta;
                 
-                select sum(cantidad*precio) into v_suma_det
+                select sum(round(cantidad*precio,2)) into v_suma_det
                 from vef.tventa_detalle
                 where id_venta =   v_parametros.id_venta;
                 
+                
+               
+                IF v_parametros.tipo_factura != 'computarizadaexpo' THEN
+                   v_suma_det = COALESCE(v_suma_det,0) + COALESCE(v_venta.transporte_fob ,0)  + COALESCE(v_venta.seguros_fob ,0)+ COALESCE(v_venta.otros_fob ,0) + COALESCE(v_venta.transporte_cif ,0) +  COALESCE(v_venta.seguros_cif ,0) + COALESCE(v_venta.otros_cif ,0);
+                END IF;
+             
+             
+                
                 if (v_suma_fp < v_venta.total_venta) then
-                    raise exception 'El importe recibido es menor al valor de la venta';
+                    raise exception 'El importe recibido es menor al valor de la venta, falta %', v_venta.total_venta - v_suma_fp;
                 end if;
                 
                 if (v_suma_fp > v_venta.total_venta) then
@@ -753,13 +955,169 @@ BEGIN
             from vef.tventa_forma_pago
             where id_venta =   v_parametros.id_venta;
             
+      
+            
+            --calcula el total de la venta en moenda de la sucursal
+            
+             IF  v_venta.tipo_cambio_venta is not null THEN
+                 v_total_venta_ms = param.f_convertir_moneda(v_id_moneda_venta,v_id_moneda_suc,v_venta.total_venta,v_venta.fecha,'CUS',2, v_venta.tipo_cambio_venta,'si');
+             ELSE
+                v_total_venta_ms = param.f_convertir_moneda(v_id_moneda_venta,v_id_moneda_suc,v_registros.monto_transaccion,v_venta.fecha::date,'O',2,NULL,'si');
+             END IF;
+            
+            update vef.tventa v set
+              total_venta_msuc = v_total_venta_ms
+            where v.id_venta = v_parametros.id_venta;
+            
+            --si es factura comercial de exportacion generamos el numero de factura y validamos la fecha
+            IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN 
+                    IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin') THEN
+                    	update vef.tventa v set
+			              excento = total_venta_msuc
+			            where v.id_venta = v_parametros.id_venta;
+                    END IF;
+                    -- si es eidicion ya tendremos un numeor de factura que no debemos cambiar
+                    IF  v_venta.nro_factura is null THEN
+                    
+                    
+                      
+                          if (EXISTS(	select 1
+                                          from vef.tventa v
+                                          where v.fecha > v_venta.fecha and v.tipo_factura = v_venta.tipo_factura 
+                                          and v.estado != 'anulado'
+                                          and v.estado_reg = 'activo'))THEN
+                              raise exception 'Existen facturas emitidas con fechas posterior a la registrada (%). Por favor revise la fecha y hora del sistema',v_fecha;
+                          end if;
+                          
+                            
+                           
+                           select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica
+                           from vef.tventa_detalle vd
+                           inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
+                           inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
+                           where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo';
+                  
+                       
+                      
+                          select d.* into v_dosificacion
+                          from vef.tdosificacion d
+                          where d.estado_reg = 'activo' and d.fecha_inicio_emi <= v_venta.fecha and
+                            d.fecha_limite >= v_venta.fecha and d.tipo = 'F' and d.tipo_generacion = 'computarizada' and
+                            d.id_sucursal = v_venta.id_sucursal and
+                            d.id_activida_economica @> v_id_actividad_economica FOR UPDATE;
+                            
+                           v_nro_factura = v_dosificacion.nro_siguiente;
+                           
+                           
+                           if (v_dosificacion is null) then
+                              raise exception 'No existe una dosificacion activa para emitir la factura';
+                            end if;
+                           --validar que el nro de factura no supere el maximo nro de factura de la dosificaiocn
+                           if (exists(	select 1 
+                                      from vef.tventa ven
+                                      where ven.nro_factura =  v_nro_factura and ven.id_dosificacion = v_dosificacion.id_dosificacion)) then
+                              raise exception 'El numero de factura ya existe para esta dosificacion. Por favor comuniquese con el administrador del sistema';
+                           end if;
+                           
+                        
+                           update vef.tventa v set
+                             nro_factura = v_nro_factura,
+                             id_dosificacion = v_dosificacion.id_dosificacion
+                           where v.id_venta = v_parametros.id_venta;
+                            
+                           update vef.tdosificacion 
+                            set nro_siguiente = nro_siguiente + 1
+                           where id_dosificacion = v_dosificacion.id_dosificacion;
+			   			
+                    		
+                   
+                   ELSE
+                          --validar que la actividad economica no varie con respecto la insertada inicialmente que la fecha n   
+                          
+                           
+                          
+                          select 
+                              *
+                          into
+                             v_dosificacion
+                          from vef.tdosificacion dos
+                          where dos.id_dosificacion = v_venta.id_dosificacion_venta;
+                          
+                          
+                          
+                          IF exists(select 1
+                               from vef.tventa_detalle vd
+                               inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
+                               inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
+                               where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo'
+                                     AND  cig.id_actividad_economica != ANY(v_dosificacion.id_activida_economica)
+                               
+                               ) THEN
+                               
+                               
+                               raise exception 'El nro de facura fue generado para la actividad economica: no puede introducir otros conceptos pertenecientes a otra actividad';
+                               
+                          END IF;
+                           
+                    END IF;
+                   
+                   
+                  
+                   --si es factura de exportacion minera insertamos descripcion por defecto
+                    IF   v_venta.tipo_factura in ('computarizadaexpomin','computarizadamin') THEN
+                       
+                    
+                    
+                      FOR v_reg_tipo_desc in (select 
+                                                 td.*
+                                              from vef.ttipo_descripcion td 
+                                              where td.id_sucursal = v_venta.id_sucursal and td.estado_reg = 'activo') LOOP
+                                              
+                           
+                                 --si el valor no exite lo insertamos
+                                 IF  not exists (select 1 from vef.tvalor_descripcion vd 
+                                 				where vd.id_tipo_descripcion =   v_reg_tipo_desc.id_tipo_descripcion
+                                                       and vd.id_venta  =  v_venta.id_venta)   THEN
+                                 
+                                 
+                                     INSERT INTO  vef.tvalor_descripcion
+                                                  (
+                                                    id_usuario_reg,                                                   
+                                                    fecha_reg,                                                   
+                                                    estado_reg,                                                    
+                                                    id_venta,
+                                                    id_tipo_descripcion
+                                                  )
+                                                  VALUES (
+                                                    p_id_usuario,                                                    
+                                                    now(),                                                   
+                                                    'activo',              
+                                                    v_venta.id_venta,
+                                                    v_reg_tipo_desc.id_tipo_descripcion
+                                                  );
+                                       
+                                 
+                                 END IF;
+                      
+                      
+                      END LOOP;
+                    
+                    END IF;
+            
+            
+            END IF;
+            if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si') then
+                v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'INS',v_parametros.id_venta);
+            end if;	 
              
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+            	
             if (v_venta.estado =ANY(string_to_array(vef_estados_validar_fp,',')) and v_suma_fp > 0)then
             	v_resp = pxp.f_agrega_clave(v_resp,'cambio',(v_suma_fp::varchar || ' ' || v_venta.moneda)::varchar);
-            end if;  
+            end if; 
+             
             --Devuelve la respuesta
             return v_resp;
 
@@ -851,17 +1209,18 @@ BEGIN
 	***********************************/
 
 	elseif(p_transaccion='VEF_SIGEVE_IME')then   
+        
         begin
         	
-         /*   PARAMETROS
-         
-        $this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
-        $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
-        $this->setParametro('id_funcionario_wf','id_funcionario_wf','int4');
-        $this->setParametro('id_depto_wf','id_depto_wf','int4');
-        $this->setParametro('obs','obs','text');
-        $this->setParametro('json_procesos','json_procesos','text');
-        */        
+           /*   PARAMETROS
+           
+          $this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
+          $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
+          $this->setParametro('id_funcionario_wf','id_funcionario_wf','int4');
+          $this->setParametro('id_depto_wf','id_depto_wf','int4');
+          $this->setParametro('obs','obs','text');
+          $this->setParametro('json_procesos','json_procesos','text');
+          */        
            
           select 
             ew.id_tipo_estado ,            
@@ -874,21 +1233,21 @@ BEGIN
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
           where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
           
-          select v.*,s.id_entidad,e.nit,tv.tipo_base into v_venta
+          select v.*,s.id_entidad,c.nit,tv.tipo_base into v_venta
           from vef.tventa v
           inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal 
-          inner join param.tentidad e on e.id_entidad = s.id_entidad
+          inner join vef.tcliente c on c.id_cliente = v.id_cliente
           inner join vef.ttipo_venta tv on tv.codigo = v.tipo_factura and tv.estado_reg = 'activo'
           where v.id_proceso_wf = v_parametros.id_proceso_wf_act;
           
            -- obtener datos tipo estado
                 
-                select
-                 te.codigo
-                into
-                 v_codigo_estado_siguiente
-                from wf.ttipo_estado te
-                where te.id_tipo_estado = v_parametros.id_tipo_estado;
+              select
+                 te.codigo,te.fin
+               into
+                 v_codigo_estado_siguiente,v_es_fin
+              from wf.ttipo_estado te
+              where te.id_tipo_estado = v_parametros.id_tipo_estado;
                 
              IF  pxp.f_existe_parametro(p_tabla,'id_depto_wf') THEN
                  
@@ -899,8 +1258,7 @@ BEGIN
              IF  pxp.f_existe_parametro(p_tabla,'obs') THEN
                   v_obs=v_parametros.obs;
              ELSE
-                   v_obs='---';
-                
+                 v_obs='---';
              END IF;
                
              --configurar acceso directo para la alarma   
@@ -926,13 +1284,7 @@ BEGIN
                                                              v_tipo_noti,
                                                              v_titulo);
                 
-          /*update vef.tventa  t set 
-             id_estado_wf =  v_id_estado_actual,
-             estado = v_codigo_estado_siguiente,
-             id_usuario_mod=p_id_usuario,
-             fecha_mod=now()                   
-          where id_proceso_wf = v_parametros.id_proceso_wf_act; 
-          */
+                   
           IF  vef.f_fun_inicio_venta_wf(p_id_usuario, 
            									v_parametros._id_usuario_ai, 
                                             v_parametros._nombre_usuario_ai, 
@@ -942,36 +1294,21 @@ BEGIN
                                             
           END IF;  
           
-          if (v_venta.tipo_base = 'computarizada') then
-                if (EXISTS(	select 1
-                              from vef.tventa v
-                              where v.fecha > now()::date and v.tipo_factura = 'computarizada' and
-                              v.estado_reg = 'activo' and v.estado = 'finalizado'))THEN
-                  raise exception 'Existen facturas emitidas con fechas posterior a la actual. Por favor revise la fecha y hora del sistema';
-                end if;
+          if (v_venta.tipo_base = 'computarizada' and v_es_fin = 'si') then
                 
-          		/*if ((select count(distinct id_actividad_economica)                	
-                    from param.tconcepto_ingas cig 
-                    where cig.id_entidad = v_venta.id_entidad and cig.estado_reg = 'activo') > 2) THEN
-                    
-                    if ((select count(distinct id_actividad_economica)                	
-                        from vef.tventa_detalle vd
-                        inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
-                        inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
-                        where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo') > 2) THEN
-                        
-                        raise exception 'No se puede facturar dos actividades economicas al mismo tiempo en la misma venta';
-                	
-                    else
-                    	select cig.id_actividad_economica into v_id_actividad_economica
-                        from vef.tventa_detalle vd
-                        inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
-                        inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
-                        where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo'
-                        limit 1 offset 0;
-                    end if;                
-                	
-                end if;*/
+                IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
+                   v_fecha_venta = now()::date;
+                   if (EXISTS(	select 1
+                                    from vef.tventa v
+                                    where v.fecha > v_fecha_venta and v.tipo_factura = 'computarizada' and
+                                    v.estado_reg = 'activo' and v.estado = 'finalizado'))THEN
+                        raise exception 'Existen facturas emitidas con fechas posterior a la actual. Por favor revise la fecha y hora del sistema';
+                   end if;
+                ELSE
+                   v_fecha_venta = v_venta.fecha;
+                   --no validamos la fecha en las facturas de exportacion
+                   --por que  valida al insertar la factura, donde se genera el nro de la factura
+                END IF;  
                 
                 select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica
                 from vef.tventa_detalle vd
@@ -979,40 +1316,78 @@ BEGIN
                 inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
                 where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo';
                 
-                select d.* into v_dosificacion
-                from vef.tdosificacion d
-                where d.estado_reg = 'activo' and d.fecha_inicio_emi <= v_venta.fecha and
-                d.fecha_limite >= v_venta.fecha and d.tipo = 'F' and d.tipo_generacion = 'computarizada' and
-                d.id_sucursal = v_venta.id_sucursal and
-                d.id_activida_economica @> v_id_actividad_economica FOR UPDATE;
+                --genera el numero de factura
                 
-                if (v_dosificacion is null) then
-                	raise exception 'No existe una dosificacion activa para emitir la factura';
-                end if;
-                 --validar que el nro de factura no supere el maximo nro de factura de la dosificaiocn
-                if (exists(	select 1 
-                            from vef.tventa ven
-                            where ven.nro_factura =  v_dosificacion.nro_siguiente and ven.id_dosificacion = v_dosificacion.id_dosificacion)) then
-                    raise exception 'El numero de factura ya existe para esta dosificacion. Por favor comuniquese con el administrador del sistema';
-                end if;
-                update vef.tventa 
-                set id_dosificacion = v_dosificacion.id_dosificacion,
-                nro_factura = v_dosificacion.nro_siguiente,
-                fecha = now()::date,
-                cod_control = pxp.f_gen_cod_control(v_dosificacion.llave,
-                									v_dosificacion.nroaut,
-                                                    v_dosificacion.nro_siguiente::varchar,
-                                                    v_venta.nit,
-                                                    to_char(now(),'YYYYMMDD')::varchar,
-                                                    round(v_venta.total_venta,0))
-                where id_venta = v_venta.id_venta;
+                IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
                 
-                update vef.tdosificacion 
-                set nro_siguiente = nro_siguiente + 1
-                where id_dosificacion = v_dosificacion.id_dosificacion;     
+                    select d.* into v_dosificacion
+                    from vef.tdosificacion d
+                    where d.estado_reg = 'activo' and d.fecha_inicio_emi <= v_venta.fecha and
+                      d.fecha_limite >= v_venta.fecha and d.tipo = 'F' and d.tipo_generacion = 'computarizada' and
+                      d.id_sucursal = v_venta.id_sucursal and
+                      d.id_activida_economica @> v_id_actividad_economica FOR UPDATE;
+                      
+                      v_nro_factura = v_dosificacion.nro_siguiente;
+                      
+                       
+                       
+                       if (v_dosificacion is null) then
+                          raise exception 'No existe una dosificacion activa para emitir la factura';
+                        end if;
+                       --validar que el nro de factura no supere el maximo nro de factura de la dosificaiocn
+                       if (exists(	select 1 
+                                  from vef.tventa ven
+                                  where ven.nro_factura =  v_dosificacion.nro_siguiente and ven.id_dosificacion = v_dosificacion.id_dosificacion)) then
+                          raise exception 'El numero de factura ya existe para esta dosificacion. Por favor comuniquese con el administrador del sistema';
+                       end if;
+                       
+                       --la factura de exportacion no altera la fecha 
+                      update vef.tventa  set 
+                        id_dosificacion = v_dosificacion.id_dosificacion,
+                        nro_factura = v_nro_factura,
+                        fecha = v_fecha_venta,
+                        cod_control = pxp.f_gen_cod_control(v_dosificacion.llave,
+                                                            v_dosificacion.nroaut,
+                                                            v_nro_factura::varchar,
+                                                            v_venta.nit,
+                                                            to_char(v_fecha_venta,'YYYYMMDD')::varchar,
+                                                            round(v_venta.total_venta,0))
+                      where id_venta = v_venta.id_venta;
+                      
+                      
+                       update vef.tdosificacion 
+                       set nro_siguiente = nro_siguiente + 1
+                       where id_dosificacion = v_dosificacion.id_dosificacion;
+			
+                
+                ELSE
+                    -- en las facturas de exportacion y minera  el numero se genera al inserta
+                     v_nro_factura =  v_venta.nro_factura;
+                      
+                     select 
+                        *
+                     into  v_dosificacion 
+                     from  vef.tdosificacion d where d.id_dosificacion = v_venta.id_dosificacion;
+                     
+                    	                       
+                      --la factura de exportacion no altera la fecha 
+                      update vef.tventa  set 
+                        cod_control = pxp.f_gen_cod_control(v_dosificacion.llave,
+                                                            v_dosificacion.nroaut,
+                                                            v_nro_factura::varchar,
+                                                            v_venta.nit,
+                                                            to_char(v_fecha_venta,'YYYYMMDD')::varchar,
+                                                            round(v_venta.total_venta_msuc,0))
+                      where id_venta = v_venta.id_venta;
                 
                 
-          end if;       
+                END IF;
+          end if;  
+          
+          --inserta o modifical el libro de ventas
+          	if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si' and v_es_fin = 'si') then
+				v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'FIN',v_venta.id_venta);
+			end if;    
           
           -- si hay mas de un estado disponible  preguntamos al usuario
           v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado de la planilla)'); 
@@ -1049,48 +1424,7 @@ BEGIN
             where ven.id_venta = v_parametros.id_venta;        
             
         
-			-- obtenemos el tipo del estado anulado
-            
-             select 
-              te.id_tipo_estado
-             into
-              v_id_tipo_estado
-             from wf.tproceso_wf pw 
-             inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso
-             inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = 'anulado'               
-             where pw.id_proceso_wf = v_registros.id_proceso_wf;
-               
-              
-             IF v_id_tipo_estado is NULL  THEN             
-                raise exception 'No se parametrizo es estado "anulado" para la venta';
-             END IF;
-             
-             select f.id_funcionario into  v_id_funcionario_inicio
-              from segu.tusuario u
-              inner join orga.tfuncionario f on f.id_persona = u.id_persona
-              where u.id_usuario = p_id_usuario;
-                          
-               -- pasamos la solicitud  al siguiente anulado
-           
-               v_id_estado_actual =  wf.f_registra_estado_wf(v_id_tipo_estado, 
-                                                           v_id_funcionario_inicio, 
-                                                           v_registros.id_estado_wf, 
-                                                           v_registros.id_proceso_wf,
-                                                           p_id_usuario,
-                                                           v_parametros._id_usuario_ai,
-                                                           v_parametros._nombre_usuario_ai,
-                                                           NULL,
-                                                           'Anulacion de venta');
-            
-             
-               -- actualiza estado en la solicitud
-              
-               update vef.tventa  set 
-                 id_estado_wf =  v_id_estado_actual,
-                 estado = 'anulado',
-                 id_usuario_mod=p_id_usuario,
-                 fecha_mod=now()
-               where id_venta  = v_parametros.id_venta;
+		v_res = vef.f_anula_venta(p_administrador,p_id_usuario,p_tabla, v_registros.id_proceso_wf,v_registros.id_estado_wf, v_parametros.id_venta);
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','venta anulada'); 

@@ -194,8 +194,22 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
                 bottom_filter: true
 		},
 		
-		
-		
+		{
+			config:{
+				name: 'direccion',
+				fieldLabel: 'Dirección',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 150,
+				maxLength:400
+			},
+				type:'TextArea',
+				filters:{pfiltro:'cli.direccion',type:'string'},
+				id_grupo:2,
+				grid:true,
+				form:true,
+                bottom_filter: true
+		},
 		
 		{
 			config:{
@@ -318,7 +332,7 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'},'direccion'
 		
 	],
 	sortInfo:{

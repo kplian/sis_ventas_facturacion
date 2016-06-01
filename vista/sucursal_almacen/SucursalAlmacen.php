@@ -273,8 +273,7 @@ Phx.vista.SucursalAlmacen=Ext.extend(Phx.gridInterfaz,{
         this.getComponente('id_sucursal').setValue(this.maestro.id_sucursal);
               
     }
-	}
-)
+})
 </script>
 		
 		
