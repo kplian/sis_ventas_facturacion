@@ -44,7 +44,13 @@ Phx.vista.VentaVendedorFarmacia = {
                        {name:'pendiente_entrega',title:'<H1 align="center"><i class="fa fa-eye"></i> Para Entrega</h1>',grupo:2,height:0},
                        {name:'entregado',title:'<H1 align="center"><i class="fa fa-eye"></i> Entregado</h1>',grupo:3,height:0},
                        {name:'descartado',title:'<H1 align="center"><i class="fa fa-eye"></i> Descartado</h1>',grupo:4,height:0}],
-  
+  actualizarSegunTab: function(name, indice){
+        if(this.finCons){
+        	 
+             this.store.baseParams.pes_estado = name;
+             this.load({params:{start:0, limit:this.tam_pag}});
+           }
+    },
   beditGroups: [0],
     bdelGroups:  [0],
     bactGroups:  [0,1,2,3,4],
@@ -96,14 +102,14 @@ Phx.vista.VentaVendedorFarmacia = {
         }
                
         this.getBoton('diagrama_gantt').enable(); 
-        Phx.vista.VentaVendedor.superclass.preparaMenu.call(this);
+        Phx.vista.VentaVendedorFarmacia.superclass.preparaMenu.call(this);
     },
     liberaMenu:function()
     {   
         this.getBoton('diagrama_gantt').disable();
         this.getBoton('ant_estado').disable();
         this.getBoton('sig_estado').disable();        
-        Phx.vista.VentaVendedor.superclass.liberaMenu.call(this);
+        Phx.vista.VentaVendedorFarmacia.superclass.liberaMenu.call(this);
     }
    
 	
