@@ -604,7 +604,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'monto_forma_pago', type: 'numeric'},
 		{name:'nro_factura', type: 'string'},
 		{name:'cod_control', type: 'string'},
-		{name:'fecha', type: 'date'},
+		{name:'fecha', type: 'date',dateFormat:'Y-m-d'},
 		{name:'excento', type: 'numeric'},
 		{name:'nroaut', type: 'numeric'},
 		'id_moneda','total_venta_msuc','transporte_fob','seguros_fob',
@@ -664,7 +664,9 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     
     onButtonEdit : function () {
         //abrir formulario de solicitud
-        this.openForm('edit', this.sm.getSelected());        
+        this.openForm('edit', this.sm.getSelected());  
+        
+        console.log(' this.sm.getSelected()........', this.sm.getSelected())      
     },    
     
     arrayDefaultColumHidden:['estado_reg','usuario_ai',

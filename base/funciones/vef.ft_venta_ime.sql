@@ -455,7 +455,7 @@ BEGIN
             COALESCE(v_otros_cif,0),
             COALESCE(v_tipo_cambio_venta,0)	,
             COALESCE(v_valor_bruto,0),
-            v_descripcion_bulto
+            COALESCE(v_descripcion_bulto,'')
             	
 			
 			) returning id_venta into v_id_venta;
@@ -690,7 +690,7 @@ BEGIN
               otros_cif = COALESCE(v_otros_cif,0),
               tipo_cambio_venta = COALESCE(v_tipo_cambio_venta,1),
               valor_bruto = COALESCE(v_valor_bruto,0),
-              descripcion_bulto = v_descripcion_bulto
+              descripcion_bulto = COALESCE(v_descripcion_bulto,'')
             
             
 			where id_venta=v_parametros.id_venta;

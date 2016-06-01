@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -172,7 +174,9 @@ BEGIN
                         ven.seguros_cif,
                         ven.otros_cif,
                         ven.tipo_cambio_venta,
-                        mon.moneda as desc_moneda
+                        mon.moneda as desc_moneda,
+                        ven.valor_bruto,
+                        ven.descripcion_bulto
                         
                         	
 						from vef.tventa ven
@@ -258,13 +262,13 @@ BEGIN
 
 		end;
 	/*********************************    
- 	#TRANSACCION:  'VF_VENCONF_SEL'
+ 	#TRANSACCION:  'VF_VENCONFBAS_SEL'
  	#DESCRIPCION:	Obtener configuraciones basicas para sistema de ventas
  	#AUTOR:		admin	
  	#FECHA:		01-06-2015 05:58:00
 	***********************************/
 
-	elsif(p_transaccion='VF_VENCONF_SEL')then
+	elsif(p_transaccion='VF_VENCONFBAS_SEL')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
@@ -293,13 +297,13 @@ BEGIN
 
 		end;
 	/*********************************    
- 	#TRANSACCION:  'VF_NOTAVEND_SEL'
+ 	#TRANSACCION:  'VF_NOTAVENDV_SEL'
  	#DESCRIPCION:	lista el detalle de la nota de venta
  	#AUTOR:		admin	
  	#FECHA:		01-06-2015 05:58:00
 	***********************************/
 
-	ELSIF(p_transaccion='VF_NOTAVEND_SEL')then
+	ELSIF(p_transaccion='VF_NOTAVENDV_SEL')then
      				
     	begin
     		--Sentencia de la consulta
@@ -341,13 +345,13 @@ BEGIN
 						
 		end;
     /*********************************    
- 	#TRANSACCION:  'VF_NOTAVEND_CONT'
+ 	#TRANSACCION:  'VF_NOTAVENDV_CONT'
  	#DESCRIPCION:	Conteo de registros
  	#AUTOR:		admin	
  	#FECHA:		01-06-2015 05:58:00
 	***********************************/
 
-	elsif(p_transaccion='VF_NOTAVEND_CONT')then
+	elsif(p_transaccion='VF_NOTAVENDV_CONT')then
 
 		begin
 			--Sentencia de la consulta de conteo de registros
@@ -367,13 +371,13 @@ BEGIN
 
 		end;
     /*********************************    
- 	#TRANSACCION:  'VF_NOTVEN_SEL'
+ 	#TRANSACCION:  'VF_NOTVENV_SEL'
  	#DESCRIPCION:   Lista de la cabecera de la nota de venta
  	#AUTOR:		admin	
  	#FECHA:		01-06-2015 05:58:00
 	***********************************/
 
-	elsif(p_transaccion='VF_NOTVEN_SEL')then
+	elsif(p_transaccion='VF_NOTVENV_SEL')then
      				
     	begin
     		--Sentencia de la consulta
@@ -440,7 +444,7 @@ BEGIN
                         pxp.f_convertir_num_a_letra(ven.total_venta) as total_venta_literal,
                         ven.observaciones,
                         cli.nombre_factura,
-                        suc.nombre,
+                        suc.nombre_comprobante,
                         ven.nro_factura,
                         dos.nroaut,
                         cli.nit,
@@ -472,7 +476,7 @@ BEGIN
                         ven.otros_cif,
                         (to_char(ven.fecha,''DD'')::integer || '' de '' ||param.f_literal_periodo(to_char(ven.fecha,''MM'')::integer) || '' de '' || to_char(ven.fecha,''YYYY''))::varchar as fecha_literal,
 			(select count(*) from vef.ttipo_descripcion td where td.estado_reg = ''activo'' and td.id_sucursal = suc.id_sucursal)::integer as descripciones, 
-			ven.estado
+			ven.estado,ven.valor_bruto,ven.descripcion_bulto
             from vef.tventa ven						
 			inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
 			inner join vef.tcliente tc on tc.id_cliente = cli.id_cliente
@@ -518,7 +522,8 @@ BEGIN
                         cig.nandina,
                         vedet.bruto,
                         vedet.ley,
-                        vedet.kg_fino
+                        vedet.kg_fino,
+                        vedet.descripcion
 						from vef.tventa_detalle vedet						
 						left join vef.tsucursal_producto sprod on sprod.id_sucursal_producto = vedet.id_sucursal_producto
 						left join vef.tformula form on form.id_formula = vedet.id_formula

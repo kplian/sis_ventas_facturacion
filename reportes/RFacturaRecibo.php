@@ -423,7 +423,7 @@ class RFacturaRecibo
 							<td style="text-align: center; border: thin solid black;" width="10%"><strong>CANTIDAD</strong></td>
 							<td style="text-align: center; border: thin solid black;" width="10%"><strong>UNIDAD DE MEDIDA</strong></td>
 							<td style="text-align: center; border: thin solid black;" width="12%"><strong>PRECIO UNITARIO</strong></td>
-							<td style="text-align: center; border: thin solid black;" width="14%"><strong>SUBTOTAL</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="14%"><strong>TOTAL</strong></td>
 						</tr>';
 					$valor_bruto = 0;
 					
@@ -460,7 +460,7 @@ class RFacturaRecibo
 					<tbody>
 						<tr>
 							<td style="text-align: center;" width="33.5%" rowspan="3"><br><h1><strong>' . $estado . '</strong></h1></td>
-							<td width="52.5%"><strong>VALOR BRUTO/Gross Value :</strong></td>
+							<td width="52.5%"><strong>Valor del Material/Material Value :</strong></td>
 							<td style="text-align: right;" width="14%"><strong>' . number_format($valor_bruto, 2, '.', ',') . '</strong></td>
 						</tr>
 						<tr>
@@ -536,6 +536,10 @@ class RFacturaRecibo
 					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
 					
 					$pagina = str_replace('<h3>&nbsp;<strong>COPIA TESORERIA</strong></h3>', '<h3>&nbsp;<strong>COPIA ARCHIVO</strong></h3>', $pagina);
+					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
+					//copia archivo adicionales
+					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
+					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
 					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
 				}
 				$html .= '<script language="VBScript">
