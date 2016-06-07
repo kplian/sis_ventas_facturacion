@@ -65,7 +65,8 @@ BEGIN
                               td.nombre,
                               td.columna,
                               td.fila,
-                              td.obs as obs_tipo	
+                              td.obs as obs_tipo,
+                              vald.valor_label
                             from vef.tvalor_descripcion vald
                             inner join vef.ttipo_descripcion td on td.id_tipo_descripcion = vald.id_tipo_descripcion
                             inner join segu.tusuario usu1 on usu1.id_usuario = vald.id_usuario_reg
