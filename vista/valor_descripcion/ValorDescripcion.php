@@ -236,7 +236,7 @@ Phx.vista.ValorDescripcion=Ext.extend(Phx.gridInterfaz,{
 		field: 'id_valor_descripcion',
 		direction: 'ASC'
 	},
-	bdel: false,
+	bdel: true,
 	bedit: false,
 	bsave: true,
 	bnew: false,
