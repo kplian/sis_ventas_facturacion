@@ -54,7 +54,7 @@ Phx.vista.ValorDescripcion=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'nombre',
+				name: 'valor_label',
 				fieldLabel: 'Atributo',
 				allowBlank: false,
 				anchor: '80%',
@@ -62,9 +62,10 @@ Phx.vista.ValorDescripcion=Ext.extend(Phx.gridInterfaz,{
 				maxLength:300
 			},
 				type:'TextField',
-				filters:{pfiltro:'td.nombre',type:'string'},
+				filters: { pfiltro:'vald.valor_label',type:'string' },
 				id_grupo:1,
 				grid:true,
+				egrid:true,
 				form:false
 		},
 		{
@@ -228,14 +229,14 @@ Phx.vista.ValorDescripcion=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'}, 'obs_tipo','codigo','nombre'
+		{name:'usr_mod', type: 'string'}, 'obs_tipo','codigo','nombre','valor_label'
 		
 	],
 	sortInfo:{
 		field: 'id_valor_descripcion',
 		direction: 'ASC'
 	},
-	bdel: false,
+	bdel: true,
 	bedit: false,
 	bsave: true,
 	bnew: false,

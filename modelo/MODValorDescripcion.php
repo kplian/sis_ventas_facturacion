@@ -39,6 +39,9 @@ class MODValorDescripcion extends MODbase{
 		$this->captura('columna','numeric');
 		$this->captura('fila','numeric');
 		$this->captura('obs_tipo','varchar');
+		$this->captura('valor_label','varchar');
+		
+		
 		
 		
 		
@@ -61,7 +64,8 @@ class MODValorDescripcion extends MODbase{
 		$this->setParametro('valor','valor','varchar');
 		$this->setParametro('id_tipo_descripcion','id_tipo_descripcion','int4');
 		$this->setParametro('obs','obs','varchar');
-		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('id_venta','id_venta','int4');		
+		$this->setParametro('valor_label','valor_label','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -84,6 +88,9 @@ class MODValorDescripcion extends MODbase{
 		$this->setParametro('id_tipo_descripcion','id_tipo_descripcion','int4');
 		$this->setParametro('obs','obs','varchar');
 		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('valor_label','valor_label','varchar');
+		
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
