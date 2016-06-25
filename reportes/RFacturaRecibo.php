@@ -314,7 +314,7 @@ class RFacturaRecibo
 								<table style="height: 130px;" width="180">
 									<tbody>
 										<tr>
-											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACEXPORTCARTAVINTO'?'/imagenes/logos/logo_vinto.png':$_SESSION['_DIR_LOGO']) .'" alt="logo" width="60" height="60" /></td>
+											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACEXPORTCARTAVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_reporte.png') .'" alt="logo" width="60" height="60" /></td>
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong></td>
@@ -604,7 +604,7 @@ class RFacturaRecibo
 								<table style="height: 130px;" width="230">
 									<tbody>
 										<tr>
-											<td style="text-align:center;"><img src="../../../lib' . $_SESSION['_DIR_LOGO'] .'" alt="logo" width="75" height="65" /></td>
+											<td style="text-align:center;"><img src="../../../lib/imagenes/logos/logo_reporte" alt="logo" width="75" height="65" /></td>
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong></td>
@@ -940,7 +940,7 @@ class RFacturaRecibo
 								<table style="height: 130px;" width="230">
 									<tbody>
 										<tr>
-											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':$_SESSION['_DIR_LOGO']) .'" alt="logo" width="60" height="60" /></td>
+											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_reporte.png') .'" alt="logo" width="60" height="60" /></td>
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong><br />' . $datos['direccion_sucursal'] . '<br />' . $datos['telefono_sucursal'] . '<br />' . $datos['lugar_sucursal'] . '</td>

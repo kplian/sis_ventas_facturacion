@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -552,7 +550,7 @@ BEGIN
     		--Sentencia de la consulta
 			v_consulta:='
                         select												
-						td.nombre,
+						vd.valor_label,
 						td.columna,
 						td.fila,
 						vd.valor
