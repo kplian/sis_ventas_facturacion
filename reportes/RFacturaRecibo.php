@@ -749,8 +749,8 @@ class RFacturaRecibo
 					<tbody>
 						<tr>							
 							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Partida</strong></td>
-							<td style="text-align: center; border: thin solid black;" width="20%"><strong>Mineral</strong></td>
-							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Bruto</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="30%"><strong>Mineral</strong></td>
+							
 							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Ley Mineral</strong></td>
 							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Peso Fino[Kg]</strong></td>
 							<td style="text-align: center; border: thin solid black;" width="16%"><strong>Peso Fino</strong></td>
@@ -764,8 +764,7 @@ class RFacturaRecibo
 						$valor_bruto += $item_detalle['precio_total']; 
 						$pagina .= '<tr>							
 							<td style="border-bottom: thin solid black;">' . $item_detalle['nandina'] . '</td>
-							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] . '</td>
-							<td style="text-align: right;border-bottom: thin solid black;">' . $item_detalle['bruto'] . '</td>
+							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] . '</td>							
 							<td style="text-align: right;border-bottom: thin solid black;">' . $item_detalle['ley'] . '</td>
 							<td style="text-align: right;border-bottom: thin solid black;">' . $item_detalle['kg_fino'] . '</td>
 							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['cantidad'], 6, '.', ',') . ' ' . $item_detalle['unidad_medida'] . '</td>
