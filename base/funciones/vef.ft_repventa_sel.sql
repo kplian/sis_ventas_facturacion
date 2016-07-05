@@ -254,6 +254,7 @@ BEGIN
 	elsif(p_transaccion='VF_VENCONF_SEL')then
 
 		begin
+        	
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='	select variable, valor
 						 	from pxp.variable_global
@@ -275,6 +276,72 @@ BEGIN
 			--Definicion de la respuesta		    
 			
 
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+        
+    /*********************************    
+ 	#TRANSACCION:  'VF_REPXPROD_SEL'
+ 	#DESCRIPCION:	Detalle de ventas para una lista de productos
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_REPXPROD_SEL')then
+
+		begin
+        	v_filtro = ' v.estado = ''finalizado'' and v.id_sucursal = ' || v_parametros.id_sucursal || ' and v.fecha >=''' 
+            		|| v_parametros.fecha_desde || ''' and v.fecha <= ''' || v_parametros.fecha_hasta ||
+                    ''' and vd.id_sucursal_producto in(' || v_parametros.id_productos || ')' ;
+			
+            --Sentencia de la consulta de conteo de registros
+			v_consulta:='	select
+                            
+                            (tdcv.codigo||'' - ''||tdcv.nombre)::varchar as desc_tipo_doc_compra_venta,                           
+                            pla.desc_plantilla::varchar,                           
+                            to_char(dcv.fecha,''YYYY-MM-DD'')::varchar as fecha,
+                            dcv.nro_autorizacion::varchar,
+                            dcv.nit::varchar,
+                            dcv.razon_social::varchar,
+                            pxp.list(cig.desc_ingas)::varchar,
+                            dcv.nro_documento,
+                            COALESCE(dcv.importe_doc,0)::numeric as importe_doc,
+                            COALESCE(dcv.importe_neto,0)::numeric as importe_neto,
+                            
+                            COALESCE(dcv.importe_iva,0)::numeric as importe_iva,
+                            COALESCE(dcv.importe_it,0)::numeric as importe_it,
+                            COALESCE(dcv.importe_neto,0)::numeric - COALESCE(dcv.importe_iva,0) as ingreso
+                                                  
+                        
+						from vef.tventa v 
+                        inner join vef.tventa_detalle vd on vd.id_venta = v.id_venta
+                        inner join vef.tsucursal_producto sp on sp.id_sucursal_producto = vd.id_sucursal_producto
+                        inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sp.id_concepto_ingas
+                        inner join conta.tdoc_compra_venta dcv on dcv.id_origen = v.id_venta and dcv.tabla_origen = ''vef.tventa''
+                          
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla                          
+                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+                          where ' || v_filtro || '
+                          group by dcv.estado,                            
+                            pla.desc_plantilla,                           
+                            dcv.fecha,
+                            dcv.nro_autorizacion,
+                            dcv.nit,
+                            dcv.razon_social,
+                            dcv.nro_documento,
+                            dcv.importe_doc,
+                            dcv.importe_neto,
+                            
+                            dcv.importe_iva,
+                            dcv.importe_it,
+                            tdcv.codigo,
+                            tdcv.nombre
+						 ';
+			
+			--Definicion de la respuesta		    
+			
+			raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 
