@@ -43,7 +43,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 mode: 'remote',
                 pageSize: 15,
                 queryDelay: 1000,                
-                minChars: 2
+                minChars: 2,
+                width:250,
+                resizable:true
             },
             type: 'ComboBox',
             id_grupo: 0,            
@@ -82,7 +84,8 @@ header("content-type: text/javascript; charset=UTF-8");
        				width:250,
        				minChars:2,
 	       			enableMultiSelect:true,
-	       			disabled:true
+	       			disabled:true,
+                	resizable:true
        			
        			},
        			type:'AwesomeCombo',
@@ -130,6 +133,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			
 			this.Cmp.id_sucursal.on('select',function(c, r, i){
 				this.Cmp.id_productos.store.baseParams.id_sucursal = r.data.id_sucursal;
+				this.Cmp.id_productos.modificado = true;
 				this.Cmp.id_productos.setDisabled(false);
 			},this);
 			
