@@ -291,7 +291,7 @@ BEGIN
 	elsif(p_transaccion='VF_REPXPROD_SEL')then
 
 		begin
-        	v_filtro = ' v.estado = ''finalizado'' and v.id_sucursal = ' || v_parametros.id_sucursal || ' and v.fecha >=''' 
+        	v_filtro = ' v.estado in (''finalizado'',''anulado'') and v.id_sucursal = ' || v_parametros.id_sucursal || ' and v.fecha >=''' 
             		|| v_parametros.fecha_desde || ''' and v.fecha <= ''' || v_parametros.fecha_hasta ||
                     ''' and vd.id_sucursal_producto in(' || v_parametros.id_productos || ')' ;
 			
@@ -337,6 +337,7 @@ BEGIN
                             dcv.importe_it,
                             tdcv.codigo,
                             tdcv.nombre
+                          order by dcv.fecha, dcv.nro_documento::integer
 						 ';
 			
 			--Definicion de la respuesta		    

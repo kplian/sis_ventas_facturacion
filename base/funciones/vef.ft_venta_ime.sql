@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -518,7 +516,12 @@ BEGIN
 	elsif(p_transaccion='VF_VEN_MOD')then
 
 		begin
-        	
+        	select 
+                v.* 
+             into 
+              v_registros  
+             from vef.tventa v 
+            where v.id_venta = v_parametros.id_venta;
             
             if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
                 v_id_punto_venta = v_parametros.id_punto_venta;
@@ -598,7 +601,10 @@ BEGIN
            
             end if;
             
-            
+            /* Lanzar exception al tratar de modificar la fecha de una venta computarizada*/
+            if (v_fecha is not null and v_fecha != v_registros.fecha and v_tipo_base = 'computarizada') then
+            	raise exception 'No es posible modificar la fecha de una venta computarizada';
+            end if;
             
             if (pxp.f_existe_parametro(p_tabla,'a_cuenta')) then
                 v_a_cuenta = v_parametros.a_cuenta;
