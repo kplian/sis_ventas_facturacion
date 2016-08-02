@@ -1271,7 +1271,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 anchor: '80%',                
                 maxLength:20
             },
-                type:'TextField',                
+                type:'NumberField',                
                 id_grupo:0,                
                 form:true,
                 valorInicial:'0'

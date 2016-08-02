@@ -949,7 +949,7 @@ BEGIN
                 end if;
                 
                 if (v_suma_fp > v_venta.total_venta) then
-                    raise exception 'El total de la venta no coincide con la división por forma de pago%',v_suma_fp;
+                    raise exception 'El total de la venta no coincide con la divisióor forma de pago%',v_suma_fp;
                 end if;
                 
                 if (v_suma_det != v_venta.total_venta) then
@@ -987,12 +987,13 @@ BEGIN
                     
                     
                       
-                          if (EXISTS(	select 1
-                                          from vef.tventa v
-                                          where v.fecha > v_venta.fecha and v.tipo_factura = v_venta.tipo_factura 
-                                          and v.estado != 'anulado'
-                                          and v.estado_reg = 'activo'))THEN
-                              raise exception 'Existen facturas emitidas con fechas posterior a la registrada (%). Por favor revise la fecha y hora del sistema',v_fecha;
+                            if (EXISTS(select 1
+                                            from vef.tventa v
+                                            where v.fecha > v_venta.fecha and v.tipo_factura = v_venta.tipo_factura 
+                                            and v.estado != 'anulado'
+                                            and v.id_sucursal = v_venta.id_sucursal
+                                            and v.estado_reg = 'activo'))THEN
+                              raise exception 'Existen facturas emitidas con fechas posterior a la registrada (%). Por favor revise la fecha y hora del sistema (%..%)',v_fecha, v_venta.fecha, v_venta.tipo_factura;
                           end if;
                           
                             
@@ -1347,6 +1348,7 @@ BEGIN
                           raise exception 'El numero de factura ya existe para esta dosificacion. Por favor comuniquese con el administrador del sistema';
                        end if;
                        
+                       
                        --la factura de exportacion no altera la fecha 
                       update vef.tventa  set 
                         id_dosificacion = v_dosificacion.id_dosificacion,
@@ -1375,6 +1377,9 @@ BEGIN
                      into  v_dosificacion 
                      from  vef.tdosificacion d where d.id_dosificacion = v_venta.id_dosificacion;
                      
+                     raise notice '>>>>>>>>>>>>>> prueba %,%,%,%', v_dosificacion.llave, v_dosificacion.nroaut,v_nro_factura,v_venta.nit;
+                     
+                      --raise exception '-- % ..', v_dosificacion.llave;
                     	                       
                       --la factura de exportacion no altera la fecha 
                       update vef.tventa  set 
