@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -949,11 +951,11 @@ BEGIN
                 end if;
                 
                 if (v_suma_fp > v_venta.total_venta) then
-                    raise exception 'El total de la venta no coincide con la divisióor forma de pago%',v_suma_fp;
+                    raise exception 'El total de la venta no coincide con la división por forma de pago%',v_suma_fp;
                 end if;
                 
                 if (v_suma_det != v_venta.total_venta) then
-                    raise exception 'El total de la venta no coincide con la suma de los detalles';
+                    raise exception 'El total de la venta no coincide con la suma de los detalles (% = %) en id: %',v_suma_det ,v_venta.total_venta, v_parametros.id_venta;
                 end if;
             end if;
             

@@ -604,7 +604,7 @@ class RFacturaRecibo
 								<table style="height: 130px;" width="230">
 									<tbody>
 										<tr>
-											<td style="text-align:center;"><img src="../../../lib/imagenes/logos/logo_reporte" alt="logo" width="75" height="65" /></td>
+											<td style="text-align:center;"><img src="../../../lib/imagenes/logos/logo_reporte.png" alt="logo" width="75" height="65" /></td>
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong></td>
@@ -930,13 +930,13 @@ class RFacturaRecibo
 					$pagina = '';
 				}	
 				
-				$pagina .= '
+				$pagina .= ' 
 			
-				<table style="height: 130px;" width="605">
+				<table style="height: 130px;" width="605">  
 					<tbody>
 						<tr>
 							<td>
-								<table style="height: 130px;" width="230">
+								<table style="height: 130px;" width="230">   
 									<tbody>
 										<tr>
 											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_reporte.png') .'" alt="logo" width="60" height="60" /></td>
