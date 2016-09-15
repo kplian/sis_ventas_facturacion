@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -97,7 +95,8 @@ DECLARE
     v_tipo_cambio_venta		numeric;
     v_es_fin				varchar;
     v_valor_bruto			numeric;
-    v_descripcion_bulto		varchar;	
+    v_descripcion_bulto		varchar;
+    v_nombre_factura		varchar;	
     
 			    
 BEGIN
@@ -298,6 +297,10 @@ BEGIN
             update vef.tcliente
             set nit = v_parametros.nit
             where id_cliente = v_id_cliente;
+            
+            select c.nombre_factura into v_nombre_factura
+            from vef.tcliente c
+            where c.id_cliente = v_id_cliente;
         else
         	INSERT INTO 
               vef.tcliente
@@ -315,6 +318,8 @@ BEGIN
               v_parametros.id_cliente,
               v_parametros.nit
             ) returning id_cliente into v_id_cliente;
+            
+            v_nombre_factura = v_parametros.id_cliente;
         	
         end if;
         --obtener gestion a partir de la fecha actual
@@ -413,7 +418,9 @@ BEGIN
             otros_cif,
             tipo_cambio_venta,
             valor_bruto,
-            descripcion_bulto
+            descripcion_bulto,
+            nit,
+            nombre_factura
             
             
           	) values(
@@ -455,7 +462,9 @@ BEGIN
             COALESCE(v_otros_cif,0),
             COALESCE(v_tipo_cambio_venta,0)	,
             COALESCE(v_valor_bruto,0),
-            COALESCE(v_descripcion_bulto,'')
+            COALESCE(v_descripcion_bulto,''),
+            v_parametros.nit,
+            v_nombre_factura
             	
 			
 			) returning id_venta into v_id_venta;
@@ -643,6 +652,10 @@ BEGIN
 	            update vef.tcliente
 	            set nit = v_parametros.nit
 	            where id_cliente = v_id_cliente;
+                
+                select c.nombre_factura into v_nombre_factura
+                from vef.tcliente c
+                where c.id_cliente = v_id_cliente;
 	        else
 	        	INSERT INTO 
 	              vef.tcliente
@@ -660,7 +673,8 @@ BEGIN
 	              v_parametros.id_cliente,
 	              v_parametros.nit
 	            ) returning id_cliente into v_id_cliente;
-	        	
+                
+	        	v_nombre_factura = v_parametros.id_cliente;
 	        end if;
 	        
 	        
@@ -698,9 +712,9 @@ BEGIN
               otros_cif = COALESCE(v_otros_cif,0),
               tipo_cambio_venta = COALESCE(v_tipo_cambio_venta,1),
               valor_bruto = COALESCE(v_valor_bruto,0),
-              descripcion_bulto = COALESCE(v_descripcion_bulto,'')
-            
-            
+              descripcion_bulto = COALESCE(v_descripcion_bulto,''),
+              nit = v_parametros.nit,
+              nombre_factura = v_nombre_factura 
 			where id_venta=v_parametros.id_venta;
             
             
@@ -1242,7 +1256,7 @@ BEGIN
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
           where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
           
-          select v.*,s.id_entidad,c.nit,tv.tipo_base into v_venta
+          select v.*,s.id_entidad,tv.tipo_base into v_venta
           from vef.tventa v
           inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal 
           inner join vef.tcliente c on c.id_cliente = v.id_cliente
