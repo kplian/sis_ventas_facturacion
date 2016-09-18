@@ -735,6 +735,11 @@ IS 'El nombre de la sucursal tal como se mostrara en el comprobante de venta. De
 /************************************F-SCP-JRR-VEF-0-12/05/2016*************************************************/ç
 
 
+CREATE INDEX tdosificacion_idx ON vef.tdosificacion
+  USING btree (nroaut)
+  WHERE estado_reg = 'activo';
+
+
 
 /************************************I-SCP-RAC-VEF-0-16/05/2016*************************************************/ç
 
@@ -778,3 +783,10 @@ ALTER TABLE vef.tventa
   ADD COLUMN nit VARCHAR(25);
 /************************************F-SCP-JRR-VEF-0-14/09/2016*************************************************/ç
 
+/************************************I-SCP-JRR-VEF-0-18/09/2016*************************************************/
+
+CREATE INDEX tdosificacion_idx ON vef.tdosificacion
+  USING btree (nroaut)
+  WHERE estado_reg = 'activo';
+  
+/************************************F-SCP-JRR-VEF-0-18/09/2016*************************************************/

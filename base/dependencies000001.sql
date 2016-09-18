@@ -354,3 +354,12 @@ ALTER TABLE ONLY vef.tvalor_descripcion
     ADD CONSTRAINT fk_tvalor_descripcion__id_tipo_descripcion
     FOREIGN KEY (id_tipo_descripcion) REFERENCES vef.ttipo_descripcion(id_tipo_descripcion);
 /************************************F-DEP-JRR-VEF-0-08/05/2016*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-18/09/2016*************************************************/
+
+CREATE TRIGGER trig_tdosificacion
+  BEFORE INSERT OR UPDATE 
+  ON vef.tdosificacion FOR EACH ROW 
+  EXECUTE PROCEDURE f_trig_tdosificacion();
+
+/************************************F-DEP-JRR-VEF-0-18/09/2016*************************************************/

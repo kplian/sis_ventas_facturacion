@@ -300,7 +300,7 @@ BEGIN
                             
                             (tdcv.codigo||'' - ''||tdcv.nombre)::varchar as desc_tipo_doc_compra_venta,                           
                             pla.desc_plantilla::varchar,                           
-                            to_char(dcv.fecha,''YYYY-MM-DD'')::varchar as fecha,
+                            to_char(dcv.fecha,''DD/MM/YYYY'')::varchar as fecha,
                             dcv.nro_autorizacion::varchar,
                             dcv.nit::varchar,
                             dcv.razon_social::varchar,
