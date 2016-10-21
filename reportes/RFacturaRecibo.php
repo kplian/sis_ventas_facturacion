@@ -384,7 +384,7 @@ class RFacturaRecibo
 						</tr>
 						<tr>
 							<td>Direccion del Importador/Address</td>
-							<td><strong>' . $datos['direccion_cliente'] . '</strong></td>
+							<td><strong>' .nl2br($datos['direccion_cliente']) . '</strong></td>
 							<td>&nbsp;</td>
 						</tr>
 						<tr>
@@ -594,7 +594,7 @@ class RFacturaRecibo
 					$pagina = '	<div id="watermark-anulado"></div>';
 				} else {
 					$pagina = '';
-				}	
+				}
 				$pagina .= '
 				
 				<table style="height: 130px;" width="750">
@@ -675,7 +675,7 @@ class RFacturaRecibo
 						</tr>
 						<tr>
 							<td>Direccion del Importador/Address</td>
-							<td><strong>' . $datos['direccion_cliente'] . '</strong></td>
+							<td><strong>' . nl2br($datos['direccion_cliente']) . '</strong></td>
 							<td>&nbsp;</td>
 						</tr>
 						<tr>

@@ -363,3 +363,13 @@ CREATE TRIGGER trig_tdosificacion
   EXECUTE PROCEDURE f_trig_tdosificacion();
 
 /************************************F-DEP-JRR-VEF-0-18/09/2016*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-19/09/2016*************************************************/
+DROP TRIGGER trig_tdosificacion ON vef.tdosificacion;
+
+CREATE TRIGGER trig_tdosificacion
+  BEFORE INSERT OR UPDATE
+  ON vef.tdosificacion FOR EACH ROW
+  EXECUTE PROCEDURE vef.f_trig_tdosificacion();
+
+/************************************F-DEP-JRR-VEF-0-19/09/2016*************************************************/
