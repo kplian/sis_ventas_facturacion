@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_dosificacion_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION vef.ft_dosificacion_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+  RETURNS varchar AS
+  $body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_dosificacion_ime
@@ -27,6 +30,9 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_dosificacion	integer;
+    v_mensaje			text;
+    v_nit				varchar;
+    v_cod_control		varchar;
 			    
 BEGIN
 
@@ -93,10 +99,36 @@ BEGIN
 			
 			)RETURNING id_dosificacion into v_id_dosificacion;
 			
+            select e.nit into v_nit
+            from vef.tsucursal s
+            inner join param.tentidad e on e.id_entidad = s.id_entidad
+            where s.id_sucursal = v_parametros.id_sucursal;
+            
+            v_cod_control = pxp.f_gen_cod_control(
+            						v_parametros.llave,
+                                    v_parametros.nroaut,
+                                    '1'::varchar,
+                                    '196560027'::varchar,
+                                    to_char(v_parametros.fecha_inicio_emi,'YYYYMMDD')::varchar,
+                                    1::numeric
+                                    );
+            
+            v_mensaje = '
+            	Dosificacion insertada con exito. Por favor valide la siguiente informacion en (http://ov.impuestos.gob.bo/Paginas/Publico/VerificacionFactura.aspx):<br>
+            		NIT Emisor : ' || v_nit || ' \n
+                    Numero Factura : 1 <br>
+                    Numero autorizacion : ' || v_parametros.nroaut || ' <br>
+                    Fecha de Emision : 	' || v_parametros.fecha_inicio_emi || ' <br>
+                    NIT Comprador : 196560027 <br>
+                    Total : 1 <br>
+                    Codigo Control : ' || v_cod_control || '<br>.
+                Esto garantizara que la informacion de la dosificacion se ha registrado correctamente.
+            ';
+            
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Dosificación almacenado(a) con exito (id_dosificacion'||v_id_dosificacion||')'); 
+			
             v_resp = pxp.f_agrega_clave(v_resp,'id_dosificacion',v_id_dosificacion::varchar);
-
+			v_resp = pxp.f_agrega_clave(v_resp,'prueba',v_mensaje); 
             --Devuelve la respuesta
             return v_resp;
 
@@ -112,6 +144,7 @@ BEGIN
 	elsif(p_transaccion='VF_DOS_MOD')then
 
 		begin
+        	
 			--Sentencia de la modificacion
 			update vef.tdosificacion set
 			id_sucursal = v_parametros.id_sucursal,
@@ -132,11 +165,37 @@ BEGIN
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai
 			where id_dosificacion=v_parametros.id_dosificacion;
-               
+            
+            select e.nit into v_nit
+            from vef.tsucursal s
+            inner join param.tentidad e on e.id_entidad = s.id_entidad
+            where s.id_sucursal = v_parametros.id_sucursal;
+            
+            v_cod_control = pxp.f_gen_cod_control(
+            						v_parametros.llave,
+                                    v_parametros.nroaut,
+                                    '1'::varchar,
+                                    '196560027'::varchar,
+                                    to_char(v_parametros.fecha_inicio_emi,'YYYYMMDD')::varchar,
+                                    1::numeric
+                                    );
+            
+            v_mensaje = '
+            	Dosificacion modificada con exito.<br> Por favor valide la siguiente informacion en <b><a href="http://ov.impuestos.gob.bo/Paginas/Publico/VerificacionFactura.aspx">Impuestos</a></b>:<br><br>
+            		NIT Emisor : ' || v_nit || '<br>
+                    Numero Factura : 1 <br>
+                    Numero autorizacion : ' || v_parametros.nroaut || ' <br>
+                    Fecha de Emision : 	' || to_char(v_parametros.fecha_inicio_emi,'DD/MM/YYYY') || ' <br>
+                    NIT Comprador : 196560027 <br>
+                    Total : 1 <br>
+                    Codigo Control : ' || v_cod_control || '<br><br>
+                <b>Esto garantizara que la informacion de la dosificacion se ha registrado correctamente.</b>
+            ';
+            
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Dosificación modificado(a)'); 
+			
             v_resp = pxp.f_agrega_clave(v_resp,'id_dosificacion',v_parametros.id_dosificacion::varchar);
-               
+            v_resp = pxp.f_agrega_clave(v_resp,'prueba',v_mensaje);    
             --Devuelve la respuesta
             return v_resp;
             
@@ -181,7 +240,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_dosificacion_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

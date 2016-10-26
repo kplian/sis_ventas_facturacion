@@ -38,10 +38,12 @@ class ACTDosificacion extends ACTbase{
 	}
 				
 	function insertarDosificacion(){
-		$this->objFunc=$this->create('MODDosificacion');	
+        $this->objParam->addParametro('llave',str_replace('\\','\\\\',$this->objParam->getParametro('llave')));
+		$this->objFunc=$this->create('MODDosificacion');
+
 		
 		if($this->objParam->insertar('id_dosificacion')){
-			$this->res=$this->objFunc->insertarDosificacion($this->objParam);			
+			$this->res=$this->objFunc->insertarDosificacion($this->objParam);
 		} else{			
 			$this->res=$this->objFunc->modificarDosificacion($this->objParam);
 		}
