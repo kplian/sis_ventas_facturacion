@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -96,7 +98,8 @@ DECLARE
     v_es_fin				varchar;
     v_valor_bruto			numeric;
     v_descripcion_bulto		varchar;
-    v_nombre_factura		varchar;	
+    v_nombre_factura		varchar;
+    v_id_cliente_destino    integer;	
     
 			    
 BEGIN
@@ -302,7 +305,8 @@ BEGIN
             from vef.tcliente c
             where c.id_cliente = v_id_cliente;
         else
-        	INSERT INTO 
+        	
+            INSERT INTO 
               vef.tcliente
             (
               id_usuario_reg,              
@@ -322,6 +326,37 @@ BEGIN
             v_nombre_factura = v_parametros.id_cliente;
         	
         end if;
+        
+        v_id_cliente_destino = null;
+        --si tenemos cliente destino
+        if v_tipo_factura = 'pedido' then
+                 if (pxp.f_is_positive_integer(v_parametros.id_cliente_destino)) THEN
+                    v_id_cliente_destino = v_parametros.id_cliente_destino::integer;
+                  else
+                	
+                    INSERT INTO 
+                      vef.tcliente
+                    (
+                      id_usuario_reg,              
+                      fecha_reg,              
+                      estado_reg, 
+                      nombre_factura
+                    )
+                    VALUES (
+                      p_id_usuario,
+                      now(),
+                      'activo',              
+                      v_parametros.id_cliente
+                    ) returning id_cliente into v_id_cliente_destino;
+                    
+                	
+                end if;
+        end if; 
+        
+        
+        
+        
+        
         --obtener gestion a partir de la fecha actual
         select id_gestion into v_id_gestion
         from param.tgestion
@@ -420,7 +455,8 @@ BEGIN
             valor_bruto,
             descripcion_bulto,
             nit,
-            nombre_factura
+            nombre_factura,
+            id_cliente_destino
             
             
           	) values(
@@ -464,7 +500,8 @@ BEGIN
             COALESCE(v_valor_bruto,0),
             COALESCE(v_descripcion_bulto,''),
             v_parametros.nit,
-            v_nombre_factura
+            v_nombre_factura,
+            v_id_cliente_destino
             	
 			
 			) returning id_venta into v_id_venta;
@@ -676,6 +713,33 @@ BEGIN
                 
 	        	v_nombre_factura = v_parametros.id_cliente;
 	        end if;
+            
+             v_id_cliente_destino = null;
+        
+            --si tenemos cliente destino
+           if v_tipo_factura = 'pedido' then
+                 if (pxp.f_is_positive_integer(v_parametros.id_cliente_destino)) THEN
+                    v_id_cliente_destino = v_parametros.id_cliente_destino::integer;
+                  else
+                	
+                    INSERT INTO 
+                      vef.tcliente
+                    (
+                      id_usuario_reg,              
+                      fecha_reg,              
+                      estado_reg, 
+                      nombre_factura
+                    )
+                    VALUES (
+                      p_id_usuario,
+                      now(),
+                      'activo',              
+                      v_parametros.id_cliente
+                    ) returning id_cliente into v_id_cliente_destino;
+                    
+                	
+                end if;
+           end if; 
 	        
 	        
 	        
@@ -714,7 +778,8 @@ BEGIN
               valor_bruto = COALESCE(v_valor_bruto,0),
               descripcion_bulto = COALESCE(v_descripcion_bulto,''),
               nit = v_parametros.nit,
-              nombre_factura = v_nombre_factura 
+              nombre_factura = v_nombre_factura ,
+              id_cliente_destino = v_id_cliente_destino
 			where id_venta=v_parametros.id_venta;
             
             

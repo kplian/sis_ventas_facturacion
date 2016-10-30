@@ -102,7 +102,8 @@ BEGIN
                             vedet.ley,
                             vedet.kg_fino,
                             um.id_unidad_medida,
-                            um.codigo as codigo_unidad_medida
+                            um.codigo as codigo_unidad_medida,
+                            COALESCE(cig.ruta_foto,'''')::varchar as ruta_foto
 						from vef.tventa_detalle vedet
 						inner join segu.tusuario usu1 on usu1.id_usuario = vedet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = vedet.id_usuario_mod

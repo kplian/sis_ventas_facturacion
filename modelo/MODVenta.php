@@ -21,6 +21,7 @@ class MODVenta extends MODbase{
 		
 
 		$this->setParametro('historico','historico','varchar');
+		$this->setParametro('tipo_factura','tipo_factura','varchar');
 
 		//Definicion de la lista del resultado del query
 		$this->captura('id_venta','int4');
@@ -75,6 +76,11 @@ class MODVenta extends MODbase{
 		$this->captura('desc_moneda','varchar');
 		$this->captura('valor_bruto','numeric');
 		$this->captura('descripcion_bulto','varchar');
+		
+		$this->captura('id_cliente_destino','integer');
+		$this->captura('cliente_destino','varchar');
+		
+		
 		
 		
 		
@@ -225,6 +231,7 @@ class MODVenta extends MODbase{
 			$this->setParametro('otros_cif','otros_cif','numeric');
 			$this->setParametro('valor_bruto','valor_bruto','numeric');
 			$this->setParametro('descripcion_bulto','descripcion_bulto','varchar');
+			$this->setParametro('id_cliente_destino','id_cliente_destino','varchar');
 			
 			
 			

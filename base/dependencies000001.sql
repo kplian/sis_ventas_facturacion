@@ -373,3 +373,23 @@ CREATE TRIGGER trig_tdosificacion
   EXECUTE PROCEDURE vef.f_trig_tdosificacion();
 
 /************************************F-DEP-JRR-VEF-0-19/09/2016*************************************************/
+
+
+
+/************************************I-DEP-JRR-VEF-0-28/10/2016*************************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD CONSTRAINT tventa__id_cliente_destino_fk FOREIGN KEY (id_cliente_destino)
+    REFERENCES vef.tcliente(id_cliente)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+/************************************F-DEP-JRR-VEF-0-28/10/2016*************************************************/
+
+
+

@@ -42,14 +42,15 @@ class MODVentaDetalle extends MODbase{
         $this->captura('id_vendedor_medico','varchar');
         $this->captura('nombre_vendedor_medico','varchar');
 		$this->captura('requiere_descripcion','varchar');
-		$this->captura('descripcion','text');
-		
+		$this->captura('descripcion','text');		
 		$this->captura('bruto','varchar');  
 		$this->captura('ley','varchar');  
-		$this->captura('kg_fino','varchar');
-		
+		$this->captura('kg_fino','varchar');		
 		$this->captura('id_unidad_medida','integer');
-		$this->captura('codigo_unidad_medida','varchar');  
+		$this->captura('codigo_unidad_medida','varchar');
+		$this->captura('ruta_foto','varchar');
+		
+		  
 		    
 		
 		//Ejecuta la instruccion

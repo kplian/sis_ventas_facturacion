@@ -790,3 +790,21 @@ CREATE INDEX tdosificacion_idx ON vef.tdosificacion
   WHERE estado_reg = 'activo';
   
 /************************************F-SCP-JRR-VEF-0-18/09/2016*************************************************/
+
+
+
+/************************************I-SCP-JRR-VEF-0-28/10/2016*************************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_cliente_destino INTEGER;
+
+COMMENT ON COLUMN vef.tventa.id_cliente_destino
+IS 'identifica el cliente destino';
+
+
+/************************************F-SCP-JRR-VEF-0-28/10/2016*************************************************/
+
+
+

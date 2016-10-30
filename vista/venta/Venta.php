@@ -313,6 +313,19 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 form:false,
                 bottom_filter: true
         },
+        
+        {
+            config:{
+                name: 'cliente_destino',
+                fieldLabel: 'Destino',
+                gwidth: 110
+            },
+                type:'TextField',
+                filters : {pfiltro : 'clides.nombre_factura',type : 'string'},             
+                grid:false,
+                form:false
+        },
+        
         {
             config:{
                 name: 'total_venta',
@@ -608,7 +621,9 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'excento', type: 'numeric'},
 		{name:'nroaut', type: 'numeric'},
 		'id_moneda','total_venta_msuc','transporte_fob','seguros_fob',
-		'otros_fob','transporte_cif','seguros_cif','otros_cif','tipo_cambio_venta','desc_moneda','valor_bruto','descripcion_bulto'
+		'otros_fob','transporte_cif','seguros_cif','otros_cif',
+		'tipo_cambio_venta','desc_moneda','valor_bruto',
+		'descripcion_bulto','cliente_destino','id_cliente_destino'
 		
 		
 	],
