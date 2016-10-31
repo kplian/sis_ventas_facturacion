@@ -387,9 +387,46 @@ ALTER TABLE vef.tventa
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
+    
+    
+--------------- SQL ---------------
+
+ -- object recreation
+DROP VIEW vef.vcliente;
+
+CREATE VIEW vef.vcliente
+AS
+  SELECT c.id_usuario_reg,
+         c.id_usuario_mod,
+         c.fecha_reg,
+         c.fecha_mod,
+         c.estado_reg,
+         c.id_usuario_ai,
+         c.usuario_ai,
+         c.id_cliente,
+         c.nombres,
+         c.primer_apellido,
+         c.segundo_apellido,
+         c.telefono_celular,
+         c.telefono_fijo,
+         c.otros_telefonos,
+         c.correo,
+         c.otros_correos,
+         c.nombre_factura,
+         c.nit,
+         (((c.nombres::text || ' '::text) || c.primer_apellido::text) || ' '::
+           text) || COALESCE(c.segundo_apellido, ''::character varying)::text AS
+           nombre_completo,
+         COALESCE(c.lugar,'')::varchar as lugar
+  FROM vef.tcliente c;
+
+ALTER TABLE vef.vcliente
+  OWNER TO postgres;    
 
 
 /************************************F-DEP-JRR-VEF-0-28/10/2016*************************************************/
+
+
 
 
 

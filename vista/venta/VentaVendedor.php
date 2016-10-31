@@ -15,6 +15,7 @@ Phx.vista.VentaVendedor = {
     requireclase:'Phx.vista.Venta',
     title:'Venta',
     nombreVista: 'VentaVendedor',
+    grupoDateFin: [1],
     
     constructor: function(config) {
         this.maestro=config.maestro;  
@@ -42,7 +43,7 @@ Phx.vista.VentaVendedor = {
         
         this.campo_fecha = new Ext.form.DateField({
 	        name: 'fecha_reg',
-	        grupo:[1],
+	        grupo: this.grupoDateFin,
 				fieldLabel: 'Fecha',
 				allowBlank: false,
 				anchor: '80%',

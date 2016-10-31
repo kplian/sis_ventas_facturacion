@@ -450,6 +450,17 @@ BEGIN
 	elsif(p_transaccion='VF_VENREP_SEL')then
      				
     	begin
+        
+             if v_parametros.tipo_factura = 'pedido' then
+               v_join_destino = '	inner join vef.vcliente clides on clides.id_cliente = ven.id_cliente_destino';
+               v_columnas_destino = ' clides.nombre_factura as cliente_destino, clides.lugar as lugar_destino ';
+            else
+               v_join_destino = '';
+                v_columnas_destino = ' ''''::varchar as cliente_destino,''''::varchar as lugar_destino  ';
+            end if;
+        
+        
+        
     		--Sentencia de la consulta
 			v_consulta:='select
 						en.nombre,
@@ -496,19 +507,25 @@ BEGIN
                         ven.otros_cif,
                         (to_char(ven.fecha,''DD'')::integer || '' de '' ||param.f_literal_periodo(to_char(ven.fecha,''MM'')::integer) || '' de '' || to_char(ven.fecha,''YYYY''))::varchar as fecha_literal,
 			(select count(*) from vef.ttipo_descripcion td where td.estado_reg = ''activo'' and td.id_sucursal = suc.id_sucursal)::integer as descripciones, 
-			ven.estado,ven.valor_bruto,ven.descripcion_bulto
+			ven.estado,
+            ven.valor_bruto,
+            ven.descripcion_bulto,
+            ven.nro_tramite,
+            cli.lugar as lugar_cliente,
+            '||v_columnas_destino||'
             from vef.tventa ven						
-			inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
-			inner join vef.tcliente tc on tc.id_cliente = cli.id_cliente
-                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
-                        inner join param.tentidad en on en.id_entidad = suc.id_entidad
-                        inner join param.tlugar lug on lug.id_lugar = suc.id_lugar
-                        inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal
-                        	and sucmon.tipo_moneda = ''moneda_base''
-                        inner join param.tmoneda mon on mon.id_moneda = sucmon.id_moneda
-                        inner join param.tmoneda mven on mven.id_moneda = ven.id_moneda
-                        left join vef.tdosificacion dos on dos.id_dosificacion = ven.id_dosificacion
-                       where  id_venta = '||v_parametros.id_venta::varchar;
+              inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+              '||v_join_destino||'
+              inner join vef.tcliente tc on tc.id_cliente = cli.id_cliente
+              inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+              inner join param.tentidad en on en.id_entidad = suc.id_entidad
+              inner join param.tlugar lug on lug.id_lugar = suc.id_lugar
+              inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal
+                  and sucmon.tipo_moneda = ''moneda_base''
+              inner join param.tmoneda mon on mon.id_moneda = sucmon.id_moneda
+              inner join param.tmoneda mven on mven.id_moneda = ven.id_moneda
+              left join vef.tdosificacion dos on dos.id_dosificacion = ven.id_dosificacion
+             where  id_venta = '||v_parametros.id_venta::varchar;
 			
 			
 			--Devuelve la respuesta

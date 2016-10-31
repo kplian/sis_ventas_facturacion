@@ -67,7 +67,8 @@ BEGIN
                 id_usuario_ai,
                 id_usuario_mod,
                 fecha_mod,
-                direccion
+                direccion,
+                lugar
           	) values(
                 v_parametros.correo,
                 v_parametros.telefono_fijo,
@@ -86,7 +87,8 @@ BEGIN
                 v_parametros._id_usuario_ai,
                 null,
                 null,
-                v_parametros.direccion
+                v_parametros.direccion,
+                v_parametros.lugar
 							
 			)RETURNING id_cliente into v_id_cliente;
 			
@@ -125,7 +127,8 @@ BEGIN
               fecha_mod = now(),
               id_usuario_ai = v_parametros._id_usuario_ai,
               usuario_ai = v_parametros._nombre_usuario_ai,
-              direccion = v_parametros.direccion
+              direccion = v_parametros.direccion,
+              lugar = v_parametros.lugar
 			where id_cliente=v_parametros.id_cliente;
                
 			--Definicion de la respuesta

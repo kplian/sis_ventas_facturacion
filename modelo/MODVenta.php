@@ -605,6 +605,7 @@ class MODVenta extends MODbase{
 		$this->setCount(false);
 		
 		$this->setParametro('id_venta','id_venta','integer');
+		$this->setParametro('tipo_factura','tipo_factura','varchar');
 
 		//Definicion de la lista del resultado del query
 		$this->captura('nombre_entidad','varchar');		
@@ -658,6 +659,13 @@ class MODVenta extends MODbase{
 		
 		$this->captura('valor_bruto','numeric');
 		$this->captura('descripcion_bulto','varchar');
+		$this->captura('nro_tramite','varchar');
+			
+		$this->captura('lugar_cliente','varchar');	
+		$this->captura('cliente_destino','varchar');
+		$this->captura('lugar_destino','varchar');
+		
+		
 		
 		
 		//Ejecuta la instruccion

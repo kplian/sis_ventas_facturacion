@@ -14,16 +14,39 @@ class ACTVenta extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_venta');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+        
+        
+        
+        
         if ($this->objParam->getParametro('pes_estado') != '') {
             if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
                 $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
             } else {
                 if ($this->objParam->getParametro('historico') != 'si') {
-                    $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
-                }
+                    	
+					
+					if ($this->objParam->getParametro('pes_estado') == 'pedido_en_proceso') {
+		                $this->objParam->addFiltro(" ven.estado not in( ''borrador'', ''comprado'', ''anulado'') ");
+		            }
+					else if ($this->objParam->getParametro('pes_estado') == 'pedido_finalizado') {
+		                $this->objParam->addFiltro(" ven.estado in( ''comprado'', ''anulado'') ");
+		            }
+					else{
+					  $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
+                	}	
+								
+                    	
+                    
+				
+				}
             }
             
         } 
+		
+		 if ($this->objParam->getParametro('nombreVista') == 'VentaVbPedido') { 
+              $this->objParam->addFiltro(" ven.estado not in ( ''borrador'') ");
+        } 
+		 
 		
 		if ($this->objParam->getParametro('id_sucursal') != '') {
 			$this->objParam->addFiltro(" ven.id_sucursal = ". $this->objParam->getParametro('id_sucursal'));

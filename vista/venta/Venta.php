@@ -16,11 +16,11 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	formClass : 'FormVenta',
     tipo_factura: 'recibo',
     nombreVista: 'Venta',
-	
+	solicitarSucursal: true, //para indicar si es forzoso o no indicar la sucrsal al iniciar
 	constructor:function(config) {
 		
 		this.maestro=config.maestro;
-		
+		this.Atributos[this.getIndAtributo('cliente_destino')].grid = true;
 		Ext.Ajax.request({
                 url:'../../sis_ventas_facturacion/control/Venta/getVariablesBasicas',                
                 params: {'prueba':'uno'},
@@ -83,13 +83,19 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	            form: false
 	        });
 		}
-		this.seleccionarPuntoVentaSucursal();
+		
+		if(this.solicitarSucursal){
+			this.seleccionarPuntoVentaSucursal();
+		}
+		
 		//llama al constructor de la clase padre
 		Phx.vista.Venta.superclass.constructor.call(this,request.arguments);
 				
 		this.init();
 		//this.load({params:{start:0, limit:this.tam_pag}});
-	}	,
+	},
+	
+	
 	seleccionarPuntoVentaSucursal : function () {
 		var validado = false;
 		var title;
@@ -784,24 +790,28 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
    imprimirNota: function(){
 		//Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
 			
-			var rec = this.sm.getSelected();
-			var data = rec.data;
+			var rec = this.sm.getSelected(),
+				data = rec.data,
+				me = this;
 			if (data) {
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({
 						url : '../../sis_ventas_facturacion/control/Venta/reporteFacturaRecibo',
 						params : {
 							'id_venta' : data.id_venta,
-							'formato_comprobante' : this.variables_globales.formato_comprobante
+							'formato_comprobante' : me.variables_globales.formato_comprobante,
+							'tipo_factura': me.tipo_factura
 						},
-						success : this.successExport,
-						failure : this.conexionFailure,
-						timeout : this.timeout,
-						scope : this
+						success : me.successExportHtml,
+						failure : me.conexionFailure,
+						timeout : me.timeout,
+						scope : me
 					});
 			}
 	},
-	successExport: function (resp) {
+	
+	
+	successExportHtml: function (resp) {
 
         Phx.CP.loadingHide();
         var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
