@@ -557,8 +557,8 @@ Phx.vista.Dosificacion=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.Dosificacion.superclass.loadValoresIniciales.call(this);        
     },
     onSubmit : function(o) {
-    	
-		this.Cmp.llave.setValue(encodeURIComponent(this.Cmp.llave_aux.getValue()));
+
+        this.Cmp.llave.setValue(this.Cmp.llave_aux.getValue());
 		Phx.vista.Dosificacion.superclass.onSubmit.call(this,o);
 	},
     successSave:function(resp){
