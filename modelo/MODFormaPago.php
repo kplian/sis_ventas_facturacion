@@ -40,6 +40,7 @@ class MODFormaPago extends MODbase{
 		$this->captura('defecto','varchar');
 		
 		$this->captura('registrar_tarjeta','varchar');
+		$this->captura('registrar_tipo_tarjeta','varchar');
 		$this->captura('registrar_cc','varchar');
 		$this->captura('valor','numeric');
 		$this->captura('numero_tarjeta','varchar');
@@ -70,6 +71,7 @@ class MODFormaPago extends MODbase{
 		$this->setParametro('defecto','defecto','varchar');
 		$this->setParametro('registrar_tarjeta','registrar_tarjeta','varchar');
 		$this->setParametro('registrar_cc','registrar_cc','varchar');
+		$this->setParametro('registrar_tipo_tarjeta','registrar_tipo_tarjeta','varchar');
 		
 
 		//Ejecuta la instruccion
@@ -96,6 +98,7 @@ class MODFormaPago extends MODbase{
 		$this->setParametro('defecto','defecto','varchar');
 		$this->setParametro('registrar_tarjeta','registrar_tarjeta','varchar');
 		$this->setParametro('registrar_cc','registrar_cc','varchar');
+		$this->setParametro('registrar_tipo_tarjeta','registrar_tipo_tarjeta','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

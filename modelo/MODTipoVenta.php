@@ -34,6 +34,8 @@ class MODTipoVenta extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
+		$this->captura('id_plantilla','int4');
+		$this->captura('desc_plantilla','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -55,6 +57,7 @@ class MODTipoVenta extends MODbase{
 		$this->setParametro('tipo_base','tipo_base','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('id_plantilla','id_plantilla','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -77,6 +80,7 @@ class MODTipoVenta extends MODbase{
 		$this->setParametro('tipo_base','tipo_base','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('id_plantilla','id_plantilla','integer');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

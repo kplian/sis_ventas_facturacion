@@ -5,6 +5,11 @@ VALUES (E'VEF', E'Sistema de Ventas', E'2015-04-20', E'VF', E'activo', E'ventas_
 
 select pxp.f_insert_tgui ('SISTEMA DE VENTAS', '', 'VEF', 'si', 1, '', 1, '', '', 'VEF');
 
+
+INSERT INTO param.tdocumento ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai",  "id_subsistema", "codigo", "descripcion", "periodo_gestion", "tipo", "tipo_numeracion", "formato", "ruta_plantilla")
+VALUES (1, NULL, E'2015-12-03 00:00:00', E'2015-12-03 09:38:53', E'activo', NULL, NULL,  (select id_subsistema from segu.tsubsistema s where s.codigo like 'VEF' and s.estado_reg = 'activo'), E'VEN', E'VEN', E'periodo', E'', E'tabla', E'codtabla-correlativo-periodo/gestion', NULL);
+
+
 /***********************************F-DAT-JRR-VEF-0-02/05/2015*****************************************/
 
 /***********************************I-DAT-JRR-VEF-0-05/07/2015*****************************************/
@@ -52,31 +57,86 @@ select pxp.f_insert_testructura_gui ('VFVENTA', 'VENCARP');
 
 
 /***********************************I-DAT-JRR-VEF-0-06/10/2015*****************************************/
-INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "descripcion")
-VALUES (43, E'vef_estados_validar_fp', E'borrador', E'variable global para definir los estados en los q se valida la forma de pago');
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES ( E'vef_estados_validar_fp', E'borrador', E'variable global para definir los estados en los q se valida la forma de pago');
 
-INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "descripcion")
-VALUES (44, E'vef_integracion_almacenes', E'false', E'variable global para definir si el sistema de ventas se integrara con el de almacenes para obtener listadod e items');
+INSERT INTO pxp.variable_global ( "variable", "valor", "descripcion")
+VALUES ( E'vef_integracion_almacenes', E'false', E'variable global para definir si el sistema de ventas se integrara con el de almacenes para obtener listadod e items');
 
-INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "descripcion")
-VALUES (41, E'vef_tiene_punto_venta', E'false', E'variable global para definir si las ventas se manejaran a nivel sucursal o a nivel punto de venta');
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES ( E'vef_tiene_punto_venta', E'false', E'variable global para definir si las ventas se manejaran a nivel sucursal o a nivel punto de venta');
 
-INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "descripcion")
-VALUES (42, E'vef_tipo_venta_habilitado', E'servicio', E'variable global para definir que tipos de venta estaran habilitados');
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_tipo_venta_habilitado', E'servicio', E'variable global para definir que tipos de venta estaran habilitados');
 
 /***********************************F-DAT-JRR-VEF-0-06/10/2015*****************************************/
 
 
 /***********************************I-DAT-JRR-VEF-0-28/03/2016*****************************************/
 
-INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
-VALUES (83, NULL, E'2016-03-22 16:34:15.546', NULL, E'activo', NULL, E'NULL', 1, E'computarizada', E'Computarizada', E'VENTA', E'computarizada');
+INSERT INTO vef.ttipo_venta ("id_usuario_reg",  "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (1,E'computarizada', E'Computarizada', E'VENTA', E'computarizada');
 
-INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
-VALUES (83, NULL, E'2016-03-22 16:34:48.414', NULL, E'activo', NULL, E'NULL', 2, E'manual', E'Manual', E'VENTA', E'manual');
+INSERT INTO vef.ttipo_venta ("id_usuario_reg", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (1,E'manual', E'Manual', E'VENTA', E'manual');
 
-INSERT INTO vef.ttipo_venta ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai", "id_tipo_venta", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
-VALUES (83, NULL, E'2016-03-22 16:35:03.413', NULL, E'activo', NULL, E'NULL', 3, E'recibo', E'Recibo', E'VENTA', E'recibo');
+INSERT INTO vef.ttipo_venta ("id_usuario_reg", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (1, E'recibo', E'Recibo', E'VENTA', E'recibo');
 
 
 /***********************************F-DAT-JRR-VEF-0-28/03/2016*****************************************/
+
+/***********************************I-DAT-JRR-VEF-0-30/04/2016*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_integracion_lcv', E'si', E'Si el sistema de ventas se integra con el libro de compras y ventas de contabilidad');
+
+
+/***********************************F-DAT-JRR-VEF-0-30/04/2016*****************************************/
+
+
+/***********************************I-DAT-RAC-VEF-0-05/05/2016*****************************************/
+
+
+----------------------------------
+--COPY LINES TO data.sql FILE  
+---------------------------------
+
+select pxp.f_insert_tgui ('Venta Computarizada Exportación', 'Factura de Exportación', 'VEFACEX', 'si', 5, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacion.php', 3, '', 'VentaVendedorExportacion', 'VEF');
+select pxp.f_insert_tgui ('Exportación Minera', 'Factura de exportación para mineria', 'EXPOMIN', 'si', 7, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacionMin.php', 3, '', 'VentaVendedorExportacionMin', 'VEF');
+select pxp.f_insert_tgui ('Computarizada minera', 'Computarizada minera', 'COMMIN', 'si', 8, 'sis_ventas_facturacion/vista/venta/VentaVendedorMin.php', 3, '', 'VentaVendedorMin', 'VEF');
+----------------------------------
+--COPY LINES TO dependencies.sql FILE  
+---------------------------------
+
+select pxp.f_insert_testructura_gui ('VEFACEX', 'VENCARP');
+select pxp.f_insert_testructura_gui ('EXPOMIN', 'VENCARP');
+select pxp.f_insert_testructura_gui ('COMMIN', 'VENCARP');
+
+/***********************************F-DAT-RAC-VEF-0-05/05/2016*****************************************/
+
+/***********************************I-DAT-JRR-VEF-0-13/07/2016*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_integracion_obingresos', E'false', E'Si el sistema de ventas se integra con el sistema de ingresos boa');
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'vef_tiene_apertura_cierre', E'no', E'Si el sistema de ventas controlara la apertura y cierre de cajas');
+
+/***********************************F-DAT-JRR-VEF-0-13/07/2016*****************************************/
+
+/***********************************I-DAT-JRR-VEF-0-27/10/2016*****************************************/
+
+select wf.f_import_tproceso_macro ('insert','VEN', 'VEF', 'Sistema de Ventas','si');
+select wf.f_import_tcategoria_documento ('insert','legales', 'Legales');
+select wf.f_import_tcategoria_documento ('insert','proceso', 'Proceso');
+select wf.f_import_ttipo_proceso ('insert','VEN',NULL,NULL,'VEN','Sistema de Ventas','','','si','','obligatorio','','VEN',NULL);
+select wf.f_import_ttipo_estado ('insert','borrador','VEN','Borrador','si','no','no','anterior','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL);
+select wf.f_import_ttipo_estado ('insert','finalizado','VEN','finalizado','no','no','si','listado','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','','borrador');
+select wf.f_import_ttipo_estado ('insert','anulado','VEN','anulado','no','no','si','anterior','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL);
+select wf.f_import_ttipo_estado ('insert','caja','VEN','caja','no','no','no','funcion_listado','vef.f_lista_funcionario_cajero','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','','borrador');
+select wf.f_import_testructura_estado ('insert','borrador','finalizado','VEN',1,'');
+select wf.f_import_tfuncionario_tipo_estado ('insert','borrador','VEN','3483198',NULL,'');
+select wf.f_import_tfuncionario_tipo_estado ('insert','finalizado','VEN','2738127',NULL,'');
+
+/***********************************F-DAT-JRR-VEF-0-27/10/2016*****************************************/

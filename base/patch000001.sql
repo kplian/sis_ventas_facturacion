@@ -477,3 +477,357 @@ CREATE TABLE vef.tventa_boleto (
 ) INHERITS (pxp.tbase);
   
 /************************************F-SCP-JRR-VEF-0-29/03/2016*************************************************/
+
+
+/************************************I-SCP-RAC-VEF-0-16/04/2016*************************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_moneda INTEGER;
+
+COMMENT ON COLUMN vef.tventa.id_moneda
+IS 'moneda de la venta';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN total_venta_msuc NUMERIC(18,2);
+
+COMMENT ON COLUMN vef.tventa.total_venta_msuc
+IS 'total venta en la moneda de la sucursal';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN transporte_fob NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.transporte_fob
+IS 'transporte fob para exportacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN seguros_fob NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.seguros_fob
+IS 'seguros fob para exportacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN otros_fob NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.otros_fob
+IS 'otros fob para exportacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN transporte_cif NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.transporte_cif
+IS 'trasporte cif para exportacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN seguros_cif NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.seguros_cif
+IS 'seguros cif para exportacion';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN otros_cif NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN cantidad TYPE NUMERIC;
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN tipo_cambio_venta NUMERIC DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.tipo_cambio_venta
+IS 'solo si la trasaccion se define en una moneda diferetne de la base';
+
+
+
+ALTER TABLE vef.tcliente
+  ADD COLUMN direccion VARCHAR DEFAULT '' NOT NULL;
+
+COMMENT ON COLUMN vef.tcliente.direccion
+IS 'direccion del cliente';
+
+/************************************F-SCP-RAC-VEF-0-16/04/2016*************************************************/
+
+
+/************************************I-SCP-RAC-VEF-0-22/04/2016*************************************************/
+
+
+--------------- SQL ---------------
+
+CREATE TABLE vef.ttipo_descripcion (
+  id_tipo_descripcion SERIAL NOT NULL,
+  codigo VARCHAR(100),
+  nombre VARCHAR(300),
+  obs VARCHAR,
+  PRIMARY KEY(id_tipo_descripcion)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.ttipo_descripcion
+  ADD COLUMN columna NUMERIC(10,2) DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.ttipo_descripcion.columna
+IS 'posicion en reporte';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.ttipo_descripcion
+  ADD COLUMN fila NUMERIC(10,2) DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.ttipo_descripcion.fila
+IS 'numeros de fila';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.ttipo_descripcion
+  ADD COLUMN id_sucursal INTEGER;
+  
+  
+ --------------- SQL ---------------
+
+CREATE TABLE vef.tvalor_descripcion (
+  id_valor_descripcion SERIAL NOT NULL,
+  id_venta INTEGER NOT NULL,
+  id_tipo_descripcion INTEGER NOT NULL,
+  valor VARCHAR(300) DEFAULT '' NOT NULL,
+  obs VARCHAR,
+  PRIMARY KEY(id_valor_descripcion)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false); 
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN bruto NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa_detalle.bruto
+IS 'esto es para facturas de mineria';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN ley NUMERIC(18,4) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa_detalle.ley
+IS 'atributo para venta de mineria';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN kg_fino NUMERIC(18,4) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa_detalle.kg_fino
+IS 'atributo para mineria';
+
+/************************************F-SCP-RAC-VEF-0-22/04/2016*************************************************/
+
+
+/************************************I-SCP-RAC-VEF-0-29/04/2016*************************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tsucursal
+  ADD COLUMN tipo_interfaz VARCHAR(100)[];
+
+COMMENT ON COLUMN vef.tsucursal.tipo_interfaz
+IS 'interfaces con las que puede trabajr una sucursal,  son los nombre de clase';
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN kg_fino DROP DEFAULT;
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN kg_fino TYPE VARCHAR;
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN kg_fino SET DEFAULT 0;
+  
+  --------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN ley DROP DEFAULT;
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN ley TYPE VARCHAR;
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN ley SET DEFAULT 0;
+  
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN bruto DROP DEFAULT;
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN bruto TYPE VARCHAR;
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN bruto SET DEFAULT 0;  
+  
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN id_unidad_medida INTEGER;
+  
+ALTER TABLE vef.ttipo_venta
+  ADD COLUMN id_plantilla INTEGER;
+  
+ALTER TABLE vef.tsucursal
+  ADD COLUMN id_depto INTEGER;
+
+
+/************************************F-SCP-RAC-VEF-0-29/04/2016*************************************************/
+
+
+
+
+/************************************I-SCP-RAC-VEF-0-12/05/2016*************************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN precio TYPE NUMERIC(18,6);
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ALTER COLUMN precio_sin_descuento TYPE NUMERIC(18,6);  
+  
+
+ALTER TABLE vef.tsucursal
+  ADD COLUMN nombre_comprobante VARCHAR ;
+  
+COMMENT ON COLUMN vef.tsucursal.nombre_comprobante
+IS 'El nombre de la sucursal tal como se mostrara en el comprobante de venta. Debe incluir el nombre de la empresa';
+
+/************************************F-SCP-JRR-VEF-0-12/05/2016*************************************************/
+
+
+
+/************************************I-SCP-RAC-VEF-0-16/05/2016*************************************************/
+
+
+ALTER TABLE vef.tventa
+  ADD COLUMN valor_bruto NUMERIC(18,2) DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.valor_bruto
+IS 'valor de los materiales';
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN descripcion_bulto VARCHAR(1000) DEFAULT '' NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.descripcion_bulto
+IS 'descripon de bultos en exportacion';
+
+
+/************************************F-SCP-RAC-VEF-0-16/05/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-16/06/2016*************************************************/
+
+
+ALTER TABLE vef.tforma_pago
+  ADD COLUMN registrar_tipo_tarjeta VARCHAR(2);
+
+ALTER TABLE vef.tforma_pago
+  ALTER COLUMN registrar_tipo_tarjeta SET DEFAULT 'no';
+
+/************************************F-SCP-JRR-VEF-0-16/06/2016*************************************************/
+
+
+/************************************I-SCP-JRR-VEF-0-07/07/2016*************************************************/
+
+CREATE TABLE vef.tapertura_cierre_caja (
+  id_apertura_cierre_caja SERIAL NOT NULL,
+  id_sucursal INTEGER,
+  id_punto_venta INTEGER,
+  id_usuario_cajero INTEGER NOT NULL,
+  id_moneda INTEGER NOT NULL,
+  monto_inicial INTEGER DEFAULT 0 NOT NULL,
+  monto_inicial_moneda_extranjera INTEGER DEFAULT 0 NOT NULL,
+  obs_cierre TEXT,
+  obs_apertura TEXT,
+  estado VARCHAR(50) NOT NULL,
+  fecha_hora_cierre TIMESTAMP,
+  fecha_apertura_cierre DATE NOT NULL,
+  arqueo_moneda_local NUMERIC(18,2),
+  arqueo_moneda_extranjera NUMERIC(18,2) DEFAULT 0,
+  PRIMARY KEY(id_apertura_cierre_caja)
+) INHERITS (pxp.tbase);
+
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_usuario_cajero INTEGER;
+
+/************************************F-SCP-JRR-VEF-0-07/07/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-30/09/2016*************************************************/
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial DROP DEFAULT;
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial TYPE NUMERIC(18,2);
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial SET DEFAULT 0;
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial_moneda_extranjera DROP DEFAULT;
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial_moneda_extranjera TYPE NUMERIC(18,2);
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial_moneda_extranjera SET DEFAULT 0;
+
+/************************************F-SCP-JRR-VEF-0-30/09/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-27/10/2016*************************************************/
+
+ALTER TABLE vef.tsucursal_usuario
+ALTER COLUMN id_sucursal DROP NOT NULL;
+
+ALTER TABLE vef.tventa
+ADD COLUMN contabilizable VARCHAR(2) DEFAULT 'si' NOT NULL;
+
+/************************************F-SCP-JRR-VEF-0-27/10/2016*************************************************/

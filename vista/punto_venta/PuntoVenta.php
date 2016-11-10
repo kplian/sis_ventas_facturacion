@@ -122,6 +122,7 @@ Phx.vista.PuntoVenta=Ext.extend(Phx.gridInterfaz,{
 				gdisplayField : 'tipo',
 				gwidth : 200,
 				anchor : '100%',
+				valueField: 'codigo',
 				baseParams : {
 					cod_subsistema : 'VEF',
 					catalogo_tipo : 'tipo_punto_venta'

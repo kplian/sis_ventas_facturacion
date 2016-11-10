@@ -28,25 +28,12 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
 	successGetVariables : function (response,request) {
 		//llama al constructor de la clase padre
 		Phx.vista.Boleto.superclass.constructor.call(this,request.arguments);
-		this.campo_fecha = new Ext.form.DateField({
-	        name: 'fecha_reg',
-				fieldLabel: 'Fecha',
-				allowBlank: false,
-				anchor: '80%',
-				gwidth: 100,
-				format: 'd/m/Y', 
-	    });
-		this.grid.getTopToolbar().addField(this.campo_fecha);
+		
 		var datos_respuesta = JSON.parse(response.responseText);
     	var fecha_array = datos_respuesta.datos.fecha.split('/');
-    	this.campo_fecha.setValue(new Date(fecha_array[2],parseInt(fecha_array[1]) - 1,fecha_array[0]));
     	
     	this.grid.getTopToolbar().doLayout();
-    	this.campo_fecha.on('select',function(value){
-    		this.store.baseParams.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');
-    		this.load();
-    	},this);
-    	
+    	    	
 		this.init();
 		this.iniciarEventos();
 		this.seleccionarPuntoVentaSucursal();
@@ -77,7 +64,7 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
 	                if (r.length == 1 ) {	                	                
 	                    	this.id_punto_venta = r[0].data.id_punto_venta;	                    	
 	                    	this.store.baseParams.id_punto_venta = r[0].data.id_punto_venta;
-	                    	this.store.baseParams.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');	                    
+	                    	//this.store.baseParams.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');	                    
 	                    	this.load({params:{start:0, limit:this.tam_pag}});  	                    
 	                } else {
 	                	
@@ -123,7 +110,7 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
 						                		VentanaInicio.close(); 
 							                    this.id_punto_venta  = combo2.getValue();
 							                    this.store.baseParams.id_punto_venta = combo2.getValue();
-							                    this.store.baseParams.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');
+							                    //this.store.baseParams.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');
 							                    this.load({params:{start:0, limit:this.tam_pag}});
 						                	}
 						                },
@@ -471,9 +458,7 @@ Phx.vista.Boleto=Ext.extend(Phx.gridInterfaz,{
        },
    
 	
-	agregarArgsExtraSubmit: function() {
-    	this.argumentExtraSubmit.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');
-    }
+	
     }
 	
 )

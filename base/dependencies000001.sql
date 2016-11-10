@@ -331,3 +331,61 @@ ALTER TABLE ONLY vef.tsucursal_producto
     FOREIGN KEY (id_moneda) REFERENCES param.tmoneda(id_moneda);
   
 /************************************F-DEP-JRR-VEF-0-14/03/2016*************************************************/
+
+
+/************************************I-DEP-JRR-VEF-0-02/05/2016*************************************************/
+
+ALTER TABLE ONLY vef.ttipo_venta
+    ADD CONSTRAINT fk_ttipo_venta__id_plantilla
+    FOREIGN KEY (id_plantilla) REFERENCES param.tplantilla(id_plantilla);
+
+ALTER TABLE ONLY vef.tsucursal
+    ADD CONSTRAINT fk_tsucursal__id_depto
+    FOREIGN KEY (id_depto) REFERENCES param.tdepto(id_depto);
+/************************************F-DEP-JRR-VEF-0-02/05/2016*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-08/05/2016*************************************************/
+
+ALTER TABLE ONLY vef.tvalor_descripcion
+    ADD CONSTRAINT fk_tvalor_descripcion__id_venta
+    FOREIGN KEY (id_venta) REFERENCES vef.tventa(id_venta);
+
+ALTER TABLE ONLY vef.tvalor_descripcion
+    ADD CONSTRAINT fk_tvalor_descripcion__id_tipo_descripcion
+    FOREIGN KEY (id_tipo_descripcion) REFERENCES vef.ttipo_descripcion(id_tipo_descripcion);
+/************************************F-DEP-JRR-VEF-0-08/05/2016*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-16/06/2016*************************************************/
+
+CREATE TRIGGER tforma_pago_tr
+  AFTER INSERT OR UPDATE 
+  ON obingresos.tforma_pago FOR EACH ROW 
+  EXECUTE PROCEDURE obingresos.f_tr_forma_pago();
+
+/************************************F-DEP-JRR-VEF-0-16/06/2016*************************************************/
+
+
+/************************************I-DEP-JRR-VEF-0-07/07/2016*************************************************/
+
+
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_sucursal
+    FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(id_sucursal);
+    
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_punto_venta
+    FOREIGN KEY (id_punto_venta) REFERENCES vef.tpunto_venta(id_punto_venta);
+    
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_usuario_cajero
+    FOREIGN KEY (id_usuario_cajero) REFERENCES segu.tusuario(id_usuario);
+    
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_moneda
+    FOREIGN KEY (id_moneda) REFERENCES param.tmoneda(id_moneda);
+
+ALTER TABLE ONLY vef.tventa
+    ADD CONSTRAINT fk_tventa__id_usuario_cajero
+    FOREIGN KEY (id_usuario_cajero) REFERENCES segu.tusuario(id_usuario);
+
+/************************************F-DEP-JRR-VEF-0-07/07/2016*************************************************/

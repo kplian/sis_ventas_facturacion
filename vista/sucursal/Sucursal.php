@@ -174,6 +174,44 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:true
         },
+        
+        {
+            config:{
+                name: 'nombre_comprobante',
+                fieldLabel: 'Nombre en Comprobante',
+                qtip:'El nombre de la sucursal tal como se mostrara en el comprobante de venta. Debe incluir el nombre de la empresa',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 230,
+                maxLength:200
+            },
+                type:'TextField',
+                filters:{pfiltro:'suc.nombre_comprobante',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:true
+        },
+        {
+   			config:{
+   				name:'id_depto',
+   				 hiddenName: 'id_depto',
+   				 //url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
+	   				origen:'DEPTO',
+	   				allowBlank:false,
+	   				fieldLabel: 'Depto',
+	   				gdisplayField:'desc_depto',//dibuja el campo extra de la consulta al hacer un inner join con orra tabla
+	   				width:250,
+   			        gwidth:180,
+	   				baseParams:{tipo_filtro:'DEPTO_UO',estado:'activo',codigo_subsistema:'VEF'},//parametros adicionales que se le pasan al store
+	      			renderer:function (value, p, record){return String.format('{0}', record.data['nombre_depto']);}
+   			},
+   			//type:'TrigguerCombo',
+   			type:'ComboRec',
+   			id_grupo:0,
+   			filters:{pfiltro:'depto.nombre',type:'string'},
+   		    grid:true,
+   			form:true
+       	},	
         {
             config:{
                 name: 'telefono',
@@ -468,6 +506,48 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+        {
+            config:{
+                name:'tipo_interfaz',
+                fieldLabel:'Tipo Venta',
+                allowBlank:true,
+                emptyText:'Tipo...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_ventas_facturacion/control/TipoVenta/listarTipoVenta',
+                    id: 'codigo',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'codigo',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['codigo','nombre'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'codigo#nombre'}
+
+                }),
+                valueField: 'codigo',
+                displayField: 'nombre',
+                gdisplayField: 'tipo_interfaz',
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                width:250,
+                minChars:2,
+                enableMultiSelect:true,
+                renderer:function(value, p, record){return String.format('{0}', record.data['tipo_interfaz']);}
+
+            },
+            type:'AwesomeCombo',
+            id_grupo:0,
+            grid:true,
+            form:true
+        },
         
 		{
 			config:{
@@ -598,17 +678,26 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
               cls:'SucursalUsuario'
          },
           { 
-          url:'../../../sis_ventas_facturacion/vista/sucursal_almacen/SucursalAlmacen.php',
-          title:'Almacenes', 
-          height:'50%',
-          cls:'SucursalAlmacen'
+          url: '../../../sis_ventas_facturacion/vista/sucursal_almacen/SucursalAlmacen.php',
+          title: 'Almacenes', 
+          height: '50%',
+          cls: 'SucursalAlmacen'
+         },
+          { 
+          url: '../../../sis_ventas_facturacion/vista/tipo_descripcion/TipoDescripcion.php',
+          title: 'Tipos de Atributos', 
+          height: '50%',
+          cls: 'TipoDescripcion'
          }],
 	fields: [
 		{name:'id_sucursal', type: 'numeric'},
 		{name:'id_lugar', type: 'numeric'},
+		{name:'id_depto', type: 'numeric'},
 		{name:'id_entidad', type: 'numeric'},
 		{name:'correo', type: 'string'},
+		{name:'nombre_depto', type: 'string'},
 		{name:'nombre', type: 'string'},
+		{name:'nombre_comprobante', type: 'string'},
 		{name:'nombre_lugar', type: 'string'},
 		{name:'telefono', type: 'string'},
 		{name:'direccion', type: 'string'},
@@ -631,7 +720,7 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'},'tipo_interfaz'
 		
 	],
 	sortInfo:{

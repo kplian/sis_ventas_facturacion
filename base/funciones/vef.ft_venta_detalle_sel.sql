@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -45,57 +47,62 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						vedet.id_venta_detalle,
-						vedet.id_venta,
-						(case when vedet.id_item is not null then
-							vedet.id_item
-						when vedet.id_sucursal_producto is not null then
-							vedet.id_sucursal_producto
-						when vedet.id_formula is not null then
-							vedet.id_formula
-						end) as id_producto,
-						vedet.tipo,
-						vedet.estado_reg,
-						vedet.cantidad,
-						vedet.precio_sin_descuento,						
-						vedet.id_usuario_ai,
-						vedet.usuario_ai,
-						vedet.fecha_reg,
-						vedet.id_usuario_reg,
-						vedet.id_usuario_mod,
-						vedet.fecha_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-						vedet.precio*vedet.cantidad,						
-						(case when vedet.id_item is not null then
-							item.codigo  || '' - '' ||  item.nombre
-						when vedet.id_sucursal_producto is not null then
-							cig.desc_ingas
-						when vedet.id_formula is not null then
-							form.nombre
-						end)::varchar as nombre_producto,
-                        vedet.porcentaje_descuento,                       
-                        (vedet.precio_sin_descuento * vedet.cantidad)::numeric,
-                        (case when vedet.id_medico is not null then
-                        	vedet.id_medico || ''_medico''
-                         when vedet.id_vendedor is not null then
-                         	vedet.id_vendedor || ''_usuario''
-                         else
-                         	NULL
-                         end)::varchar as id_vendedor_medico,
-                         (case when vedet.id_medico is not null then
-                        	med.nombre_completo
-                         when vedet.id_vendedor is not null then
-                         	ven.desc_persona
-                         else
-                         	NULL
-                         end)::varchar as nombre_vendedor_medico,
-                         (case when vedet.id_sucursal_producto is not null then
-							sprod.requiere_descripcion
-						else
-							''no''::varchar
-						end) as requiere_descripcion,
-                        vedet.descripcion 
+                            vedet.id_venta_detalle,
+                            vedet.id_venta,
+                            (case when vedet.id_item is not null then
+                                vedet.id_item
+                            when vedet.id_sucursal_producto is not null then
+                                vedet.id_sucursal_producto
+                            when vedet.id_formula is not null then
+                                vedet.id_formula
+                            end) as id_producto,
+                            vedet.tipo,
+                            vedet.estado_reg,
+                            vedet.cantidad,
+                            vedet.precio_sin_descuento,						
+                            vedet.id_usuario_ai,
+                            vedet.usuario_ai,
+                            vedet.fecha_reg,
+                            vedet.id_usuario_reg,
+                            vedet.id_usuario_mod,
+                            vedet.fecha_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            vedet.precio*vedet.cantidad,						
+                            (case when vedet.id_item is not null then
+                                item.codigo  || '' - '' ||  item.nombre
+                            when vedet.id_sucursal_producto is not null then
+                                cig.desc_ingas
+                            when vedet.id_formula is not null then
+                                form.nombre
+                            end)::varchar as nombre_producto,
+                            vedet.porcentaje_descuento,                       
+                            (vedet.precio_sin_descuento * vedet.cantidad)::numeric,
+                            (case when vedet.id_medico is not null then
+                                vedet.id_medico || ''_medico''
+                             when vedet.id_vendedor is not null then
+                                vedet.id_vendedor || ''_usuario''
+                             else
+                                NULL
+                             end)::varchar as id_vendedor_medico,
+                             (case when vedet.id_medico is not null then
+                                med.nombre_completo
+                             when vedet.id_vendedor is not null then
+                                ven.desc_persona
+                             else
+                                NULL
+                             end)::varchar as nombre_vendedor_medico,
+                             (case when vedet.id_sucursal_producto is not null then
+                                sprod.requiere_descripcion
+                            else
+                                ''no''::varchar
+                            end) as requiere_descripcion,
+                            vedet.descripcion,
+                            vedet.bruto,
+                            vedet.ley,
+                            vedet.kg_fino,
+                            um.id_unidad_medida,
+                            um.codigo as codigo_unidad_medida
 						from vef.tventa_detalle vedet
 						inner join segu.tusuario usu1 on usu1.id_usuario = vedet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = vedet.id_usuario_mod
@@ -105,6 +112,7 @@ BEGIN
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
 				        left join vef.vmedico med on med.id_medico = vedet.id_medico
                         left join segu.vusuario ven on ven.id_usuario = vedet.id_vendedor
+                        left join param.tunidad_medida um on um.id_unidad_medida = vedet.id_unidad_medida 
                         where  ';
 			
 			--Definicion de la respuesta

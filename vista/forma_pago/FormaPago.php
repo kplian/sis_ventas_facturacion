@@ -100,7 +100,6 @@ Phx.vista.FormaPago=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         }, 
-        
         {
             config:{
                 name: 'registrar_tarjeta',
@@ -122,6 +121,34 @@ Phx.vista.FormaPago=Ext.extend(Phx.gridInterfaz,{
             filters:{   
                          type: 'list',
                          pfiltro:'forpa.registrar_tarjeta',
+                         options: ['si','no']
+                    },
+            grid:true,
+            form:true,
+            valorInicial:'no'
+        }, 
+        
+        {
+            config:{
+                name: 'registrar_tipo_tarjeta',
+                fieldLabel: 'Registrar Tipo de Tarjeta',
+                allowBlank: false,               
+                gwidth: 130,
+                maxLength:15,
+                emptyText:'registrar...',                   
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',                                  
+               // displayField: 'descestilo',
+                store:['si','no']
+            },
+            type:'ComboBox',
+            //filters:{pfiltro:'promac.inicio',type:'string'},
+            id_grupo:0,
+            filters:{   
+                         type: 'list',
+                         pfiltro:'forpa.registrar_tipo_tarjeta',
                          options: ['si','no']
                     },
             grid:true,
@@ -308,6 +335,7 @@ Phx.vista.FormaPago=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
+		{name:'registrar_tipo_tarjeta', type: 'string'},
 		
 	],
 	sortInfo:{

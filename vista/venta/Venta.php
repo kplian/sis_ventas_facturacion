@@ -12,10 +12,16 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 
+	formUrl: '../../../sis_ventas_facturacion/vista/venta/FormVenta.php',
+	formClass : 'FormVenta',
+    tipo_factura: 'recibo',
+    nombreVista: 'Venta',
+    tipo_usuario : 'vendedor',
+
 	constructor:function(config) {
 		
 		this.maestro=config.maestro;
-		this.tipo_factura = 'recibo';
+		
 		Ext.Ajax.request({
                 url:'../../sis_ventas_facturacion/control/Venta/getVariablesBasicas',                
                 params: {'prueba':'uno'},
@@ -81,9 +87,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		this.seleccionarPuntoVentaSucursal();
 		//llama al constructor de la clase padre
 		Phx.vista.Venta.superclass.constructor.call(this,request.arguments);
-		this.formUrl = '../../../sis_ventas_facturacion/vista/venta/FormVenta.php';
-		this.formClass = 'FormVenta';
-		
+				
 		this.init();
 		//this.load({params:{start:0, limit:this.tam_pag}});
 	}	,
@@ -105,7 +109,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                    totalProperty: 'total',
 	                    fields: ['id_punto_venta', 'id_sucursal','nombre', 'codigo','habilitar_comisiones','formato_comprobante'],
 	                    remoteSort: true,
-	                    baseParams: {par_filtro: 'puve.nombre#puve.codigo'}
+	                    baseParams: {tipo_usuario: this.tipo_usuario,par_filtro: 'puve.nombre#puve.codigo', tipo_factura: this.tipo_factura}
 	        });
 		} else {
 			title = 'Seleccione la sucursal con la que trabajara';
@@ -121,11 +125,11 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                     totalProperty: 'total',
                     fields: ['id_sucursal', 'nombre', 'codigo','habilitar_comisiones','formato_comprobante'],
                     remoteSort: true,
-                    baseParams: {filtro_usuario: 'si',par_filtro: 'suc.nombre#suc.codigo'}
+                    baseParams: {tipo_usuario: this.tipo_usuario,par_filtro: 'suc.nombre#suc.codigo', tipo_factura: this.tipo_factura}
                });
 		}		
 	    
-	    storeCombo.load({params:{start:0,limit:this.tam_pag}, 
+	    storeCombo.load({params:{start: 0, limit: this.tam_pag}, 
 	           callback : function (r) {
 	                if (r.length == 1 ) {   
 	                	if (this.variables_globales.vef_tiene_punto_venta === 'true') {                    
@@ -133,12 +137,15 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                    	this.variables_globales.habilitar_comisiones = r[0].data.habilitar_comisiones;
 	                    	this.variables_globales.formato_comprobante = r[0].data.formato_comprobante;
 	                    	this.store.baseParams.id_punto_venta = this.variables_globales.id_punto_venta;
+                            this.store.baseParams.tipo_usuario = this.tipo_usuario;
 	                    } else {
 	                    	this.variables_globales.id_sucursal = r[0].data.id_sucursal;
 	                    	this.variables_globales.habilitar_comisiones = r[0].data.habilitar_comisiones;
 	                    	this.variables_globales.formato_comprobante = r[0].data.formato_comprobante;
 	                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
+                            this.store.baseParams.tipo_usuario = this.tipo_usuario;
 	                    }
+	                    this.store.baseParams.tipo_factura = this.tipo_factura;
 	                    this.load({params:{start:0, limit:this.tam_pag}});  	                    
 	                } else {
 	                	
@@ -195,7 +202,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 							                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
 							                    }
 							                    
-							                    
+							                    this.store.baseParams.tipo_factura = this.tipo_factura;
 							                    this.load({params:{start:0, limit:this.tam_pag}});
 						                	}
 						                },
@@ -306,65 +313,19 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 form:false,
                 bottom_filter: true
         },
-        
         {
-            config : {
-                name : 'id_cliente',
-                fieldLabel : 'Cliente',
-                allowBlank : false,
-                emptyText : 'Cliente...',
-                store : new Ext.data.JsonStore({
-                    url : '../../sis_ventas_facturacion/control/Cliente/listarCliente',
-                    id : 'id_cliente',
-                    root : 'datos',
-                    sortInfo : {
-                        field : 'nombres',
-                        direction : 'ASC'
-                    },
-                    totalProperty : 'total',
-                    fields : ['id_cliente', 'nombres', 'primer_apellido', 'segundo_apellido','nombre_factura','nit'],
-                    remoteSort : true,
-                    baseParams : {
-                        par_filtro : 'cli.nombres#cli.primer_apellido#cli.segundo_apellido#nombre_factura#nit'
-                    }
-                }),
-                valueField : 'id_cliente',
-                displayField : 'primer_apellido',
-                gdisplayField : 'nombre_factura',
-                hiddenName : 'id_cliente',
-                forceSelection : true,
-                typeAhead : false,
-                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>NIT:</b> {nit}</p><p><b>Razon Social:</b> {nombre_factura}</p><p><b>Nombre:</b> {nombres} {primer_apellido} {segundo_apellido}</p> </div></tpl>',
-                triggerAction : 'all',
-                lazyRender : true,
-                mode : 'remote',
-                pageSize : 10,
-                queryDelay : 1000,
-                turl:'../../../sis_ventas_facturacion/vista/cliente/Cliente.php',
-                ttitle:'Clientes',
-                // tconfig:{width:1800,height:500},
-                tasignacion : true,           
-                tname : 'id_cliente',
-                tdata:{},
-                tcls:'Cliente',
-                gwidth : 170,
-                minChars : 2,
-                renderer: function(value, p, record){                    
-                    return String.format('{0}', record.data['nombre_factura']);
-                }
+            config:{
+                name: 'nombre_factura',
+                fieldLabel: 'Cliente',              
+                gwidth: 110
             },
-            type : 'TrigguerCombo',
-            id_grupo : 0,
-            filters : {
-                pfiltro : 'cli.nombre_factura',
-                type : 'string'
-            },
-            grid : true,
-            form : false,
-            bottom_filter: true
-        },		
-		
-		{
+                type:'TextField',
+                filters : {pfiltro : 'cli.nombre_factura',type : 'string'},             
+                grid:true,
+                form:false,
+                bottom_filter: true
+        },
+        {
             config:{
                 name: 'total_venta',
                 fieldLabel: 'Total Venta',
@@ -380,90 +341,45 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:false
         },
-		
-		{
-            config: {
-                name: 'id_sucursal',
-                fieldLabel: 'Sucursal',
-                allowBlank: false,
-                emptyText: 'Elija una Suc...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_ventas_facturacion/control/Sucursal/listarSucursal',
-                    id: 'id_sucursal',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_sucursal', 'nombre', 'codigo'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'suc.nombre#suc.codigo'}
-                }),
-                valueField: 'id_sucursal',
-                displayField: 'nombre',
-                gdisplayField: 'nombre_sucursal',
-                hiddenName: 'id_sucursal',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,               
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['nombre_sucursal']);
-                }
-            },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'suc.nombre',type: 'string'},
-            grid: true,
-            form: false
-        },
         {
-            config: {
-                name: 'id_forma_pago',
-                fieldLabel: 'Forma de Pago',
-                allowBlank: false,
-                emptyText: 'Forma de Pago...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_ventas_facturacion/control/FormaPago/listarFormaPago',
-                    id: 'id_forma_pago',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_forma_pago', 'nombre', 'desc_moneda'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'forpa.nombre#mon.codigo'}
-                }),
-                valueField: 'id_forma_pago',
-                displayField: 'nombre',
-                gdisplayField: 'forma_pago',
-                hiddenName: 'id_forma_pago',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,               
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['forma_pago']);
-                }
+            config:{
+                name: 'fecha',
+                fieldLabel: 'Fecha Doc.',              
+                gwidth: 110,
+                format: 'd/m/Y', 
+				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
-            type: 'ComboBox',
-            id_grupo: 0,
-            grid: true,
-            form: false
+                type:'DateField',
+                filters: { pfiltro:'ven.fecha', type:'date'},              
+                grid:true,
+                form:false
         },
+		{
+            config:{
+                name: 'nombre_sucursal',
+                fieldLabel: 'Sucursal',              
+                gwidth: 110
+            },
+                type:'TextField',
+                filters: { pfiltro: 'suc.nombre', type: 'string'},      
+                grid: true,
+                form: false,
+                bottom_filter: true
+        },
+        
+         {
+            config:{
+                name: 'forma_pago',
+                fieldLabel: 'Forma de Pago',              
+                gwidth: 110
+            },
+                type:'TextField',
+                grid:true,
+                form:false
+        },
+		
+		
+        
         {
 			config:{
 				name: 'observaciones',
@@ -636,19 +552,6 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
-                name: 'fecha',
-                fieldLabel: 'Fecha Factura/Recibo',              
-                gwidth: 110,
-                format: 'd/m/Y', 
-				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
-            },
-                type:'DateField',
-                filters:{pfiltro:'ven.fecha',type:'date'},              
-                grid:true,
-                form:false
-        },
-        {
-            config:{
                 name: 'excento',
                 fieldLabel: 'Imp Excento',              
                 gwidth: 110
@@ -697,6 +600,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombre_punto_venta', type: 'string'},
 		{name:'estado', type: 'string'},
 		{name:'correlativo_venta', type: 'string'},
+        {name:'contabilizable', type: 'string'},
 		{name:'a_cuenta', type: 'numeric'},
 		{name:'total_venta', type: 'numeric'},
 		{name:'comision', type: 'numeric'},
@@ -713,9 +617,11 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'monto_forma_pago', type: 'numeric'},
 		{name:'nro_factura', type: 'string'},
 		{name:'cod_control', type: 'string'},
-		{name:'fecha', type: 'date'},
+		{name:'fecha', type: 'date',dateFormat:'Y-m-d'},
 		{name:'excento', type: 'numeric'},
 		{name:'nroaut', type: 'numeric'},
+		'id_moneda','total_venta_msuc','transporte_fob','seguros_fob',
+		'otros_fob','transporte_cif','seguros_cif','otros_cif','tipo_cambio_venta','desc_moneda','valor_bruto','descripcion_bulto'
 		
 		
 	],
@@ -771,7 +677,9 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     
     onButtonEdit : function () {
         //abrir formulario de solicitud
-        this.openForm('edit', this.sm.getSelected());        
+        this.openForm('edit', this.sm.getSelected());  
+        
+        console.log(' this.sm.getSelected()........', this.sm.getSelected())      
     },    
     
     arrayDefaultColumHidden:['estado_reg','usuario_ai',
@@ -842,13 +750,14 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         
     }, 
     successWizard:function(resp){
-        var rec=this.sm.getSelected();
+        var rec=this.sm.getSelected();        
+        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
         
-        if (rec.data.estado == 'borrador' && this.tipo_factura != 'manual') {
+        if (objRes.ROOT.datos.estado == 'finalizado' && this.tipo_factura != 'manual') {
             this.imprimirNota();
         }
         Phx.CP.loadingHide();
-        resp.argument.wizard.panel.destroy()
+        resp.argument.wizard.panel.destroy();
         this.reload();
      },
      
@@ -884,25 +793,18 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 							'id_venta' : data.id_venta,
 							'formato_comprobante' : this.variables_globales.formato_comprobante
 						},
-						success : this.successExport,
+						success : this.successExport2,
 						failure : this.conexionFailure,
 						timeout : this.timeout,
 						scope : this
 					});
 			}
 	},
-	successExport: function (resp) {
+	successExport2: function (resp) {
 
         Phx.CP.loadingHide();
-
-
-        //doc.write(texto);
         var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-		
-        //console.log(objRes.ROOT.datos[0].length)
-
-
-        var objetoDatos = (objRes.ROOT == undefined)?objRes.datos:objRes.ROOT.datos;
+		var objetoDatos = (objRes.ROOT == undefined)?objRes.datos:objRes.ROOT.datos;
         var wnd = window.open("about:blank", "", "_blank");
 		wnd.document.write(objetoDatos.html);
 
@@ -912,7 +814,6 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
    onAntEstado:function(wizard,resp){
             Phx.CP.loadingShow(); 
             Ext.Ajax.request({ 
-                // form:this.form.getForm().getEl(),
                 url:'../../sis_ventas_facturacion/control/Venta/anteriorEstadoVenta',
                 params:{
                         id_proceso_wf:resp.id_proceso_wf,

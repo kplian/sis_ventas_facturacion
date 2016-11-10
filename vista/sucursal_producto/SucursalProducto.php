@@ -191,6 +191,46 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 				form:true
 		},
 		{
+   			config:{
+   				name:'id_unidad_medida',
+   				tipo: 'All',
+   				origen:'UNIDADMEDIDA',
+   				allowBlank:true,
+   				fieldLabel:'Unidad',
+   				gdisplayField:'desc_unidad_medida',//mapea al store del grid
+   				gwidth:200,
+   				width: 350,
+   				listWidth: 350,
+   				//anchor: '80%',
+	   			renderer:function (value, p, record){return String.format('{0}', record.data['desc_unidad_medida']);}
+       	     },
+   			type:'ComboRec',
+   			id_grupo:2,
+   			filters:{	
+		        pfiltro:'um.codigo#um.descripcion',
+				type:'string'
+			},
+   		   
+   			grid:true,
+   			form:true
+	   	},
+		{
+			config:{
+				name: 'nandina',
+				fieldLabel: 'Nandina',
+				qtip: 'Código de partida aduanera',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:100
+			},
+			type:'TextField',
+			filters:{pfiltro:'cig.nandina',type:'string'},
+			id_grupo:2,
+			grid:true,
+			form:true
+		},
+		{
             config : {
                 name : 'id_actividad_economica',
                 fieldLabel : 'Actividad Economica',
@@ -524,7 +564,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
+		{name:'usr_mod', type: 'string'},'nandina','id_unidad_medida','desc_unidad_medida'
 		
 	],
 	sortInfo:{

@@ -46,6 +46,12 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('contabilizable','varchar');
 		$this->captura('excento','varchar');
 		
+		$this->captura('id_unidad_medida','integer');
+		$this->captura('desc_unidad_medida','varchar');
+		$this->captura('nandina','VARCHAR');
+		
+		
+		 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -63,6 +69,9 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('id_sucursal','id_sucursal','int4');
 		$this->setParametro('id_punto_venta','id_punto_venta','int4');
+		
+		$this->setParametro('tipo_cambio_venta','tipo_cambio_venta','numeric');
+		$this->setParametro('id_moneda','id_moneda','int4');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_producto','integer');
@@ -72,8 +81,13 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('precio','numeric');			
 		$this->captura('medico','varchar');
 		$this->captura('requiere_descripcion','varchar');
+
 		$this->captura('contabilizable','varchar');
 		$this->captura('excento','varchar');
+
+		$this->captura('id_unidad_medida','integer');
+		$this->captura('codigo_unidad_medida','varchar');
+
 		
 		
 		//Ejecuta la instruccion
@@ -125,8 +139,15 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 		$this->setParametro('id_moneda','id_moneda','integer');
+
 		$this->setParametro('contabilizable','contabilizable','varchar');
 		$this->setParametro('excento','excento','varchar');
+
+		
+		$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
+		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
+		$this->setParametro('nandina','nandina','varchar');
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -154,8 +175,15 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 		$this->setParametro('id_moneda','id_moneda','integer');
+
 		$this->setParametro('contabilizable','contabilizable','varchar');
 		$this->setParametro('excento','excento','varchar');
+
+		
+		$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
+		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
+		$this->setParametro('nandina','nandina','varchar');
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

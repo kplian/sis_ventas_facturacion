@@ -39,6 +39,7 @@ class ACTDosificacion extends ACTbase{
 				
 	function insertarDosificacion(){
 		$this->objFunc=$this->create('MODDosificacion');	
+		
 		if($this->objParam->insertar('id_dosificacion')){
 			$this->res=$this->objFunc->insertarDosificacion($this->objParam);			
 		} else{			

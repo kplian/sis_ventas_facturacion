@@ -33,6 +33,9 @@ DECLARE
 	v_select			varchar;
     v_select_precio_item		varchar;
     v_having			varchar;
+    v_id_moneda_venta	integer;
+    v_tipo_cambio_venta		numeric;
+    v_tipo					varchar;
 			    
 BEGIN
 
@@ -75,7 +78,10 @@ BEGIN
                         sprod.id_moneda,
                         mon.codigo_internacional as desc_moneda,
                         sprod.contabilizable,
-                        sprod.excento	
+                        sprod.excento,
+						um.id_unidad_medida,
+                        um.codigo as desc_unidad_medida,
+                        cig.nandina	
 						from vef.tsucursal_producto sprod
 						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						
 						left join segu.tusuario usu2 on usu2.id_usuario = sprod.id_usuario_mod
@@ -83,7 +89,8 @@ BEGIN
                         left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica
                         left join alm.titem item on item.id_item = sprod.id_item
                         left join param.tmoneda mon on mon.id_moneda = sprod.id_moneda
-				        where  ';
+                        left join param.tunidad_medida um on um.id_unidad_medida = cig.id_unidad_medida
+				        where ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -113,7 +120,8 @@ BEGIN
 					    left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
 					    left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica
                         left join param.tmoneda mon on mon.id_moneda = sprod.id_moneda
-                        where ';
+                        left join param.tunidad_medida um on um.id_unidad_medida = cig.id_unidad_medida
+				        where  ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -155,6 +163,17 @@ BEGIN
     			where suc.id_sucursal = v_parametros.id_sucursal;
     			
     		end if;
+            
+             if (pxp.f_existe_parametro(p_tabla,'id_moneda')) then
+              v_id_moneda_venta =  v_parametros.id_moneda;
+              v_tipo_cambio_venta =  v_parametros.tipo_cambio_venta;
+              v_tipo = 'CUS';
+            else
+              v_id_moneda_venta = v_sucursal.id_moneda;
+              v_tipo = 'O';
+              v_tipo_cambio_venta = NULL;
+            end if;
+           
     		
     		--Items si se integra con almacenes
     		if (v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'true') then
@@ -162,11 +181,14 @@ BEGIN
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
 											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,
-                                            param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
-                                            ''''::varchar as medico,''''::varchar as contabilizable,''''::varchar as excento
-                                            sp.requiere_descripcion
+                                            param.f_convertir_moneda(sp.id_moneda,' ||v_id_moneda_venta  || ',sp.precio,now()::date,'''||v_tipo||''',2,'||COALESCE(v_tipo_cambio_venta::varchar,'NULL')||',''si'') as precio,
+                                            ''''::varchar as medico,
+                                            sp.requiere_descripcion,
+                                            um.id_unidad_medida,
+                                            um.codigo as codigo_unidad_medida
 									from alm.titem it 
 									inner join vef.tsucursal_producto sp on sp.id_item = it.id_item
+                                    left join param.tunidad_medida um on um.id_unidad_medida = it.id_unidad_medida
 									where sp.estado_reg = ''activo'' and it.estado_reg = ''activo'' and
 									sp.id_sucursal = ' || v_sucursal.id_sucursal || '
 									)';
@@ -174,8 +196,11 @@ BEGIN
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
 											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,it.precio_ref as precio,''''::varchar as medico,
-                                             ''''::varchar as requiere_descripcion,''''::varchar as contabilizable,''''::varchar as excento
-									from alm.titem it 									
+                                             ''''::varchar as requiere_descripcion,
+                                            um.id_unidad_medida,
+                                            um.codigo as codigo_unidad_medida
+									from alm.titem it 
+                                    left join param.tunidad_medida um on um.id_unidad_medida = it.id_unidad_medida									
 									where it.estado_reg = ''activo'' and
 									(select s.clasificaciones_para_venta 
                                                 from vef.tsucursal s 
@@ -199,12 +224,17 @@ BEGIN
 				v_consulta := 'with tabla_temporal as (
 									select sp.id_sucursal_producto as id_producto, ' || v_select || ' ,
 											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,
-											param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+											round(param.f_convertir_moneda(sp.id_moneda,' || v_id_moneda_venta || ',sp.precio,now()::date,'''||v_tipo||''',2,'||COALESCE(v_tipo_cambio_venta::varchar,'NULL')||',''si''),2) as precio,
 											''''::varchar as medico,
-                                            sp.requiere_descripcion,sp.contabilizable,sp.excento
-									from vef.tsucursal_producto sp
+                                            sp.requiere_descripcion,
+											sp.contabilizable,
+											sp.excento,
+											um.id_unidad_medida,
+                                            um.codigo as codigo_unidad_medida
+																		from vef.tsucursal_producto sp
 									' || v_join || '
 									inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sp.id_concepto_ingas
+                                     left join param.tunidad_medida um on um.id_unidad_medida = cig.id_unidad_medida	
 									where sp.estado_reg = ''activo'' and cig.estado_reg = ''activo'' and
 									sp.id_sucursal = ' || v_sucursal.id_sucursal || v_where ||'
 									)';
@@ -233,10 +263,15 @@ BEGIN
                                                             	sp.precio
                                                             end))::numeric as precio,
                                         med.nombre_completo::varchar as medico,
-                                        ''''::varchar as requiere_descripcion,''''::varchar as contabilizable,''''::varchar as excento
+                                        ''''::varchar as requiere_descripcion,
+										''''::varchar as contabilizable,
+										''''::varchar as excento,
+										um.id_unidad_medida,
+                                        um.codigo as codigo_unidad_medida
 								from vef.tformula form
 								left join vef.vmedico med on med.id_medico = form.id_medico
 								inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula
+                                left join param.tunidad_medida um on um.id_unidad_medida = form.id_unidad_medida
                                 left join vef.tsucursal_producto sp on sp.id_concepto_ingas = fd.id_concepto_ingas 
                                 	and sp.estado_reg = ''activo'' 
                         		' || v_join || '
@@ -248,7 +283,14 @@ BEGIN
 			
 			end if;
 			v_consulta = v_consulta ||	' 	select todo.id_producto,todo.tipo,todo.nombre,
-													todo.descripcion,todo.precio,todo.medico,todo.requiere_descripcion,todo.contabilizable,todo.excento
+													todo.descripcion,
+													todo.precio,
+													todo.medico,
+													todo.requiere_descripcion,
+													todo.contabilizable,
+													todo.excento,
+													todo.id_unidad_medida,
+                                                   todo.codigo_unidad_medida
 											from tabla_temporal todo
 											where ';
 			
@@ -302,7 +344,7 @@ BEGIN
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
 											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,
-                                            param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+                                            1 as precio,
                                             ''''::varchar as medico,
                                             sp.requiere_descripcion
 									from alm.titem it 
@@ -339,7 +381,7 @@ BEGIN
 				v_consulta := 'with tabla_temporal as (
 									select sp.id_sucursal_producto as id_producto, ' || v_select || ' ,
 											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,
-											param.f_convertir_moneda(sp.id_moneda,' || v_sucursal.id_moneda || ',sp.precio,now()::date,''O'',2,NULL,''si'') as precio,
+											1 as precio,
 											''''::varchar as medico,
                                             sp.requiere_descripcion
 									from vef.tsucursal_producto sp

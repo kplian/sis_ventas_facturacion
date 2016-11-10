@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_forma_pago_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION vef.ft_forma_pago_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_forma_pago_ime
@@ -58,7 +61,8 @@ BEGIN
 			fecha_mod,
 			defecto,
 			registrar_tarjeta,
-			registrar_cc
+			registrar_cc,
+            registrar_tipo_tarjeta
           	) values(
 			'activo',
 			v_parametros.codigo,
@@ -73,8 +77,8 @@ BEGIN
 			null,
 			v_parametros.defecto,
 			v_parametros.registrar_tarjeta,
-			v_parametros.registrar_cc				
-			
+			v_parametros.registrar_cc,
+            v_parametros.registrar_tipo_tarjeta	
 			
 			)RETURNING id_forma_pago into v_id_forma_pago;
 			
@@ -109,7 +113,8 @@ BEGIN
 			usuario_ai = v_parametros._nombre_usuario_ai,
 			defecto = v_parametros.defecto,
 			registrar_tarjeta = v_parametros.registrar_tarjeta,
-			registrar_cc = v_parametros.registrar_cc
+			registrar_cc = v_parametros.registrar_cc,
+            registrar_tipo_tarjeta = v_parametros.registrar_tipo_tarjeta
 			where id_forma_pago=v_parametros.id_forma_pago;
                
 			--Definicion de la respuesta
@@ -160,7 +165,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_forma_pago_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

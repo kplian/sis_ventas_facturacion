@@ -10,19 +10,19 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.VentaVendedorComputarizada = {    
-    bsave:false,    
-    require:'../../../sis_ventas_facturacion/vista/venta/VentaVendedor.php',
-    requireclase:'Phx.vista.VentaVendedor',
-    title:'Venta',
+    bsave: false,    
+    require: '../../../sis_ventas_facturacion/vista/venta/VentaVendedor.php',
+    requireclase: 'Phx.vista.VentaVendedor',
+    title: 'Venta',
     nombreVista: 'VentaVendedorComputarizada',
+    tipo_factura:'computarizada',
     
     constructor: function(config) {
-        this.maestro=config.maestro;  
+        this.maestro = config.maestro;  
         Phx.vista.VentaVendedorComputarizada.superclass.constructor.call(this,config);
-        this.tipo_factura = 'computarizada';           
+                
     } ,
-    arrayDefaultColumHidden:['estado_reg','usuario_ai',
-    'fecha_reg','fecha_mod','usr_reg','usr_mod','excento','cod_control','nroaut'],
+    arrayDefaultColumHidden:['estado_reg','usuario_ai','fecha_reg','fecha_mod','usr_reg','usr_mod','excento','cod_control','nroaut'],
     rowExpander: new Ext.ux.grid.RowExpander({
             tpl : new Ext.Template(
                 '<br>',   
@@ -34,7 +34,7 @@ Phx.vista.VentaVendedorComputarizada = {
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Modificado por:&nbsp;&nbsp;</b> {usr_mod}</p><br>'
             )
-    }),    
+    })
     
     
 };

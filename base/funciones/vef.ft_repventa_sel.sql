@@ -4,117 +4,233 @@ CREATE OR REPLACE FUNCTION vef.ft_repventa_sel (
   p_tabla varchar,
   p_transaccion varchar
 )
-RETURNS varchar AS
-$body$
-/**************************************************************************
- SISTEMA:		Sistema de Ventas
- FUNCION: 		vef.ft_repventa_sel
- DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'vef.tventa'
- AUTOR: 		 (admin)
- FECHA:	        01-06-2015 05:58:00
- COMENTARIOS:	
-***************************************************************************
- HISTORIAL DE MODIFICACIONES:
+  RETURNS varchar AS
+  $body$
+  /**************************************************************************
+   SISTEMA:		Sistema de Ventas
+   FUNCION: 		vef.ft_repventa_sel
+   DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'vef.tventa'
+   AUTOR: 		 (admin)
+   FECHA:	        01-06-2015 05:58:00
+   COMENTARIOS:
+  ***************************************************************************
+   HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
-***************************************************************************/
+   DESCRIPCION:
+   AUTOR:
+   FECHA:
+  ***************************************************************************/
 
-DECLARE
+  DECLARE
 
-	v_consulta    		varchar;
-	v_parametros  		record;
-	v_nombre_funcion   	text;
-	v_resp				varchar;
+    v_consulta    		varchar;
+    v_parametros  		record;
+    v_nombre_funcion   	text;
+    v_resp				varchar;
     v_id_funcionario_usuario	integer;
     v_sucursales		varchar;
     v_filtro			varchar;
     v_join				varchar;
     v_select			varchar;
     v_historico			varchar;
-			    
-BEGIN
+    v_id_sucursal		integer;
+    v_id_moneda			integer;
+    v_id_moneda_usd		integer;
+    v_cod_moneda		varchar;
+    v_group_by			varchar;
+    v_id_pais			integer;
 
-	v_nombre_funcion = 'vef.ft_repventa_sel';
+  BEGIN
+
+    v_nombre_funcion = 'vef.ft_repventa_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
- 	#TRANSACCION:  'VF_CONSUC_SEL'
- 	#DESCRIPCION:	Obtencion de conceptos de gasto por punto de venta o sucursal
- 	#AUTOR:		admin	
- 	#FECHA:		01-06-2015 05:58:00
-	***********************************/
+    /*********************************
+     #TRANSACCION:  'VF_CONSUC_SEL'
+     #DESCRIPCION:	Obtencion de conceptos de gasto por punto de venta o sucursal
+     #AUTOR:		admin
+     #FECHA:		01-06-2015 05:58:00
+    ***********************************/
 
-	if(p_transaccion='VF_CONSUC_SEL')then
-     				
-    	begin
-        	IF  pxp.f_existe_parametro(p_tabla,'id_punto_venta') THEN             
-            	v_consulta:='select ''TARIFA NETA''
+    if(p_transaccion='VF_CONSUC_SEL')then
+
+      begin
+        IF  pxp.f_existe_parametro(p_tabla,'id_punto_venta') THEN
+
+          select param.f_get_id_lugar_pais(s.id_lugar),mon.codigo_internacional into v_id_pais, v_cod_moneda
+          from vef.tpunto_venta pv
+            inner join vef.tsucursal s on s.id_sucursal = pv.id_sucursal
+            inner join vef.tsucursal_moneda sm on sm.id_sucursal = s.id_sucursal
+            inner join param.tmoneda mon on mon.id_moneda = sm.id_moneda
+          where pv.id_punto_venta = v_parametros.id_punto_venta;
+
+          if ( v_cod_moneda = 'USD') then
+            v_select = 'select ''CASH USD''::varchar,''4MONEDA1''::varchar as tipo UNION ALL
+                    			select ''OTRO USD''::varchar ''4MONEDA1''::varchar as tipo';
+          else
+            v_select = 'select ''CASH USD''::varchar,''4MONEDA1''::varchar as tipo UNION ALL
+                    			select ''OTRO USD''::varchar, ''4MONEDA1''::varchar as tipo UNION ALL
+                    			select ''CASH ' || v_cod_moneda || '''::varchar,''4MONEDA2''::varchar as tipo UNION ALL
+                                select ''OTRO ' || v_cod_moneda || '''::varchar,''4MONEDA2''::varchar as tipo';
+          end if;
+
+          v_filtro = ' id_punto_venta = ' || v_parametros.id_punto_venta;
+
+          v_consulta:='(' || v_select || ' UNION ALL select ''TARIFA NETA'',''1TARIFA''::varchar as tipo
                 			UNION ALL
-                			select cig.desc_ingas
-                			 from vef.tpunto_venta_producto pvp
+                			select cig.desc_ingas,''3CONCEPTO''::varchar as tipo
+                			 from vef.tventa v
+                             inner join vef.tventa_detalle vd 
+                             	on vd.id_venta = v.id_venta
                              inner join vef.tsucursal_producto sp 
-                             	on sp.id_sucursal_producto = pvp.id_sucursal_producto
+                             	on vd.id_sucursal_producto = sp.id_sucursal_producto
                              inner join param.tconcepto_ingas cig
                              	on cig.id_concepto_ingas = sp.id_concepto_ingas
-                             where pvp.estado_reg = ''activo'' and sp.estado_reg = ''activo''
-                             and cig.estado_reg = ''activo'' and 
-                             pvp.id_punto_venta = ' || v_parametros.id_punto_venta;     
-            ELSE            
-            	v_consulta:='select ''TARIFA NETA''
+                             where v.id_punto_venta = ' || v_parametros.id_punto_venta || ' and 
+             			(v.fecha between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''')
+                        group by cig.desc_ingas';
+        ELSE
+          select param.f_get_id_lugar_pais(s.id_lugar),mon.codigo_internacional into v_id_pais, v_cod_moneda
+          from vef.tsucursal  s
+            inner join vef.tsucursal_moneda sm on sm.id_sucursal = s.id_sucursal
+            inner join param.tmoneda mon on mon.id_moneda = sm.id_moneda
+          where s.id_sucursal = v_parametros.id_sucursal;
+
+          if ( v_cod_moneda = 'USD') then
+            v_select = 'select ''USD'',''4MONEDA''::varchar as tipo';
+          else
+            v_select = 'select ''USD'',''4MONEDA''::varchar as tipo UNION ALL
+                    			select ''' || v_cod_moneda || ''',''4MONEDA''::varchar as tipo';
+          end if;
+
+          v_filtro = ' id_sucursal = ' || v_parametros.id_sucursal;
+
+          v_consulta:='(' || v_select || ' UNION ALL select ''TARIFA NETA'',''1TARIFA''::varchar as tipo
                 			UNION ALL
-                			select cig.desc_ingas
-                			 from vef.tsucursal_producto sp 
-                             	on sp.id_sucursal_producto = pvp.id_sucursal_producto
+                			select cig.desc_ingas,''3CONCEPTO''::varchar as tipo
+                			 from vef.tventa v
+                             inner join vef.tventa_detalle vd 
+                             	on vd.id_venta = v.id_venta
+                             inner join vef.tsucursal_producto sp 
+                             	on vd.id_sucursal_producto = sp.id_sucursal_producto
                              inner join param.tconcepto_ingas cig
                              	on cig.id_concepto_ingas = sp.id_concepto_ingas
-                             where sp.estado_reg = ''activo''
-                             and cig.estado_reg = ''activo'' and 
-                             sp.id_sucursal = ' || v_parametros.id_sucursal;           
-            END IF;
-        	
-            
-			--Devuelve la respuesta
-			return v_consulta;
-						
-		end;
+                             where v.id_sucursal = ' || v_parametros.id_sucursal || ' and 
+             			(v.fecha between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''')
+                        group by cig.desc_ingas';
+        END IF;
 
-	/*********************************    
- 	#TRANSACCION:  'VF_REPDETBOA_SEL'
- 	#DESCRIPCION:	Reporte de Boa para detalle de ventas
- 	#AUTOR:		admin	
- 	#FECHA:		01-06-2015 05:58:00
-	***********************************/
+        v_consulta:= v_consulta || ')
+                        UNION ALL
+                        (select imp.codigo,''2IMPUESTO''::varchar as tipo
+                 from  obingresos.tboleto_impuesto bimp
+                 inner join obingresos.tboleto b on b.id_boleto = bimp.id_boleto
+                 inner join obingresos.timpuesto imp on imp.id_impuesto = bimp.id_impuesto
+                where ' || v_filtro || ' and 
+             			(b.fecha_emision between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''') 
+                group by imp.codigo
+                order by imp.codigo)
+                order by 2,1';
 
-	elsif(p_transaccion='VF_REPDETBOA_SEL')then
+        --Devuelve la respuesta
+        raise notice '%',v_consulta;
+        return v_consulta;
 
-		begin
-        	IF  pxp.f_existe_parametro(p_tabla,'id_punto_venta') THEN 
-            	v_filtro = ' id_punto_venta = ' || v_parametros.id_punto_venta;
-            else
-            	v_filtro = ' id_sucursal = ' || v_parametros.id_sucursal;
-            end if;
-            
-            
-            
-        	v_consulta:='   
-            ( WITH forma_pago_cc  AS(
-                      select vfp.id_venta,vfp.monto_mb_efectivo as monto_tarjeta
+      end;
+
+    /*********************************
+     #TRANSACCION:  'VF_REPDETBOA_SEL'
+     #DESCRIPCION:	Reporte de Boa para detalle de ventas
+     #AUTOR:		admin
+     #FECHA:		01-06-2015 05:58:00
+    ***********************************/
+
+    elsif(p_transaccion='VF_REPDETBOA_SEL')then
+
+      begin
+        IF  pxp.f_existe_parametro(p_tabla,'id_punto_venta') THEN
+          v_filtro = ' id_punto_venta = ' || v_parametros.id_punto_venta;
+          select id_sucursal into v_id_sucursal
+          from vef.tpunto_venta
+          where id_punto_venta = v_parametros.id_punto_venta;
+        else
+          v_filtro = ' id_sucursal = ' || v_parametros.id_sucursal;
+          v_id_sucursal = v_parametros.id_sucursal;
+        end if;
+
+        select	mon.codigo_internacional,mon.id_moneda into v_cod_moneda,v_id_moneda
+        from vef.tsucursal_moneda sm
+          inner join param.tmoneda mon on mon.id_moneda = sm.id_moneda
+        where sm.tipo_moneda = 'moneda_base' and id_sucursal = v_id_sucursal;
+
+        select id_moneda into v_id_moneda_usd
+        from param.tmoneda
+        where codigo_internacional = 'USD';
+
+        v_consulta:='
+            ( WITH ';
+        if (v_cod_moneda != 'USD') then
+          v_consulta = v_consulta || ' forma_pago_usd  AS(
+                      select vfp.id_venta,
+                      round(sum(	case when fp.codigo = ''CA'' then 
+                                          vfp.monto_transaccion -(vfp.cambio /
+                                           param.f_get_tipo_cambio(fp.id_moneda, v.fecha::date, ''O''))
+                             			ELSE
+                                        	0
+                             			end), 2) as monto_cash_usd,
+                             round(sum(	case when fp.codigo != ''CA'' then 
+                                          vfp.monto_transaccion -(vfp.cambio /
+                                           param.f_get_tipo_cambio(fp.id_moneda, v.fecha::date, ''O''))
+                             			ELSE
+                                        	0
+                             			end), 2) as monto_otro_usd,
+                      pxp.list(fp.nombre) as forma_pago
                       from  vef.tventa_forma_pago vfp
                       inner join vef.tforma_pago fp on vfp.id_forma_pago = fp.id_forma_pago
-                      where fp.codigo = ''CCSUS''
-                  ),
-                  forma_pago_cash AS(
-                      select vfp.id_venta,vfp.monto_mb_efectivo as monto_efectivo
+                      inner join vef.tventa v on v.id_venta = vfp.id_venta
+                      where fp.id_moneda = ' || v_id_moneda_usd || ' and (v.fecha::date between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''')
+                      group by vfp.id_venta
+                  ),';
+        end if;
+
+        v_consulta = v_consulta || ' forma_pago_mb AS(
+                      select vfp.id_venta,
+                      sum(CASE when fp.codigo = ''CA'' then 
+                             		vfp.monto_transaccion - vfp.cambio
+                             	 ELSE
+                                 	0
+                                 END) as monto_cash_mb,
+                             sum(CASE when fp.codigo != ''CA'' then 
+                             		vfp.monto_transaccion - vfp.cambio
+                             	 ELSE
+                                 	0
+                                 END) as monto_otro_mb,  
+                      pxp.list(fp.nombre) as forma_pago
                       from  vef.tventa_forma_pago vfp
                       inner join vef.tforma_pago fp on vfp.id_forma_pago = fp.id_forma_pago
-                      where fp.codigo = ''EFESUS''
+                      inner join vef.tventa v on v.id_venta = vfp.id_venta
+                      where fp.id_moneda = ' || v_id_moneda || ' and (v.fecha::date between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''')
+                      group by vfp.id_venta
                   )
-                  select v.fecha_reg::date as fecha,v.correlativo_venta,cli.nombre_factura,vd.descripcion::varchar as boleto,''''::varchar as ruta,cig.desc_ingas,
-                  round(((coalesce(fpcc.monto_tarjeta,0)/v.total_venta)*vd.cantidad*vd.precio),2) as precio_cc,
-                  round(((coalesce(fpcash.monto_efectivo,0)/v.total_venta)*vd.cantidad*vd.precio),2) as precio_cash,
-                  vd.cantidad*vd.precio as monto
+                  select ''' || v_cod_moneda || '''::varchar as moneda_emision, ''venta''::varchar as tipo,v.fecha::date as fecha,v.correlativo_venta,cli.nombre_factura,v.observaciones::varchar as boleto,''''::varchar as ruta,string_agg(cig.desc_ingas,''|'')::varchar as conceptos,
+                  ';
+        if (v_cod_moneda != 'USD') then
+          v_consulta = v_consulta || ' coalesce(fpusd.forma_pago || '','','''')|| coalesce(fpmb.forma_pago,'''') as forma_pago,
+                    			coalesce(fpusd.monto_cash_usd, 0) as monto_cash_usd,
+                         		coalesce(fpusd.monto_otro_usd, 0) as monto_otro_usd,';
+          v_group_by = ' ,fpusd.forma_pago, fpusd.monto_cash_usd,fpusd.monto_otro_usd';
+        else
+          v_group_by = '';
+          v_consulta = v_consulta || ' fpmb.forma_pago as forma_pago,
+                    						coalesce(fpmb.monto_cash_mb, 0) as monto_cash_usd,
+                                            coalesce(fpmb.monto_otro_mb, 0) as monto_otro_usd,';
+        end if;
+        v_consulta = v_consulta || '
+                  coalesce(fpmb.monto_cash_mb, 0) as monto_cash_mb,
+                  coalesce(fpmb.monto_otro_mb, 0) as monto_otro_mb,
+                  0::numeric,
+                  string_agg((vd.precio*vd.cantidad)::text,''|'')::varchar as precios_detalles,
+                  NULL::varchar as mensaje_error
                   from vef.tventa v
                   inner join vef.tventa_detalle vd 
                       on v.id_venta = vd.id_venta and vd.estado_reg = ''activo''
@@ -123,45 +239,118 @@ BEGIN
                   inner join param.tconcepto_ingas cig 
                       on cig.id_concepto_ingas = sp.id_concepto_ingas
                   inner join vef.tcliente cli 
-                      on cli.id_cliente = v.id_cliente
-                  left join forma_pago_cc fpcc
-                      on v.id_venta = fpcc.id_venta
-                  left join forma_pago_cash fpcash
-                      on v.id_venta = fpcash.id_venta
+                      on cli.id_cliente = v.id_cliente';
+        if (v_cod_moneda != 'USD') then
+          v_consulta = v_consulta || ' left join forma_pago_usd fpusd
+                      on v.id_venta = fpusd.id_venta ';
+
+        end if;
+
+        v_consulta = v_consulta || ' left join forma_pago_mb fpmb
+                      on v.id_venta = fpmb.id_venta
                   where v.estado = ''finalizado'' and ' || v_filtro || ' and
-                  	(v.fecha_reg::date between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || '''))
+                  	(v.fecha::date between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''')
+                  group by v.fecha,v.correlativo_venta,cli.nombre_factura,v.observaciones,
+                  			fpmb.forma_pago, fpmb.monto_cash_mb,fpmb.monto_otro_mb,v.total_venta_msuc ' || v_group_by || ' 
+                  )
 		union ALL
-	 		(WITH bol_forma_pago_cc  AS(
-        			select vfp.id_boleto,vfp.monto as monto_tarjeta
-                    from  vef.tboleto_fp vfp
-                    inner join vef.tforma_pago fp on vfp.id_forma_pago = fp.id_forma_pago
-                    where fp.codigo = ''CCSUS''
-        	),
-            bol_forma_pago_cash AS(
-                select vfp.id_boleto,vfp.monto as monto_efectivo
-                from  vef.tboleto_fp vfp
-                inner join vef.tforma_pago fp on vfp.id_forma_pago = fp.id_forma_pago
-                where fp.codigo = ''EFESUS''
+	 		(WITH ';
+        if (v_cod_moneda != 'USD') then
+          v_consulta = v_consulta || ' bol_forma_pago_usd  AS(
+        			select bfp.id_boleto,
+                    sum(case when fp.codigo = ''CA'' then 
+                           			bfp.importe
+                           		ELSE
+                                	0
+                                END) as monto_cash_usd,
+                           sum(case when fp.codigo != ''CA'' then 
+                           			bfp.importe
+                           		ELSE
+                                	0
+                                END) as monto_otro_usd,
+                    pxp.list(fp.nombre) as forma_pago
+                    from  obingresos.tboleto_forma_pago bfp
+                    inner join obingresos.tboleto b on b.id_boleto = bfp.id_boleto
+                    inner join obingresos.tforma_pago fp on bfp.id_forma_pago = fp.id_forma_pago
+                    where ' || v_filtro || ' and 
+             			(b.fecha_emision between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''') and fp.id_moneda = ' || v_id_moneda_usd || '
+                    group by bfp.id_boleto
+        			),';
+        end if;
+
+        v_consulta = v_consulta || 'bol_forma_pago_mb AS(
+                select bfp.id_boleto,
+                sum(case when fp.codigo = ''CA'' then 
+                           			bfp.importe
+                           		ELSE
+                                	0
+                                END) as monto_cash_mb,
+                           sum(case when fp.codigo != ''CA'' then 
+                           			bfp.importe
+                           		ELSE
+                                	0
+                                END) as monto_otro_mb,
+                pxp.list(fp.nombre) as forma_pago
+                 from  obingresos.tboleto_forma_pago bfp
+                 inner join obingresos.tboleto b on b.id_boleto = bfp.id_boleto
+                 inner join obingresos.tforma_pago fp on bfp.id_forma_pago = fp.id_forma_pago
+                where ' || v_filtro || ' and 
+             			(b.fecha_emision between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''') and fp.id_moneda = ' || v_id_moneda || '
+                group by bfp.id_boleto
+            ), bol_impuesto AS(
+            	select bimp.id_boleto,string_agg(bimp.importe::text,''|'')::varchar as monto_impuesto,string_agg(imp.codigo,''|'')::varchar as impuesto
+                 from  obingresos.tboleto_impuesto bimp
+                 inner join obingresos.tboleto b on b.id_boleto = bimp.id_boleto
+                 inner join obingresos.timpuesto imp on imp.id_impuesto = bimp.id_impuesto
+                where ' || v_filtro || ' and 
+             			(b.fecha_emision between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''') 
+                group by bimp.id_boleto
             )
-             SELECT b.fecha, ''''::varchar as correlativo_venta,''''::varchar as nombre_factura,b.numero as boleto,b.ruta,
-             ''TARIFA NETA''::varchar as concepto,
-             fpcc.monto_tarjeta as precio_tarjeta,
-             fpcash.monto_efectivo as precio_cash,
-             coalesce(fpcc.monto_tarjeta,0) + coalesce(fpcash.monto_efectivo,0) as monto
+             SELECT b.moneda::varchar as moneda_emision,''boleto''::varchar as tipo ,b.fecha_emision, ''''::varchar as correlativo_venta,b.pasajero::varchar as nombre_factura,b.nro_boleto as boleto,b.ruta_completa as ruta ,
+             imp.impuesto as conceptos,
+             ';
+        if (v_cod_moneda != 'USD') then
+          v_consulta = v_consulta || ' coalesce(fpusd.forma_pago || '','','''')|| coalesce(fpmb.forma_pago,'''') as forma_pago,
+                    		coalesce(fpusd.monto_cash_usd,0) as monto_cash_usd,
+                            coalesce(fpusd.monto_otro_usd,0) as monto_otro_usd,';
+          v_group_by = ' ,fpusd.forma_pago, fpusd.monto_cash_usd,fpusd.monto_otro_usd ';
+        else
+          v_consulta = v_consulta || ' fpmb.forma_pago as forma_pago,
+                    					coalesce(fpmb.monto_cash_mb,0) as monto_cash_usd,
+                                        coalesce(fpmb.monto_otro_mb,0) as monto_otro_usd,';
+          v_group_by = '';
+        end if;
+        v_consulta = v_consulta ||  '
+             coalesce(fpmb.monto_cash_mb,0) as monto_cash_mb,
+             coalesce(fpmb.monto_otro_mb,0) as monto_otro_mb,
+             b.neto,
+             imp.monto_impuesto as precios_conceptos,
+             b.mensaje_error
+             from obingresos.tboleto b
+             ';
+        if (v_cod_moneda != 'USD') then
+          v_consulta = v_consulta || ' left join bol_forma_pago_usd fpusd
+                      on b.id_boleto = fpusd.id_boleto ';
+        end if;
+
+        v_consulta = v_consulta || '
+             left join bol_forma_pago_mb fpmb
+                on fpmb.id_boleto = b.id_boleto
+             left join bol_impuesto imp
+                on imp.id_boleto = b.id_boleto
              
-             from vef.tboleto b
-             left join bol_forma_pago_cc fpcc 
-                on fpcc.id_boleto = b.id_boleto
-             left join bol_forma_pago_cash fpcash 
-                on fpcash.id_boleto = b.id_boleto
-             where ' || v_filtro || ' and 
-             (b.fecha between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || '''))
-             order by fecha,boleto';     
+             
+             where b.estado_reg = ''activo'' and ' || v_filtro || ' and 
+             (b.fecha_emision between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''')
+             
+             group by b.fecha_emision,b.pasajero, b.nro_boleto,b.mensaje_error,b.ruta_completa,b.moneda,b.neto,imp.impuesto,
+             		imp.monto_impuesto,fpmb.forma_pago,fpmb.monto_cash_mb,fpmb.monto_otro_mb '|| v_group_by || ')
+             order by fecha,boleto';
+        raise notice '%',v_consulta;
+        --Devuelve la respuesta
+        return v_consulta;
 
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
+      end;
     /*********************************    
  	#TRANSACCION:  'VF_REPRESBOA_SEL'
  	#DESCRIPCION:	Reporte de Boa para resumen de ventas
@@ -169,18 +358,18 @@ BEGIN
  	#FECHA:		01-06-2015 05:58:00
 	***********************************/
 
-	elsif(p_transaccion='VF_REPRESBOA_SEL')then
+    elsif(p_transaccion='VF_REPRESBOA_SEL')then
 
-		begin
-        	IF  pxp.f_existe_parametro(p_tabla,'id_punto_venta') THEN 
-            	v_filtro = ' id_punto_venta = ' || v_parametros.id_punto_venta;
-            else
-            	v_filtro = ' id_sucursal = ' || v_parametros.id_sucursal;
-            end if;
-            
-            
-            
-        	v_consulta:='   
+      begin
+        IF  pxp.f_existe_parametro(p_tabla,'id_punto_venta') THEN
+          v_filtro = ' id_punto_venta = ' || v_parametros.id_punto_venta;
+        else
+          v_filtro = ' id_sucursal = ' || v_parametros.id_sucursal;
+        end if;
+
+
+
+        v_consulta:='
             ( WITH forma_pago_cc  AS(
                       select vfp.id_venta,vfp.monto_mb_efectivo as monto_tarjeta
                       from  vef.tventa_forma_pago vfp
@@ -238,24 +427,24 @@ BEGIN
              where ' || v_filtro || ' and 
              (b.fecha between ''' || v_parametros.fecha_desde || ''' and ''' || v_parametros.fecha_hasta || ''')
              group by b.fecha)
-             order by fecha';     
+             order by fecha';
 
-			--Devuelve la respuesta
-			return v_consulta;
+        --Devuelve la respuesta
+        return v_consulta;
 
-		end;
-	/*********************************    
- 	#TRANSACCION:  'VF_VENCONF_SEL'
- 	#DESCRIPCION:	Obtener configuraciones basicas para sistema de ventas
- 	#AUTOR:		admin	
- 	#FECHA:		01-06-2015 05:58:00
-	***********************************/
+      end;
+    /*********************************
+     #TRANSACCION:  'VF_VENCONF_SEL'
+     #DESCRIPCION:	Obtener configuraciones basicas para sistema de ventas
+     #AUTOR:		admin
+     #FECHA:		01-06-2015 05:58:00
+    ***********************************/
 
-	elsif(p_transaccion='VF_VENCONF_SEL')then
+    elsif(p_transaccion='VF_VENCONF_SEL')then
 
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='	select variable, valor
+      begin
+        --Sentencia de la consulta de conteo de registros
+        v_consulta:='	select variable, valor
 						 	from pxp.variable_global
 						 	where variable like ''vef_%'' 
 						 union all
@@ -271,26 +460,26 @@ BEGIN
                          union all
 						 	select ''fecha'',to_char(now(),''DD/MM/YYYY'')::varchar
 						 ';
-			
-			--Definicion de la respuesta		    
-			
 
-			--Devuelve la respuesta
-			return v_consulta;
+        --Definicion de la respuesta
 
-		end;
-	/*********************************    
- 	#TRANSACCION:  'VF_NOTAVEND_SEL'
- 	#DESCRIPCION:	lista el detalle de la nota de venta
- 	#AUTOR:		admin	
- 	#FECHA:		01-06-2015 05:58:00
-	***********************************/
 
-	ELSIF(p_transaccion='VF_NOTAVEND_SEL')then
-     				
-    	begin
-    		--Sentencia de la consulta
-			v_consulta:='select
+        --Devuelve la respuesta
+        return v_consulta;
+
+      end;
+    /*********************************
+     #TRANSACCION:  'VF_NOTAVEND_SEL'
+     #DESCRIPCION:	lista el detalle de la nota de venta
+     #AUTOR:		admin
+     #FECHA:		01-06-2015 05:58:00
+    ***********************************/
+
+    ELSIF(p_transaccion='VF_NOTAVEND_SEL')then
+
+      begin
+        --Sentencia de la consulta
+        v_consulta:='select
 						 
                               vd.id_venta,
                               vd.id_venta_detalle,
@@ -319,14 +508,14 @@ BEGIN
                         where  
                                vd.estado_reg = ''activo'' and
                                vd.id_venta = '||v_parametros.id_venta::varchar;
-			
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||' order by vd.id_venta_detalle, fd.id_formula_detalle';
 
-			--Devuelve la respuesta
-			return v_consulta;
-						
-		end;
+        --Definicion de la respuesta
+        v_consulta:=v_consulta||' order by vd.id_venta_detalle, fd.id_formula_detalle';
+
+        --Devuelve la respuesta
+        return v_consulta;
+
+      end;
     /*********************************    
  	#TRANSACCION:  'VF_NOTAVEND_CONT'
  	#DESCRIPCION:	Conteo de registros
@@ -334,25 +523,25 @@ BEGIN
  	#FECHA:		01-06-2015 05:58:00
 	***********************************/
 
-	elsif(p_transaccion='VF_NOTAVEND_CONT')then
+    elsif(p_transaccion='VF_NOTAVEND_CONT')then
 
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select
+      begin
+        --Sentencia de la consulta de conteo de registros
+        v_consulta:='select
                             count(vd.id_venta_detalle) as total,
                             SUM(vd.cantidad*COALESCE(vd.precio,0)) as suma_total
                          from vef.tventa_detalle vd
                          where  id_venta = '||v_parametros.id_venta::varchar||' 
                               and vd.estado_reg = ''activo''
                           group by vd.id_venta ';
-			
-			--Definicion de la respuesta		    
-			
 
-			--Devuelve la respuesta
-			return v_consulta;
+        --Definicion de la respuesta
 
-		end;
+
+        --Devuelve la respuesta
+        return v_consulta;
+
+      end;
     /*********************************    
  	#TRANSACCION:  'VF_NOTVEN_SEL'
  	#DESCRIPCION:   Lista de la cabecera de la nota de venta
@@ -360,11 +549,11 @@ BEGIN
  	#FECHA:		01-06-2015 05:58:00
 	***********************************/
 
-	elsif(p_transaccion='VF_NOTVEN_SEL')then
-     				
-    	begin
-    		--Sentencia de la consulta
-			v_consulta:='select
+    elsif(p_transaccion='VF_NOTVEN_SEL')then
+
+      begin
+        --Sentencia de la consulta
+        v_consulta:='select
 						ven.id_venta,
 						ven.id_cliente,
 						ven.id_sucursal,
@@ -397,29 +586,29 @@ BEGIN
 				        inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                        where  id_venta = '||v_parametros.id_venta::varchar;
-			
-			
-			--Devuelve la respuesta
-			return v_consulta;
-						
-		end;
-    				
-	else
-					     
-		raise exception 'Transaccion inexistente';
-					         
-	end if;
-					
-EXCEPTION
-					
-	WHEN OTHERS THEN
-			v_resp='';
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-			raise exception '%',v_resp;
-END;
-$body$
+
+
+        --Devuelve la respuesta
+        return v_consulta;
+
+      end;
+
+    else
+
+      raise exception 'Transaccion inexistente';
+
+    end if;
+
+    EXCEPTION
+
+    WHEN OTHERS THEN
+      v_resp='';
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+      v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+      v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+      raise exception '%',v_resp;
+  END;
+  $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT

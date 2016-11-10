@@ -26,21 +26,29 @@ class MODReportesVentas extends MODbase{
 		$this->setParametro('fecha_hasta','fecha_hasta','date');
 
 		//Definicion de la lista del resultado del query
+		$this->captura('moneda_emision','varchar');
+		$this->captura('tipo','varchar');
 		$this->captura('fecha','date');
 		$this->captura('correlativo','varchar');
 		$this->captura('pasajero','varchar');
 		$this->captura('boleto','varchar');
 		$this->captura('ruta','varchar');
-		$this->captura('concepto','varchar');
-		$this->captura('monto_tarjeta','numeric');
-		$this->captura('monto_cash','numeric');
-		$this->captura('monto','numeric');
+		$this->captura('conceptos','varchar');
+		$this->captura('forma_pago','text');		
+		$this->captura('monto_cash_usd','numeric');
+        $this->captura('monto_otro_usd','numeric');
+        $this->captura('monto_cash_mb','numeric');
+        $this->captura('monto_otro_mb','numeric');
+		$this->captura('neto','numeric');
+		$this->captura('precios_detalles','varchar');
+        $this->captura('mensaje_error','varchar');
 		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
-		
+
 		$this->ejecutarConsulta();
+
 		
 		//Devuelve la respuesta
 		return $this->respuesta;
@@ -84,13 +92,17 @@ class MODReportesVentas extends MODbase{
 		
 		$this->setParametro('id_sucursal','id_sucursal','integer');
 		$this->setParametro('id_punto_venta','id_punto_venta','integer');
+		$this->setParametro('fecha_desde','fecha_desde','date');
+		$this->setParametro('fecha_hasta','fecha_hasta','date');
 		
 		//Definicion de la lista del resultado del query
 		$this->captura('nombre','varchar');
+		$this->captura('tipo','varchar');
 				
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+
 		
 		$this->ejecutarConsulta();
 		

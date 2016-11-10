@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_venta_forma_pago_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION vef.ft_venta_forma_pago_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_venta_forma_pago_ime
@@ -27,6 +30,8 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_venta_forma_pago	integer;
+    v_forma_pago			record;
+    v_res					varchar;
 			    
 BEGIN
 
@@ -43,6 +48,9 @@ BEGIN
 	if(p_transaccion='VF_VENFP_INS')then
 					
         begin
+        	select * into v_forma_pago
+            from vef.tforma_pago fp 
+            where fp.id_forma_pago = v_parametros.id_forma_pago;
         	--Sentencia de la insercion
         	insert into vef.tventa_forma_pago(
 			id_forma_pago,
@@ -78,6 +86,12 @@ BEGIN
 			
 			
 			)RETURNING id_venta_forma_pago into v_id_venta_forma_pago;
+            
+            if (v_forma_pago.registrar_tarjeta = 'si' and v_forma_pago.registrar_tipo_tarjeta = 'no')then
+            	v_res = pxp.f_valida_numero_tarjeta_credito(v_parametros.numero_tarjeta,substring(v_forma_pago.codigo from 3 for 2));
+            elsif (v_forma_pago.registrar_tarjeta = 'si' and v_forma_pago.registrar_tipo_tarjeta = 'si')then
+            	v_res = pxp.f_valida_numero_tarjeta_credito(v_parametros.numero_tarjeta,v_parametros.tipo_tarjeta);
+            end if; 
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Forma de Pago almacenado(a) con exito (id_venta_forma_pago'||v_id_venta_forma_pago||')'); 
@@ -160,7 +174,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_venta_forma_pago_ime"(integer, integer, character varying, character varying) OWNER TO postgres;
