@@ -35,6 +35,7 @@ class MODFormulaDetalle extends MODbase{
 		$this->captura('usr_mod','varchar');
         $this->captura('nombre_producto','varchar');
 		$this->captura('tipo','varchar');
+        $this->captura('unidad_medida','varchar');
         
 		
 		//Ejecuta la instruccion

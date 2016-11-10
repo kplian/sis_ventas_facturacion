@@ -122,7 +122,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_sucursal', 'nombre', 'codigo','habilitar_comisiones','formato_comprobante'],
+                    fields: ['id_sucursal', 'nombre', 'codigo','habilitar_comisiones','formato_comprobante','id_entidad'],
                     remoteSort: true,
                     baseParams: {filtro_usuario: 'si',par_filtro: 'suc.nombre#suc.codigo', nombreVista: this.nombreVista}
                });
@@ -138,6 +138,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                    	this.store.baseParams.id_punto_venta = this.variables_globales.id_punto_venta;
 	                    } else {
 	                    	this.variables_globales.id_sucursal = r[0].data.id_sucursal;
+	                    	this.variables_globales.id_entidad = r[0].data.id_entidad;
 	                    	this.variables_globales.habilitar_comisiones = r[0].data.habilitar_comisiones;
 	                    	this.variables_globales.formato_comprobante = r[0].data.formato_comprobante;
 	                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
@@ -586,12 +587,14 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombre_factura', type: 'string'},
 		{name:'nombre_sucursal', type: 'string'},
 		{name:'nombre_punto_venta', type: 'string'},
+		{name:'forma_pedido', type: 'string'},
 		{name:'estado', type: 'string'},
 		{name:'correlativo_venta', type: 'string'},
 		{name:'a_cuenta', type: 'numeric'},
 		{name:'total_venta', type: 'numeric'},
 		{name:'comision', type: 'numeric'},
 		{name:'fecha_estimada_entrega', type: 'date',dateFormat:'Y-m-d'},
+		{name:'hora_estimada_entrega', type: 'string'},
 		{name:'usuario_ai', type: 'string'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_reg', type: 'numeric'},
@@ -604,6 +607,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'monto_forma_pago', type: 'numeric'},
 		{name:'nro_factura', type: 'string'},
 		{name:'cod_control', type: 'string'},
+        {name:'vendedor_medico', type: 'string'},
 		{name:'fecha', type: 'date',dateFormat:'Y-m-d'},
 		{name:'excento', type: 'numeric'},
 		{name:'nroaut', type: 'numeric'},

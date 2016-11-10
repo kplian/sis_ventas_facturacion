@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -277,7 +275,9 @@ BEGIN
 								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo'' ' || v_where || '
 								group by form.id_formula,
 								form.nombre, form.descripcion,
-								med.nombre_completo
+								med.nombre_completo,
+                                um.id_unidad_medida,
+                                um.codigo
                                 ' || v_having || ')';
 			
 			end if;
@@ -468,8 +468,9 @@ BEGIN
 				v_consulta := 'with tabla_temporal as (
 									select cig.id_concepto_ingas as id_producto, ''producto_servicio''::varchar as tipo,
 											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,
-                                            ''''::varchar as unidad_medida
-									from param.tconcepto_ingas cig 
+                                            um.descripcion as unidad_medida
+									from param.tconcepto_ingas cig
+									left join param.tunidad_medida um on (um.id_unidad_medida = cig.id_unidad_medida)
 									where cig.estado_reg = ''activo'' and cig.id_entidad is not null 
 									)';		
                 raise notice '%', v_consulta;	

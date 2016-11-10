@@ -75,6 +75,9 @@ class MODVenta extends MODbase{
 		$this->captura('desc_moneda','varchar');
 		$this->captura('valor_bruto','numeric');
 		$this->captura('descripcion_bulto','varchar');
+		$this->captura('hora_estimada_entrega','varchar');
+        $this->captura('vendedor_medico','varchar');
+		$this->captura('forma_pedido','varchar');
 		
 		
 		
@@ -225,6 +228,8 @@ class MODVenta extends MODbase{
 			$this->setParametro('otros_cif','otros_cif','numeric');
 			$this->setParametro('valor_bruto','valor_bruto','numeric');
 			$this->setParametro('descripcion_bulto','descripcion_bulto','varchar');
+			$this->setParametro('hora_estimada_entrega','hora_estimada_entrega','varchar');
+			$this->setParametro('forma_pedido','forma_pedido','varchar');
 			
 			
 			
@@ -652,12 +657,20 @@ class MODVenta extends MODbase{
 		$this->captura('valor_bruto','numeric');
 		$this->captura('descripcion_bulto','varchar');
 		
+		$this->captura('telefono_cliente','varchar');
+		$this->captura('fecha_hora_entrega','varchar');
+		$this->captura('a_cuenta','numeric');
+
+        $this->captura('medico_vendedor','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		
 	     
 		$this->ejecutarConsulta();
+		
+		
 		
 		//Devuelve la respuesta
 		return $this->respuesta;
@@ -683,6 +696,8 @@ class MODVenta extends MODbase{
 		$this->captura('ley','varchar');	
 		$this->captura('kg_fino','varchar');	
 		$this->captura('descripcion','text');	
+		$this->captura('unidad_concepto','varchar');
+        $this->captura('precio_grupo','numeric');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

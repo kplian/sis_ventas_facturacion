@@ -49,10 +49,11 @@ class MODVentaDetalle extends MODbase{
 		$this->captura('kg_fino','varchar');
 		
 		$this->captura('id_unidad_medida','integer');
-		$this->captura('codigo_unidad_medida','varchar');  
-		    
-		
-		//Ejecuta la instruccion
+		$this->captura('codigo_unidad_medida','varchar');
+        $this->captura('codigo_unidad_cig','varchar');
+
+
+        //Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 		

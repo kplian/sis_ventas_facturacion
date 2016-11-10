@@ -64,7 +64,8 @@ BEGIN
 						med.fecha_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-						med.fecha_nacimiento	
+						med.fecha_nacimiento,
+                        med.especialidad	
 						from vef.tmedico med
 						inner join segu.tusuario usu1 on usu1.id_usuario = med.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = med.id_usuario_mod

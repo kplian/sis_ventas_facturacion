@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -53,6 +51,7 @@ DECLARE
     v_kg_fino					varchar;
     v_descripcion				varchar;
     v_id_unidad_medida			integer;
+   
     
 	
 			    
@@ -125,6 +124,16 @@ BEGIN
             if (pxp.f_existe_parametro(p_tabla,'id_unidad_medida')) then            
                v_id_unidad_medida = v_parametros.id_unidad_medida;
             end if;
+            
+            --Si el total a pagar debe estar redondeado a entero
+            if (pxp.f_get_variable_global('vef_redondeo_detalle') = 'true') then
+                --si el total no es entero
+                if (trunc((v_parametros.precio * v_parametros.cantidad_det) - (v_parametros.precio * v_parametros.cantidad_det * v_porcentaje_descuento / 100)) != ((v_parametros.precio * v_parametros.cantidad_det) - (v_parametros.precio * v_parametros.cantidad_det * v_porcentaje_descuento / 100))) then
+                    v_total = ceil((v_parametros.precio * v_parametros.cantidad_det) - (v_parametros.precio * v_parametros.cantidad_det * v_porcentaje_descuento / 100));
+                    v_parametros.precio = v_total / v_parametros.cantidad_det*100/(100 - v_porcentaje_descuento);
+                end if;
+            end if;
+            
             
             --Sentencia de la insercion
         	insert into vef.tventa_detalle(

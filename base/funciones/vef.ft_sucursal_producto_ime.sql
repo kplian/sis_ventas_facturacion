@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -35,6 +33,7 @@ DECLARE
     v_id_concepto			integer;
     v_id_entidad			integer;
     v_desc_ingas			varchar;
+    v_id_sucursal			integer;
 			    
 BEGIN
 
@@ -51,16 +50,32 @@ BEGIN
 	if(p_transaccion='VF_SPROD_INS')then
 					
         begin
-        	select id_entidad into v_id_entidad
+        	if (v_parametros.id_sucursal is not null) then         
+                
+                v_id_sucursal = v_parametros.id_sucursal;
+            else
+            	SELECT su.id_sucursal into v_id_sucursal
+                from vef.tsucursal_usuario su
+                where su.id_usuario = p_id_usuario and su.estado_reg = 'activo'
+                limit 1 offset 0;
+                
+                if (v_id_sucursal is null) then
+                	raise exception 'El usuario no tiene ninguna sucursal asignada';
+                end if;
+            end if;
+            
+            select id_entidad into v_id_entidad
             from vef.tsucursal
-            where id_sucursal = v_parametros.id_sucursal;
+            where id_sucursal = v_id_sucursal;
+            
+            
             
             if (v_parametros.tipo_producto != 'item_almacen') then
                 if (pxp.f_is_positive_integer(v_parametros.nombre_producto)) then
                     v_id_concepto = v_parametros.nombre_producto;
                     
                     if (exists (select 1 from vef.tsucursal_producto
-                    			where id_concepto_ingas = v_id_concepto and estado_reg = 'activo' and id_sucursal = v_parametros.id_sucursal))  then
+                    			where id_concepto_ingas = v_id_concepto and estado_reg = 'activo' and id_sucursal = v_id_sucursal))  then
                     	raise exception 'El producto o servicio ya se encuentra registrado en esta sucursal';
                     end if;
                     
@@ -132,7 +147,7 @@ BEGIN
             requiere_descripcion,
             id_moneda
           	) values(
-			v_parametros.id_sucursal,
+			v_id_sucursal,
 			v_parametros.id_item,			
 			v_parametros.precio,			
 			'activo',
@@ -167,9 +182,23 @@ BEGIN
 	elsif(p_transaccion='VF_SPROD_MOD')then
 
 		begin
+        	if (v_parametros.id_sucursal is not null) then         
+                
+                v_id_sucursal = v_parametros.id_sucursal;
+            else
+            	SELECT su.id_sucursal into v_id_sucursal
+                from vef.tsucursal_usuario su
+                where su.id_usuario = p_id_usuario and su.estado_reg = 'activo'
+                limit 1 offset 0;
+                
+                if (v_id_sucursal is null) then
+                	raise exception 'El usuario no tiene ninguna sucursal asignada';
+                end if;
+            end if;
+        	
         	select id_entidad into v_id_entidad
             from vef.tsucursal
-            where id_sucursal = v_parametros.id_sucursal;
+            where id_sucursal = v_id_sucursal;
             
             select cig.id_concepto_ingas, cig.desc_ingas into v_id_concepto,v_desc_ingas
             from param.tconcepto_ingas cig
@@ -257,7 +286,7 @@ BEGIN
             end if;
 			--Sentencia de la modificacion
 			update vef.tsucursal_producto set
-			id_sucursal = v_parametros.id_sucursal,
+			id_sucursal = v_id_sucursal,
 			id_item = v_parametros.id_item,			
 			precio = v_parametros.precio,			
 			tipo_producto = v_parametros.tipo_producto,

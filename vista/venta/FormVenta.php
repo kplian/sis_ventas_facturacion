@@ -175,8 +175,9 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		                form:true
 		      });
 		}
-		
-		this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
+		if (!this.tipoDetalleArray) {			
+			this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
+        }
         this.addEvents('beforesave');
         this.addEvents('successsave');
         
@@ -245,7 +246,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                                     direction: 'ASC'
                                                 },
                                                 totalProperty: 'total',
-                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio'],
+                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio','codigo_unidad_medida'],
                                                 remoteSort: true,
                                                 baseParams: {par_filtro: 'todo.nombre'}
                                             }),
@@ -256,7 +257,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                             forceSelection: true,
                                             tpl : new Ext.XTemplate('<tpl for="."><div class="x-combo-list-item">','<tpl if="tipo == \'formula\'">',
                                             '<p><b>Medico:</b> {medico}</p>','</tpl>',
-                                            '<p><b>Nombre:</b> {nombre_producto}</p><p><b>Descripcion:</b> {descripcion}</p><p><b>Precio:</b> {precio}</p></div></tpl>'),
+                                            '<p><b>Nombre:</b> {nombre_producto}</p><p><b>Descripcion:</b> {descripcion} {codigo_unidad_medida}</p><p><b>Precio:</b> {precio}</p></div></tpl>'),
                                             typeAhead: false,
                                             triggerAction: 'all',
                                             lazyRender: true,
@@ -317,9 +318,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             this.detCmp.precio_unitario.setValue(Number(r.data.precio));
             
             var tmp = this.roundTwo(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()))
-            this.detCmp.precio_total.setValue(tmp);
-        	
-        	
+            this.detCmp.precio_total.setValue(tmp);       	
         	
         	if (r.data.requiere_descripcion == 'si') {        		
         		this.habilitarDescripcion(true);
@@ -446,7 +445,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         
         this.iniciarEventosProducto();
         
-        this.detCmp.cantidad.on('keyup',function() {  
+        this.detCmp.cantidad.on('keyup',function() {
             this.detCmp.precio_total.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
         },this);
         
@@ -456,6 +455,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     }, 
     
     roundTwo: function(can){
+    	
     	 return  Math.round(can*Math.pow(10,2))/Math.pow(10,2);
     },
     
@@ -547,7 +547,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         var cmb_rec = this.detCmp['id_producto'].store.getById(rec.get('id_producto'));
         if(cmb_rec) {
             
-            rec.set('nombre_producto', cmb_rec.get('nombre_producto')); 
+            rec.set('nombre_producto', cmb_rec.get('nombre_producto') + ' (' + cmb_rec.get('codigo_unidad_medida') + ')'); 
         }
                      
        
@@ -775,11 +775,17 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 });
     },
     armarFormularioFormula : function () {
-    	var comboFormula = new Ext.form.ComboBox(
+    	var comboFormula = new Ext.form.TrigguerCombo(
 						    {
 						        typeAhead: false,
 						        fieldLabel: 'Paquete / Formula',
-						        allowBlank : false,						        
+						        allowBlank : false,	
+						        tinit:true,
+							    turl:'../../../sis_ventas_facturacion/vista/formula/Formula.php',
+								ttitle:'Formula',
+								tconfig:{width:'80%',height:'90%'},
+								tdata:{},
+								tcls:'Formula',					        
 						        store: new Ext.data.JsonStore({
                                                 url: '../../sis_ventas_facturacion/control/SucursalProducto/listarProductoServicioItem',
                                                 id: 'id_producto',
@@ -842,7 +848,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		                		validado = true;	
 		                		var nombre_formula = comboFormula.getRawValue();                		
 		                		VentanaFormula.close(); 
-		                		params['id_formula'] = comboFormula.getValue();   
+		                		params.id_formula = comboFormula.getValue();   
 		                		console.log(params);
 		                		Ext.Ajax.request({
 					                url:'../../sis_ventas_facturacion/control/FormulaDetalle/listarFormulaDetalleParaInsercion',                
@@ -1612,7 +1618,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     title: 'Formulario Venta',
     onEdit:function(){
         
-    	this.accionFormulario = 'EDIT';    	
+    	this.accionFormulario = 'EDIT';   
+    	console.log(this.data.datos_originales); 	
     	this.loadForm(this.data.datos_originales);    	
     	
         //load detalle de conceptos

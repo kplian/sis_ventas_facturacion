@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -97,7 +95,10 @@ DECLARE
     v_tipo_cambio_venta		numeric;
     v_es_fin				varchar;
     v_valor_bruto			numeric;
-    v_descripcion_bulto		varchar;	
+    v_descripcion_bulto		varchar;
+    v_hora_estimada_entrega	time;	
+    v_tiene_formula			varchar;
+    v_forma_pedido			varchar;
     
 			    
 BEGIN
@@ -115,6 +116,7 @@ BEGIN
 	if(p_transaccion='VF_VEN_INS')then
 					
         begin
+        v_tiene_formula = 'no';
         --obtener correlativo
         
         select id_periodo into v_id_periodo from
@@ -286,8 +288,31 @@ BEGIN
         
         if (pxp.f_existe_parametro(p_tabla,'fecha_estimada_entrega')) then
         	v_fecha_estimada_entrega = v_parametros.fecha_estimada_entrega;
+            if (v_fecha_estimada_entrega is not null) then
+            	v_tiene_formula = 'si';
+            else
+            	v_fecha_estimada_entrega = now();
+            end if;
         else
         	v_fecha_estimada_entrega = now();
+        end if;
+        
+        if (pxp.f_existe_parametro(p_tabla,'hora_estimada_entrega')) then
+        	
+            if (v_parametros.hora_estimada_entrega is not null and v_parametros.hora_estimada_entrega != '') then
+               		
+                v_hora_estimada_entrega = (v_parametros.hora_estimada_entrega || ':00')::time;
+            else
+                v_hora_estimada_entrega = NULL;
+            end if;
+        else
+            v_hora_estimada_entrega = now()::time;
+        end if;
+        
+        if (pxp.f_existe_parametro(p_tabla,'forma_pedido')) then
+        	v_forma_pedido = v_parametros.forma_pedido;
+        else
+        	v_forma_pedido =NULL;
         end if;
         
         
@@ -413,7 +438,10 @@ BEGIN
             otros_cif,
             tipo_cambio_venta,
             valor_bruto,
-            descripcion_bulto
+            descripcion_bulto,
+            hora_estimada_entrega,
+            tiene_formula,
+            forma_pedido
             
             
           	) values(
@@ -455,7 +483,10 @@ BEGIN
             COALESCE(v_otros_cif,0),
             COALESCE(v_tipo_cambio_venta,0)	,
             COALESCE(v_valor_bruto,0),
-            COALESCE(v_descripcion_bulto,'')
+            COALESCE(v_descripcion_bulto,''),
+            v_hora_estimada_entrega,
+            v_tiene_formula,
+            v_forma_pedido
             	
 			
 			) returning id_venta into v_id_venta;
@@ -519,7 +550,7 @@ BEGIN
 
 		begin
         	
-            
+            v_tiene_formula = 'no';
             if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
                 v_id_punto_venta = v_parametros.id_punto_venta;
             else
@@ -625,8 +656,31 @@ BEGIN
             
             if (pxp.f_existe_parametro(p_tabla,'fecha_estimada_entrega')) then
                 v_fecha_estimada_entrega = v_parametros.fecha_estimada_entrega;
+                if (v_fecha_estimada_entrega is not null) then
+                    v_tiene_formula = 'si';
+                else
+                    v_fecha_estimada_entrega = now();
+                end if;
             else
                 v_fecha_estimada_entrega = now();
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'hora_estimada_entrega')) then
+        	
+                if (v_parametros.hora_estimada_entrega is not null and v_parametros.hora_estimada_entrega != '') then
+               		
+                    v_hora_estimada_entrega = (v_parametros.hora_estimada_entrega || ':00')::time;
+                else
+                    v_hora_estimada_entrega = NULL;
+                end if;
+            else
+                v_hora_estimada_entrega = now()::time;
+            end if;
+            
+            if (pxp.f_existe_parametro(p_tabla,'forma_pedido')) then
+                v_forma_pedido = v_parametros.forma_pedido;
+            else
+                v_forma_pedido =NULL;
             end if;
             
 			if (pxp.f_is_positive_integer(v_parametros.id_cliente)) THEN
@@ -663,6 +717,7 @@ BEGIN
               id_sucursal = v_id_sucursal,
               a_cuenta = v_a_cuenta,
               fecha_estimada_entrega = v_fecha_estimada_entrega,
+              hora_estimada_entrega = v_hora_estimada_entrega,
               id_usuario_mod = p_id_usuario,
               fecha_mod = now(),
               id_usuario_ai = v_parametros._id_usuario_ai,
@@ -671,7 +726,9 @@ BEGIN
               id_vendedor_medico = v_id_vendedor_medico,
               porcentaje_descuento = v_porcentaje_descuento,
               comision = v_comision,
+              tiene_formula = v_tiene_formula,
               observaciones = v_parametros.observaciones,
+              forma_pedido = v_forma_pedido,
               fecha = (case when v_fecha is null then 
                           fecha 
                       else

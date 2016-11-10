@@ -527,6 +527,7 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
 							['VentaVendedorManual','Factura de manual'],
 							['VentaVendedorExportacionMin','Factura  Minera de Exportación'],
 							['VentaVendedorMin','Factura Computariza Minera'],	
+							['VentaVendedorFarmacia','Ventas Farmacia']
 						]	        				
 	    		}),
 	    		valueField:'ID',

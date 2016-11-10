@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -95,6 +93,14 @@ BEGIN
 					        from vef.tventa_forma_pago vfp
 					        inner join vef.tforma_pago fp on fp.id_forma_pago = vfp.id_forma_pago
 					        group by vfp.id_venta        
+					    ),
+					    medico_usuario as(
+					    	select (med.id_medico || ''_medico'')::varchar as id_medico_usuario,med.nombre_completo::varchar as nombre
+					        from vef.vmedico med
+					      union all
+					      select (usu.id_usuario || ''_usuario'')::varchar as id_medico_usuario,usu.desc_persona::varchar as nombre
+					      from segu.vusuario usu
+
 					    )
 			
 						select
@@ -176,12 +182,15 @@ BEGIN
                         ven.tipo_cambio_venta,
                         mon.moneda as desc_moneda,
                         ven.valor_bruto,
-                        ven.descripcion_bulto
-                        
+                        ven.descripcion_bulto,
+                        to_char(ven.hora_estimada_entrega,''HH24:MI'')::varchar,
+                        mu.nombre as vendedor_medico,
+                         ven.forma_pedido
                         	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+						left join medico_usuario mu on mu.id_medico_usuario = ven.id_vendedor_medico
 				        inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
@@ -243,10 +252,21 @@ BEGIN
             end if;
             
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(' || v_select || ')
+			v_consulta:='
+			with medico_usuario as(
+					    	select (med.id_medico || ''_medico'')::varchar as id_medico_usuario,med.nombre_completo::varchar as nombre
+					        from vef.vmedico med
+					      union all
+					      select (usu.id_usuario || ''_usuario'')::varchar as id_medico_usuario,usu.desc_persona::varchar as nombre
+					      from segu.vusuario usu
+
+					    )
+
+			        select count(' || v_select || ')
 					    from vef.tventa ven
 					    inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+						left join medico_usuario mu on mu.id_medico_usuario = ven.id_vendedor_medico
 					    inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
@@ -476,7 +496,10 @@ BEGIN
                         ven.otros_cif,
                         (to_char(ven.fecha,''DD'')::integer || '' de '' ||param.f_literal_periodo(to_char(ven.fecha,''MM'')::integer) || '' de '' || to_char(ven.fecha,''YYYY''))::varchar as fecha_literal,
 			(select count(*) from vef.ttipo_descripcion td where td.estado_reg = ''activo'' and td.id_sucursal = suc.id_sucursal)::integer as descripciones, 
-			ven.estado,ven.valor_bruto,ven.descripcion_bulto
+			ven.estado,ven.valor_bruto,ven.descripcion_bulto,(cli.telefono_celular || '' '' || cli.telefono_fijo)::varchar,
+            (to_char(ven.fecha_estimada_entrega,''DD/MM/YYYY'') || '' '' || to_char(ven.hora_estimada_entrega,''HH24:MI''))::varchar,
+            ven.a_cuenta
+            
             from vef.tventa ven						
 			inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
 			inner join vef.tcliente tc on tc.id_cliente = cli.id_cliente
@@ -523,14 +546,15 @@ BEGIN
                         vedet.bruto,
                         vedet.ley,
                         vedet.kg_fino,
-                        vedet.descripcion
+                        vedet.descripcion,
+                        umcig.codigo as unidad_concepto
 						from vef.tventa_detalle vedet						
 						left join vef.tsucursal_producto sprod on sprod.id_sucursal_producto = vedet.id_sucursal_producto
 						left join vef.tformula form on form.id_formula = vedet.id_formula
 						left join alm.titem item on item.id_item = vedet.id_item
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
                         left join param.tunidad_medida um on um.id_unidad_medida = vedet.id_unidad_medida
-				        			        
+				        left join param.tunidad_medida umcig on umcig.id_unidad_medida = cig.id_unidad_medida			        
                        where  id_venta = '||v_parametros.id_venta::varchar;
 			
 			

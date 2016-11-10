@@ -24,8 +24,8 @@ Phx.vista.VentaVendedorFarmacia = {
 		Phx.vista.VentaVendedorFarmacia.superclass.successGetVariables.call(this,response,request); 
 		this.store.baseParams.pes_estado = 'borrador';        
         this.finCons = true;
-        this.addButton('ant_estado',{grupo:[3,4],argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
-        this.addButton('sig_estado',{grupo:[0,2],text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
+        this.addButton('ant_estado',{grupo:[1,2,3,4],argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
+        this.addButton('sig_estado',{grupo:[0,1,2],text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
         this.addButton('diagrama_gantt',{grupo:[0,1,2,3,4],text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
         this.addButton('btnImprimir',
             {   grupo:[0,1,2,3,4],
@@ -57,6 +57,21 @@ Phx.vista.VentaVendedorFarmacia = {
     btestGroups: [0],
     bexcelGroups: [0,1,2,3,4],  
    addElements : function () {
+
+       this.Atributos.push({
+           config:{
+               name: 'vendedor_medico',
+               fieldLabel: 'Vendedor/Medico',
+               allowBlank: false,
+               anchor: '80%',
+               gwidth: 120
+           },
+           type:'TextField',
+           filters:{pfiltro:'mu.nombre',type:'string'},
+           grid:true,
+           form:false,
+           bottom_filter: true
+       });
   	this.Atributos.push({
 			config:{
 				name: 'a_cuenta',
@@ -71,6 +86,21 @@ Phx.vista.VentaVendedorFarmacia = {
 				id_grupo:1,
 				grid:true,
 				form:true
+		});
+	
+	this.Atributos.push({
+			config:{
+				name: 'forma_pedido',
+				fieldLabel: 'Forma Pedido',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 120,
+				maxLength:5
+			},
+				type:'TextField',				
+				id_grupo:1,
+				grid:true,
+				form:false
 		});
 		
 	this.Atributos.push({
@@ -102,13 +132,15 @@ Phx.vista.VentaVendedorFarmacia = {
         }
                
         this.getBoton('diagrama_gantt').enable(); 
+        this.getBoton('btnImprimir').enable();
         Phx.vista.VentaVendedorFarmacia.superclass.preparaMenu.call(this);
     },
     liberaMenu:function()
     {   
         this.getBoton('diagrama_gantt').disable();
         this.getBoton('ant_estado').disable();
-        this.getBoton('sig_estado').disable();        
+        this.getBoton('sig_estado').disable();  
+        this.getBoton('btnImprimir').disable();      
         Phx.vista.VentaVendedorFarmacia.superclass.liberaMenu.call(this);
     }
    

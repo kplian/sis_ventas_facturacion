@@ -80,11 +80,18 @@ BEGIN
                         	''item''::varchar
                         else
                         	''producto_servicio''::varchar
-                        end) as tipo
+                        end) as tipo,
+            (case when item.id_item is not null then
+              umit.descripcion
+            else
+              umcig.descripcion
+            end) as unidad_medida
 						from vef.tformula_detalle fordet
 						inner join segu.tusuario usu1 on usu1.id_usuario = fordet.id_usuario_reg
 						left join alm.titem item on item.id_item = fordet.id_item
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = fordet.id_concepto_ingas
+            left join param.tunidad_medida umcig on umcig.id_unidad_medida = cig.id_unidad_medida
+            left join param.tunidad_medida umit on umit.id_unidad_medida = item.id_unidad_medida
 						left join segu.tusuario usu2 on usu2.id_usuario = fordet.id_usuario_mod
 				        where  ';
 			
@@ -133,6 +140,7 @@ BEGIN
 	elsif(p_transaccion='VF_FORDETINS_SEL')then
     	begin
         	v_filtro = '';
+            v_join = '';
         	if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
     			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tpunto_venta pv
@@ -197,6 +205,8 @@ BEGIN
                 v_select_precio_item = 'coalesce (i.precio_ref,0)';
                 v_join = v_join || ' left join alm.titem i on i.id_item = fd.id_item ';
             end if;
+            
+            --raise exception 'llega%,%',v_filtro,v_join;
                 
 				v_consulta := '
 								select (case when fd.id_item is not null then

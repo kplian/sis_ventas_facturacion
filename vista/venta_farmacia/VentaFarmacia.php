@@ -22,6 +22,21 @@ Phx.vista.VentaFarmacia = {
   },
   
   addElements : function () {
+
+      this.Atributos.push({
+          config:{
+              name: 'vendedor_medico',
+              fieldLabel: 'Vendedor/Medico',
+              allowBlank: false,
+              anchor: '80%',
+              gwidth: 120
+          },
+          type:'TextField',
+          filters:{pfiltro:'mu.nombre',type:'string'},
+          grid:true,
+          form:false,
+          bottom_filter: true
+      });
   	this.Atributos.push({
 			config:{
 				name: 'a_cuenta',
@@ -36,6 +51,22 @@ Phx.vista.VentaFarmacia = {
 				id_grupo:1,
 				grid:true,
 				form:true
+		});
+	
+	this.Atributos.push({
+			config:{
+				name: 'forma_pedido',
+				fieldLabel: 'Forma Pedido',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 120,
+				maxLength:5
+			},
+				type:'TextField',
+				filters:{pfiltro:'ven.forma_pedido',type:'varchar'},
+				id_grupo:1,
+				grid:true,
+				form:false
 		});
 		
 	this.Atributos.push({

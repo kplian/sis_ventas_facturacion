@@ -40,6 +40,7 @@ class MODMedico extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('fecha_nacimiento','date');
+		$this->captura('especialidad','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -89,6 +90,7 @@ class MODMedico extends MODbase{
 		$this->setParametro('otros_telefonos','otros_telefonos','varchar');
 		$this->setParametro('nombres','nombres','varchar');
 		$this->setParametro('fecha_nacimiento','fecha_nacimiento','date');
+		$this->setParametro('especialidad','especialidad','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -117,6 +119,7 @@ class MODMedico extends MODbase{
 		$this->setParametro('otros_telefonos','otros_telefonos','varchar');
 		$this->setParametro('nombres','nombres','varchar');
 		$this->setParametro('fecha_nacimiento','fecha_nacimiento','date');
+		$this->setParametro('especialidad','especialidad','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

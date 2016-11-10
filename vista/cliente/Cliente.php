@@ -205,10 +205,26 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'TextArea',
 				filters:{pfiltro:'cli.direccion',type:'string'},
-				id_grupo:2,
+				id_grupo:1,
 				grid:true,
 				form:true,
                 bottom_filter: true
+		},
+		
+		{
+			config:{
+				name: 'observaciones',
+				fieldLabel: 'Observaciones',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 150,
+				maxLength:400
+			},
+				type:'TextArea',
+				filters:{pfiltro:'cli.observaciones',type:'string'},
+				id_grupo:0,
+				grid:true,
+				form:true
 		},
 		
 		{
@@ -317,6 +333,8 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombres', type: 'string'},
 		{name:'otros_telefonos', type: 'string'},
 		{name:'otros_correos', type: 'string'},
+		{name:'direccion', type: 'string'},
+		{name:'observaciones', type: 'string'},
 		{name:'nit', type: 'string'},
 		{name:'telefono_celular', type: 'string'},
 		{name:'primer_apellido', type: 'string'},

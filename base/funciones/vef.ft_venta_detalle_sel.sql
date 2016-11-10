@@ -102,7 +102,8 @@ BEGIN
                             vedet.ley,
                             vedet.kg_fino,
                             um.id_unidad_medida,
-                            um.codigo as codigo_unidad_medida
+                            um.codigo as codigo_unidad_medida,
+                            umcig.codigo as codigo_unidad_cig
 						from vef.tventa_detalle vedet
 						inner join segu.tusuario usu1 on usu1.id_usuario = vedet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = vedet.id_usuario_mod
@@ -112,7 +113,8 @@ BEGIN
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
 				        left join vef.vmedico med on med.id_medico = vedet.id_medico
                         left join segu.vusuario ven on ven.id_usuario = vedet.id_vendedor
-                        left join param.tunidad_medida um on um.id_unidad_medida = vedet.id_unidad_medida 
+                        left join param.tunidad_medida um on um.id_unidad_medida = vedet.id_unidad_medida
+                        left join param.tunidad_medida umcig on umcig.id_unidad_medida = cig.id_unidad_medida
                         where  ';
 			
 			--Definicion de la respuesta
@@ -145,6 +147,7 @@ BEGIN
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
 					    left join vef.tmedico med on med.id_medico = vedet.id_medico
                         left join segu.vusuario ven on ven.id_usuario = vedet.id_vendedor
+                        left join param.tunidad_medida umcig on umcig.id_unidad_medida = cig.id_unidad_medida
                         where ';
 			
 			--Definicion de la respuesta		    

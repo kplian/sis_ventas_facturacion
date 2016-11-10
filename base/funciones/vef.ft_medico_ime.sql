@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_medico_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION vef.ft_medico_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_medico_ime
@@ -61,7 +64,8 @@ BEGIN
 			id_usuario_ai,
 			id_usuario_mod,
 			fecha_mod,
-			fecha_nacimiento
+			fecha_nacimiento,
+            especialidad
           	) values(
 			v_parametros.correo,
 			v_parametros.telefono_fijo,
@@ -79,7 +83,8 @@ BEGIN
 			v_parametros._id_usuario_ai,
 			null,
 			null,
-			v_parametros.fecha_nacimiento
+			v_parametros.fecha_nacimiento,
+            v_parametros.especialidad
 							
 			
 			
@@ -119,7 +124,8 @@ BEGIN
 			fecha_mod = now(),
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai,
-			fecha_nacimiento = v_parametros.fecha_nacimiento
+			fecha_nacimiento = v_parametros.fecha_nacimiento,
+            especialidad = v_parametros.especialidad
 			where id_medico=v_parametros.id_medico;
                
 			--Definicion de la respuesta
@@ -170,7 +176,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_medico_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

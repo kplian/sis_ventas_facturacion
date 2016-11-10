@@ -1104,6 +1104,204 @@ class RFacturaRecibo
 						</script>                                                                                   
                                 </body>
                                 </html>';
+			} else if ($codigo_reporte == 'RECECOFARMA') {
+				setlocale(LC_ALL,"es_ES@euro","es_ES","esp");
+				$html = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+					   "http://www.w3.org/TR/html4/strict.dtd">
+					<html>
+					<head>
+						<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+						<title>sis_ventas_facturacion</title>
+						<meta name="author" content="kplian">
+						    
+					
+					  <link rel="stylesheet" href="../../../sis_ventas_facturacion/control/print_medio_oficio.css" type="text/css"  charset="utf-8">
+					  
+					</head>';
+				
+					
+				$html .= '<body>
+				<center>';				
+				
+
+				$pagina .= '
+				<table width="645">
+					<tbody>
+						<tr>
+							<td>
+								<table style="border-spacing: 0;" width="200">
+									<tbody>
+										<tr>
+											<td style="text-align:center;"><img src="../../../lib/images/logo.png" alt="logo" width="120" height="60" /></td>
+										</tr>
+										<tr>
+											<td style="text-align: center;"><strong>' . $datos['direccion_sucursal'] . '<br> Telf. '. $datos['telefono_sucursal'] . '</strong></td>
+
+										</tr>
+									</tbody>
+								</table>
+							</td>
+							<td>
+								<table width="265">
+									<tbody>
+										<tr>
+											<td style="text-align:center;">
+												<h2 style="text-align: center;">PROFORMA</h2>												
+											</td>
+										</tr>
+										
+									</tbody>
+								</table>
+							</td>
+							<td style="text-align: left;" width="180">
+								<h4 style="text-align: center;">' . $datos['nro_venta'] . '</h4>
+							</td>
+						</tr>
+					</tbody>
+				</table>				
+				<table style="border: thin solid black;" width="645">
+					<tbody>
+						<tr>
+							<td width="25%">Lugar y Fecha</td>
+							<td width="40%"><strong>' . $datos['departamento_sucursal'] . ', ' . $datos['fecha_literal'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td width="25%">Nombre Cliente</td>
+							<td width="40%"> <strong>' . $datos['cliente'] . '</strong></td>
+							<td>Med/Ven : <strong>' . $datos['medico_vendedor'] . '</strong></td>
+						</tr>
+						<tr>
+							<td width="25%">Telefono Cliente</td>
+							<td width="40%"><strong>' . $datos['telefono_cliente'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td width="25%">Fecha y Hora de Entrega</td>
+							<td width="40%"><strong>' . $datos['fecha_hora_entrega'] . '</strong></td>
+							<td>&nbsp;</td>
+						</tr>												
+						<tr>
+							<td style="border-top: thin solid black;" colspan="3">
+								<h3 style="text-align: center;">DETALLE&nbsp;</h3>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<table style="border-collapse: collapse; height: 33px;" width="645">
+					<tbody>
+						<tr>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>No</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="44%"><strong>DESCRIPCION</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>CANTIDAD</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>UNIDAD DE MEDIDA</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="12%"><strong>PRECIO UNITARIO</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="14%"><strong>TOTAL</strong></td>
+						</tr>';
+                    $descripcion = '';
+                    $numero = 1;
+					
+					foreach ($datos['detalle'] as $item_detalle) {
+
+                        if ($item_detalle['descripcion'] == '') {
+                            $pagina .= '<tr>
+                                <td style="border: thin solid black;"><b>' . $numero . '</b></td>
+                                <td style="border: thin solid black;">' . $item_detalle['concepto'].'</td>
+                                <td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['cantidad'], 6, '.', ',') . '</td>
+                                <td style="border: thin solid black;">' . $item_detalle['unidad_concepto'] . '</td>
+                                <td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['precio_unitario'], 6, '.', ',') . '</td>
+                                <td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
+                            </tr>';
+                            $numero ++;
+                            $descripcion = '';
+
+                        } else {
+                            if ($item_detalle['descripcion'] == $descripcion) {
+                                $pagina .= '<tr>
+                                    <td style="border-left: thin solid black;"></td>
+                                    <td style="border-left: thin solid black;">&nbsp;&nbsp;' . $item_detalle['concepto'].'</td>
+                                    <td style="text-align: right; border-left: thin solid black;">' . number_format($item_detalle['cantidad'], 6, '.', ',') . '</td>
+                                    <td style="border-left: thin solid black;">' . $item_detalle['unidad_concepto'] . '</td>
+                                    <td style="text-align: right; border-left: thin solid black;"></td>
+                                    <td style="text-align: right; border-left: thin solid black;border-right: thin solid black;"></td>
+                                </tr>';
+
+                            } else {
+                                $pagina .= '<tr>
+                                    <td style="border-top: thin solid black;border-left: thin solid black;"><b>' . $numero . '</b></td>
+                                    <td style="border-top: thin solid black;border-left: thin solid black;">&nbsp;&nbsp;' . $item_detalle['concepto'].'</td>
+                                    <td style="text-align: right; border-top: thin solid black;border-left: thin solid black;">' . number_format($item_detalle['cantidad'], 6, '.', ',') . '</td>
+                                    <td style="border-top: thin solid black;border-left: thin solid black;">' . $item_detalle['unidad_concepto'] . '</td>
+                                    <td style="text-align: right; border-top: thin solid black;border-left: thin solid black;">' . number_format($item_detalle['precio_grupo'], 2, '.', ',') . '</td>
+                                    <td style="text-align: right; border-top: thin solid black;border-left: thin solid black;border-right: thin solid black;">' . number_format($item_detalle['precio_grupo'], 2, '.', ',') . '</td>
+                                </tr>';
+
+                                $numero ++;
+                                $descripcion = $item_detalle['descripcion'];
+
+                            }
+                        }
+						
+
+					}
+					
+					
+					$pagina .= '	
+					</tbody>
+				</table>
+				<table style="border-collapse: collapse;" width="645">
+					<tbody>
+						<tr>
+							<td width="60%" style="border-top: thin solid black;">&nbsp;</td>
+							<td width="20%" style="border-top: thin solid black;"> <strong>TOTAL</strong></td>
+							<td width="20%" style="text-align: right; border-top: thin solid black;"><strong>' . number_format($datos['total_venta'], 2, '.', ',') . '</strong></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td><strong>A CUENTA</strong></td>
+							<td style="text-align: right;"><strong>' . number_format($datos['a_cuenta'], 2, '.', ',') . '</strong></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td><strong>SALDO</strong></td>
+							<td style="text-align: right;"><strong>' . number_format($datos['total_venta'] - $datos['a_cuenta'], 2, '.', ',') . '</strong></td>
+						</tr>
+					</tbody>
+				</table>';
+				
+								
+				$html .= $pagina;
+				
+				$html .= '<script language="VBScript">
+						Sub Print()
+						       OLECMDID_PRINT = 6
+						       OLECMDEXECOPT_DONTPROMPTUSER = 2
+						       OLECMDEXECOPT_PROMPTUSER = 1
+						       call WB.ExecWB(OLECMDID_PRINT, OLECMDEXECOPT_DONTPROMPTUSER,1)
+						End Sub
+						document.write "<object ID="WB" WIDTH=0 HEIGHT=0 CLASSID="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2"></object>"
+						</script>
+						
+						<script type="text/javascript"> 
+						';
+				if ($datos['estado'] == 'elaboracion') {
+					$html .= '
+							setTimeout(function(){
+								 self.print();							 
+								}, 1000);
+							
+							setTimeout(function(){
+								 self.close();							 
+								}, 2000);
+							
+							';
+				}
+				$html .= '				
+						</script>                                                                                   
+                                </body>
+                                </html>';
+				
+				
 			}
 			
 			return $html;

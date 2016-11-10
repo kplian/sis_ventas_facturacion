@@ -1,0 +1,42 @@
+@page {
+    size: 8.5in 11in;
+    margin: 20mm 20mm 20mm 20mm; /* change the margins as you want them to be. */
+}
+/* Headings */
+h1,h2,h3,h4,h5,h6 { 
+	padding:0;
+	margin:0;
+	page-break-after:avoid; }
+h1{font-size:17pt;}
+h2{font-size:14pt;}
+h3{font-size:12pt;}
+h4,h5,h6{font-size:11pt;}
+
+body
+{
+   font-size: 8pt;
+   color: #000 !important;
+   font-family: Arial !important;
+   
+   margin: 0px; 
+}
+
+div#watermark-borrador {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: url('../../../sis_ventas_facturacion/reportes/borrador.jpg') center center no-repeat;
+    pointer-events: none;
+}
+
+div#watermark-anulado {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: url('../../../sis_ventas_facturacion/reportes/anulado.jpg') center center no-repeat;
+    pointer-events: none;
+}
+
+

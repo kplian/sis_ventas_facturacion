@@ -201,6 +201,7 @@ class ACTVenta extends ACTbase{
 		
 		$this->objFunc = $this->create('MODVenta');
 		$this->res = $this->objFunc->listarReciboFacturaDetalle($this->objParam);
+		
 		$datos['detalle'] = $this->res->getDatos();
 		
 		$reporte = new RFacturaRecibo();

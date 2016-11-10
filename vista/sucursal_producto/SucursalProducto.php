@@ -20,7 +20,12 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 		this.grid.getTopToolbar().disable();
         this.grid.getBottomToolbar().disable();
         this.iniciarEventos();
-		//this.load({params:{start:0, limit:this.tam_pag}})
+        if (config.formulario == 'venta') {
+        	this.onReloadPage(config.maestro);
+        } else if (config.formulario == 'formula') {
+        	this.load({params:{start:0, limit:50}});
+        }
+        
 	},
 			
 	Atributos:[
@@ -511,7 +516,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 	],
 	sortInfo:{
 		field: 'id_sucursal_producto',
-		direction: 'ASC'
+		direction: 'DESC'
 	},
 	
 	Grupos: [
