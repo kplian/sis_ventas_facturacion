@@ -94,15 +94,8 @@ class MODVentaDetalle extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_venta_detalle','id_venta_detalle','int4');
-		$this->setParametro('id_venta','id_venta','int4');
-		$this->setParametro('id_item','id_item','int4');
-		$this->setParametro('id_sucursal_producto','id_sucursal_producto','int4');
-		$this->setParametro('id_formula','id_formula','int4');
-		$this->setParametro('tipo','tipo','varchar');
-		$this->setParametro('estado_reg','estado_reg','varchar');
-		$this->setParametro('cantidad_det','cantidad','numeric');
-		$this->setParametro('precio','precio','numeric');
-		$this->setParametro('sw_porcentaje_formula','sw_porcentaje_formula','varchar');
+
+		$this->setParametro('descripcion','descripcion','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

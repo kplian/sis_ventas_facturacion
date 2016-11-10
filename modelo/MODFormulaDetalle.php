@@ -71,6 +71,8 @@ class MODFormulaDetalle extends MODbase{
 		$this->captura('precio_total','numeric');
 		$this->captura('id_vendedor_medico','varchar');
 		$this->captura('nombre_vendedor_medico','varchar');
+		$this->captura('contabilizable','varchar');
+		$this->captura('excento','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

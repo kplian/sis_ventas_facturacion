@@ -355,6 +355,32 @@ ALTER TABLE ONLY vef.tvalor_descripcion
     FOREIGN KEY (id_tipo_descripcion) REFERENCES vef.ttipo_descripcion(id_tipo_descripcion);
 /************************************F-DEP-JRR-VEF-0-08/05/2016*************************************************/
 
+
+/************************************I-DEP-JRR-VEF-0-07/07/2016*************************************************/
+
+
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_sucursal
+    FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(id_sucursal);
+    
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_punto_venta
+    FOREIGN KEY (id_punto_venta) REFERENCES vef.tpunto_venta(id_punto_venta);
+    
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_usuario_cajero
+    FOREIGN KEY (id_usuario_cajero) REFERENCES segu.tusuario(id_usuario);
+    
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_moneda
+    FOREIGN KEY (id_moneda) REFERENCES param.tmoneda(id_moneda);
+
+ALTER TABLE ONLY vef.tventa
+    ADD CONSTRAINT fk_tventa__id_usuario_cajero
+    FOREIGN KEY (id_usuario_cajero) REFERENCES segu.tusuario(id_usuario);
+
+/************************************F-DEP-JRR-VEF-0-07/07/2016*************************************************/
+
 /************************************I-DEP-JRR-VEF-0-18/09/2016*************************************************/
 
 CREATE TRIGGER trig_tdosificacion
@@ -373,3 +399,4 @@ CREATE TRIGGER trig_tdosificacion
   EXECUTE PROCEDURE vef.f_trig_tdosificacion();
 
 /************************************F-DEP-JRR-VEF-0-19/09/2016*************************************************/
+

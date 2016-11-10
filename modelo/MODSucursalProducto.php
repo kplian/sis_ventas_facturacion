@@ -43,6 +43,8 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('requiere_descripcion','varchar');
 		$this->captura('id_moneda','integer');
 		$this->captura('desc_moneda','varchar');
+		$this->captura('contabilizable','varchar');
+		$this->captura('excento','varchar');
 		
 		$this->captura('id_unidad_medida','integer');
 		$this->captura('desc_unidad_medida','varchar');
@@ -79,8 +81,13 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('precio','numeric');			
 		$this->captura('medico','varchar');
 		$this->captura('requiere_descripcion','varchar');
+
+		$this->captura('contabilizable','varchar');
+		$this->captura('excento','varchar');
+
 		$this->captura('id_unidad_medida','integer');
 		$this->captura('codigo_unidad_medida','varchar');
+
 		
 		
 		//Ejecuta la instruccion
@@ -132,10 +139,15 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 		$this->setParametro('id_moneda','id_moneda','integer');
+
+		$this->setParametro('contabilizable','contabilizable','varchar');
+		$this->setParametro('excento','excento','varchar');
+
 		
 		$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
 		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
 		$this->setParametro('nandina','nandina','varchar');
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -163,10 +175,15 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_actividad_economica','id_actividad_economica','integer');
 		$this->setParametro('requiere_descripcion','requiere_descripcion','varchar');
 		$this->setParametro('id_moneda','id_moneda','integer');
+
+		$this->setParametro('contabilizable','contabilizable','varchar');
+		$this->setParametro('excento','excento','varchar');
+
 		
 		$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
 		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
 		$this->setParametro('nandina','nandina','varchar');
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

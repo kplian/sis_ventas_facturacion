@@ -507,43 +507,48 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
             form:true
         },
         {
-            config: {
-                name: 'tipo_interfaz',
-                fieldLabel: 'Interfaces',
-                qtip:'Configurar en que interfaces aparece esta sucursal',
-                allowBlank: true,
-                emptyText: 'Interfaz..',
-                forceSelection: true,
+            config:{
+                name:'tipo_interfaz',
+                fieldLabel:'Tipo Venta',
+                allowBlank:true,
+                emptyText:'Tipo...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_ventas_facturacion/control/TipoVenta/listarTipoVenta',
+                    id: 'codigo',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'codigo',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['codigo','nombre'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'codigo#nombre'}
+
+                }),
+                valueField: 'codigo',
+                displayField: 'nombre',
+                gdisplayField: 'tipo_interfaz',
+                forceSelection:true,
                 typeAhead: false,
                 triggerAction: 'all',
-                lazyRender: true,
-                mode: 'local',
-                pageSize: 20,
-                store:new Ext.data.ArrayStore({
-	        	fields: ['ID', 'valor'],
-	        	data :	[
-		        	        ['VentaVendedorComputarizada','Factura Computariza'],
-		        	        ['VentaVendedorExportacion','Factura de Exportación'],	
-							['VentaVendedorManual','Factura de manual'],
-							['VentaVendedorExportacionMin','Factura  Minera de Exportación'],
-							['VentaVendedorMin','Factura Computariza Minera'],	
-							['VentaVendedorFarmacia','Ventas Farmacia']
-						]	        				
-	    		}),
-	    		valueField:'ID',
-				displayField:'valor',
-                queryDelay: 100,
-                anchor: '100%',
-                gwidth: 120,
+
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                width:250,
+                minChars:2,
                 enableMultiSelect:true,
-                minChars: 2
+                renderer:function(value, p, record){return String.format('{0}', record.data['tipo_interfaz']);}
+
             },
             type:'AwesomeCombo',
-            id_grupo:1,
+            id_grupo:0,
             grid:true,
             form:true
         },
-        
         
 		{
 			config:{

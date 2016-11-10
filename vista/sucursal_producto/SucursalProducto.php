@@ -308,6 +308,62 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
         
         {
             config:{
+                name: 'contabilizable',
+                fieldLabel: 'Contabilizable',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 130,
+                maxLength:2,
+                emptyText:'si/no...',                   
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',                                  
+               // displayField: 'descestilo',
+                store:['si','no']
+            },
+            type:'ComboBox',
+            //filters:{pfiltro:'promac.inicio',type:'string'},
+            id_grupo:2,
+            filters:{   
+                         type: 'list',
+                         pfiltro:'sprod.contabilizable',
+                         options: ['si','no'],  
+                    },
+            grid:true,
+            form:true
+        },
+        
+        {
+            config:{
+                name: 'excento',
+                fieldLabel: 'Tiene Excento',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 130,
+                maxLength:2,
+                emptyText:'si/no...',                   
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',                                  
+               // displayField: 'descestilo',
+                store:['si','no']
+            },
+            type:'ComboBox',
+            //filters:{pfiltro:'promac.inicio',type:'string'},
+            id_grupo:2,
+            filters:{   
+                         type: 'list',
+                         pfiltro:'sprod.excento',
+                         options: ['si','no'],  
+                    },
+            grid:true,
+            form:true
+        },
+        
+        {
+            config:{
                 name:'id_moneda',
                 origen:'MONEDA',
                  allowBlank:false,
@@ -494,6 +550,8 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_actividad_economica', type: 'numeric'},
 		{name:'id_moneda', type: 'numeric'},
 		{name:'desc_moneda', type: 'string'},
+		{name:'contabilizable', type: 'string'},
+		{name:'excento', type: 'string'},
 		{name:'id_sucursal', type: 'numeric'},
 		{name:'id_item', type: 'numeric'},
 		{name:'nombre_item', type: 'string'},

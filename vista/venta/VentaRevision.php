@@ -17,33 +17,22 @@ Phx.vista.VentaRevision = {
     nombreVista: 'VentaRevision',
     
     constructor: function(config) {
+    	this.config = config;
         this.maestro=config.maestro;  
-        this.historico = 'no';
         
-        this.tbarItems = ['-',{
-            text: 'Histórico',
-            enableToggle: true,
-            pressed: false,
-            toggleHandler: function(btn, pressed) {
-               
-                if(pressed){
-                    this.historico = 'si';
-                    this.desBotoneshistorico();
-                }
-                else{
-                   this.historico = 'no' 
-                }
-                
-                this.store.baseParams.historico = this.historico;
-                this.onButtonAct();
-             },
-            scope: this
-           }];
+        
+        
         Phx.vista.VentaRevision.superclass.constructor.call(this,config);
-        this.store.baseParams.historico = this.historico;
-        this.store.baseParams.pes_estado = config.estado_parametro;
-        this.load({params:{start:0, limit:this.tam_pag}});        
         
+        
+    } , 
+    
+    successGetVariables :function (response,request) {   
+    	Phx.vista.VentaRevision.superclass.successGetVariables.call(this,response,request);  				  		
+  		
+        this.store.baseParams.pes_estado = this.config.estado_parametro;
+        this.load({params:{start:0, limit:this.tam_pag}});        
+        this.addButton('anular',{grupo:[1],text:'Anular',iconCls: 'bdel',disabled:true,handler:this.anular,tooltip: '<b>Anular la venta</b>',hidden:true});
         this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
         this.addButton('sig_estado',{text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
         this.addButton('diagrama_gantt',{text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
@@ -56,8 +45,9 @@ Phx.vista.VentaRevision = {
                 tooltip: '<b>Imprimir Formulario de Venta</b><br/>Imprime el formulario de la venta'
             }
         );
-        
-    } ,        
+               
+		  
+  	},       
     preparaMenu:function()
     {   var rec = this.sm.getSelected();
         
@@ -65,9 +55,7 @@ Phx.vista.VentaRevision = {
         this.getBoton('sig_estado').enable();
         this.getBoton('diagrama_gantt').enable(); 
         Phx.vista.VentaRevision.superclass.preparaMenu.call(this);
-        if(this.historico == 'si'){
-             this.desBotoneshistorico();
-        }
+        
     },
     liberaMenu:function()
     {   

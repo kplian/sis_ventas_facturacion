@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_ime (
   p_tabla varchar,
   p_transaccion varchar
 )
-RETURNS varchar AS
-$body$
+  RETURNS varchar AS
+  $body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_sucursal_producto_ime
@@ -64,7 +64,7 @@ BEGIN
                 end if;
             end if;
             
-            select id_entidad into v_id_entidad
+        	select id_entidad into v_id_entidad
             from vef.tsucursal
             where id_sucursal = v_id_sucursal;
             
@@ -145,7 +145,9 @@ BEGIN
 			id_usuario_mod,           
             id_concepto_ingas,
             requiere_descripcion,
-            id_moneda
+            id_moneda,
+            contabilizable,
+            excento
           	) values(
 			v_id_sucursal,
 			v_parametros.id_item,			
@@ -160,7 +162,9 @@ BEGIN
 			null,            
             v_id_concepto,
             v_parametros.requiere_descripcion,
-            v_parametros.id_moneda	
+            v_parametros.id_moneda,
+            v_parametros.contabilizable,
+            v_parametros.excento	
 			)RETURNING id_sucursal_producto into v_id_sucursal_producto;
 			
 			--Definicion de la respuesta
@@ -296,7 +300,9 @@ BEGIN
 			usuario_ai = v_parametros._nombre_usuario_ai,
             id_concepto_ingas = v_id_concepto,
             requiere_descripcion = v_parametros.requiere_descripcion,
-            id_moneda = v_parametros.id_moneda
+            id_moneda = v_parametros.id_moneda,
+            contabilizable = v_parametros.contabilizable,
+            excento = v_parametros.excento
 			where id_sucursal_producto=v_parametros.id_sucursal_producto;
                
 			--Definicion de la respuesta

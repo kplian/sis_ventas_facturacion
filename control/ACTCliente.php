@@ -13,6 +13,10 @@ class ACTCliente extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_cliente');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if ($this->objParam->getParametro('nit') != '') {
+            $this->objParam->addFiltro("cli.nit = ''". $this->objParam->getParametro('nit')."''");
+        }  
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODCliente','listarCliente');

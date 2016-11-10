@@ -15,14 +15,14 @@ class ACTReportesVentas extends ACTbase{
 		
 		$this->objFunc=$this->create('MODReportesVentas');	
 		
-		$this->res=$this->objFunc->listarConceptosSucursal($this->objParam);
-		
+		$this->res=$this->objFunc->listarConceptosSucursal($this->objParam);		
 		
 		$this->objFunc=$this->create('MODReportesVentas');	
 		$this->res2=$this->objFunc->listarReporteDetalle($this->objParam);
 		
-		$this->objFunc=$this->create('MODReportesVentas');	
-		$this->res3=$this->objFunc->listarReporteResumen($this->objParam);
+			
+		//$this->objFunc=$this->create('MODReportesVentas');	
+		//$this->res3=$this->objFunc->listarReporteResumen($this->objParam);
 		//obtener titulo del reporte
 		$titulo = 'Resumen de Ventas';
 		//Genera el nombre del archivo (aleatorio + titulo)
@@ -32,12 +32,12 @@ class ACTReportesVentas extends ACTbase{
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 		$this->objParam->addParametro('conceptos',$this->res->datos);
 		$this->objParam->addParametro('datos',$this->res2->datos);
-		$this->objParam->addParametro('resumen',$this->res3->datos);
+		//$this->objParam->addParametro('resumen',$this->res3->datos);
 			
 		//Instancia la clase de excel
 		$this->objReporteFormato=new RResumenVentasBoaXLS($this->objParam);
 		$this->objReporteFormato->imprimeDatos();
-		$this->objReporteFormato->imprimeDatosResumen();
+		//$this->objReporteFormato->imprimeDatosResumen();
 		$this->objReporteFormato->generarReporte();
 		
 		$this->mensajeExito=new Mensaje();

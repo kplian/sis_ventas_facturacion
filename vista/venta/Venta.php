@@ -16,7 +16,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	formClass : 'FormVenta',
     tipo_factura: 'recibo',
     nombreVista: 'Venta',
-	
+    tipo_usuario : 'vendedor',
+
 	constructor:function(config) {
 		
 		this.maestro=config.maestro;
@@ -108,7 +109,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                    totalProperty: 'total',
 	                    fields: ['id_punto_venta', 'id_sucursal','nombre', 'codigo','habilitar_comisiones','formato_comprobante'],
 	                    remoteSort: true,
-	                    baseParams: {par_filtro: 'puve.nombre#puve.codigo'}
+	                    baseParams: {tipo_usuario: this.tipo_usuario,par_filtro: 'puve.nombre#puve.codigo', tipo_factura: this.tipo_factura}
 	        });
 		} else {
 			title = 'Seleccione la sucursal con la que trabajara';
@@ -124,7 +125,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                     totalProperty: 'total',
                     fields: ['id_sucursal', 'nombre', 'codigo','habilitar_comisiones','formato_comprobante','id_entidad'],
                     remoteSort: true,
-                    baseParams: {filtro_usuario: 'si',par_filtro: 'suc.nombre#suc.codigo', nombreVista: this.nombreVista}
+                    baseParams: {tipo_usuario: this.tipo_usuario,par_filtro: 'suc.nombre#suc.codigo', tipo_factura: this.tipo_factura}
                });
 		}		
 	    
@@ -136,12 +137,14 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	                    	this.variables_globales.habilitar_comisiones = r[0].data.habilitar_comisiones;
 	                    	this.variables_globales.formato_comprobante = r[0].data.formato_comprobante;
 	                    	this.store.baseParams.id_punto_venta = this.variables_globales.id_punto_venta;
+                            this.store.baseParams.tipo_usuario = this.tipo_usuario;
 	                    } else {
 	                    	this.variables_globales.id_sucursal = r[0].data.id_sucursal;
 	                    	this.variables_globales.id_entidad = r[0].data.id_entidad;
 	                    	this.variables_globales.habilitar_comisiones = r[0].data.habilitar_comisiones;
 	                    	this.variables_globales.formato_comprobante = r[0].data.formato_comprobante;
 	                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
+                            this.store.baseParams.tipo_usuario = this.tipo_usuario;
 	                    }
 	                    this.store.baseParams.tipo_factura = this.tipo_factura;
 	                    this.load({params:{start:0, limit:this.tam_pag}});  	                    
@@ -294,10 +297,19 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'correlativo_venta',
                 fieldLabel: 'Nro',              
-                gwidth: 110
+                gwidth: 110,
+                renderer: function(value,c,r){  
+                	
+                	if (r.data.estado == 'anulado') {
+                		return String.format('{0}', '<p><font color="red">' + value + '</font></p>');
+                	} else {
+                		return value;
+                	}  
+                    
+                }
             },
                 type:'TextField',
-                filters:{pfiltro:'ven.correlativo_venta',type:'string'},              
+                filters:{pfiltro:'ven.correlativo_venta',type:'string'},                            
                 grid:true,
                 form:false,
                 bottom_filter: true
@@ -590,6 +602,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		{name:'forma_pedido', type: 'string'},
 		{name:'estado', type: 'string'},
 		{name:'correlativo_venta', type: 'string'},
+        {name:'contabilizable', type: 'string'},
 		{name:'a_cuenta', type: 'numeric'},
 		{name:'total_venta', type: 'numeric'},
 		{name:'comision', type: 'numeric'},
@@ -741,13 +754,14 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         
     }, 
     successWizard:function(resp){
-        var rec=this.sm.getSelected();
+        var rec=this.sm.getSelected();        
+        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
         
-        if (rec.data.estado == 'borrador' && this.tipo_factura != 'manual') {
+        if (objRes.ROOT.datos.estado == 'finalizado' && this.tipo_factura != 'manual') {
             this.imprimirNota();
         }
         Phx.CP.loadingHide();
-        resp.argument.wizard.panel.destroy()
+        resp.argument.wizard.panel.destroy();
         this.reload();
      },
      
@@ -783,14 +797,14 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 							'id_venta' : data.id_venta,
 							'formato_comprobante' : this.variables_globales.formato_comprobante
 						},
-						success : this.successExport,
+						success : this.successExport2,
 						failure : this.conexionFailure,
 						timeout : this.timeout,
 						scope : this
 					});
 			}
 	},
-	successExport: function (resp) {
+	successExport2: function (resp) {
 
         Phx.CP.loadingHide();
         var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
