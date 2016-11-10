@@ -355,15 +355,6 @@ ALTER TABLE ONLY vef.tvalor_descripcion
     FOREIGN KEY (id_tipo_descripcion) REFERENCES vef.ttipo_descripcion(id_tipo_descripcion);
 /************************************F-DEP-JRR-VEF-0-08/05/2016*************************************************/
 
-/************************************I-DEP-JRR-VEF-0-16/06/2016*************************************************/
-
-CREATE TRIGGER tforma_pago_tr
-  AFTER INSERT OR UPDATE 
-  ON obingresos.tforma_pago FOR EACH ROW 
-  EXECUTE PROCEDURE obingresos.f_tr_forma_pago();
-
-/************************************F-DEP-JRR-VEF-0-16/06/2016*************************************************/
-
 
 /************************************I-DEP-JRR-VEF-0-07/07/2016*************************************************/
 
@@ -389,3 +380,23 @@ ALTER TABLE ONLY vef.tventa
     FOREIGN KEY (id_usuario_cajero) REFERENCES segu.tusuario(id_usuario);
 
 /************************************F-DEP-JRR-VEF-0-07/07/2016*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-18/09/2016*************************************************/
+
+CREATE TRIGGER trig_tdosificacion
+  BEFORE INSERT OR UPDATE 
+  ON vef.tdosificacion FOR EACH ROW 
+  EXECUTE PROCEDURE f_trig_tdosificacion();
+
+/************************************F-DEP-JRR-VEF-0-18/09/2016*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-19/09/2016*************************************************/
+DROP TRIGGER trig_tdosificacion ON vef.tdosificacion;
+
+CREATE TRIGGER trig_tdosificacion
+  BEFORE INSERT OR UPDATE
+  ON vef.tdosificacion FOR EACH ROW
+  EXECUTE PROCEDURE vef.f_trig_tdosificacion();
+
+/************************************F-DEP-JRR-VEF-0-19/09/2016*************************************************/
+

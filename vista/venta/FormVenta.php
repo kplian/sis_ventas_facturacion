@@ -1374,7 +1374,21 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             id_grupo : 0,            
             form : true
         },
-        
+
+        {
+            config:{
+                name: 'nit',
+                fieldLabel: 'NIT',
+                allowBlank: false,
+                anchor: '80%',                
+                maxLength:20
+            },
+                type:'NumberField',                
+                id_grupo:0,                
+                form:true,
+                valorInicial:'0'
+        }, 
+
         
         {
 			config:{

@@ -742,6 +742,11 @@ IS 'El nombre de la sucursal tal como se mostrara en el comprobante de venta. De
 /************************************F-SCP-JRR-VEF-0-12/05/2016*************************************************/
 
 
+CREATE INDEX tdosificacion_idx ON vef.tdosificacion
+  USING btree (nroaut)
+  WHERE estado_reg = 'activo';
+
+
 
 /************************************I-SCP-RAC-VEF-0-16/05/2016*************************************************/
 
@@ -763,9 +768,19 @@ IS 'descripon de bultos en exportacion';
 
 /************************************F-SCP-RAC-VEF-0-16/05/2016*************************************************/
 
+
+
+/************************************I-SCP-RAC-VEF-0-06/06/2016*************************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tvalor_descripcion
+  ADD COLUMN valor_label VARCHAR(300);
+
+/************************************F-SCP-RAC-VEF-0-06/06/2016*************************************************/
+
 /************************************I-SCP-JRR-VEF-0-16/06/2016*************************************************/
-
-
 ALTER TABLE vef.tforma_pago
   ADD COLUMN registrar_tipo_tarjeta VARCHAR(2);
 
@@ -831,3 +846,23 @@ ALTER TABLE vef.tventa
 ADD COLUMN contabilizable VARCHAR(2) DEFAULT 'si' NOT NULL;
 
 /************************************F-SCP-JRR-VEF-0-27/10/2016*************************************************/
+
+
+
+/************************************I-SCP-JRR-VEF-0-14/09/2016*************************************************/
+
+ALTER TABLE vef.tventa
+  ADD COLUMN nombre_factura VARCHAR(100);
+
+ALTER TABLE vef.tventa
+  ADD COLUMN nit VARCHAR(25);
+/************************************F-SCP-JRR-VEF-0-14/09/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-18/09/2016*************************************************/
+
+CREATE INDEX tdosificacion_idx ON vef.tdosificacion
+  USING btree (nroaut)
+  WHERE estado_reg = 'activo';
+  
+/************************************F-SCP-JRR-VEF-0-18/09/2016*************************************************/
+

@@ -45,7 +45,7 @@ BEGIN
 	 v_resp	= 'exito';
 	 
 	 select v.*,tv.id_plantilla,sm.id_moneda as id_moneda_sucursal,
-     	c.nit,d.nroaut,c.nombre_factura,s.id_depto into v_venta
+     	d.nroaut,s.id_depto into v_venta
 	 from vef.tventa v
      inner join vef.ttipo_venta tv on tv.codigo = v.tipo_factura
      inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal

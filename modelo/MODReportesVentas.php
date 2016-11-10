@@ -54,6 +54,40 @@ class MODReportesVentas extends MODbase{
 		return $this->respuesta;
 	}
 
+	function listarReporteXProducto () {
+		$this->procedimiento='vef.ft_repventa_sel';
+		$this->transaccion='VF_REPXPROD_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+		
+		$this->setParametro('id_sucursal','id_sucursal','integer');
+		$this->setParametro('id_productos','id_productos','varchar');
+		$this->setParametro('fecha_desde','fecha_desde','date');
+		$this->setParametro('fecha_hasta','fecha_hasta','date');
+		
+		$this->captura('estado','varchar');		
+		$this->captura('tipo_documento','varchar');		
+		$this->captura('fecha','varchar');		
+		$this->captura('autorizacion','varchar');		
+		$this->captura('nit','varchar');
+		$this->captura('razon_social','varchar');
+		$this->captura('productos','varchar');
+		$this->captura('nro_doc','varchar');
+		$this->captura('monto','numeric');
+		$this->captura('neto','numeric');
+		$this->captura('iva','numeric');
+		$this->captura('it','numeric');
+		$this->captura('ingreso','numeric');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 	function listarReporteResumen(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='vef.ft_repventa_sel';
