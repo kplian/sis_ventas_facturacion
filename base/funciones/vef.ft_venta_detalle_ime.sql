@@ -204,7 +204,7 @@ BEGIN
             END IF;
             
             update vef.tventa
-             set total_venta = round((select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_parametros.id_venta) + v_total,2)
+             set total_venta = round((select sum(round(precio * cantidad,2)) from vef.tventa_detalle where id_venta = v_parametros.id_venta) + v_total,2)
             where id_venta = v_parametros.id_venta;
 			
             --Definicion de la respuesta
@@ -277,7 +277,7 @@ BEGIN
             v_total = COALESCE(v_registros.transporte_fob ,0)  + COALESCE(v_registros.seguros_fob ,0)+ COALESCE(v_registros.otros_fob ,0) + COALESCE(v_registros.transporte_cif ,0) +  COALESCE(v_registros.seguros_cif ,0) + COALESCE(v_registros.otros_cif ,0);
             
             update vef.tventa
-            set total_venta = coalesce((select sum(precio * cantidad) from vef.tventa_detalle where id_venta = v_id_venta),0) + v_total,
+            set total_venta = coalesce((select sum(round(precio * cantidad,2)) from vef.tventa_detalle where id_venta = v_id_venta),0) + v_total,
             tiene_formula = v_tiene_formula
             where id_venta = v_id_venta;
                

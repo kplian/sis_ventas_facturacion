@@ -340,7 +340,7 @@ Phx.vista.FormVentaExportacionMin = {
                             disabled : true
                     }),*/
                     
-                     'bruto': new Ext.form.TextField({
+                   /*  'bruto': new Ext.form.TextField({
                                         name: 'bruto',
                                         msgTarget: 'title',
                                         fieldLabel: 'Bruto',
@@ -349,7 +349,7 @@ Phx.vista.FormVentaExportacionMin = {
                                         maxLength:10,
                                         enableKeyEvents : true
                                         
-                                }),
+                                }),*/
                                 
                      
                      'ley': new Ext.form.TextField({
@@ -696,14 +696,14 @@ Phx.vista.FormVentaExportacionMin = {
                         sortable: false,                        
                         editor: this.detCmp.descripcion 
                     },  */               
-                    {
+                    /*{
                        
                         header: 'Bruto',
                         dataIndex: 'bruto',
                         align: 'right',
                         width: 100,
                         editor: this.detCmp.bruto 
-                    },                 
+                    },  */               
                     {
                        
                         header: 'Ley Mineral',

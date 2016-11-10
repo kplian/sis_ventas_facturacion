@@ -254,6 +254,7 @@ BEGIN
 	elsif(p_transaccion='VF_VENCONF_SEL')then
 
 		begin
+        	
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='	select variable, valor
 						 	from pxp.variable_global
@@ -278,7 +279,202 @@ BEGIN
 			--Devuelve la respuesta
 			return v_consulta;
 
+<<<<<<< HEAD
 		end;	
+=======
+		end;
+        
+    /*********************************    
+ 	#TRANSACCION:  'VF_REPXPROD_SEL'
+ 	#DESCRIPCION:	Detalle de ventas para una lista de productos
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_REPXPROD_SEL')then
+
+		begin
+        	v_filtro = ' v.estado in (''finalizado'',''anulado'') and v.id_sucursal = ' || v_parametros.id_sucursal || ' and v.fecha >=''' 
+            		|| v_parametros.fecha_desde || ''' and v.fecha <= ''' || v_parametros.fecha_hasta ||
+                    ''' and vd.id_sucursal_producto in(' || v_parametros.id_productos || ')' ;
+			
+            --Sentencia de la consulta de conteo de registros
+			v_consulta:='	select
+                            
+                            (tdcv.codigo||'' - ''||tdcv.nombre)::varchar as desc_tipo_doc_compra_venta,                           
+                            pla.desc_plantilla::varchar,                           
+                            to_char(dcv.fecha,''DD/MM/YYYY'')::varchar as fecha,
+                            dcv.nro_autorizacion::varchar,
+                            dcv.nit::varchar,
+                            dcv.razon_social::varchar,
+                            pxp.list(cig.desc_ingas)::varchar,
+                            dcv.nro_documento,
+                            COALESCE(dcv.importe_doc,0)::numeric as importe_doc,
+                            COALESCE(dcv.importe_neto,0)::numeric as importe_neto,
+                            
+                            COALESCE(dcv.importe_iva,0)::numeric as importe_iva,
+                            COALESCE(dcv.importe_it,0)::numeric as importe_it,
+                            COALESCE(dcv.importe_neto,0)::numeric - COALESCE(dcv.importe_iva,0) as ingreso
+                                                  
+                        
+						from vef.tventa v 
+                        inner join vef.tventa_detalle vd on vd.id_venta = v.id_venta
+                        inner join vef.tsucursal_producto sp on sp.id_sucursal_producto = vd.id_sucursal_producto
+                        inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sp.id_concepto_ingas
+                        inner join conta.tdoc_compra_venta dcv on dcv.id_origen = v.id_venta and dcv.tabla_origen = ''vef.tventa''
+                          
+                          inner join param.tplantilla pla on pla.id_plantilla = dcv.id_plantilla                          
+                          inner join conta.ttipo_doc_compra_venta tdcv on tdcv.id_tipo_doc_compra_venta = dcv.id_tipo_doc_compra_venta
+                          where ' || v_filtro || '
+                          group by dcv.estado,                            
+                            pla.desc_plantilla,                           
+                            dcv.fecha,
+                            dcv.nro_autorizacion,
+                            dcv.nit,
+                            dcv.razon_social,
+                            dcv.nro_documento,
+                            dcv.importe_doc,
+                            dcv.importe_neto,
+                            
+                            dcv.importe_iva,
+                            dcv.importe_it,
+                            tdcv.codigo,
+                            tdcv.nombre
+                          order by dcv.fecha, dcv.nro_documento::integer
+						 ';
+			
+			--Definicion de la respuesta		    
+			
+			raise notice '%',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+	/*********************************    
+ 	#TRANSACCION:  'VF_NOTAVEND_SEL'
+ 	#DESCRIPCION:	lista el detalle de la nota de venta
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	ELSIF(p_transaccion='VF_NOTAVEND_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+						 
+                              vd.id_venta,
+                              vd.id_venta_detalle,
+                              COALESCE(vd.precio,0) as precio,
+                              vd.tipo,
+                              vd.cantidad,
+                              (vd.cantidad * COALESCE(vd.precio,0)) as precio_total,
+                              i.codigo as codigo_nombre,
+                              i.nombre as item_nombre,
+                              sp.nombre_producto,
+                              fo.id_formula,	
+                              fd.id_formula_detalle,
+                              fd.cantidad as cantidad_df,
+                              ifo.nombre as item_nombre_df,
+                              fo.nombre as nombre_formula
+
+
+
+                            from vef.tventa_detalle vd
+                            left join alm.titem i on i.id_item = vd.id_item
+                            left join vef.tformula fo on fo.id_formula = vd.id_formula
+                            left join vef.vmedico me on me.id_medico = fo.id_medico
+                            left join vef.tformula_detalle fd on fd.id_formula = fo.id_formula
+                            left join alm.titem ifo on ifo.id_item = fd.id_item
+                            left join vef.tsucursal_producto sp on sp.id_sucursal_producto = vd.id_sucursal_producto
+                        where  
+                               vd.estado_reg = ''activo'' and
+                               vd.id_venta = '||v_parametros.id_venta::varchar;
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||' order by vd.id_venta_detalle, fd.id_formula_detalle';
+
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'VF_NOTAVEND_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_NOTAVEND_CONT')then
+
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select
+                            count(vd.id_venta_detalle) as total,
+                            SUM(vd.cantidad*COALESCE(vd.precio,0)) as suma_total
+                         from vef.tventa_detalle vd
+                         where  id_venta = '||v_parametros.id_venta::varchar||' 
+                              and vd.estado_reg = ''activo''
+                          group by vd.id_venta ';
+			
+			--Definicion de la respuesta		    
+			
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+    /*********************************    
+ 	#TRANSACCION:  'VF_NOTVEN_SEL'
+ 	#DESCRIPCION:   Lista de la cabecera de la nota de venta
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_NOTVEN_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+						ven.id_venta,
+						ven.id_cliente,
+						ven.id_sucursal,
+						ven.id_proceso_wf,
+						ven.id_estado_wf,
+						ven.estado_reg,
+						ven.nro_tramite,
+						ven.a_cuenta,
+						ven.total_venta,
+						ven.fecha_estimada_entrega,
+						ven.usuario_ai,
+						ven.fecha_reg,
+						ven.id_usuario_reg,
+						ven.id_usuario_ai,
+						ven.id_usuario_mod,
+						ven.fecha_mod,
+						usu1.cuenta as usr_reg,
+						usu2.cuenta as usr_mod,
+                        ven.estado,
+                        cli.nombre_completo,
+                        suc.nombre,
+                        suc.direccion,
+                        suc.correo,
+                        suc.telefono,
+                        pxp.f_convertir_num_a_letra(ven.total_venta) as total_string
+                        	
+						from vef.tventa ven
+						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+				        inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                       where  id_venta = '||v_parametros.id_venta::varchar;
+			
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+>>>>>>> 3bc7616c154dde3c057a95c28720a79c8e75cd3c
     				
 	else
 					     

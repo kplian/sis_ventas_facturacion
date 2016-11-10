@@ -33,6 +33,7 @@ class MODDosificacion extends MODbase{
 		$this->captura('glosa_impuestos','varchar');
 		$this->captura('id_activida_economica','varchar');
 		$this->captura('llave','varchar');
+        $this->captura('llave_aux','varchar');
 		$this->captura('inicial','integer');
 		$this->captura('estado_reg','varchar');
 		$this->captura('glosa_empresa','varchar');
@@ -59,6 +60,8 @@ class MODDosificacion extends MODbase{
 		$this->procedimiento='vef.ft_dosificacion_ime';
 		$this->transaccion='VF_DOS_INS';
 		$this->tipo_procedimiento='IME';
+
+        
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_sucursal','id_sucursal','int4');
@@ -90,7 +93,8 @@ class MODDosificacion extends MODbase{
 		$this->procedimiento='vef.ft_dosificacion_ime';
 		$this->transaccion='VF_DOS_MOD';
 		$this->tipo_procedimiento='IME';
-				
+
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_dosificacion','id_dosificacion','int4');
 		$this->setParametro('id_sucursal','id_sucursal','int4');
@@ -111,6 +115,7 @@ class MODDosificacion extends MODbase{
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+
 		$this->ejecutarConsulta();
 
 		//Devuelve la respuesta

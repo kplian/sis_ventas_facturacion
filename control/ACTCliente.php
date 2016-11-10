@@ -25,7 +25,8 @@ class ACTCliente extends ACTbase{
 	}
 				
 	function insertarCliente(){
-		$this->objFunc=$this->create('MODCliente');	
+		$this->objFunc=$this->create('MODCliente');
+
 		if($this->objParam->insertar('id_cliente')){
 			$this->res=$this->objFunc->insertarCliente($this->objParam);			
 		} else{			

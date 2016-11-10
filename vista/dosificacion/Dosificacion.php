@@ -45,6 +45,16 @@ Phx.vista.Dosificacion=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
+        {
+            //configuracion del componente
+            config:{
+                labelSeparator:'',
+                inputType:'hidden',
+                name: 'llave'
+            },
+            type:'Field',
+            form:true
+        },
 		{
 			config:{
 				name: 'tipo',
@@ -198,7 +208,7 @@ Phx.vista.Dosificacion=Ext.extend(Phx.gridInterfaz,{
 		//INI ES COMPUTARIZADA
 		{
 			config:{
-				name: 'llave',
+				name: 'llave_aux',
 				fieldLabel: 'Llave',
 				allowBlank: false,
 				anchor: '100%',
@@ -445,6 +455,7 @@ Phx.vista.Dosificacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_activida_economica', type: 'string'},
 		{name:'desc_actividad_economica', type: 'string'},
 		{name:'llave', type: 'string'},
+        {name:'llave_aux', type: 'string'},
 		{name:'inicial', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
 		{name:'glosa_empresa', type: 'string'},
@@ -546,10 +557,20 @@ Phx.vista.Dosificacion=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.Dosificacion.superclass.loadValoresIniciales.call(this);        
     },
     onSubmit : function(o) {
-    	alert(encodeURIComponent(this.Cmp.llave.getValue()));
-		this.Cmp.llave.setValue(encodeURIComponent(this.Cmp.llave.getValue()));
+
+        this.Cmp.llave.setValue(this.Cmp.llave_aux.getValue());
 		Phx.vista.Dosificacion.superclass.onSubmit.call(this,o);
 	},
+    successSave:function(resp){
+        var datos_respuesta = JSON.parse(resp.responseText);
+        if (datos_respuesta.ROOT.datos.prueba) {
+            Ext.Msg.alert('Atencion',datos_respuesta.ROOT.datos.prueba).getDialog().setSize(350,300);
+
+        } 
+        Phx.vista.Dosificacion.superclass.successSave.call(this,resp);
+
+
+    }
     
     
 	}

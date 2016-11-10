@@ -68,7 +68,7 @@ BEGIN
                             vedet.fecha_mod,
                             usu1.cuenta as usr_reg,
                             usu2.cuenta as usr_mod,
-                            vedet.precio*vedet.cantidad,						
+                            round(vedet.precio*vedet.cantidad,2) as precio_total,						
                             (case when vedet.id_item is not null then
                                 item.codigo  || '' - '' ||  item.nombre
                             when vedet.id_sucursal_producto is not null then

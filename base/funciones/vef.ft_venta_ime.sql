@@ -96,9 +96,13 @@ DECLARE
     v_es_fin				varchar;
     v_valor_bruto			numeric;
     v_descripcion_bulto		varchar;
+<<<<<<< HEAD
     v_hora_estimada_entrega	time;	
     v_tiene_formula			varchar;
     v_forma_pedido			varchar;
+=======
+    v_nombre_factura		varchar;	
+>>>>>>> 3bc7616c154dde3c057a95c28720a79c8e75cd3c
     
 			    
 BEGIN
@@ -323,6 +327,10 @@ BEGIN
             update vef.tcliente
             set nit = v_parametros.nit
             where id_cliente = v_id_cliente;
+            
+            select c.nombre_factura into v_nombre_factura
+            from vef.tcliente c
+            where c.id_cliente = v_id_cliente;
         else
         	INSERT INTO 
               vef.tcliente
@@ -340,6 +348,8 @@ BEGIN
               v_parametros.id_cliente,
               v_parametros.nit
             ) returning id_cliente into v_id_cliente;
+            
+            v_nombre_factura = v_parametros.id_cliente;
         	
         end if;
         --obtener gestion a partir de la fecha actual
@@ -439,9 +449,14 @@ BEGIN
             tipo_cambio_venta,
             valor_bruto,
             descripcion_bulto,
+<<<<<<< HEAD
             hora_estimada_entrega,
             tiene_formula,
             forma_pedido
+=======
+            nit,
+            nombre_factura
+>>>>>>> 3bc7616c154dde3c057a95c28720a79c8e75cd3c
             
             
           	) values(
@@ -484,9 +499,14 @@ BEGIN
             COALESCE(v_tipo_cambio_venta,0)	,
             COALESCE(v_valor_bruto,0),
             COALESCE(v_descripcion_bulto,''),
+<<<<<<< HEAD
             v_hora_estimada_entrega,
             v_tiene_formula,
             v_forma_pedido
+=======
+            v_parametros.nit,
+            v_nombre_factura
+>>>>>>> 3bc7616c154dde3c057a95c28720a79c8e75cd3c
             	
 			
 			) returning id_venta into v_id_venta;
@@ -549,8 +569,18 @@ BEGIN
 	elsif(p_transaccion='VF_VEN_MOD')then
 
 		begin
+<<<<<<< HEAD
         	
             v_tiene_formula = 'no';
+=======
+        	select 
+                v.* 
+             into 
+              v_registros  
+             from vef.tventa v 
+            where v.id_venta = v_parametros.id_venta;
+            
+>>>>>>> 3bc7616c154dde3c057a95c28720a79c8e75cd3c
             if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
                 v_id_punto_venta = v_parametros.id_punto_venta;
             else
@@ -629,7 +659,10 @@ BEGIN
            
             end if;
             
-            
+            /* Lanzar exception al tratar de modificar la fecha de una venta computarizada*/
+            if (v_fecha is not null and v_fecha != v_registros.fecha and v_tipo_base = 'computarizada') then
+            	raise exception 'No es posible modificar la fecha de una venta computarizada';
+            end if;
             
             if (pxp.f_existe_parametro(p_tabla,'a_cuenta')) then
                 v_a_cuenta = v_parametros.a_cuenta;
@@ -689,6 +722,10 @@ BEGIN
 	            update vef.tcliente
 	            set nit = v_parametros.nit
 	            where id_cliente = v_id_cliente;
+                
+                select c.nombre_factura into v_nombre_factura
+                from vef.tcliente c
+                where c.id_cliente = v_id_cliente;
 	        else
 	        	INSERT INTO 
 	              vef.tcliente
@@ -706,7 +743,8 @@ BEGIN
 	              v_parametros.id_cliente,
 	              v_parametros.nit
 	            ) returning id_cliente into v_id_cliente;
-	        	
+                
+	        	v_nombre_factura = v_parametros.id_cliente;
 	        end if;
 	        
 	        
@@ -747,9 +785,9 @@ BEGIN
               otros_cif = COALESCE(v_otros_cif,0),
               tipo_cambio_venta = COALESCE(v_tipo_cambio_venta,1),
               valor_bruto = COALESCE(v_valor_bruto,0),
-              descripcion_bulto = COALESCE(v_descripcion_bulto,'')
-            
-            
+              descripcion_bulto = COALESCE(v_descripcion_bulto,''),
+              nit = v_parametros.nit,
+              nombre_factura = v_nombre_factura 
 			where id_venta=v_parametros.id_venta;
             
             
@@ -1004,7 +1042,7 @@ BEGIN
                 end if;
                 
                 if (v_suma_det != v_venta.total_venta) then
-                    raise exception 'El total de la venta no coincide con la suma de los detalles';
+                    raise exception 'El total de la venta no coincide con la suma de los detalles (% = %) en id: %',v_suma_det ,v_venta.total_venta, v_parametros.id_venta;
                 end if;
             end if;
             
@@ -1038,12 +1076,13 @@ BEGIN
                     
                     
                       
-                          if (EXISTS(	select 1
-                                          from vef.tventa v
-                                          where v.fecha > v_venta.fecha and v.tipo_factura = v_venta.tipo_factura 
-                                          and v.estado != 'anulado'
-                                          and v.estado_reg = 'activo'))THEN
-                              raise exception 'Existen facturas emitidas con fechas posterior a la registrada (%). Por favor revise la fecha y hora del sistema',v_fecha;
+                            if (EXISTS(select 1
+                                            from vef.tventa v
+                                            where v.fecha > v_venta.fecha and v.tipo_factura = v_venta.tipo_factura 
+                                            and v.estado != 'anulado'
+                                            and v.id_sucursal = v_venta.id_sucursal
+                                            and v.estado_reg = 'activo'))THEN
+                              raise exception 'Existen facturas emitidas con fechas posterior a la registrada (%). Por favor revise la fecha y hora del sistema (%..%)',v_fecha, v_venta.fecha, v_venta.tipo_factura;
                           end if;
                           
                             
@@ -1290,7 +1329,7 @@ BEGIN
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
           where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
           
-          select v.*,s.id_entidad,c.nit,tv.tipo_base into v_venta
+          select v.*,s.id_entidad,tv.tipo_base into v_venta
           from vef.tventa v
           inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal 
           inner join vef.tcliente c on c.id_cliente = v.id_cliente
@@ -1398,6 +1437,7 @@ BEGIN
                           raise exception 'El numero de factura ya existe para esta dosificacion. Por favor comuniquese con el administrador del sistema';
                        end if;
                        
+                       
                        --la factura de exportacion no altera la fecha 
                       update vef.tventa  set 
                         id_dosificacion = v_dosificacion.id_dosificacion,
@@ -1426,6 +1466,9 @@ BEGIN
                      into  v_dosificacion 
                      from  vef.tdosificacion d where d.id_dosificacion = v_venta.id_dosificacion;
                      
+                     raise notice '>>>>>>>>>>>>>> prueba %,%,%,%', v_dosificacion.llave, v_dosificacion.nroaut,v_nro_factura,v_venta.nit;
+                     
+                      --raise exception '-- % ..', v_dosificacion.llave;
                     	                       
                       --la factura de exportacion no altera la fecha 
                       update vef.tventa  set 

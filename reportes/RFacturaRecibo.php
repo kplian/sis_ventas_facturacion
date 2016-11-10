@@ -314,7 +314,7 @@ class RFacturaRecibo
 								<table style="height: 130px;" width="180">
 									<tbody>
 										<tr>
-											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACEXPORTCARTAVINTO'?'/imagenes/logos/logo_vinto.png':$_SESSION['_DIR_LOGO']) .'" alt="logo" width="60" height="60" /></td>
+											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACEXPORTCARTAVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_reporte.png') .'" alt="logo" width="60" height="60" /></td>
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong></td>
@@ -384,7 +384,7 @@ class RFacturaRecibo
 						</tr>
 						<tr>
 							<td>Direccion del Importador/Address</td>
-							<td><strong>' . $datos['direccion_cliente'] . '</strong></td>
+							<td><strong>' .nl2br($datos['direccion_cliente']) . '</strong></td>
 							<td>&nbsp;</td>
 						</tr>
 						<tr>
@@ -594,7 +594,7 @@ class RFacturaRecibo
 					$pagina = '	<div id="watermark-anulado"></div>';
 				} else {
 					$pagina = '';
-				}	
+				}
 				$pagina .= '
 				
 				<table style="height: 130px;" width="750">
@@ -604,7 +604,7 @@ class RFacturaRecibo
 								<table style="height: 130px;" width="230">
 									<tbody>
 										<tr>
-											<td style="text-align:center;"><img src="../../../lib' . $_SESSION['_DIR_LOGO'] .'" alt="logo" width="75" height="65" /></td>
+											<td style="text-align:center;"><img src="../../../lib/imagenes/logos/logo_reporte.png" alt="logo" width="75" height="65" /></td>
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong></td>
@@ -675,7 +675,7 @@ class RFacturaRecibo
 						</tr>
 						<tr>
 							<td>Direccion del Importador/Address</td>
-							<td><strong>' . $datos['direccion_cliente'] . '</strong></td>
+							<td><strong>' . nl2br($datos['direccion_cliente']) . '</strong></td>
 							<td>&nbsp;</td>
 						</tr>
 						<tr>
@@ -749,8 +749,8 @@ class RFacturaRecibo
 					<tbody>
 						<tr>							
 							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Partida</strong></td>
-							<td style="text-align: center; border: thin solid black;" width="20%"><strong>Mineral</strong></td>
-							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Bruto</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="30%"><strong>Mineral</strong></td>
+							
 							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Ley Mineral</strong></td>
 							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Peso Fino[Kg]</strong></td>
 							<td style="text-align: center; border: thin solid black;" width="16%"><strong>Peso Fino</strong></td>
@@ -764,8 +764,7 @@ class RFacturaRecibo
 						$valor_bruto += $item_detalle['precio_total']; 
 						$pagina .= '<tr>							
 							<td style="border-bottom: thin solid black;">' . $item_detalle['nandina'] . '</td>
-							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] . '</td>
-							<td style="text-align: right;border-bottom: thin solid black;">' . $item_detalle['bruto'] . '</td>
+							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] . '</td>							
 							<td style="text-align: right;border-bottom: thin solid black;">' . $item_detalle['ley'] . '</td>
 							<td style="text-align: right;border-bottom: thin solid black;">' . $item_detalle['kg_fino'] . '</td>
 							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['cantidad'], 6, '.', ',') . ' ' . $item_detalle['unidad_medida'] . '</td>
@@ -931,16 +930,16 @@ class RFacturaRecibo
 					$pagina = '';
 				}	
 				
-				$pagina .= '
+				$pagina .= ' 
 			
-				<table style="height: 130px;" width="605">
+				<table style="height: 130px;" width="605">  
 					<tbody>
 						<tr>
 							<td>
-								<table style="height: 130px;" width="230">
+								<table style="height: 130px;" width="230">   
 									<tbody>
 										<tr>
-											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':$_SESSION['_DIR_LOGO']) .'" alt="logo" width="60" height="60" /></td>
+											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_reporte.png') .'" alt="logo" width="60" height="60" /></td>
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong><br />' . $datos['direccion_sucursal'] . '<br />' . $datos['telefono_sucursal'] . '<br />' . $datos['lugar_sucursal'] . '</td>
