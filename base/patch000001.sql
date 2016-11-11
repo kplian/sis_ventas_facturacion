@@ -839,9 +839,7 @@ ALTER TABLE vef.tapertura_cierre_caja
 
 /************************************I-SCP-RAC-VEF-0-18/06/2016*************************************************/
 
-ALTER TABLE vef.tcliente
-  ADD COLUMN direccion VARCHAR(255);
-  
+
 ALTER TABLE vef.tcliente
   ADD COLUMN observaciones VARCHAR(255);
 
