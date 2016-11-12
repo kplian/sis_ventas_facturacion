@@ -1320,7 +1320,7 @@ else if ($codigo_reporte == 'FACMEDIACAR' || $codigo_reporte == 'FACMEDIACARVINT
 
 			else if ($codigo_reporte == 'PEDIDOMEDIACAR') {
 				
-				$cadena_qr = 	$datos['nro_tramite'];
+				$cadena_qr = 	$datos['codigo_cliente'];
 						
 				$barcodeobj = new TCPDF2DBarcode($cadena_qr, 'QRCODE,H');
 				
@@ -1469,10 +1469,19 @@ else if ($codigo_reporte == 'FACMEDIACAR' || $codigo_reporte == 'FACMEDIACARVINT
 						<tr>
 							<td style="text-align:left;" width="50%">&nbsp;C&oacute;digo de Seguimiento : <strong>' . $datos['nro_tramite'] . '</strong>
 							</td>
-							<td width="50%"><div align="center">
+							    <td rowspan="2" width="50%">
+							      <div align="center">
 								    '.$barcodeobj->getBarcodeSVGcode(2, 2, 'black').'
-								</div></td>
+								  </div>
+							</td>
 						</tr>
+						<tr>
+							<td style="text-align:left;" width="50%">&nbsp;C&oacute;digo de Cliente : <strong>' . $datos['codigo_cliente'] . '</strong>
+						    </td>
+							
+						</tr>
+						
+						
 					</tbody>
 				</table>
 				

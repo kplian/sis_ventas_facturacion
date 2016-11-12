@@ -428,5 +428,69 @@ ALTER TABLE vef.vcliente
 
 
 
+/************************************I-DEP-RAC-VEF-0-11/11/2016*************************************************/
+CREATE TRIGGER trig_tcliente
+  AFTER INSERT 
+  ON vef.tcliente FOR EACH ROW 
+  EXECUTE PROCEDURE vef.f_trig_cliente();
+  
+  --------------- SQL ---------------
+
+CREATE OR REPLACE VIEW vef.vcliente(
+    id_usuario_reg,
+    id_usuario_mod,
+    fecha_reg,
+    fecha_mod,
+    estado_reg,
+    id_usuario_ai,
+    usuario_ai,
+    id_cliente,
+    nombres,
+    primer_apellido,
+    segundo_apellido,
+    telefono_celular,
+    telefono_fijo,
+    otros_telefonos,
+    correo,
+    otros_correos,
+    nombre_factura,
+    nit,
+    nombre_completo,
+    lugar,
+    codigo)
+AS
+  SELECT c.id_usuario_reg,
+         c.id_usuario_mod,
+         c.fecha_reg,
+         c.fecha_mod,
+         c.estado_reg,
+         c.id_usuario_ai,
+         c.usuario_ai,
+         c.id_cliente,
+         c.nombres,
+         c.primer_apellido,
+         c.segundo_apellido,
+         c.telefono_celular,
+         c.telefono_fijo,
+         c.otros_telefonos,
+         c.correo,
+         c.otros_correos,
+         c.nombre_factura,
+         c.nit,
+         (((c.nombres::text || ' '::text) || c.primer_apellido::text) || ' '::
+           text) || COALESCE(c.segundo_apellido, ''::character varying)::text AS
+           nombre_completo,
+         COALESCE(c.lugar, ''::character varying) AS lugar,
+         c.codigo
+  FROM vef.tcliente c;
+
+
+/************************************F-DEP-RAC-VEF-0-11/11/2016*************************************************/
+
+
+
+
+
+
 
 

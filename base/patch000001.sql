@@ -817,3 +817,39 @@ ALTER TABLE vef.tcliente
 /************************************F-SCP-RAC-VEF-0-31/10/2016*************************************************/
 
 
+
+/************************************I-SCP-RAC-VEF-0-11/11/2016*************************************************/
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN estado VARCHAR(100) DEFAULT 'registrado' NOT NULL;
+
+COMMENT ON COLUMN vef.tventa_detalle.estado
+IS 'registrado, validado';
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN obs VARCHAR;
+  
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN serie VARCHAR(400) DEFAULT '' NOT NULL;
+  
+  --------------- SQL ---------------
+
+ALTER TABLE vef.tcliente
+  ADD COLUMN codigo VARCHAR(20);
+  
+
+/************************************F-SCP-RAC-VEF-0-11/11/2016*************************************************/
+
+
+
+
+

@@ -511,7 +511,9 @@ BEGIN
             ven.valor_bruto,
             ven.descripcion_bulto,
             ven.nro_tramite,
+            tc.codigo as codigo_cliente,
             cli.lugar as lugar_cliente,
+            
             '||v_columnas_destino||'
             from vef.tventa ven						
               inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente

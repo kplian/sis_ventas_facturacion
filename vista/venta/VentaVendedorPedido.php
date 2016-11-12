@@ -62,7 +62,7 @@ Phx.vista.VentaVendedorPedido = {
         
         
         Phx.vista.VentaVendedorPedido.superclass.preparaMenu.call(this);
-        if (rec.data.estado != 'comprado') {              
+        if (rec.data.estado != 'entregado') {              
               this.getBoton('anular').enable();
                           
         } 

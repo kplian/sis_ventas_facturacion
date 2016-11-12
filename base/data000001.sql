@@ -112,4 +112,26 @@ select pxp.f_insert_testructura_gui ('COMMIN', 'VENCARP');
 
 
 
+/***********************************I-DAT-RAC-VEF-0-11/11/2016*****************************************/
+
+----------------------------------
+--COPY LINES TO SUBSYSTEM data.sql FILE  
+---------------------------------
+
+select param.f_import_tcatalogo_tipo ('insert','estado_detalle','VEF','tventa_detalle');
+select param.f_import_tcatalogo ('insert','VEF','registrado','registrado','estado_detalle');
+select param.f_import_tcatalogo ('insert','VEF','comprado','comprado','estado_detalle');
+select param.f_import_tcatalogo ('insert','VEF','finalizado','finalizado','estado_detalle');
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'vef_codigo_cliente', E'false', E'habilita la generacion de codigo automatico al insertar clientes');
+
+/***********************************F-DAT-RAC-VEF-0-11/11/2016*****************************************/
+
+
+
+
+
 

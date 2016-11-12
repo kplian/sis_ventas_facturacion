@@ -29,7 +29,7 @@ class ACTVenta extends ACTbase{
 		                $this->objParam->addFiltro(" ven.estado not in( ''borrador'', ''comprado'', ''anulado'') ");
 		            }
 					else if ($this->objParam->getParametro('pes_estado') == 'pedido_finalizado') {
-		                $this->objParam->addFiltro(" ven.estado in( ''comprado'', ''anulado'') ");
+		                $this->objParam->addFiltro(" ven.estado in( ''entregado'', ''anulado'') ");
 		            }
 					else{
 					  $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");

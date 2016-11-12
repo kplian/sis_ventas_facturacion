@@ -660,6 +660,8 @@ class MODVenta extends MODbase{
 		$this->captura('valor_bruto','numeric');
 		$this->captura('descripcion_bulto','varchar');
 		$this->captura('nro_tramite','varchar');
+		$this->captura('codigo_cliente','varchar');
+		
 			
 		$this->captura('lugar_cliente','varchar');	
 		$this->captura('cliente_destino','varchar');

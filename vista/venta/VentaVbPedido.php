@@ -122,6 +122,14 @@ Phx.vista.VentaVbPedido = {
           this.getBoton('ant_estado').disable();          
           this.getBoton('sig_estado').disable();           
     },
+	
+	south:
+          { 
+          url:'../../../sis_ventas_facturacion/vista/venta_detalle/VentaDetalleVb.php',
+          title:'Detalle', 
+          height:'50%',
+          cls:'VentaDetalleVb'
+         }
     
     
 };
