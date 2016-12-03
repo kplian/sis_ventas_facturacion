@@ -204,6 +204,28 @@ class MODVentaDetalle extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+	function listarPedidoDetalleCliente(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_detalle_sel';
+		$this->transaccion='VF_PEDDETCLI_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_venta','int4');
+		$this->captura('fecha','date');
+		$this->captura('nombre_completo','text');
+		$this->captura('producto','varchar');
+        $this->captura('cantidad','numeric');       
+        
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>

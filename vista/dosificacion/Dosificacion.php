@@ -45,16 +45,7 @@ Phx.vista.Dosificacion=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
-        {
-            //configuracion del componente
-            config:{
-                labelSeparator:'',
-                inputType:'hidden',
-                name: 'llave'
-            },
-            type:'Field',
-            form:true
-        },
+
 		{
 			config:{
 				name: 'tipo',
@@ -208,7 +199,7 @@ Phx.vista.Dosificacion=Ext.extend(Phx.gridInterfaz,{
 		//INI ES COMPUTARIZADA
 		{
 			config:{
-				name: 'llave_aux',
+				name: 'llave',
 				fieldLabel: 'Llave',
 				allowBlank: false,
 				anchor: '100%',
@@ -558,7 +549,7 @@ Phx.vista.Dosificacion=Ext.extend(Phx.gridInterfaz,{
     },
     onSubmit : function(o) {
 
-		this.Cmp.llave.setValue(encodeURIComponent(this.Cmp.llave_aux.getValue()));
+		//this.Cmp.llave.setValue(encodeURIComponent(this.Cmp.llave.getValue()));
 		Phx.vista.Dosificacion.superclass.onSubmit.call(this,o);
 	},
     successSave:function(resp){

@@ -279,7 +279,36 @@ BEGIN
 			return v_consulta;
 
 		end;    
-        
+	/*********************************    
+    #TRANSACCION:  'VF_PEDDETCLI_SEL'
+    #DESCRIPCION:   Consulta del detalle de productos por pedido por cliente
+    #AUTOR:         rcm   
+    #FECHA:         13/11/2016
+    ***********************************/
+
+    elseif(p_transaccion='VF_PEDDETCLI_SEL')then
+                    
+        begin
+            --Sentencia de la consulta
+            v_consulta:='select
+                        vent.id_venta, vent.fecha, cli.nombre_completo,
+                        pro.producto, vdet.cantidad
+                        from vef.tventa_detalle vdet
+                        inner join vef.tventa vent
+                        on vent.id_venta = vdet.id_venta
+                        inner join vef.vcliente cli
+                        on cli.id_cliente = vent.id_cliente_destino
+                        inner join vef.vproducto pro
+                        on pro.id_sucursal_producto = vdet.id_sucursal_producto
+                        where ';
+
+            --Definicion de la respuesta            
+            v_consulta:=v_consulta||v_parametros.filtro;
+
+            --Devuelve la respuesta
+            return v_consulta;
+
+        end;        
 					
 	else
 					     

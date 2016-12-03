@@ -66,6 +66,24 @@ class ACTVentaDetalle extends ACTbase{
 		$this->res=$this->objFunc->actulizarVentaDetallePedido($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+	function listarPedidoDetalleCliente(){
+		$this->objParam->defecto('ordenacion','id_venta_detalle');
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+        if ($this->objParam->getParametro('id_cliente') != '') {
+            $this->objParam->addFiltro("vent.id_cliente = ". $this->objParam->getParametro('id_cliente'));
+        }  
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVentaDetalle','listarPedidoDetalleCliente');
+		} else{
+			$this->objFunc=$this->create('MODVentaDetalle');
+			
+			$this->res=$this->objFunc->listarPedidoDetalleCliente($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 			
 }
 
