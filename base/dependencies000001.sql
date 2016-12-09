@@ -488,9 +488,18 @@ AS
 /************************************F-DEP-RAC-VEF-0-11/11/2016*************************************************/
 
 
+/************************************I-DEP-RCM-VEF-0-13/11/2016*************************************************/
+DROP VIEW vef.vproducto;
 
+CREATE VIEW vef.vproducto
+AS
 
+    SELECT sprod.id_sucursal_producto, suc.id_sucursal,suc.nombre, suc.codigo as codigo_suc,
+    cing.id_concepto_ingas, cing.desc_ingas as producto, cing.codigo as codigo_producto
+    from vef.tsucursal_producto sprod
+    inner join vef.tsucursal suc
+    on suc.id_sucursal = sprod.id_sucursal
+    inner join param.tconcepto_ingas cing
+    on cing.id_concepto_ingas = sprod.id_concepto_ingas;
 
-
-
-
+/************************************F-DEP-RCM-VEF-0-13/11/2016*************************************************/

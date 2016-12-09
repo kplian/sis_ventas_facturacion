@@ -279,7 +279,8 @@ BEGIN
 			return v_consulta;
 
 		end;    
-	/*********************************    
+    
+    /*********************************    
     #TRANSACCION:  'VF_PEDDETCLI_SEL'
     #DESCRIPCION:   Consulta del detalle de productos por pedido por cliente
     #AUTOR:         rcm   
@@ -292,7 +293,8 @@ BEGIN
             --Sentencia de la consulta
             v_consulta:='select
                         vent.id_venta, vent.fecha, cli.nombre_completo,
-                        pro.producto, vdet.cantidad
+                        pro.producto, vdet.cantidad, vent.id_estado_wf, te.nombre_estado as estado_gral,
+                        vdet.estado
                         from vef.tventa_detalle vdet
                         inner join vef.tventa vent
                         on vent.id_venta = vdet.id_venta
@@ -300,6 +302,10 @@ BEGIN
                         on cli.id_cliente = vent.id_cliente_destino
                         inner join vef.vproducto pro
                         on pro.id_sucursal_producto = vdet.id_sucursal_producto
+                        inner join wf.testado_wf ef
+                        on ef.id_estado_wf = vent.id_estado_wf
+                        inner join wf.ttipo_estado te
+                        on te.id_tipo_estado = ef.id_tipo_estado
                         where ';
 
             --Definicion de la respuesta            
@@ -308,7 +314,8 @@ BEGIN
             --Devuelve la respuesta
             return v_consulta;
 
-        end;        
+            end;
+        
 					
 	else
 					     

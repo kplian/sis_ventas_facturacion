@@ -217,8 +217,11 @@ class MODVentaDetalle extends MODbase{
 		$this->captura('fecha','date');
 		$this->captura('nombre_completo','text');
 		$this->captura('producto','varchar');
-        $this->captura('cantidad','numeric');       
-        
+        	$this->captura('cantidad','numeric');  
+        	$this->captura('id_estado_wf','int4');
+        	$this->captura('estado_gral','varchar');
+        	$this->captura('estado','varchar');
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
