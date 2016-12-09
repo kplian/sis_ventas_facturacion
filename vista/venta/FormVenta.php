@@ -107,7 +107,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		      
 		}
 		
-		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadaexpo'|| this.data.objPadre.tipo_factura == 'computarizadamin'|| this.data.objPadre.tipo_factura == 'computarizadaexpomin') {
+		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadaexpo'|| this.data.objPadre.tipo_factura == 'computarizadamin'|| this.data.objPadre.tipo_factura == 'computarizadaexpomin'|| this.data.objPadre.tipo_factura == 'pedido') {
 			this.Atributos.push({
 				config:{
 					name: 'fecha',
@@ -245,7 +245,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                                     direction: 'ASC'
                                                 },
                                                 totalProperty: 'total',
-                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio'],
+                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio','ruta_foto'],
                                                 remoteSort: true,
                                                 baseParams: {par_filtro: 'todo.nombre'}
                                             }),
@@ -1275,7 +1275,57 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 id_grupo:0,                
                 form:true,
                 valorInicial:'0'
-        }, 
+        },
+        
+        {
+            config : {
+                name : 'id_cliente_destino',
+                fieldLabel : 'Destino',
+                allowBlank : false,
+                emptyText : 'Destino...',
+                qtip:'Cliente Destino',
+                store : new Ext.data.JsonStore({
+                    url : '../../sis_ventas_facturacion/control/Cliente/listarCliente',
+                    id : 'id_cliente',
+                    root : 'datos',
+                    sortInfo : {
+                        field : 'nombres',
+                        direction : 'ASC'
+                    },
+                    totalProperty : 'total',
+                    fields : ['id_cliente', 'nombres', 'primer_apellido', 'segundo_apellido','nombre_factura','nit'],
+                    remoteSort : true,
+                    baseParams : {
+                        par_filtro : 'cli.nombres#cli.primer_apellido#cli.segundo_apellido#nombre_factura#nit'
+                    }
+                }),
+                valueField : 'id_cliente',
+                displayField : 'nombre_factura',  
+                gdisplayField : 'cliente_destino',              
+                hiddenName : 'id_cliente_destino',
+                forceSelection : false,
+                typeAhead : false,
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>NIT:</b> {nit}</p><p><b>Razon Social:</b> {nombre_factura}</p><p><b>Nombre:</b> {nombres} {primer_apellido} {segundo_apellido}</p> </div></tpl>',
+                triggerAction : 'all',
+                lazyRender : true,
+                mode : 'remote',
+                pageSize : 10,
+                queryDelay : 1000,
+                turl:'../../../sis_ventas_facturacion/vista/cliente/Cliente.php',
+                ttitle:'Clientes',
+                // tconfig:{width:1800,height:500},
+                tasignacion : true,           
+                tname : 'id_cliente',
+                tdata:{},
+                tcls:'Cliente',
+                gwidth : 170,
+                minChars : 2
+            },
+            type : 'TrigguerCombo',
+            id_grupo : 0,            
+            form : false
+        },
+         
         
         {
 			config:{

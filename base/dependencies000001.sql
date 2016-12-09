@@ -373,3 +373,133 @@ CREATE TRIGGER trig_tdosificacion
   EXECUTE PROCEDURE vef.f_trig_tdosificacion();
 
 /************************************F-DEP-JRR-VEF-0-19/09/2016*************************************************/
+
+
+
+/************************************I-DEP-JRR-VEF-0-28/10/2016*************************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD CONSTRAINT tventa__id_cliente_destino_fk FOREIGN KEY (id_cliente_destino)
+    REFERENCES vef.tcliente(id_cliente)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+    
+--------------- SQL ---------------
+
+ -- object recreation
+DROP VIEW vef.vcliente;
+
+CREATE VIEW vef.vcliente
+AS
+  SELECT c.id_usuario_reg,
+         c.id_usuario_mod,
+         c.fecha_reg,
+         c.fecha_mod,
+         c.estado_reg,
+         c.id_usuario_ai,
+         c.usuario_ai,
+         c.id_cliente,
+         c.nombres,
+         c.primer_apellido,
+         c.segundo_apellido,
+         c.telefono_celular,
+         c.telefono_fijo,
+         c.otros_telefonos,
+         c.correo,
+         c.otros_correos,
+         c.nombre_factura,
+         c.nit,
+         (((c.nombres::text || ' '::text) || c.primer_apellido::text) || ' '::
+           text) || COALESCE(c.segundo_apellido, ''::character varying)::text AS
+           nombre_completo,
+         COALESCE(c.lugar,'')::varchar as lugar
+  FROM vef.tcliente c;
+
+ALTER TABLE vef.vcliente
+  OWNER TO postgres;    
+
+
+/************************************F-DEP-JRR-VEF-0-28/10/2016*************************************************/
+
+
+
+/************************************I-DEP-RAC-VEF-0-11/11/2016*************************************************/
+CREATE TRIGGER trig_tcliente
+  AFTER INSERT 
+  ON vef.tcliente FOR EACH ROW 
+  EXECUTE PROCEDURE vef.f_trig_cliente();
+  
+  --------------- SQL ---------------
+
+CREATE OR REPLACE VIEW vef.vcliente(
+    id_usuario_reg,
+    id_usuario_mod,
+    fecha_reg,
+    fecha_mod,
+    estado_reg,
+    id_usuario_ai,
+    usuario_ai,
+    id_cliente,
+    nombres,
+    primer_apellido,
+    segundo_apellido,
+    telefono_celular,
+    telefono_fijo,
+    otros_telefonos,
+    correo,
+    otros_correos,
+    nombre_factura,
+    nit,
+    nombre_completo,
+    lugar,
+    codigo)
+AS
+  SELECT c.id_usuario_reg,
+         c.id_usuario_mod,
+         c.fecha_reg,
+         c.fecha_mod,
+         c.estado_reg,
+         c.id_usuario_ai,
+         c.usuario_ai,
+         c.id_cliente,
+         c.nombres,
+         c.primer_apellido,
+         c.segundo_apellido,
+         c.telefono_celular,
+         c.telefono_fijo,
+         c.otros_telefonos,
+         c.correo,
+         c.otros_correos,
+         c.nombre_factura,
+         c.nit,
+         (((c.nombres::text || ' '::text) || c.primer_apellido::text) || ' '::
+           text) || COALESCE(c.segundo_apellido, ''::character varying)::text AS
+           nombre_completo,
+         COALESCE(c.lugar, ''::character varying) AS lugar,
+         c.codigo
+  FROM vef.tcliente c;
+
+
+/************************************F-DEP-RAC-VEF-0-11/11/2016*************************************************/
+
+
+/************************************I-DEP-RCM-VEF-0-13/11/2016*************************************************/
+DROP VIEW vef.vproducto;
+
+CREATE VIEW vef.vproducto
+AS
+
+    SELECT sprod.id_sucursal_producto, suc.id_sucursal,suc.nombre, suc.codigo as codigo_suc,
+    cing.id_concepto_ingas, cing.desc_ingas as producto, cing.codigo as codigo_producto
+    from vef.tsucursal_producto sprod
+    inner join vef.tsucursal suc
+    on suc.id_sucursal = sprod.id_sucursal
+    inner join param.tconcepto_ingas cing
+    on cing.id_concepto_ingas = sprod.id_concepto_ingas;
+
+/************************************F-DEP-RCM-VEF-0-13/11/2016*************************************************/

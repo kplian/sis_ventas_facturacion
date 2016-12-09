@@ -42,14 +42,15 @@ class MODVentaDetalle extends MODbase{
         $this->captura('id_vendedor_medico','varchar');
         $this->captura('nombre_vendedor_medico','varchar');
 		$this->captura('requiere_descripcion','varchar');
-		$this->captura('descripcion','text');
-		
+		$this->captura('descripcion','text');		
 		$this->captura('bruto','varchar');  
 		$this->captura('ley','varchar');  
-		$this->captura('kg_fino','varchar');
-		
+		$this->captura('kg_fino','varchar');		
 		$this->captura('id_unidad_medida','integer');
-		$this->captura('codigo_unidad_medida','varchar');  
+		$this->captura('codigo_unidad_medida','varchar');
+		$this->captura('ruta_foto','varchar');
+		
+		  
 		    
 		
 		//Ejecuta la instruccion
@@ -59,6 +60,60 @@ class MODVentaDetalle extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+   function listarVentaDetalleVb(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_detalle_sel';
+		$this->transaccion='VF_VEDETVB_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_venta_detalle','int4');
+		$this->captura('id_venta','int4');
+		$this->captura('id_producto','int4');		
+		$this->captura('tipo','varchar');
+		$this->captura('estado_reg','varchar');
+		$this->captura('cantidad','numeric');
+		$this->captura('precio_unitario','numeric');		
+		$this->captura('id_usuario_ai','int4');
+		$this->captura('usuario_ai','varchar');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+        $this->captura('precio_total','numeric');        
+        $this->captura('nombre_producto','varchar');
+        $this->captura('porcentaje_descuento','numeric');       
+        $this->captura('precio_total_sin_descuento','numeric');
+        $this->captura('id_vendedor_medico','varchar');
+        $this->captura('nombre_vendedor_medico','varchar');
+		$this->captura('requiere_descripcion','varchar');
+		$this->captura('descripcion','text');		
+		$this->captura('bruto','varchar');  
+		$this->captura('ley','varchar');  
+		$this->captura('kg_fino','varchar');		
+		$this->captura('id_unidad_medida','integer');
+		$this->captura('codigo_unidad_medida','varchar');
+		$this->captura('ruta_foto','varchar');
+		
+		$this->captura('estado','varchar');
+		$this->captura('obs','varchar');
+		$this->captura('serie','varchar');
+		
+		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
+
 			
 	function insertarVentaDetalle(){
 		//Definicion de variables para ejecucion del procedimiento
@@ -110,6 +165,28 @@ class MODVentaDetalle extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function actulizarVentaDetallePedido(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_detalle_ime';
+		$this->transaccion='VF_VEDETACT_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta_detalle','id_venta_detalle','int4');		
+		$this->setParametro('serie','serie','varchar');
+		$this->setParametro('obs','obs','varchar');
+		$this->setParametro('estado','estado','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	
 			
 	function eliminarVentaDetalle(){
 		//Definicion de variables para ejecucion del procedimiento
@@ -124,6 +201,31 @@ class MODVentaDetalle extends MODbase{
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarPedidoDetalleCliente(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_detalle_sel';
+		$this->transaccion='VF_PEDDETCLI_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_venta','int4');
+		$this->captura('fecha','date');
+		$this->captura('nombre_completo','text');
+		$this->captura('producto','varchar');
+        	$this->captura('cantidad','numeric');  
+        	$this->captura('id_estado_wf','int4');
+        	$this->captura('estado_gral','varchar');
+        	$this->captura('estado','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

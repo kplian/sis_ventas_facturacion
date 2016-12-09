@@ -213,6 +213,26 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		
 		{
 			config:{
+				name: 'lugar',
+				fieldLabel: 'Lugar',
+				qtip: 'para indicar la ciudad de recidencia del cliente, ejemplo, La Paz - Bolivia (esto facilitara as busquedas)',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 150,
+				maxLength:400
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cli.lugar',type:'string'},
+			id_grupo:2,
+			grid:true,
+			form:true,
+            bottom_filter: true
+		},
+		
+		
+		
+		{
+			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
@@ -332,7 +352,7 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'direccion'
+		{name:'usr_mod', type: 'string'},'direccion','lugar'
 		
 	],
 	sortInfo:{

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -16,9 +18,9 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:	Se aumenta el cliente destino para la interface del tipo pedido
+ AUTOR:			Rensi Arteaga Copari
+ FECHA:		    29/10/2016
 ***************************************************************************/
 
 DECLARE
@@ -33,6 +35,8 @@ DECLARE
     v_join				varchar;
     v_select			varchar;
     v_historico			varchar;
+    v_join_destino		varchar;
+    v_columnas_destino	varchar;
 			    
 BEGIN
 
@@ -81,7 +85,16 @@ BEGIN
             	v_filtro = '(ewf.id_funcionario='||v_id_funcionario_usuario::varchar||' or ven.id_sucursal in ('||v_sucursales||' )) and ';
             else
             	v_filtro = ' 0 = 0 and ';
-            end if;          
+            end if; 
+            
+            
+            if v_parametros.tipo_factura = 'pedido' then
+               v_join_destino = '	inner join vef.vcliente clides on clides.id_cliente = ven.id_cliente_destino';
+               v_columnas_destino = ' clides.nombre_factura as cliente_destino';
+            else
+               v_join_destino = '';
+                v_columnas_destino = ' ''''::varchar as cliente_destino';
+            end if;         
             
             
     		--Sentencia de la consulta
@@ -174,13 +187,15 @@ BEGIN
                         ven.tipo_cambio_venta,
                         mon.moneda as desc_moneda,
                         ven.valor_bruto,
-                        ven.descripcion_bulto
-                        
+                        ven.descripcion_bulto,
+                        ven.id_cliente_destino,
+                        '||v_columnas_destino||'
                         	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
 				        inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+                        '||v_join_destino||'
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
                         left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
@@ -240,12 +255,19 @@ BEGIN
             	v_filtro = ' 0 = 0 and ';
             end if;
             
+            if v_parametros.tipo_factura = 'pedido' then
+               v_join_destino = '	inner join vef.vcliente clides on clides.id_cliente = ven.id_cliente_destino';
+            else
+               v_join_destino = '';
+            end if;
+            
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(' || v_select || ')
 					    from vef.tventa ven
-					    inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
+					    inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg                        
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
 					    inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+                        '||v_join_destino||'
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
                         left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
@@ -428,6 +450,17 @@ BEGIN
 	elsif(p_transaccion='VF_VENREP_SEL')then
      				
     	begin
+        
+             if v_parametros.tipo_factura = 'pedido' then
+               v_join_destino = '	inner join vef.vcliente clides on clides.id_cliente = ven.id_cliente_destino';
+               v_columnas_destino = ' clides.nombre_factura as cliente_destino, clides.lugar as lugar_destino ';
+            else
+               v_join_destino = '';
+                v_columnas_destino = ' ''''::varchar as cliente_destino,''''::varchar as lugar_destino  ';
+            end if;
+        
+        
+        
     		--Sentencia de la consulta
 			v_consulta:='select
 						en.nombre,
@@ -474,19 +507,27 @@ BEGIN
                         ven.otros_cif,
                         (to_char(ven.fecha,''DD'')::integer || '' de '' ||param.f_literal_periodo(to_char(ven.fecha,''MM'')::integer) || '' de '' || to_char(ven.fecha,''YYYY''))::varchar as fecha_literal,
 			(select count(*) from vef.ttipo_descripcion td where td.estado_reg = ''activo'' and td.id_sucursal = suc.id_sucursal)::integer as descripciones, 
-			ven.estado,ven.valor_bruto,ven.descripcion_bulto
+			ven.estado,
+            ven.valor_bruto,
+            ven.descripcion_bulto,
+            ven.nro_tramite,
+            tc.codigo as codigo_cliente,
+            cli.lugar as lugar_cliente,
+            
+            '||v_columnas_destino||'
             from vef.tventa ven						
-			inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
-			inner join vef.tcliente tc on tc.id_cliente = cli.id_cliente
-                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
-                        inner join param.tentidad en on en.id_entidad = suc.id_entidad
-                        inner join param.tlugar lug on lug.id_lugar = suc.id_lugar
-                        inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal
-                        	and sucmon.tipo_moneda = ''moneda_base''
-                        inner join param.tmoneda mon on mon.id_moneda = sucmon.id_moneda
-                        inner join param.tmoneda mven on mven.id_moneda = ven.id_moneda
-                        left join vef.tdosificacion dos on dos.id_dosificacion = ven.id_dosificacion
-                       where  id_venta = '||v_parametros.id_venta::varchar;
+              inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+              '||v_join_destino||'
+              inner join vef.tcliente tc on tc.id_cliente = cli.id_cliente
+              inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+              inner join param.tentidad en on en.id_entidad = suc.id_entidad
+              inner join param.tlugar lug on lug.id_lugar = suc.id_lugar
+              inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal
+                  and sucmon.tipo_moneda = ''moneda_base''
+              inner join param.tmoneda mon on mon.id_moneda = sucmon.id_moneda
+              inner join param.tmoneda mven on mven.id_moneda = ven.id_moneda
+              left join vef.tdosificacion dos on dos.id_dosificacion = ven.id_dosificacion
+             where  id_venta = '||v_parametros.id_venta::varchar;
 			
 			
 			--Devuelve la respuesta

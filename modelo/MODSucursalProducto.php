@@ -47,6 +47,11 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('id_unidad_medida','integer');
 		$this->captura('desc_unidad_medida','varchar');
 		$this->captura('nandina','VARCHAR');
+		$this->captura('ruta_foto','VARCHAR');
+		$this->captura('codigo','VARCHAR');
+		
+		
+		
 		
 		
 		 
@@ -80,7 +85,11 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('medico','varchar');
 		$this->captura('requiere_descripcion','varchar');
 		$this->captura('id_unidad_medida','integer');
-		$this->captura('codigo_unidad_medida','varchar');
+		$this->captura('codigo_unidad_medida','varchar');		
+		$this->captura('ruta_foto','varchar');
+		
+		
+		
 		
 		
 		//Ejecuta la instruccion
@@ -136,6 +145,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
 		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
 		$this->setParametro('nandina','nandina','varchar');
+		$this->setParametro('codigo','codigo','VARCHAR');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -167,6 +177,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('id_unidad_medida','id_unidad_medida','int4');
 		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
 		$this->setParametro('nandina','nandina','varchar');
+		$this->setParametro('codigo','codigo','VARCHAR');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

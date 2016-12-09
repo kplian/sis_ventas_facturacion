@@ -519,14 +519,15 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                 lazyRender: true,
                 mode: 'local',
                 pageSize: 20,
-                store:new Ext.data.ArrayStore({
+                store: new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
 	        	data :	[
 		        	        ['VentaVendedorComputarizada','Factura Computariza'],
 		        	        ['VentaVendedorExportacion','Factura de Exportación'],	
 							['VentaVendedorManual','Factura de manual'],
 							['VentaVendedorExportacionMin','Factura  Minera de Exportación'],
-							['VentaVendedorMin','Factura Computariza Minera'],	
+							['VentaVendedorMin','Factura Computariza Minera'],
+							['VentaVendedorPedido','Pedidos de Compra'],		
 						]	        				
 	    		}),
 	    		valueField:'ID',

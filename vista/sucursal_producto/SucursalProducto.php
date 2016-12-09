@@ -15,12 +15,39 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
+    	this.buildGrupos();
 		Phx.vista.SucursalProducto.superclass.constructor.call(this,config);
 		this.init();
 		this.grid.getTopToolbar().disable();
         this.grid.getBottomToolbar().disable();
         this.iniciarEventos();
+        
+        this.addButton('addImagen', {
+				text : 'Imagen',
+				iconCls : 'bundo',
+				disabled : false,
+				handler : this.addImagen,
+				tooltip : ' <b>Subir imagen</b>'
+			});
+			
+        
+        
+        
 		//this.load({params:{start:0, limit:this.tam_pag}})
+	},
+	
+	addImagen : function() {
+
+
+			var rec = this.sm.getSelected();
+			Phx.CP.loadWindows('../../../sis_parametros/vista/concepto_ingas/subirImagenConcepto.php', 'Subir', {
+				modal : true,
+				width : 500,
+				height : 250
+			}, {id_concepto_ingas: rec.data.id_concepto_ingas}, this.idContenedor, 'subirImagenConcepto')
+
+			
+
 	},
 			
 	Atributos:[
@@ -29,9 +56,28 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
-					name: 'id_sucursal_producto'
+					name: 'id_sucursal_producto',
+					renderer:function (value, p, record){	
+						//return  String.format('{0}',"<div style='text-align:center'><img src = ../../control/foto_persona/"+ record.data['foto']+"?"+record.data['nombre_foto']+hora_actual+" align='center' width='70' height='70'/></div>");
+						if(record.data['tipo_producto'] =='servicio' ||record.data['tipo_producto'] =='producto'){
+							var splittedArray = record.data['ruta_foto'].split('.');
+							if (splittedArray[splittedArray.length - 1] != "") {
+								return  String.format('{0}',"<div style='text-align:center'><img src = '"+ record.data['ruta_foto']+"' align='center' width='70' height='70'/></div>");
+							} else {
+								return  String.format('{0}',"<div style='text-align:center'><img src = '../../../lib/imagenes/noimagen2.jpg' align='center' width='70' height='70'/></div>");
+							}
+						}
+						else{
+							return '';
+							
+						}
+						
+						
+					}
+			
 			},
 			type:'Field',
+			grid:true,
 			form:true 
 		},
 		{
@@ -140,7 +186,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                             direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot','descripcion_larga'],
+                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot','descripcion_larga','ruta_foto','codigo','nandina'],
                     // turn on remote sorting
                     remoteSort: true,
                     baseParams:{par_filtro:'desc_ingas',movimiento:'recurso',start:0,
@@ -230,6 +276,23 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		{
+			config:{
+				name: 'codigo',
+				fieldLabel: 'Código',
+				qtip: 'Código propio',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength: 100
+			},
+			type:'TextField',
+			filters:{pfiltro:'cig.codigo',type:'string'},
+			id_grupo:2,
+			grid:true,
+			form:true
+		},
+		
 		{
             config : {
                 name : 'id_actividad_economica',
@@ -469,12 +532,27 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                 this.allowBlankGrupo(2, false);
                 this.ocultarGrupo(1);
                 this.allowBlankGrupo(1, true);
-                this.resetGroup(1)
+                this.resetGroup(1);
+                
+                
+                
             }
+             this.resetPanel();
         },this);
         
         this.Cmp.nombre_producto.on('select',function (c,r,v) {
         	this.Cmp.descripcion_producto.setValue(r.data.descripcion_larga);
+        	this.Cmp.nandina.setValue(r.data.nandina);
+        	this.Cmp.codigo.setValue(r.data.codigo);
+        	
+        	var ruta = '../../../lib/imagenes/noimagen2.jpg';
+			if (r.data['ruta_foto'] && r.data['ruta_foto'] != "") {
+        		ruta = r.data['ruta_foto'];
+        	}        	
+        	var plantilla = "<div style='text-align:center'><img src = '{0}' align='center' width='70' height='70'/></div>";
+			this.panelResumen.update( String.format(plantilla,ruta));
+        	
+        	
         },this);
     },
 	tam_pag:50,	
@@ -506,7 +584,8 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'nandina','id_unidad_medida','desc_unidad_medida'
+		{name:'usr_mod', type: 'string'},'nandina','id_unidad_medida',
+		'desc_unidad_medida','ruta_foto','codigo'
 		
 	],
 	sortInfo:{
@@ -514,7 +593,15 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	
-	Grupos: [
+	 buildGrupos: function(){ 
+    	var me = this;
+    	this.panelResumen = new Ext.Panel({  
+    		    padding: '0 0 0 20',
+    		    html: '',
+    		    split: true, 
+    		    layout:  'fit' });
+    		    
+    	me.Grupos =[
             {
                 layout: 'column',
                 border: false,
@@ -524,16 +611,15 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                     border: false
                 },            
                 items: [{
-                               
-                                bodyStyle: 'padding-right:5px;',
-                                items: [{
+                              bodyStyle: 'padding-right:5px;',
+                              items: [{
                                     xtype: 'fieldset',
                                     title: 'Datos Generales',
                                     autoHeight: true,
                                     items: [],
                                     id_grupo:0
                                 }]
-                            }, {
+                       }, {
                                 bodyStyle: 'padding-left:5px;',
                                 items: [{
                                     xtype: 'fieldset',
@@ -552,17 +638,32 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                                 items: [],
                                 id_grupo:2
                             }]
-                        }]
+                        },
+                     {
+                      bodyStyle: 'padding-right:5px;',
+                      width: '40%',
+                      border: true,
+                      autoHeight: true,
+				      items: [me.panelResumen]
+                     }]
             }
-        ],
+        ];
         
-    fheight:'60%',
-    fwidth:'60%',
+    },
+     
+    resetPanel(){
+     	this.panelResumen.update("");
+     	
+     }, 
+        
+    fheight:'80%',
+    fwidth:'80%',
         
     onButtonNew:function() {                    
             Phx.vista.SucursalProducto.superclass.onButtonNew.call(this);
             this.ocultarGrupo(2);
-            this.ocultarGrupo(1);  
+            this.ocultarGrupo(1); 
+            this.resetPanel();
                       
             
     },
@@ -592,6 +693,22 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
             }                      
             
     },
+    
+    preparaMenu: function (n) {		
+		Phx.vista.SucursalProducto.superclass.preparaMenu.call(this, n);
+		var record = this.getSelectedData();
+		if(record['tipo_producto'] =='servicio' ||record['tipo_producto'] =='producto'){
+		    this.getBoton('addImagen').enable();
+		}else{
+			this.getBoton('addImagen').disable();
+		}
+	
+	},
+	liberaMenu: function (n) {		
+		Phx.vista.SucursalProducto.superclass.liberaMenu.call(this, n);
+		this.getBoton('addImagen').disable();
+		
+	},
 	
 	bdel:true,
 	bsave:true,
