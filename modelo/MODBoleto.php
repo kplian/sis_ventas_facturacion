@@ -47,6 +47,8 @@ class MODBoleto extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+	
 			
 	function insertarBoleto(){
 		//Definicion de variables para ejecucion del procedimiento

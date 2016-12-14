@@ -45,7 +45,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     totalProperty: 'total',
                     fields: ['id_sucursal', 'nombre', 'codigo'],
                     remoteSort: true,
-                    baseParams: {filtro_usuario: 'si',par_filtro: 'suc.nombre#suc.codigo'}
+                    baseParams: {tipo_usuario : 'todos',par_filtro: 'suc.nombre#suc.codigo'}
                 }),
                 valueField: 'id_sucursal',
                 gdisplayField : 'nombre_sucursal',
@@ -58,8 +58,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 lazyRender: true,
                 mode: 'remote',
                 pageSize: 15,
+                width:250,
                 queryDelay: 1000,                
                 minChars: 2,
+                resizable:true,
                 hidden : true
             },
             type: 'ComboBox',
@@ -83,7 +85,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	                    totalProperty: 'total',
 	                    fields: ['id_punto_venta', 'nombre', 'codigo'],
 	                    remoteSort: true,
-	                    baseParams: {filtro_usuario: 'si',par_filtro: 'puve.nombre#puve.codigo'}
+	                    baseParams: {tipo_usuario : 'todos',par_filtro: 'puve.nombre#puve.codigo'}
 	                }),
 	                valueField: 'id_punto_venta',
 	                displayField: 'nombre',
@@ -98,6 +100,8 @@ header("content-type: text/javascript; charset=UTF-8");
 	                pageSize: 15,
 	                queryDelay: 1000,               
 	                gwidth: 150,
+	                width:250,
+	                resizable:true,
 	                minChars: 2,
 	                renderer : function(value, p, record) {
 	                    return String.format('{0}', record.data['nombre_punto_venta']);

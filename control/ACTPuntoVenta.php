@@ -14,6 +14,39 @@ class ACTPuntoVenta extends ACTbase{
 		if ($this->objParam->getParametro('id_sucursal') != '') {
             $this->objParam->addFiltro(" puve.id_sucursal = " .  $this->objParam->getParametro('id_sucursal'));
         }
+
+        if($this->objParam->getParametro('tipo_factura') != '') {
+            $this->objParam->addFiltro(" ''".$this->objParam->getParametro('tipo_factura')."'' =ANY (suc.tipo_interfaz)");
+        }
+		
+		if($this->objParam->getParametro('tipo_usuario') == 'vendedor') {
+                $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
+                                                " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
+                                                vef.tsucursal_usuario sucusu where puve.id_punto_venta = sucusu.id_punto_venta and
+                                                    sucusu.tipo_usuario = ''vendedor''))) ");
+        }
+
+        if($this->objParam->getParametro('tipo_usuario') == 'administrador') {
+            $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
+                                                " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
+                                                vef.tsucursal_usuario sucusu where puve.id_punto_venta = sucusu.id_punto_venta and
+                                                    sucusu.tipo_usuario = ''administrador''))) ");
+        }
+
+        if($this->objParam->getParametro('tipo_usuario') == 'cajero') {
+            $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
+                                                " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
+                                                vef.tsucursal_usuario sucusu where puve.id_punto_venta = sucusu.id_punto_venta and
+                                                    sucusu.tipo_usuario = ''cajero''))) ");
+        }
+
+        if($this->objParam->getParametro('tipo_usuario') == 'todos') {
+            $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
+                                                " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
+                                                vef.tsucursal_usuario sucusu where puve.id_punto_venta = sucusu.id_punto_venta
+                                                    ))) ");
+        }
+		
 		$this->objParam->defecto('dir_ordenacion','asc');
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);

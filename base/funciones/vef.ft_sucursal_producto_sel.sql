@@ -1,13 +1,11 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_sel (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
   p_transaccion varchar
 )
-RETURNS varchar AS
-$body$
+  RETURNS varchar AS
+  $body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_sucursal_producto_sel
@@ -79,14 +77,16 @@ BEGIN
                         sprod.requiere_descripcion,
                         sprod.id_moneda,
                         mon.codigo_internacional as desc_moneda,
-                        um.id_unidad_medida,
+                        sprod.contabilizable,
+                        sprod.excento,
+						um.id_unidad_medida,
                         um.codigo as desc_unidad_medida,
                         cig.nandina,
                         COALESCE(cig.ruta_foto,'''')::varchar as ruta_foto,
                         cig.codigo 
 			
                         
-                        from vef.tsucursal_producto sprod
+						from vef.tsucursal_producto sprod
 						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						
 						left join segu.tusuario usu2 on usu2.id_usuario = sprod.id_usuario_mod
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
@@ -99,7 +99,7 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-            raise notice '%', v_consulta;
+
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -118,10 +118,10 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_sucursal_producto)
 					    from vef.tsucursal_producto sprod
-						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						
+					    inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg					    
 						left join segu.tusuario usu2 on usu2.id_usuario = sprod.id_usuario_mod
-                        left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
-                        left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica
+					    left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
+					    left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica
                         left join alm.titem item on item.id_item = sprod.id_item
                         left join param.tmoneda mon on mon.id_moneda = sprod.id_moneda
                         left join param.tunidad_medida um on um.id_unidad_medida = cig.id_unidad_medida
@@ -147,7 +147,7 @@ BEGIN
     		v_where = '';
             v_join = '';
     		
-            if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
+    		if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
     			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tpunto_venta pv
     			inner join vef.tsucursal suc on suc.id_sucursal = pv.id_sucursal
@@ -234,10 +234,12 @@ BEGIN
 											round(param.f_convertir_moneda(sp.id_moneda,' || v_id_moneda_venta || ',sp.precio,now()::date,'''||v_tipo||''',2,'||COALESCE(v_tipo_cambio_venta::varchar,'NULL')||',''si''),2) as precio,
 											''''::varchar as medico,
                                             sp.requiere_descripcion,
-                                            um.id_unidad_medida,
+											sp.contabilizable,
+											sp.excento,
+											um.id_unidad_medida,
                                             um.codigo as codigo_unidad_medida,
                                             COALESCE(cig.ruta_foto,'''')::varchar as ruta_foto
-									from vef.tsucursal_producto sp
+																		from vef.tsucursal_producto sp
 									' || v_join || '
 									inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sp.id_concepto_ingas
                                      left join param.tunidad_medida um on um.id_unidad_medida = cig.id_unidad_medida	
@@ -270,7 +272,9 @@ BEGIN
                                                             end))::numeric as precio,
                                         med.nombre_completo::varchar as medico,
                                         ''''::varchar as requiere_descripcion,
-                                        um.id_unidad_medida,
+										''''::varchar as contabilizable,
+										''''::varchar as excento,
+										um.id_unidad_medida,
                                         um.codigo as codigo_unidad_medida,
                                         ''''::varchar as ruta_foto
 								from vef.tformula form
@@ -283,14 +287,20 @@ BEGIN
 								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo'' ' || v_where || '
 								group by form.id_formula,
 								form.nombre, form.descripcion,
-								med.nombre_completo
+								med.nombre_completo,
+                                um.id_unidad_medida,
+                                um.codigo
                                 ' || v_having || ')';
 			
 			end if;
 			v_consulta = v_consulta ||	' 	select todo.id_producto,todo.tipo,todo.nombre,
-												   todo.descripcion,todo.precio,todo.medico,
-                                                   todo.requiere_descripcion,
-                                                   todo.id_unidad_medida,
+													todo.descripcion,
+													todo.precio,
+													todo.medico,
+													todo.requiere_descripcion,
+													todo.contabilizable,
+													todo.excento,
+													todo.id_unidad_medida,
                                                    todo.codigo_unidad_medida,
                                                    todo.ruta_foto
 											from tabla_temporal todo
@@ -475,8 +485,9 @@ BEGIN
 				v_consulta := 'with tabla_temporal as (
 									select cig.id_concepto_ingas as id_producto, ''producto_servicio''::varchar as tipo,
 											cig.desc_ingas as nombre, cig.descripcion_larga::text as descripcion,
-                                            ''''::varchar as unidad_medida
+                                            um.descripcion as unidad_medida
 									from param.tconcepto_ingas cig 
+									left join param.tunidad_medida um on (um.id_unidad_medida = cig.id_unidad_medida)
 									where cig.estado_reg = ''activo'' and cig.id_entidad is not null 
 									)';		
                 raise notice '%', v_consulta;	
@@ -573,4 +584,3 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
-COST 100;

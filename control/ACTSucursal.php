@@ -14,13 +14,34 @@ class ACTSucursal extends ACTbase{
 
 		$this->objParam->defecto('dir_ordenacion','asc');
 		
-		if($this->objParam->getParametro('nombreVista') != '') {
-                $this->objParam->addFiltro(" ''".$this->objParam->getParametro('nombreVista')."'' =ANY (tipo_interfaz)");
+		if($this->objParam->getParametro('tipo_factura') != '') {
+                $this->objParam->addFiltro(" ''".$this->objParam->getParametro('tipo_factura')."'' =ANY (tipo_interfaz)");
         }
         
         
-        if($this->objParam->getParametro('filtro_usuario') != '') {
+        if($this->objParam->getParametro('tipo_usuario') == 'vendedor') {
                 $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
+                                                " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
+                                                vef.tsucursal_usuario sucusu where suc.id_sucursal = sucusu.id_sucursal and
+                                                    sucusu.tipo_usuario = ''vendedor''))) ");
+        }
+
+        if($this->objParam->getParametro('tipo_usuario') == 'administrador') {
+            $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
+                                                " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
+                                                vef.tsucursal_usuario sucusu where suc.id_sucursal = sucusu.id_sucursal and
+                                                    sucusu.tipo_usuario = ''administrador''))) ");
+        }
+
+        if($this->objParam->getParametro('tipo_usuario') == 'cajero') {
+            $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
+                                                " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
+                                                vef.tsucursal_usuario sucusu where suc.id_sucursal = sucusu.id_sucursal and
+                                                    sucusu.tipo_usuario = ''cajero''))) ");
+        }
+
+        if($this->objParam->getParametro('tipo_usuario') == 'todos') {
+            $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
                                                 " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from
                                                 vef.tsucursal_usuario sucusu where suc.id_sucursal = sucusu.id_sucursal))) ");
         }

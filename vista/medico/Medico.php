@@ -170,10 +170,25 @@ Phx.vista.Medico=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'DateField',
 				filters:{pfiltro:'med.fecha_nacimiento',type:'date'},
-				id_grupo:1,
+				id_grupo:0,
 				grid:true,
 				form:true
 		},
+		{
+            config:{
+                name: 'especialidad',
+                fieldLabel: 'Especialidad',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 200,
+                maxLength:100
+            },
+                type:'TextField',
+                filters:{pfiltro:'med.especialidad',type:'string'},
+                id_grupo:0,
+                grid:true,
+                form:true
+        },
         {
             config:{
                 name: 'porcentaje',
@@ -314,6 +329,7 @@ Phx.vista.Medico=Ext.extend(Phx.gridInterfaz,{
 		{name:'telefono_fijo', type: 'string'},
 		{name:'estado_reg', type: 'string'},
 		{name:'segundo_apellido', type: 'string'},
+		{name:'especialidad', type: 'string'},
 		{name:'porcentaje', type: 'numeric'},
 		{name:'telefono_celular', type: 'string'},
 		{name:'primer_apellido', type: 'string'},

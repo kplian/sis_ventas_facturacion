@@ -64,11 +64,20 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                             gwidth: 150,
                             store:['producto_servicio','item']
                     }),
-                   'id_producto': new Ext.form.ComboBox({
+                   'id_producto': new Ext.form.TrigguerCombo({
                                             name: 'id_producto',
                                             fieldLabel: 'Producto/Servicio',
                                             allowBlank: false,
                                             emptyText: 'Productos...',
+                                            tinit:true,
+										    tasignacion:false,
+										    tname:'id_producto',
+									        tdisplayField:'nombre',   				
+											turl:'../../../sis_ventas_facturacion/vista/sucursal_producto/SucursalProducto.php',
+											ttitle:'Sucursal Producto',
+											tconfig:{width:'80%',height:'90%'},
+											tdata:{formulario : 'formula'},
+											tcls:'SucursalProducto',		
                                             store: new Ext.data.JsonStore({
                                                 url: '../../sis_ventas_facturacion/control/SucursalProducto/listarItemsFormula',
                                                 id: 'id_producto',
@@ -101,13 +110,21 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                                             listWidth:'450',
                                             minChars: 2 ,
                                             disabled:true                                           
-                                         }),                  
+                                         }),
+                    'unidad_medida': new Ext.form.TextField({
+                        name: 'unidad_medida',
+                        msgTarget: 'title',
+                        fieldLabel: 'Unidad Medida',
+                        allowBlank: true,
+                        readOnly :true
+                    }),
                     'cantidad': new Ext.form.NumberField({
                                         name: 'cantidad',
                                         msgTarget: 'title',
                                         fieldLabel: 'Cantidad',
                                         allowBlank: false,
-                                        allowDecimals: false,
+                                        allowDecimals: true,
+                                        decimalPrecision : 6,
                                         maxLength:10,
                                         enableKeyEvents : true
                                         
@@ -143,6 +160,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
         },this); 
         
         this.detCmp.id_producto.on('select',function(c,r,i) {
+            this.detCmp.unidad_medida.setValue(r.data.unidad_medida);
             this.detCmp.precio_unitario.setValue(Number(r.data.precio));
             this.detCmp.precio_total.setValue(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()));
         	
@@ -207,7 +225,7 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                     root: 'datos',
                     totalProperty: 'total',
                     fields: ['id_formula_detalle','tipo','id_producto', 'cantidad',
-                             'nombre_producto','precio_unitario','precio_total'
+                             'nombre_producto','precio_unitario','precio_total','unidad_medida'
                     ],remoteSort: true,
                     baseParams: {dir:'ASC',sort:'id_formula_detalle',limit:'100',start:'0'}
                 });
@@ -284,8 +302,15 @@ Phx.vista.FormFormula=Ext.extend(Phx.frmInterfaz,{
                         sortable: false,
                         renderer:function(value, p, record){return String.format('{0}', record.data['nombre_producto']);},
                         editor: this.detCmp.id_producto 
-                    },                   
-                    {
+                    },
+                        {
+                            header: 'Unidad Medida',
+                            dataIndex: 'unidad_medida',
+                            width: 130,
+                            sortable: false,
+                            editor: this.detCmp.unidad_medida
+                        },
+                        {
                        
                         header: 'Cantidad',
                         dataIndex: 'cantidad',

@@ -89,7 +89,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		      });
 		}
 		
-		if (this.data.objPadre.tipo_factura == 'computarizada' || this.data.objPadre.tipo_factura == 'manual'){
+		if (this.data.objPadre.tipo_factura == 'computarizada' || this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == ''){
 			this.Atributos.push({
 		            config:{
 		                name: 'excento',
@@ -175,8 +175,9 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		                form:true
 		      });
 		}
-		
-		this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
+		if (!this.tipoDetalleArray) {			
+		  this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
+        }
         this.addEvents('beforesave');
         this.addEvents('successsave');
         
@@ -245,7 +246,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                                     direction: 'ASC'
                                                 },
                                                 totalProperty: 'total',
-                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio','ruta_foto'],
+                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio','ruta_foto','codigo_unidad_medida'],
                                                 remoteSort: true,
                                                 baseParams: {par_filtro: 'todo.nombre'}
                                             }),
@@ -256,7 +257,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                             forceSelection: true,
                                             tpl : new Ext.XTemplate('<tpl for="."><div class="x-combo-list-item">','<tpl if="tipo == \'formula\'">',
                                             '<p><b>Medico:</b> {medico}</p>','</tpl>',
-                                            '<p><b>Nombre:</b> {nombre_producto}</p><p><b>Descripcion:</b> {descripcion}</p><p><b>Precio:</b> {precio}</p></div></tpl>'),
+                                            '<p><b>Nombre:</b> {nombre_producto}</p><p><b>Descripcion:</b> {descripcion} {codigo_unidad_medida}</p><p><b>Precio:</b> {precio}</p></div></tpl>'),
                                             typeAhead: false,
                                             triggerAction: 'all',
                                             lazyRender: true,
@@ -319,8 +320,6 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             var tmp = this.roundTwo(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()))
             this.detCmp.precio_total.setValue(tmp);
         	
-        	
-        	
         	if (r.data.requiere_descripcion == 'si') {        		
         		this.habilitarDescripcion(true);
         	} else {
@@ -369,13 +368,12 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         }
         
         this.Cmp.id_forma_pago.on('select',function(c,r,i) {
-            if (r.data.registrar_tarjeta == 'si' || r.data.registrar_cc == 'si') {
+            	if (r.data.registrar_tarjeta == 'si' || r.data.registrar_cc == 'si') {
             	this.mostrarComponente(this.Cmp.numero_tarjeta);
             	this.Cmp.numero_tarjeta.allowBlank = false;
             	if (r.data.registrar_tarjeta == 'si') {
 	            	this.mostrarComponente(this.Cmp.codigo_tarjeta);
-	            	this.mostrarComponente(this.Cmp.tipo_tarjeta);
-	            	
+	            	this.mostrarComponente(this.Cmp.tipo_tarjeta);            	
 	            	this.Cmp.codigo_tarjeta.allowBlank = false;
 	            	this.Cmp.tipo_tarjeta.allowBlank = false;
 	            } else {
@@ -443,6 +441,27 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             }            
         },this);      
         
+        this.Cmp.nit.on('focus',function(c) {
+        	this.Cmp.id_cliente.reset();
+        },this);      
+        
+        this.Cmp.nit.on('blur',function(c) {
+        
+        	if (this.Cmp.nit.getValue() != '') {        		
+        		this.Cmp.id_cliente.store.baseParams.nit = this.Cmp.nit.getValue();
+            	this.Cmp.id_cliente.store.load({params:{start:0,limit:this.tam_pag}, 
+		           callback : function (r) {
+		           		this.Cmp.id_cliente.store.baseParams.nit = '';
+		           		if (r.length == 1) {
+		           			this.Cmp.id_cliente.setValue(r[0].data.id_cliente);
+		           			//this.Cmp.id_cliente.fireEvent('select',this.Cmp.id_cliente, this.Cmp.id_cliente.store.getById(r[0].data.id_cliente));
+		           		}          	                   
+		                                
+		            }, scope : this
+		        });
+		    }        
+        },this);          
+        
         
         this.iniciarEventosProducto();
         
@@ -489,7 +508,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     },
     cargarFormaPago : function () {
         if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {  
-    	   this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+    	    this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+    		this.Cmp.id_forma_pago.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
     	} else {
     		this.Cmp.id_forma_pago.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
     	}
@@ -547,8 +567,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         var cmb_rec = this.detCmp['id_producto'].store.getById(rec.get('id_producto'));
         if(cmb_rec) {
             
-            rec.set('nombre_producto', cmb_rec.get('nombre_producto')); 
-        }
+            rec.set('nombre_producto', cmb_rec.get('nombre_producto') + ' (' + cmb_rec.get('codigo_unidad_medida') + ')'); 
+       }
                      
        
     },
@@ -717,6 +737,24 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                             }
                             this.evaluaGrilla();
                         }
+                    },
+                    {
+
+                            text: '<i class="fa fa-plus-circle fa-lg"></i> Duplicar registro',
+                            scope:this,
+                            handler: function(){
+                                if (this.megrid.getSelectionModel().getCount() == 0) {
+                                    alert('Debe seleccionar un registro para duplicar');
+                                } else if (this.megrid.getSelectionModel().getCount() > 1) {
+                                    alert('Debe seleccionar un solo registro para duplicar');
+                                } else {
+                                    this.editorDetail.stopEditing();
+                                    var s = this.megrid.getSelectionModel().getSelected();
+                                    this.onDuplicateDetail(s);
+                                    this.evaluaGrilla();
+                                }
+
+                            }
                     }],
             
                     columns: [
@@ -775,11 +813,17 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 });
     },
     armarFormularioFormula : function () {
-    	var comboFormula = new Ext.form.ComboBox(
+    	var comboFormula = new Ext.form.TrigguerCombo(
 						    {
 						        typeAhead: false,
 						        fieldLabel: 'Paquete / Formula',
-						        allowBlank : false,						        
+						        allowBlank : false,
+                                tinit:true,
+							    turl:'../../../sis_ventas_facturacion/vista/formula/Formula.php',
+								ttitle:'Formula',
+								tconfig:{width:'80%',height:'90%'},
+								tdata:{},
+								tcls:'Formula',	
 						        store: new Ext.data.JsonStore({
                                                 url: '../../sis_ventas_facturacion/control/SucursalProducto/listarProductoServicioItem',
                                                 id: 'id_producto',
@@ -842,7 +886,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		                		validado = true;	
 		                		var nombre_formula = comboFormula.getRawValue();                		
 		                		VentanaFormula.close(); 
-		                		params['id_formula'] = comboFormula.getValue();   
+		                		params.id_formula = comboFormula.getValue();   
 		                		console.log(params);
 		                		Ext.Ajax.request({
 					                url:'../../sis_ventas_facturacion/control/FormulaDetalle/listarFormulaDetalleParaInsercion',                
@@ -904,6 +948,43 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     	}
     	this.mestore.commitChanges();
     	
+    },
+    onDuplicateDetail : function (r) {
+        var grillaRecord =  Ext.data.Record.create([
+            {name:'id_venta_detalle', type: 'numeric'},
+            {name:'id_venta', type: 'numeric'},
+            {name:'nombre_producto', type: 'string'},
+            {name:'id_producto', type: 'numeric'},
+            {name:'tipo', type: 'string'},
+            {name:'descripcion', type: 'string'},
+            {name:'requiere_descripcion', type: 'string'},
+            {name:'estado_reg', type: 'string'},
+            {name:'cantidad', type: 'numeric'},
+            {name:'precio_unitario', type: 'numeric'},
+            {name:'precio_total', type: 'numeric'},
+            {name:'id_usuario_ai', type: 'numeric'},
+            {name:'usuario_ai', type: 'string'},
+            {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+            {name:'id_usuario_reg', type: 'numeric'},
+            {name:'id_usuario_mod', type: 'numeric'},
+            {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+            {name:'usr_reg', type: 'string'},
+            {name:'usr_mod', type: 'string'}
+        ]);
+        
+        var myNewRecord = new grillaRecord({
+            nombre_producto : r.data.nombre_producto,
+            descripcion : r.data.descripcion,
+            id_producto : r.data.id_producto,
+            tipo : r.data.tipo,
+            cantidad : r.data.cantidad,
+            precio_unitario : r.data.precio_unitario,
+            precio_total: r.data.precio_total
+
+        });
+        this.mestore.add(myNewRecord);
+
+        this.mestore.commitChanges();
     },
     onInitAdd : function (r, i) {  
     	if(this.data.readOnly===true){
@@ -1045,6 +1126,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	           {name: 'numero_tarjeta',     type: 'string'},
 	           {name: 'codigo_tarjeta',     type: 'string'},
 	           {name: 'registrar_tarjeta',     type: 'string'},
+               {name: 'registrar_tipo_tarjeta',     type: 'string'},
 	           {name: 'registrar_cc',     type: 'string'},
 	           {name: 'tipo_tarjeta',     type: 'string'}
 	        ]
@@ -1169,6 +1251,11 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	                		if (fp.data.valor > 0 && fp.data.registrar_tarjeta == 'si' && (fp.data.numero_tarjeta == '' || fp.data.codigo_tarjeta == '' || fp.data.tipo_tarjeta == '')) {
 	                			validado = false;
 	                			alert('La forma de pago ' + fp.data.nombre + ' requiere el tipo, numero de tarjeta y codigo de autorización')
+	                		}
+                            
+                            if (fp.data.valor > 0 && fp.data.registrar_tipo_tarjeta == 'si' && fp.data.tipo_tarjeta == '') {
+	                			validado = false;
+	                			alert('La forma de pago ' + fp.data.nombre + ' requiere el tipo de tarjeta de credito')
 	                		}
 	                		
 	                		if (fp.data.valor > 0 && fp.data.registrar_cc == 'si' && (fp.data.numero_tarjeta == '')) {
@@ -1442,6 +1529,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 displayField: 'nombre',
                 gdisplayField: 'forma_pago',
                 hiddenName: 'id_forma_pago',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>Moneda:{desc_moneda}</p> </div></tpl>',
                 forceSelection: true,
                 typeAhead: false,
                 triggerAction: 'all',
@@ -1450,6 +1538,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 pageSize: 15,
                 queryDelay: 1000,               
                 gwidth: 150,
+                listWidth:450,
+                resizable:true,
                 minChars: 2,
                 renderer : function(value, p, record) {
                     return String.format('{0}', record.data['forma_pago']);

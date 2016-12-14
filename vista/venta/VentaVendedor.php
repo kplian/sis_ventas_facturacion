@@ -80,6 +80,7 @@ Phx.vista.VentaVendedor = {
         	 	this.store.baseParams.fecha = '';
         	 }
              this.store.baseParams.pes_estado = name;
+             this.store.baseParams.interfaz = 'vendedor';
              this.load({params:{start:0, limit:this.tam_pag}});
            }
     },

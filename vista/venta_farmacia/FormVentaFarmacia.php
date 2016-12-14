@@ -14,11 +14,13 @@ Phx.vista.FormVentaFarmacia = {
 	requireclase:'Phx.vista.FormVenta',
 	title:'Venta',
 	nombreVista: 'FormVentaFarmacia',
-	
+	cantidadAllowDecimals: true,	
 	constructor: function(config) {	
+		
 		this.addElements();
-		   
-        Phx.vista.FormVentaFarmacia.superclass.constructor.call(this,config);        
+		this.tipoDetalleArray = [['servicio','Servicio'],['producto_terminado','Producto']];  
+        Phx.vista.FormVentaFarmacia.superclass.constructor.call(this,config); 
+        
         this.Cmp.nit.allowBlank = true; 
         if (this.data.tipo_form == 'edit') {
             if (this.data.datos_originales.data.estado == 'pendiente_entrega') {
@@ -32,13 +34,8 @@ Phx.vista.FormVentaFarmacia = {
             this.mostrarComponente(this.Cmp.a_cuenta);
             this.ocultarGrupo(2);
         }
-        
-        
-        
-        
-       
-        
   },
+  
   addElements : function () {
     
   	this.Atributos.push({
@@ -59,7 +56,7 @@ Phx.vista.FormVentaFarmacia = {
 			config:{
 				name: 'fecha_estimada_entrega',
 				fieldLabel: 'Fecha de Entrega Estimada',
-				allowBlank: false,				
+				allowBlank: true,				
 				format: 'd/m/Y'
 							
 			},
@@ -67,6 +64,23 @@ Phx.vista.FormVentaFarmacia = {
 				id_grupo:0,				
 				form:true
 		});
+	
+	this.Atributos.push({
+			config:{
+				name: 'hora_estimada_entrega',
+				fieldLabel: 'Hora de Entrega Estimada',
+				allowBlank: true,				
+				format: 'H:i',
+				minValue: '8:00 AM',
+    			maxValue: '8:00 PM',
+    			increment:30
+							
+			},
+				type:'TimeField',				
+				id_grupo:0,				
+				form:true
+		});
+		
 	this.Atributos.push({
             config: {
                 name: 'id_vendedor_medico',
@@ -121,14 +135,93 @@ Phx.vista.FormVentaFarmacia = {
                 id_grupo:1,             
                 form:true
         });
+        
+        this.Atributos.push({
+			config:{
+                name: 'forma_pedido',
+                fieldLabel: 'Forma Pedido',
+                allowBlank: false,
+                anchor: '60%', 
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',                                  
+               // displayField: 'descestilo',
+                store:['personal','telefono','whatsapp']
+            },
+            type:'ComboBox',            
+            id_grupo:0,
+            valorInicial : 'personal',            
+            form:true
+		});
   },
   onNew: function(){      
       this.accionFormulario = 'NEW'; 
       this.Cmp.porcentaje_descuento.setValue(0);
+      this.Cmp.forma_pedido.setValue('personal');
   },
   
   buildComponentesDetalle: function(){
+  	
       Phx.vista.FormVentaFarmacia.superclass.buildComponentesDetalle.call(this); 
+      this.detCmp.id_producto = new Ext.form.TrigguerCombo({
+        name: 'id_sucursal_producto',
+        fieldLabel: 'Producto/Servicio',
+        allowBlank: false,
+        tinit:true,
+	    tasignacion:false,
+	    tname:'id_producto',
+        tdisplayField:'nombre',   				
+		turl:'../../../sis_ventas_facturacion/vista/sucursal_producto/SucursalProducto.php',
+		ttitle:'Sucursal Producto',
+		tconfig:{width:'80%',height:'90%'},
+		tdata:{},
+		tcls:'SucursalProducto',
+		pid:this.idContenedor,
+        emptyText: 'Productos...',
+        store: new Ext.data.JsonStore({
+            url: '../../sis_ventas_facturacion/control/SucursalProducto/listarProductoServicioItem',
+            id: 'id_producto',
+            root: 'datos',
+            sortInfo: {
+                field: 'nombre',
+                direction: 'ASC'
+            },
+            totalProperty: 'total',
+            fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio','codigo_unidad_medida'],
+            remoteSort: true,
+            baseParams: {par_filtro: 'todo.nombre'}
+        }),
+        valueField: 'id_producto',
+        displayField: 'nombre_producto',
+        gdisplayField: 'nombre_producto',
+        hiddenName: 'id_producto',
+        forceSelection: true,
+        tpl : new Ext.XTemplate('<tpl for="."><div class="x-combo-list-item">','<tpl if="tipo == \'formula\'">',
+        '<p><b>Medico:</b> {medico}</p>','</tpl>',
+        '<p><b>Nombre:</b> {nombre_producto}</p><p><b>Descripcion:</b> {descripcion} {codigo_unidad_medida}</p><p><b>Precio:</b> {precio}</p></div></tpl>'),
+        typeAhead: false,
+        triggerAction: 'all',
+        lazyRender: true,
+        mode: 'remote',
+        resizable:true,
+        pageSize: 15,
+        queryDelay: 1000,
+        anchor: '100%',
+        width : 250,
+        listWidth:'450',
+        minChars: 2 ,
+        disabled:true                                           
+     });
+
+      this.detCmp.unidad_medida = new Ext.form.TextField({
+          name: 'unidad_medida',
+          msgTarget: 'title',
+          fieldLabel: 'Unidad',
+          allowBlank: true,
+          readOnly :true
+      });
+     
       this.detCmp.porcentaje_descuento = new Ext.form.NumberField({
             name: 'porcentaje_descuento',
             fieldLabel: 'Porcentaje Descuento',
@@ -185,6 +278,16 @@ Phx.vista.FormVentaFarmacia = {
                 maxLength:10,
                 readOnly :true
         });
+
+      this.detCmp.precio_total_sin_descuento = new Ext.form.NumberField({
+          name: 'precio_total_sin_descuento',
+          msgTarget: 'title',
+          fieldLabel: 'Total',
+          allowBlank: false,
+          allowDecimals: false,
+          maxLength:10,
+          readOnly :true
+      });
   },
   
   buildDetailGrid: function(){
@@ -237,6 +340,7 @@ Phx.vista.FormVentaFarmacia = {
                         {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
                         {name:'usr_reg', type: 'string'},
                         {name:'usr_mod', type: 'string'},
+                        {name:'codigo_unidad_cig', type: 'string'},
                         
                     ],
                     remoteSort: true,
@@ -354,15 +458,16 @@ Phx.vista.FormVentaFarmacia = {
                         sortable: false,
                         renderer:function(value, p, record){return String.format('{0}', record.data['nombre_producto']);},
                         editor: this.detCmp.id_producto 
-                    },   
-                    {
-                        header: 'Descripción',
-                        dataIndex: 'descripcion',
-                        width: 230,
-                        sortable: false,                        
-                        editor: this.detCmp.descripcion 
-                    },                 
-                    {
+                    },
+                        {
+                            header: 'Unidad',
+                            dataIndex: 'codigo_unidad_cig',
+                            width: 110,
+                            sortable: false,
+                            editor: this.detCmp.unidad_medida
+                        },
+
+                        {
                        
                         header: 'Cantidad',
                         dataIndex: 'cantidad',
@@ -424,34 +529,37 @@ Phx.vista.FormVentaFarmacia = {
         Phx.vista.FormVentaFarmacia.superclass.onAfterEdit.call(this,re,o,rec,num);
         rec.set('nombre_vendedor_medico', this.detCmp.id_vendedor_medico.getRawValue());
                 
-    },
+    },    
     iniciarEventos : function () {
-        
+        this.detCmp.id_producto.tdata.formulario = 'venta';
+        this.detCmp.id_producto.tdata.maestro = {	id_sucursal : this.data.objPadre.variables_globales.id_sucursal,
+        									id_entidad : this.data.objPadre.variables_globales.id_entidad};
         this.Cmp.id_vendedor_medico.store.baseParams.id_sucursal = this.data.objPadre.variables_globales.id_sucursal;
         this.detCmp.id_vendedor_medico.store.baseParams.id_sucursal = this.data.objPadre.variables_globales.id_sucursal;
         
        this.detCmp.porcentaje_descuento.on('keyup',function() {  
             
-            this.detCmp.precio_total_sin_descuento.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
-            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_total_sin_descuento.getValue()) - (Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.porcentaje_descuento.getValue()) / Number(100)) );
+            this.detCmp.precio_total_sin_descuento.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
+            this.detCmp.precio_total.setValue(this.round(Number(this.detCmp.precio_total_sin_descuento.getValue()) - (Number(this.detCmp.precio_total_sin_descuento.getValue()) * Number(this.detCmp.porcentaje_descuento.getValue()) / Number(100))) );
         },this);
         Phx.vista.FormVentaFarmacia.superclass.iniciarEventos.call(this);
         this.detCmp.cantidad.on('keyup',function() {  
-            this.detCmp.precio_total_sin_descuento.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
-            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_total_sin_descuento.getValue()) - (Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.porcentaje_descuento.getValue()) / Number(100)) );
+            this.detCmp.precio_total_sin_descuento.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
+            this.detCmp.precio_total.setValue(this.round(Number(this.detCmp.precio_total_sin_descuento.getValue()) - (Number(this.detCmp.precio_total_sin_descuento.getValue()) * Number(this.detCmp.porcentaje_descuento.getValue()) / Number(100))));
         },this);
         
         
         
         this.detCmp.precio_unitario.on('keyup',function() {  
-            this.detCmp.precio_total_sin_descuento.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
-            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_total_sin_descuento.getValue()) - (Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.porcentaje_descuento.getValue()) / Number(100)) );
+            this.detCmp.precio_total_sin_descuento.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
+            this.detCmp.precio_total.setValue(this.round(Number(this.detCmp.precio_total_sin_descuento.getValue()) - (Number(this.detCmp.precio_total_sin_descuento.getValue()) * Number(this.detCmp.porcentaje_descuento.getValue()) / Number(100))));
         },this);
         
         this.detCmp.id_producto.on('select',function(c,r,i) {
+            this.detCmp.unidad_medida.setValue(r.data.codigo_unidad_medida);
             this.detCmp.precio_unitario.setValue(Number(r.data.precio));
-            this.detCmp.precio_total_sin_descuento.setValue(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue()));
-            this.detCmp.precio_total.setValue(Number(this.detCmp.precio_total_sin_descuento.getValue()) - (Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.porcentaje_descuento.getValue()) / Number(100)) );
+            this.detCmp.precio_total_sin_descuento.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
+            this.detCmp.precio_total.setValue(this.round(Number(this.detCmp.precio_total_sin_descuento.getValue()) - (Number(this.detCmp.precio_total_sin_descuento.getValue()) * Number(this.detCmp.porcentaje_descuento.getValue()) / Number(100))));
         },this);
         
         if (this.data.tipo_form == 'edit') {
@@ -563,11 +671,17 @@ Phx.vista.FormVentaFarmacia = {
                 allowDecimals:false
         });
         porcentajeDescuento.setValue(this.Cmp.porcentaje_descuento.getValue());
-    	var comboFormula = new Ext.form.ComboBox(
+    	var comboFormula = new Ext.form.TrigguerCombo(
 						    {
 						        typeAhead: false,
 						        fieldLabel: 'Paquete / Formula',
-						        allowBlank : false,						        
+						        allowBlank : false,	
+						        tinit:true,
+							    turl:'../../../sis_ventas_facturacion/vista/formula/Formula.php',
+								ttitle:'Formula',
+								tconfig:{width:'80%',height:'90%'},
+								tdata:{},
+								tcls:'Formula',						        
 						        store: new Ext.data.JsonStore({
                                                 url: '../../sis_ventas_facturacion/control/SucursalProducto/listarProductoServicioItem',
                                                 id: 'id_producto',
@@ -630,6 +744,7 @@ Phx.vista.FormVentaFarmacia = {
 		                		validado = true;	
 		                		var nombre_formula = comboFormula.getRawValue(); 
 		                		params.id_vendedor_medico = comboVendedor.getValue();
+		                		params.id_formula = comboFormula.getValue();
                 				params.porcentaje_descuento = porcentajeDescuento.getValue();              		
 		                		
 		                		Ext.Ajax.request({
@@ -654,6 +769,7 @@ Phx.vista.FormVentaFarmacia = {
 	        });
 	      VentanaFormula.show();
     },
+    
     successCargarFormula : function (response,request) {
     	var respuesta = JSON.parse(response.responseText);
     	var grillaRecord =  Ext.data.Record.create([
@@ -690,7 +806,7 @@ Phx.vista.FormVentaFarmacia = {
     			tipo : respuesta.datos[i].tipo,
     			cantidad : respuesta.datos[i].cantidad,
     			precio_unitario : respuesta.datos[i].precio_unitario,
-    			precio_total: respuesta.datos[i].precio_total,
+    			precio_total: this.round(Number(respuesta.datos[i].precio_total)) ,
     			precio_total_sin_descuento : respuesta.datos[i].precio_total_sin_descuento,
     			porcentaje_descuento : respuesta.datos[i].porcentaje_descuento, 
     			id_vendedor_medico : respuesta.datos[i].id_vendedor_medico, 
@@ -702,8 +818,9 @@ Phx.vista.FormVentaFarmacia = {
     	this.mestore.commitChanges();
     	
     },
-  
-   
+    round: function(can) {    	
+    	 return  Math.ceil(can);
+    }  
 	
 };
 </script>

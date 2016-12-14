@@ -107,6 +107,8 @@ Phx.vista.FormulaDetalle=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
+				allowDecimals: true,
+				decimalPrecision : 6,
 				maxLength:1179650
 			},
 				type:'NumberField',

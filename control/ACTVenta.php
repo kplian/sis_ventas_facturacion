@@ -21,6 +21,11 @@ class ACTVenta extends ACTbase{
         if ($this->objParam->getParametro('pes_estado') != '') {
             if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
                 $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
+            }elseif ($this->objParam->getParametro('pes_estado') == 'finalizado') {
+                $this->objParam->addFiltro(" ven.estado in( ''finalizado'', ''anulado'') ");
+				if ($this->objParam->getParametro('interfaz') == 'vendedor' || $this->objParam->getParametro('interfaz') == 'caja') {
+					$this->objParam->addFiltro(" ven.fecha_reg::date = now()::date");
+				}
             } else {
                 if ($this->objParam->getParametro('historico') != 'si') {
                     	
@@ -58,10 +63,6 @@ class ACTVenta extends ACTbase{
 		
 		if ($this->objParam->getParametro('id_punto_venta') != '') {
 			$this->objParam->addFiltro(" ven.id_punto_venta = ". $this->objParam->getParametro('id_punto_venta'));
-		}
-		
-		if ($this->objParam->getParametro('fecha') != '') {
-			$this->objParam->addFiltro(" ven.fecha_reg::date = ''". $this->objParam->getParametro('fecha')."''");
 		}
 		
 		 
@@ -115,6 +116,18 @@ class ACTVenta extends ACTbase{
 		$this->res=$this->objFunc->anularVenta($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+    function setContabilizable(){
+        $this->objFunc=$this->create('MODVenta');
+        $this->res=$this->objFunc->setContabilizable($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function verificarRelacion(){
+        $this->objFunc=$this->create('MODVenta');
+        $this->res=$this->objFunc->verificarRelacion($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
     
     function siguienteEstadoVenta(){
         $this->objFunc=$this->create('MODVenta');  
@@ -224,6 +237,7 @@ class ACTVenta extends ACTbase{
 		
 		$this->objFunc = $this->create('MODVenta');
 		$this->res = $this->objFunc->listarReciboFacturaDetalle($this->objParam);
+		
 		$datos['detalle'] = $this->res->getDatos();
 		
 		$reporte = new RFacturaRecibo();

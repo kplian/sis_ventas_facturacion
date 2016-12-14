@@ -6,7 +6,6 @@
 *@date 20-04-2015 08:52:44
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -205,7 +204,7 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'TextArea',
 				filters:{pfiltro:'cli.direccion',type:'string'},
-				id_grupo:2,
+				id_grupo:1,
 				grid:true,
 				form:true,
                 bottom_filter: true
@@ -216,7 +215,7 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 				name: 'lugar',
 				fieldLabel: 'Lugar',
 				qtip: 'para indicar la ciudad de recidencia del cliente, ejemplo, La Paz - Bolivia (esto facilitara as busquedas)',
-				allowBlank: true,
+	            allowBlank: true,
 				anchor: '100%',
 				gwidth: 150,
 				maxLength:400
@@ -230,6 +229,21 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		},
 		
 		
+		{
+			config:{
+				name: 'observaciones',
+				fieldLabel: 'Observaciones',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 150,
+				maxLength:400
+			},
+				type:'TextArea',
+				filters:{pfiltro:'cli.observaciones',type:'string'},
+				id_grupo:0,
+				grid:true,
+				form:true
+		},
 		
 		{
 			config:{
@@ -337,6 +351,8 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombres', type: 'string'},
 		{name:'otros_telefonos', type: 'string'},
 		{name:'otros_correos', type: 'string'},
+		{name:'direccion', type: 'string'},
+		{name:'observaciones', type: 'string'},
 		{name:'nit', type: 'string'},
 		{name:'telefono_celular', type: 'string'},
 		{name:'primer_apellido', type: 'string'},
@@ -431,5 +447,3 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 	}
 )
 </script>
-		
-		

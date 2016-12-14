@@ -355,6 +355,32 @@ ALTER TABLE ONLY vef.tvalor_descripcion
     FOREIGN KEY (id_tipo_descripcion) REFERENCES vef.ttipo_descripcion(id_tipo_descripcion);
 /************************************F-DEP-JRR-VEF-0-08/05/2016*************************************************/
 
+
+/************************************I-DEP-JRR-VEF-0-07/07/2016*************************************************/
+
+
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_sucursal
+    FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(id_sucursal);
+    
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_punto_venta
+    FOREIGN KEY (id_punto_venta) REFERENCES vef.tpunto_venta(id_punto_venta);
+    
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_usuario_cajero
+    FOREIGN KEY (id_usuario_cajero) REFERENCES segu.tusuario(id_usuario);
+    
+ALTER TABLE ONLY vef.tapertura_cierre_caja
+    ADD CONSTRAINT fk_tapertura_cierre_caja__id_moneda
+    FOREIGN KEY (id_moneda) REFERENCES param.tmoneda(id_moneda);
+
+ALTER TABLE ONLY vef.tventa
+    ADD CONSTRAINT fk_tventa__id_usuario_cajero
+    FOREIGN KEY (id_usuario_cajero) REFERENCES segu.tusuario(id_usuario);
+
+/************************************F-DEP-JRR-VEF-0-07/07/2016*************************************************/
+
 /************************************I-DEP-JRR-VEF-0-18/09/2016*************************************************/
 
 CREATE TRIGGER trig_tdosificacion
@@ -388,41 +414,6 @@ ALTER TABLE vef.tventa
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
     
-    
---------------- SQL ---------------
-
- -- object recreation
-DROP VIEW vef.vcliente;
-
-CREATE VIEW vef.vcliente
-AS
-  SELECT c.id_usuario_reg,
-         c.id_usuario_mod,
-         c.fecha_reg,
-         c.fecha_mod,
-         c.estado_reg,
-         c.id_usuario_ai,
-         c.usuario_ai,
-         c.id_cliente,
-         c.nombres,
-         c.primer_apellido,
-         c.segundo_apellido,
-         c.telefono_celular,
-         c.telefono_fijo,
-         c.otros_telefonos,
-         c.correo,
-         c.otros_correos,
-         c.nombre_factura,
-         c.nit,
-         (((c.nombres::text || ' '::text) || c.primer_apellido::text) || ' '::
-           text) || COALESCE(c.segundo_apellido, ''::character varying)::text AS
-           nombre_completo,
-         COALESCE(c.lugar,'')::varchar as lugar
-  FROM vef.tcliente c;
-
-ALTER TABLE vef.vcliente
-  OWNER TO postgres;    
-
 
 /************************************F-DEP-JRR-VEF-0-28/10/2016*************************************************/
 
@@ -435,29 +426,10 @@ CREATE TRIGGER trig_tcliente
   EXECUTE PROCEDURE vef.f_trig_cliente();
   
   --------------- SQL ---------------
+-- object recreation
+DROP VIEW vef.vcliente;
 
-CREATE OR REPLACE VIEW vef.vcliente(
-    id_usuario_reg,
-    id_usuario_mod,
-    fecha_reg,
-    fecha_mod,
-    estado_reg,
-    id_usuario_ai,
-    usuario_ai,
-    id_cliente,
-    nombres,
-    primer_apellido,
-    segundo_apellido,
-    telefono_celular,
-    telefono_fijo,
-    otros_telefonos,
-    correo,
-    otros_correos,
-    nombre_factura,
-    nit,
-    nombre_completo,
-    lugar,
-    codigo)
+CREATE OR REPLACE VIEW vef.vcliente
 AS
   SELECT c.id_usuario_reg,
          c.id_usuario_mod,

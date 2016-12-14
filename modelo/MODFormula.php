@@ -158,7 +158,7 @@ class MODFormula extends MODbase{
                 //Define los parametros para la funcion
                 $this->setParametro('id_producto', 'id_producto', 'int4');
                 $this->setParametro('id_formula', 'id_formula', 'int4');
-                $this->setParametro('cantidad_det', 'cantidad', 'int4'); 
+                $this->setParametro('cantidad_det', 'cantidad', 'numeric'); 
 				$this->setParametro('tipo', 'tipo', 'varchar');                
                 
                 //Ejecuta la instruccion

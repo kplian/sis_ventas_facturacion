@@ -211,7 +211,7 @@ CREATE TABLE vef.tdosificacion (
   fecha_dosificacion DATE NOT NULL,  
   fecha_inicio_emi DATE,
   fecha_limite DATE,  
-  id_actividad_economica INTEGER[] NOT NULL,
+  id_activida_economica INTEGER[] NOT NULL,
   glosa_impuestos VARCHAR(150),  
   glosa_empresa VARCHAR(150),  
   nro_siguiente INTEGER,
@@ -457,11 +457,29 @@ CREATE TABLE vef.tproceso_venta (
   CONSTRAINT pk_tproceso_venta PRIMARY KEY(id_proceso_venta)
 ) INHERITS (pxp.tbase);
   
-/************************************F-SCP-JRR-VEF-0-22/03/2016*************************************************/ç
+/************************************F-SCP-JRR-VEF-0-22/03/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-29/03/2016*************************************************/
+
+ALTER TABLE vef.tsucursal_producto
+  ADD COLUMN contabilizable VARCHAR(2) DEFAULT 'no' NOT NULL;
+  
+ALTER TABLE vef.tsucursal_producto
+  ADD COLUMN excento VARCHAR(2) DEFAULT 'no' NOT NULL;
+  
+CREATE TABLE vef.tventa_boleto (
+  id_venta_boleto SERIAL,
+  id_venta INTEGER NOT NULL,
+  id_boleto INTEGER,
+  nro_boleto VARCHAR(20) NOT NULL,
+  monto_moneda_susursal NUMERIC(18,2),  
+  CONSTRAINT pk_tventa_boleto PRIMARY KEY(id_venta_boleto)
+) INHERITS (pxp.tbase);
+  
+/************************************F-SCP-JRR-VEF-0-29/03/2016*************************************************/
 
 
-
-/************************************I-SCP-RAC-VEF-0-16/04/2016*************************************************/ç
+/************************************I-SCP-RAC-VEF-0-16/04/2016*************************************************/
 
 --------------- SQL ---------------
 
@@ -548,11 +566,6 @@ COMMENT ON COLUMN vef.tventa.tipo_cambio_venta
 IS 'solo si la trasaccion se define en una moneda diferetne de la base';
 
 
-/************************************F-SCP-RAC-VEF-0-16/04/2016*************************************************/ç
-
-
-
-/************************************I-SCP-RAC-VEF-0-16/04/2016*************************************************/ç
 -------------- SQL ---------------
 
 ALTER TABLE vef.tcliente
@@ -561,10 +574,10 @@ ALTER TABLE vef.tcliente
 COMMENT ON COLUMN vef.tcliente.direccion
 IS 'direccion del cliente';
 
-/************************************F-SCP-RAC-VEF-0-16/04/2016*************************************************/ç
+/************************************F-SCP-RAC-VEF-0-16/04/2016*************************************************/
 
 
-/************************************I-SCP-RAC-VEF-0-22/04/2016*************************************************/ç
+/************************************I-SCP-RAC-VEF-0-22/04/2016*************************************************/
 
 
 --------------- SQL ---------------
@@ -643,10 +656,10 @@ ALTER TABLE vef.tventa_detalle
 COMMENT ON COLUMN vef.tventa_detalle.kg_fino
 IS 'atributo para mineria';
 
-/************************************F-SCP-RAC-VEF-0-22/04/2016*************************************************/ç
+/************************************F-SCP-RAC-VEF-0-22/04/2016*************************************************/
 
 
-/************************************I-SCP-RAC-VEF-0-29/04/2016*************************************************/ç
+/************************************I-SCP-RAC-VEF-0-29/04/2016*************************************************/
 
 
 
@@ -703,12 +716,12 @@ ALTER TABLE vef.tsucursal
   ADD COLUMN id_depto INTEGER;
 
 
-/************************************F-SCP-RAC-VEF-0-29/04/2016*************************************************/ç
+/************************************F-SCP-RAC-VEF-0-29/04/2016*************************************************/
 
 
 
 
-/************************************I-SCP-RAC-VEF-0-12/05/2016*************************************************/ç
+/************************************I-SCP-RAC-VEF-0-12/05/2016*************************************************/
 
 --------------- SQL ---------------
 
@@ -718,21 +731,15 @@ ALTER TABLE vef.tventa_detalle
 --------------- SQL ---------------
 
 ALTER TABLE vef.tventa_detalle
-  ALTER COLUMN precio_sin_descuento TYPE NUMERIC(18,6);
+  ALTER COLUMN precio_sin_descuento TYPE NUMERIC(18,6);  
   
-  
-
-/************************************F-SCP-RAC-VEF-0-12/05/2016*************************************************/ç
-
-/************************************I-SCP-JRR-VEF-0-12/05/2016*************************************************/ç
-
 ALTER TABLE vef.tsucursal
   ADD COLUMN nombre_comprobante VARCHAR ;
   
 COMMENT ON COLUMN vef.tsucursal.nombre_comprobante
 IS 'El nombre de la sucursal tal como se mostrara en el comprobante de venta. Debe incluir el nombre de la empresa';
 
-/************************************F-SCP-JRR-VEF-0-12/05/2016*************************************************/ç
+/************************************F-SCP-JRR-VEF-0-12/05/2016*************************************************/
 
 
 CREATE INDEX tdosificacion_idx ON vef.tdosificacion
@@ -741,7 +748,7 @@ CREATE INDEX tdosificacion_idx ON vef.tdosificacion
 
 
 
-/************************************I-SCP-RAC-VEF-0-16/05/2016*************************************************/ç
+/************************************I-SCP-RAC-VEF-0-16/05/2016*************************************************/
 
 
 ALTER TABLE vef.tventa
@@ -759,10 +766,10 @@ COMMENT ON COLUMN vef.tventa.descripcion_bulto
 IS 'descripon de bultos en exportacion';
 
 
-/************************************F-SCP-RAC-VEF-0-16/05/2016*************************************************/ç
+/************************************F-SCP-RAC-VEF-0-16/05/2016*************************************************/
 
 
-/************************************I-SCP-RAC-VEF-0-06/06/2016*************************************************/ç
+/************************************I-SCP-RAC-VEF-0-06/06/2016*************************************************/
 
 
 --------------- SQL ---------------
@@ -770,18 +777,114 @@ IS 'descripon de bultos en exportacion';
 ALTER TABLE vef.tvalor_descripcion
   ADD COLUMN valor_label VARCHAR(300);
 
+/************************************F-SCP-RAC-VEF-0-06/06/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-16/06/2016*************************************************/
+ALTER TABLE vef.tforma_pago
+  ADD COLUMN registrar_tipo_tarjeta VARCHAR(2);
+
+ALTER TABLE vef.tforma_pago
+  ALTER COLUMN registrar_tipo_tarjeta SET DEFAULT 'no';
+
+/************************************F-SCP-JRR-VEF-0-16/06/2016*************************************************/
 
 
-/************************************F-SCP-RAC-VEF-0-06/06/2016*************************************************/ç
+/************************************I-SCP-JRR-VEF-0-07/07/2016*************************************************/
 
-/************************************I-SCP-JRR-VEF-0-14/09/2016*************************************************/ç
+CREATE TABLE vef.tapertura_cierre_caja (
+  id_apertura_cierre_caja SERIAL NOT NULL,
+  id_sucursal INTEGER,
+  id_punto_venta INTEGER,
+  id_usuario_cajero INTEGER NOT NULL,
+  id_moneda INTEGER NOT NULL,
+  monto_inicial INTEGER DEFAULT 0 NOT NULL,
+  monto_inicial_moneda_extranjera INTEGER DEFAULT 0 NOT NULL,
+  obs_cierre TEXT,
+  obs_apertura TEXT,
+  estado VARCHAR(50) NOT NULL,
+  fecha_hora_cierre TIMESTAMP,
+  fecha_apertura_cierre DATE NOT NULL,
+  arqueo_moneda_local NUMERIC(18,2),
+  arqueo_moneda_extranjera NUMERIC(18,2) DEFAULT 0,
+  PRIMARY KEY(id_apertura_cierre_caja)
+) INHERITS (pxp.tbase);
+
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_usuario_cajero INTEGER;
+
+/************************************F-SCP-JRR-VEF-0-07/07/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-30/09/2016*************************************************/
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial DROP DEFAULT;
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial TYPE NUMERIC(18,2);
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial SET DEFAULT 0;
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial_moneda_extranjera DROP DEFAULT;
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial_moneda_extranjera TYPE NUMERIC(18,2);
+
+ALTER TABLE vef.tapertura_cierre_caja
+  ALTER COLUMN monto_inicial_moneda_extranjera SET DEFAULT 0;
+
+
+/************************************F-SCP-JRR-VEF-0-30/09/2016*************************************************/
+
+/************************************I-SCP-RAC-VEF-0-18/06/2016*************************************************/
+
+
+ALTER TABLE vef.tcliente
+  ADD COLUMN observaciones VARCHAR(255);
+
+/************************************F-SCP-RAC-VEF-0-18/06/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-16/07/2016*************************************************/
+
+ALTER TABLE vef.tventa
+  ADD COLUMN hora_estimada_entrega TIME(0) WITHOUT TIME ZONE;
+  
+ALTER TABLE vef.tformula_detalle
+  ALTER COLUMN cantidad TYPE NUMERIC(18,6);
+
+/************************************F-SCP-JRR-VEF-0-16/07/2016*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-14/08/2016*************************************************/
+ALTER TABLE vef.tmedico
+  ADD COLUMN especialidad VARCHAR(200);
+  
+ALTER TABLE vef.tventa
+  ADD COLUMN forma_pedido VARCHAR(200);
+
+/************************************F-SCP-JRR-VEF-0-14/08/2016*************************************************/
+
+
+/************************************I-SCP-JRR-VEF-0-27/10/2016*************************************************/
+
+ALTER TABLE vef.tsucursal_usuario
+ALTER COLUMN id_sucursal DROP NOT NULL;
+
+ALTER TABLE vef.tventa
+ADD COLUMN contabilizable VARCHAR(2) DEFAULT 'si' NOT NULL;
+
+/************************************F-SCP-JRR-VEF-0-27/10/2016*************************************************/
+
+
+
+/************************************I-SCP-JRR-VEF-0-14/09/2016*************************************************/
 
 ALTER TABLE vef.tventa
   ADD COLUMN nombre_factura VARCHAR(100);
 
 ALTER TABLE vef.tventa
   ADD COLUMN nit VARCHAR(25);
-/************************************F-SCP-JRR-VEF-0-14/09/2016*************************************************/ç
+/************************************F-SCP-JRR-VEF-0-14/09/2016*************************************************/
 
 /************************************I-SCP-JRR-VEF-0-18/09/2016*************************************************/
 
@@ -790,6 +893,7 @@ CREATE INDEX tdosificacion_idx ON vef.tdosificacion
   WHERE estado_reg = 'activo';
   
 /************************************F-SCP-JRR-VEF-0-18/09/2016*************************************************/
+
 
 
 
@@ -848,8 +952,5 @@ ALTER TABLE vef.tcliente
   
 
 /************************************F-SCP-RAC-VEF-0-11/11/2016*************************************************/
-
-
-
 
 

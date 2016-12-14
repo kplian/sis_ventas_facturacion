@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_cliente_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -68,7 +66,11 @@ BEGIN
                 id_usuario_mod,
                 fecha_mod,
                 direccion,
-                lugar
+
+                lugar,
+
+                observaciones
+
           	) values(
                 v_parametros.correo,
                 v_parametros.telefono_fijo,
@@ -88,7 +90,10 @@ BEGIN
                 null,
                 null,
                 v_parametros.direccion,
-                v_parametros.lugar
+
+                v_parametros.lugar,
+
+                v_parametros.observaciones
 							
 			)RETURNING id_cliente into v_id_cliente;
 			
@@ -128,7 +133,11 @@ BEGIN
               id_usuario_ai = v_parametros._id_usuario_ai,
               usuario_ai = v_parametros._nombre_usuario_ai,
               direccion = v_parametros.direccion,
-              lugar = v_parametros.lugar
+
+              lugar = v_parametros.lugar,
+
+              observaciones = v_parametros.observaciones
+
 			where id_cliente=v_parametros.id_cliente;
                
 			--Definicion de la respuesta

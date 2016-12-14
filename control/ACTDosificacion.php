@@ -36,19 +36,21 @@ class ACTDosificacion extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-				
-	function insertarDosificacion(){
-        $this->objParam->addParametro('llave',str_replace('\\','\\\\',$this->objParam->getParametro('llave')));
-		$this->objFunc=$this->create('MODDosificacion');
 
-		
-		if($this->objParam->insertar('id_dosificacion')){
-			$this->res=$this->objFunc->insertarDosificacion($this->objParam);
-		} else{			
-			$this->res=$this->objFunc->modificarDosificacion($this->objParam);
-		}
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
+    function insertarDosificacion(){
+        if ($_SESSION["encriptar_data"] == 'no') {
+            $this->objParam->addParametro('llave', str_replace('\\', '\\\\', $this->objParam->getParametro('llave')));
+        }
+        $this->objFunc=$this->create('MODDosificacion');
+
+
+        if($this->objParam->insertar('id_dosificacion')){
+            $this->res=$this->objFunc->insertarDosificacion($this->objParam);
+        } else{
+            $this->res=$this->objFunc->modificarDosificacion($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 						
 	function eliminarDosificacion(){
 			$this->objFunc=$this->create('MODDosificacion');	

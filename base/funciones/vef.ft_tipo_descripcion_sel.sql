@@ -114,4 +114,3 @@ END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE
 COST 100;
-ALTER FUNCTION "vef"."ft_tipo_descripcion_sel"(integer, integer, character varying, character varying) OWNER TO postgres;

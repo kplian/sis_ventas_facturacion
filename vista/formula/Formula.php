@@ -269,7 +269,7 @@ Phx.vista.Formula=Ext.extend(Phx.gridInterfaz,{
 	],
 	sortInfo:{
 		field: 'id_formula',
-		direction: 'ASC'
+		direction: 'DESC'
 	},
 	
     /*south : {
