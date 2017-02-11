@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION vef.f_trig_tdosificacion (
+CREATE OR REPLACE FUNCTION vef.f_trig_tdosificacion(
 )
 RETURNS trigger AS
 $body$
