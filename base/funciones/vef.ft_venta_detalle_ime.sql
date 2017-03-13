@@ -341,6 +341,38 @@ $body$
 
       end;
 
+    /*********************************    
+ 	#TRANSACCION:  'VF_VEDETACT_MOD'
+ 	#DESCRIPCION:	modifica dastos de pediso, obs, estado , serie
+ 	#AUTOR:		rac	
+ 	#FECHA:		01-06-2015 09:21:07
+	***********************************/
+
+	elsif(p_transaccion='VF_VEDETACT_MOD')then
+
+		begin
+        	
+            
+            
+           update vef.tventa_detalle set            
+              serie=v_parametros.serie,
+              obs = v_parametros.obs,
+              estado = v_parametros.estado
+            where id_venta_Detalle = v_parametros.id_venta_detalle;
+			
+          
+            
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de Venta modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_venta_detalle',v_parametros.id_venta_detalle::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;
+        
+        
+         
     else
 
       raise exception 'Transaccion inexistente: %',p_transaccion;

@@ -81,7 +81,11 @@ BEGIN
                         sprod.excento,
 						um.id_unidad_medida,
                         um.codigo as desc_unidad_medida,
-                        cig.nandina	
+                        cig.nandina,
+                        COALESCE(cig.ruta_foto,'''')::varchar as ruta_foto,
+                        cig.codigo 
+			
+                        
 						from vef.tsucursal_producto sprod
 						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						
 						left join segu.tusuario usu2 on usu2.id_usuario = sprod.id_usuario_mod
@@ -186,7 +190,8 @@ BEGIN
                                             ''''::varchar as medico,
                                             sp.requiere_descripcion,
                                             um.id_unidad_medida,
-                                            um.codigo as codigo_unidad_medida
+                                            um.codigo as codigo_unidad_medida,
+                                           ''''::varchar as ruta_foto
 									from alm.titem it 
 									inner join vef.tsucursal_producto sp on sp.id_item = it.id_item
                                     left join param.tunidad_medida um on um.id_unidad_medida = it.id_unidad_medida
@@ -199,7 +204,8 @@ BEGIN
 											(it.codigo || '' - '' || it.nombre)::varchar as nombre, it.descripcion::text,it.precio_ref as precio,''''::varchar as medico,
                                              ''''::varchar as requiere_descripcion,
                                             um.id_unidad_medida,
-                                            um.codigo as codigo_unidad_medida
+                                            um.codigo as codigo_unidad_medida,
+                                            ''''::varchar as ruta_foto
 									from alm.titem it 
                                     left join param.tunidad_medida um on um.id_unidad_medida = it.id_unidad_medida									
 									where it.estado_reg = ''activo'' and
@@ -231,7 +237,8 @@ BEGIN
 											sp.contabilizable,
 											sp.excento,
 											um.id_unidad_medida,
-                                            um.codigo as codigo_unidad_medida
+                                            um.codigo as codigo_unidad_medida,
+                                            COALESCE(cig.ruta_foto,'''')::varchar as ruta_foto
 																		from vef.tsucursal_producto sp
 									' || v_join || '
 									inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sp.id_concepto_ingas
@@ -268,7 +275,8 @@ BEGIN
 										''''::varchar as contabilizable,
 										''''::varchar as excento,
 										um.id_unidad_medida,
-                                        um.codigo as codigo_unidad_medida
+                                        um.codigo as codigo_unidad_medida,
+                                        ''''::varchar as ruta_foto
 								from vef.tformula form
 								left join vef.vmedico med on med.id_medico = form.id_medico
 								inner join vef.tformula_detalle fd on fd.id_formula = form.id_formula
@@ -293,7 +301,8 @@ BEGIN
 													todo.contabilizable,
 													todo.excento,
 													todo.id_unidad_medida,
-                                                   todo.codigo_unidad_medida
+                                                   todo.codigo_unidad_medida,
+                                                   todo.ruta_foto
 											from tabla_temporal todo
 											where ';
 			
@@ -575,4 +584,3 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
-COST 100;

@@ -127,6 +127,7 @@ VALUES (E'vef_tiene_apertura_cierre', E'no', E'Si el sistema de ventas controlar
 
 /***********************************I-DAT-JRR-VEF-0-27/10/2016*****************************************/
 
+
 select wf.f_import_tproceso_macro ('insert','VEN', 'VEF', 'Sistema de Ventas','si');
 select wf.f_import_tcategoria_documento ('insert','legales', 'Legales');
 select wf.f_import_tcategoria_documento ('insert','proceso', 'Proceso');
@@ -139,4 +140,25 @@ select wf.f_import_testructura_estado ('insert','borrador','finalizado','VEN',1,
 select wf.f_import_tfuncionario_tipo_estado ('insert','borrador','VEN','3483198',NULL,'');
 select wf.f_import_tfuncionario_tipo_estado ('insert','finalizado','VEN','2738127',NULL,'');
 
+
 /***********************************F-DAT-JRR-VEF-0-27/10/2016*****************************************/
+
+/***********************************I-DAT-RAC-VEF-0-11/11/2016*****************************************/
+
+----------------------------------
+--COPY LINES TO SUBSYSTEM data.sql FILE  
+---------------------------------
+
+select param.f_import_tcatalogo_tipo ('insert','estado_detalle','VEF','tventa_detalle');
+select param.f_import_tcatalogo ('insert','VEF','registrado','registrado','estado_detalle');
+select param.f_import_tcatalogo ('insert','VEF','comprado','comprado','estado_detalle');
+select param.f_import_tcatalogo ('insert','VEF','finalizado','finalizado','estado_detalle');
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'vef_codigo_cliente', E'false', E'habilita la generacion de codigo automatico al insertar clientes');
+
+/***********************************F-DAT-RAC-VEF-0-11/11/2016*****************************************/
+
+

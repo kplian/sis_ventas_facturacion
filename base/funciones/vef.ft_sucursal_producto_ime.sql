@@ -87,7 +87,10 @@ BEGIN
                       end),
                       id_entidad = v_id_entidad,
                       descripcion_larga = v_parametros.descripcion_producto,
-                      id_actividad_economica = v_parametros.id_actividad_economica
+                      id_actividad_economica = v_parametros.id_actividad_economica,
+                      id_unidad_medida = v_parametros.id_unidad_medida,
+                      nandina = v_parametros.nandina,
+                      codigo = v_parametros.codigo
                     where id_concepto_ingas = v_id_concepto;
                 else
                     --insertar el concepto de gasto
@@ -106,7 +109,8 @@ BEGIN
                       descripcion_larga,
                       id_actividad_economica,
                       id_unidad_medida,
-                      nandina
+                      nandina,
+                      codigo
                     )
                     VALUES (
                       p_id_usuario,                  
@@ -125,13 +129,15 @@ BEGIN
                       v_parametros.descripcion_producto,
                       v_parametros.id_actividad_economica,
                       v_parametros.id_unidad_medida,
-                      v_parametros.nandina
+                      v_parametros.nandina,
+                      v_parametros.codigo
                     ) returning id_concepto_ingas into v_id_concepto;
                 end if;
             end if;
             
         	--Sentencia de la insercion
         	insert into vef.tsucursal_producto(
+
 			id_sucursal,
 			id_item,			
 			precio,			
@@ -165,6 +171,7 @@ BEGIN
             v_parametros.id_moneda,
             v_parametros.contabilizable,
             v_parametros.excento	
+
 			)RETURNING id_sucursal_producto into v_id_sucursal_producto;
 			
 			--Definicion de la respuesta
@@ -244,7 +251,8 @@ BEGIN
                           descripcion_larga = v_parametros.descripcion_producto,
                           id_actividad_economica = v_parametros.id_actividad_economica,
                           id_unidad_medida = v_parametros.id_unidad_medida,
-                          nandina = v_parametros.nandina
+                          nandina = v_parametros.nandina,
+                          codigo = v_parametros.codigo
                         where id_concepto_ingas = v_id_concepto;
                     else                    
                     

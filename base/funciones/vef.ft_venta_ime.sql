@@ -99,6 +99,7 @@ $body$
     v_valor_bruto			numeric;
     v_descripcion_bulto		varchar;
     v_nombre_factura		varchar;
+    v_id_cliente_destino    integer;	
 
     v_tabla					varchar;
     v_ventas				varchar;
@@ -349,6 +350,37 @@ $body$
           v_nombre_factura = v_parametros.id_cliente;
 
         end if;
+        
+        v_id_cliente_destino = null;
+        --si tenemos cliente destino
+        if v_tipo_factura = 'pedido' then
+                 if (pxp.f_is_positive_integer(v_parametros.id_cliente_destino)) THEN
+                    v_id_cliente_destino = v_parametros.id_cliente_destino::integer;
+                  else
+                	
+                    INSERT INTO 
+                      vef.tcliente
+                    (
+                      id_usuario_reg,              
+                      fecha_reg,              
+                      estado_reg, 
+                      nombre_factura
+                    )
+                    VALUES (
+                      p_id_usuario,
+                      now(),
+                      'activo',              
+                      v_parametros.id_cliente
+                    ) returning id_cliente into v_id_cliente_destino;
+                    
+                	
+                end if;
+        end if; 
+        
+        
+        
+        
+        
         --obtener gestion a partir de la fecha actual
         select id_gestion into v_id_gestion
         from param.tgestion
@@ -405,7 +437,6 @@ $body$
 
 
 
-
         --Sentencia de la insercion
         insert into vef.tventa(
           id_venta,
@@ -448,6 +479,7 @@ $body$
           descripcion_bulto,
           nit,
           nombre_factura,
+          id_cliente_destino,
           hora_estimada_entrega,
           tiene_formula,
           forma_pedido
@@ -490,19 +522,19 @@ $body$
           COALESCE(v_transporte_cif,0),
           COALESCE(v_seguros_cif,0),
           COALESCE(v_otros_cif,0),
-          COALESCE(v_tipo_cambio_venta,0)	,
+          COALESCE(v_tipo_cambio_venta,0),
           COALESCE(v_valor_bruto,0),
           COALESCE(v_descripcion_bulto,''),
           v_parametros.nit,
           v_nombre_factura,
-
+          v_id_cliente_destino,
           v_hora_estimada_entrega,
           v_tiene_formula,
           v_forma_pedido
 
 
         ) returning id_venta into v_id_venta;
-
+        
         if (v_parametros.id_forma_pago != 0 ) then
 
           insert into vef.tventa_forma_pago(
@@ -740,8 +772,35 @@ $body$
           v_nombre_factura = v_parametros.id_cliente;
         end if;
 
+             v_id_cliente_destino = null;
 
+            --si tenemos cliente destino
+           if v_tipo_factura = 'pedido' then
+                 if (pxp.f_is_positive_integer(v_parametros.id_cliente_destino)) THEN
+                    v_id_cliente_destino = v_parametros.id_cliente_destino::integer;
+                  else
 
+                    INSERT INTO 
+                      vef.tcliente
+                    (
+                      id_usuario_reg,              
+                      fecha_reg,              
+                      estado_reg, 
+                      nombre_factura
+                    )
+                    VALUES (
+                      p_id_usuario,
+                      now(),
+                      'activo',              
+                      v_parametros.id_cliente
+                    ) returning id_cliente into v_id_cliente_destino;
+                    
+                	
+                end if;
+           end if; 
+	        
+	        
+	        
         --Sentencia de la modificacion
         update vef.tventa set
           id_cliente = v_id_cliente,
@@ -780,7 +839,8 @@ $body$
           valor_bruto = COALESCE(v_valor_bruto,0),
           descripcion_bulto = COALESCE(v_descripcion_bulto,''),
           nit = v_parametros.nit,
-          nombre_factura = v_nombre_factura
+              nombre_factura = v_nombre_factura ,
+              id_cliente_destino = v_id_cliente_destino
         where id_venta=v_parametros.id_venta;
 
 
@@ -994,14 +1054,14 @@ $body$
         end if;
 
         --Validar que si el excento no es 0 que haya un concepto que tenga excento
-        if (v_cantidad = 0 and v_venta.excento > 0) then
+        if (v_cantidad = 0 and v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin') and v_venta.excento > 0) then
           raise exception 'No tiene ningun concepto que requiera excento. El excento no puede ser mayor a 0 para esta venta';
         end if;
 
         --Validar que el excento no es mayor que el valor total de la venta
 
-        if (v_venta.excento >= v_venta.total_venta) then
-          raise exception 'El importe excento no puede ser mayor o igual al total de la venta';
+        if (v_venta.excento > v_venta.total_venta_msuc) then
+          raise exception 'El importe excento no puede ser mayor al total de la venta%,%',v_venta.excento,v_venta.total_venta;
         end if;
 
         --si es un estado para validar la forma de pago
@@ -1468,7 +1528,7 @@ $body$
           --genera el numero de factura
 
           IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
-
+			
             select d.* into v_dosificacion
             from vef.tdosificacion d
             where d.estado_reg = 'activo' and d.fecha_inicio_emi <= v_venta.fecha and
