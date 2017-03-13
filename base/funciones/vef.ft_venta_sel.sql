@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -519,7 +517,8 @@ BEGIN
                         to_char(ven.fecha,''DD/MM/YYYY'')::varchar,
                         ven.correlativo_venta,
                         mon.codigo_internacional as moneda,
-                        ven.total_venta,                                              
+                        ven.total_venta,    
+                        ven.total_venta - coalesce(ven.excento,0),                                            
                         pxp.f_convertir_num_a_letra(ven.total_venta) as total_venta_literal,
                         ven.observaciones,
                         ven.nombre_factura,

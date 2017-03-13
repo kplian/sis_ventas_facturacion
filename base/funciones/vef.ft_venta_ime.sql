@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
-  $body$
+RETURNS varchar AS
+$body$
   /**************************************************************************
    SISTEMA:		Sistema de Ventas
    FUNCION: 		vef.ft_venta_ime
@@ -436,7 +436,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
 
 
 
-
+		--raise exception '%',v_excento;
 
         --Sentencia de la insercion
         insert into vef.tventa(
@@ -534,7 +534,9 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
           v_forma_pedido
 
 
-        ) returning id_venta into v_id_venta;
+        ) returning id_venta,excento into v_id_venta,v_excento;
+        
+        
 
         if (v_parametros.id_forma_pago != 0 ) then
 
@@ -1055,14 +1057,14 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
         end if;
 
         --Validar que si el excento no es 0 que haya un concepto que tenga excento
-        if (v_cantidad = 0 and v_venta.excento > 0) then
+        if (v_cantidad = 0 and v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin') and v_venta.excento > 0) then
           raise exception 'No tiene ningun concepto que requiera excento. El excento no puede ser mayor a 0 para esta venta';
         end if;
 
         --Validar que el excento no es mayor que el valor total de la venta
 
-        if (v_venta.excento >= v_venta.total_venta) then
-          raise exception 'El importe excento no puede ser mayor o igual al total de la venta';
+        if (v_venta.excento > v_venta.total_venta_msuc) then
+          raise exception 'El importe excento no puede ser mayor al total de la venta%,%',v_venta.excento,v_venta.total_venta;
         end if;
 
         --si es un estado para validar la forma de pago
@@ -1507,6 +1509,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
         if (v_venta.tipo_base = 'computarizada' and v_es_fin = 'si') then
 
           IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
+           
             v_fecha_venta = now()::date;
             if (EXISTS(	select 1
                          from vef.tventa v
@@ -1515,6 +1518,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
               raise exception 'Existen facturas emitidas con fechas posterior a la actual. Por favor revise la fecha y hora del sistema';
             end if;
           ELSE
+          	
             v_fecha_venta = v_venta.fecha;
           --no validamos la fecha en las facturas de exportacion
           --por que  valida al insertar la factura, donde se genera el nro de la factura
@@ -1529,7 +1533,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
           --genera el numero de factura
 
           IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
-
+			
             select d.* into v_dosificacion
             from vef.tdosificacion d
             where d.estado_reg = 'activo' and d.fecha_inicio_emi <= v_venta.fecha and
@@ -1758,7 +1762,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
       raise exception '%',v_resp;
 
   END;
-  $body$
+$body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT

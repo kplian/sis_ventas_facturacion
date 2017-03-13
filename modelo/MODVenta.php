@@ -694,7 +694,13 @@ class MODVenta extends MODbase{
 		
 		$this->captura('valor_bruto','numeric');
 		$this->captura('descripcion_bulto','varchar');
-		$this->captura('nro_tramite','varchar');
+        $this->captura('telefono_cliente','varchar');
+        $this->captura('fecha_hora_entrega','varchar');
+        $this->captura('a_cuenta','numeric');
+        $this->captura('medico_vendedor','varchar');
+
+
+        $this->captura('nro_tramite','varchar');
 		$this->captura('codigo_cliente','varchar');
 		
 			
@@ -704,11 +710,9 @@ class MODVenta extends MODbase{
 		
 		
 		
-		$this->captura('telefono_cliente','varchar');
-		$this->captura('fecha_hora_entrega','varchar');
-		$this->captura('a_cuenta','numeric');
 
-        $this->captura('medico_vendedor','varchar');
+
+
 		
 		
 		//Ejecuta la instruccion
