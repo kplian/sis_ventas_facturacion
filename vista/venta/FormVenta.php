@@ -570,8 +570,11 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         
         var cmb_rec = this.detCmp['id_producto'].store.getById(rec.get('id_producto'));
         if(cmb_rec) {
-            
-            rec.set('nombre_producto', cmb_rec.get('nombre_producto') + ' (' + cmb_rec.get('codigo_unidad_medida') + ')'); 
+            if (cmb_rec.get('codigo_unidad_medida')) {
+                rec.set('nombre_producto', cmb_rec.get('nombre_producto') + ' (' + cmb_rec.get('codigo_unidad_medida') + ')');
+            } else {
+                rec.set('nombre_producto', cmb_rec.get('nombre_producto'));
+            }
         }
                      
        
@@ -989,7 +992,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 
         this.mestore.commitChanges();
     },
-    onInitAdd : function (r, i) {  
+    onInitAdd : function (r, i) {
+
     	if(this.data.readOnly===true){
     		return false
     	}      
@@ -999,6 +1003,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         var recTem = new Array();
         recTem['id_producto'] = record.data['id_producto'];
         recTem['nombre_producto'] = record.data['nombre_producto'];
+
         
         this.detCmp.id_producto.store.add(new Ext.data.Record(this.arrayToObject(this.detCmp.id_producto.store.fields.keys,recTem), record.data['id_producto']));
         this.detCmp.id_producto.store.commitChanges();
@@ -1380,21 +1385,6 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             id_grupo : 0,            
             form : true
         },
-
-        {
-            config:{
-                name: 'nit',
-                fieldLabel: 'NIT',
-                allowBlank: false,
-                anchor: '80%',                
-                maxLength:20
-            },
-                type:'NumberField',                
-                id_grupo:0,                
-                form:true,
-                valorInicial:'0'
-        }, 
-
         
         {
 			config:{
@@ -1735,7 +1725,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     onEdit:function(){
         
     	this.accionFormulario = 'EDIT';   
-    	console.log(this.data.datos_originales); 	
+
     	this.loadForm(this.data.datos_originales);    	
     	
         //load detalle de conceptos

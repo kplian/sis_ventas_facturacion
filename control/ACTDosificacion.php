@@ -38,9 +38,6 @@ class ACTDosificacion extends ACTbase{
 	}
 
     function insertarDosificacion(){
-        if ($_SESSION["encriptar_data"] == 'no') {
-            $this->objParam->addParametro('llave', str_replace('\\', '\\\\', $this->objParam->getParametro('llave')));
-        }
         $this->objFunc=$this->create('MODDosificacion');
 
 

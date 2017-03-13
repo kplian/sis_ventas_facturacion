@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
-  $body$
+RETURNS varchar AS
+$body$
   /**************************************************************************
    SISTEMA:		Sistema de Ventas
    FUNCION: 		vef.ft_venta_detalle_ime
@@ -208,7 +208,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
         where id_venta = v_parametros.id_venta;
 
         --verificar si existe el sistema obingresos, si existe actualizar el ib_boleto
-        if ( (v_descripcion != '' and v_descripcion is not null) and
+        if ( (v_descripcion != '' and v_descripcion is not null and pxp.f_is_positive_integer(v_descripcion)) and
              exists (
                  select 1
                  from segu.tsubsistema s
@@ -258,7 +258,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
 
 
         --verificar si existe el sistema obingresos, si existe actualizar el ib_boleto
-        if ((v_parametros.descripcion != '' and v_parametros.descripcion is not null) and
+        if ((v_parametros.descripcion != '' and v_parametros.descripcion is not null and pxp.f_is_positive_integer(v_descripcion)) and
             exists (
                 select 1
                 from segu.tsubsistema s
@@ -357,7 +357,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
       raise exception '%',v_resp;
 
   END;
-  $body$
+$body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT

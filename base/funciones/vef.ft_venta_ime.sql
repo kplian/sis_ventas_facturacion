@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
-  $body$
+RETURNS varchar AS
+$body$
   /**************************************************************************
    SISTEMA:		Sistema de Ventas
    FUNCION: 		vef.ft_venta_ime
@@ -447,7 +447,10 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
           valor_bruto,
           descripcion_bulto,
           nit,
-          nombre_factura
+          nombre_factura,
+          hora_estimada_entrega,
+          tiene_formula,
+          forma_pedido
 
 
         ) values(
@@ -1666,7 +1669,8 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
         select pxp.list_unique(v.correlativo_venta || '<br>') into v_ventas
         from vef.tventa_detalle vd
           inner join vef.tventa v on v.id_venta = vd.id_venta
-        where vd.descripcion is not null and vd.id_boleto is null and
+        where vd.descripcion is not null and vd.id_boleto is null 
+        		and pxp.f_is_positive_integer(vd.descripcion) and
               v.estado = 'finalizado' and vd.descripcion != ''  and vd.estado_reg = 'activo' and v.id_punto_venta = v_parametros.id_punto_venta
               and v.tipo_factura = v_parametros.tipo_factura;
         --Definicion de la respuesta
@@ -1694,7 +1698,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
       raise exception '%',v_resp;
 
   END;
-  $body$
+$body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT

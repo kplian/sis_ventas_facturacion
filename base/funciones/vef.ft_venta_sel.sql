@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
-  $body$
+RETURNS varchar AS
+$body$
   /**************************************************************************
    SISTEMA:		Sistema de Ventas
    FUNCION: 		vef.ft_venta_sel
@@ -191,7 +191,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
                         mon.moneda as desc_moneda,
                         ven.valor_bruto,
                         ven.descripcion_bulto,
-                        ven.contabilizable
+                        ven.contabilizable,
                         
                         to_char(ven.hora_estimada_entrega,''HH24:MI'')::varchar,
                         mu.nombre as vendedor_medico,
@@ -637,7 +637,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
       v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
       raise exception '%',v_resp;
   END;
-  $body$
+$body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT

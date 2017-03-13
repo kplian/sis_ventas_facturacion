@@ -36,6 +36,7 @@ DECLARE
     v_id_vendedor				integer;
     v_id_medico					integer;
     v_filtro					varchar;
+    v_id_sucursal				integer;
 			    
 BEGIN
 
@@ -160,7 +161,7 @@ BEGIN
     			inner join vef.tsucursal_moneda sucmon on sucmon.id_sucursal = suc.id_sucursal 
     										and sucmon.tipo_moneda = 'moneda_base'
     			where suc.id_sucursal = v_parametros.id_sucursal;
-    			
+    			v_filtro = ' spc.id_sucursal = ' || v_parametros.id_sucursal || ' and ';
     		end if;
             
             --verificar si existe vendedor o medico
@@ -259,8 +260,7 @@ BEGIN
                                 left join vef.tsucursal_producto spc on spc.id_concepto_ingas = fd.id_concepto_ingas 
                                 	and spc.estado_reg = ''activo'' 
                         		' || v_join || '
-								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo'' and spc.id_sucursal = ' 
-                                || v_parametros.id_sucursal || ' and ' || v_filtro ;
+								where form.estado_reg = ''activo'' and fd.estado_reg = ''activo'' and ' || v_filtro ;
                 
                 --Devuelve la respuesta
                 
