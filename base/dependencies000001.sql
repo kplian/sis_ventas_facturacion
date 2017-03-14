@@ -453,7 +453,7 @@ AS
 
 
 /************************************I-DEP-RCM-VEF-0-13/11/2016*************************************************/
-DROP VIEW vef.vproducto;
+DROP VIEW IF EXISTS vef.vproducto;
 
 CREATE VIEW vef.vproducto
 AS
