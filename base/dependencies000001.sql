@@ -467,3 +467,13 @@ AS
     on cing.id_concepto_ingas = sprod.id_concepto_ingas;
 
 /************************************F-DEP-RCM-VEF-0-13/11/2016*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-14/03/2017*************************************************/
+ALTER TABLE vef.tpunto_venta
+  ADD CONSTRAINT fk_tpunto_venta__id_sucursal FOREIGN KEY (id_sucursal)
+    REFERENCES vef.tsucursal(id_sucursal)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/************************************F-DEP-JRR-VEF-0-14/03/2017*************************************************/

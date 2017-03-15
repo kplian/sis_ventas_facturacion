@@ -1357,8 +1357,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             id_grupo : 0,            
             form : true
         },
-<<<<<<< HEAD
-=======
+
         {
             config:{
                 name: 'nit',
@@ -1422,7 +1421,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             form : false
         },
          
->>>>>>> 234825f07c2923e911bc9f7f18d5a1f1a5d15dd0
+
         
         {
 			config:{
