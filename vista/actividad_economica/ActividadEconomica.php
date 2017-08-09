@@ -11,10 +11,10 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.ActividadEconomica=Ext.extend(Phx.gridInterfaz,{
-
+    
 	constructor:function(config){
 		this.maestro=config.maestro;
-    	//llama al constructor de la clase padre
+    	//llama al constructor de la clase padre ...
 		Phx.vista.ActividadEconomica.superclass.constructor.call(this,config);
 		this.init();
 		this.load({params:{start:0, limit:this.tam_pag}})
