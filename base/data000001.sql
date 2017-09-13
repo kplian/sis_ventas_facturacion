@@ -161,4 +161,13 @@ VALUES
 
 /***********************************F-DAT-RAC-VEF-0-11/11/2016*****************************************/
 
+/***********************************I-DAT-JRR-VEF-0-17/03/2017*****************************************/
+
+select pxp.f_insert_tgui ('Ventas en Caja', 'Ventas en Caja', 'VEFCAJE', 'si', 8, 'sis_ventas_facturacion/vista/venta/VentaCaja.php', 3, '', 'VentaCaja', 'VEF');
+select pxp.f_insert_tgui ('Apertura de Caja', 'Apertura de Caja', 'VEFAPCIECAJ', 'si', 1, 'sis_ventas_facturacion/vista/apertura_cierre_caja/AperturaCierreCaja.php', 3, '', 'AperturaCierreCaja', 'VEF');
+select pxp.f_insert_testructura_gui ('VEFCAJE', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VEFAPCIECAJ', 'VENCARP');
+
+/***********************************F-DAT-JRR-VEF-0-17/03/2017*****************************************/
+
 
