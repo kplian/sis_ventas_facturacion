@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
-  $body$
+RETURNS varchar AS
+$body$
   /**************************************************************************
    SISTEMA:		Sistema de Ventas
    FUNCION: 		vef.ft_venta_detalle_ime
@@ -208,7 +208,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
         where id_venta = v_parametros.id_venta;
 
         --verificar si existe el sistema obingresos, si existe actualizar el ib_boleto
-        if ( (v_descripcion != '' and v_descripcion is not null) and
+        if ( (v_descripcion != '' and v_descripcion is not null and pxp.f_is_positive_integer(v_descripcion)) and
              exists (
                  select 1
                  from segu.tsubsistema s
@@ -258,7 +258,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
 
 
         --verificar si existe el sistema obingresos, si existe actualizar el ib_boleto
-        if ((v_parametros.descripcion != '' and v_parametros.descripcion is not null) and
+        if ((v_parametros.descripcion != '' and v_parametros.descripcion is not null and pxp.f_is_positive_integer(v_descripcion)) and
             exists (
                 select 1
                 from segu.tsubsistema s
@@ -341,6 +341,38 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
 
       end;
 
+    /*********************************    
+ 	#TRANSACCION:  'VF_VEDETACT_MOD'
+ 	#DESCRIPCION:	modifica dastos de pediso, obs, estado , serie
+ 	#AUTOR:		rac	
+ 	#FECHA:		01-06-2015 09:21:07
+	***********************************/
+
+	elsif(p_transaccion='VF_VEDETACT_MOD')then
+
+		begin
+        	
+            
+            
+           update vef.tventa_detalle set            
+              serie=v_parametros.serie,
+              obs = v_parametros.obs,
+              estado = v_parametros.estado
+            where id_venta_Detalle = v_parametros.id_venta_detalle;
+			
+          
+            
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de Venta modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_venta_detalle',v_parametros.id_venta_detalle::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;
+        
+        
+         
     else
 
       raise exception 'Transaccion inexistente: %',p_transaccion;
@@ -357,7 +389,7 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
       raise exception '%',v_resp;
 
   END;
-  $body$
+$body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT

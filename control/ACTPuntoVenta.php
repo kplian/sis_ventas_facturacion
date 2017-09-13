@@ -26,6 +26,12 @@ class ACTPuntoVenta extends ACTbase{
                                                     sucusu.tipo_usuario = ''vendedor''))) ");
         }
 
+		if($this->objParam->getParametro('lugar') != ''){
+			$this->objParam->addFiltro(" puve.id_sucursal in (select suc.id_sucursal from vef.tsucursal suc
+						  inner join param.tlugar lug on lug.id_lugar = suc.id_lugar where lug.codigo=''".
+					$this->objParam->getParametro('lugar')."'')");
+		}
+
         if($this->objParam->getParametro('tipo_usuario') == 'administrador') {
             $this->objParam->addFiltro(" (1 in (select id_rol from segu.tusuario_rol ur where ur.id_usuario = " . $_SESSION["ss_id_usuario"] . " ) or (
                                                 " . $_SESSION["ss_id_usuario"] .  " in (select id_usuario from

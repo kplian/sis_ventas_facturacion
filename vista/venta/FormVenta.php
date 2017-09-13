@@ -107,7 +107,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		      
 		}
 		
-		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadaexpo'|| this.data.objPadre.tipo_factura == 'computarizadamin'|| this.data.objPadre.tipo_factura == 'computarizadaexpomin') {
+		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadaexpo'|| this.data.objPadre.tipo_factura == 'computarizadamin'|| this.data.objPadre.tipo_factura == 'computarizadaexpomin'|| this.data.objPadre.tipo_factura == 'pedido') {
 			this.Atributos.push({
 				config:{
 					name: 'fecha',
@@ -176,7 +176,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		      });
 		}
 		if (!this.tipoDetalleArray) {			
-			this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
+		  this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
         }
         this.addEvents('beforesave');
         this.addEvents('successsave');
@@ -246,7 +246,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                                     direction: 'ASC'
                                                 },
                                                 totalProperty: 'total',
-                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio','codigo_unidad_medida'],
+                                                fields: ['id_producto', 'tipo','nombre_producto','descripcion','medico','requiere_descripcion','precio','ruta_foto','codigo_unidad_medida'],
                                                 remoteSort: true,
                                                 baseParams: {par_filtro: 'todo.nombre'}
                                             }),
@@ -318,7 +318,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             this.detCmp.precio_unitario.setValue(Number(r.data.precio));
             
             var tmp = this.roundTwo(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()))
-            this.detCmp.precio_total.setValue(tmp);       	
+            this.detCmp.precio_total.setValue(tmp);
         	
         	if (r.data.requiere_descripcion == 'si') {        		
         		this.habilitarDescripcion(true);
@@ -333,7 +333,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     iniciarEventos : function () {
     	
     	
-        this.Cmp.id_sucursal.store.load({params:{start:0,limit:100}, 
+        this.Cmp.id_sucursal.store.load({params:{start:0,limit:this.tam_pag}, 
            callback : function (r) {
            		
            		this.Cmp.id_sucursal.setValue(this.data.objPadre.variables_globales.id_sucursal);
@@ -346,7 +346,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         });
 	    
         if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {
-	        this.Cmp.id_punto_venta.store.load({params:{start:0,limit:100}, 
+	        this.Cmp.id_punto_venta.store.load({params:{start:0,limit:this.tam_pag}, 
 	           callback : function (r) {
 	           		
 	                this.Cmp.id_punto_venta.setValue(this.data.objPadre.variables_globales.id_punto_venta);
@@ -368,26 +368,21 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         }
         
         this.Cmp.id_forma_pago.on('select',function(c,r,i) {
-        	console.log(r);
-            if (r.data.registrar_tarjeta == 'si' || r.data.registrar_cc == 'si' || r.data.registrar_tipo_tarjeta == 'si') {
+            	if (r.data.registrar_tarjeta == 'si' || r.data.registrar_cc == 'si') {
             	this.mostrarComponente(this.Cmp.numero_tarjeta);
             	this.Cmp.numero_tarjeta.allowBlank = false;
-            	if (r.data.registrar_tipo_tarjeta == 'si') {
-            		this.mostrarComponente(this.Cmp.tipo_tarjeta);
-            		this.Cmp.tipo_tarjeta.allowBlank = false;
-            	} else {
-            		this.Cmp.tipo_tarjeta.allowBlank = true;
-            		this.ocultarComponente(this.Cmp.tipo_tarjeta);
-            		this.Cmp.tipo_tarjeta.reset();
-            	}
             	if (r.data.registrar_tarjeta == 'si') {
-	            	this.mostrarComponente(this.Cmp.codigo_tarjeta);            	
+	            	this.mostrarComponente(this.Cmp.codigo_tarjeta);
+	            	this.mostrarComponente(this.Cmp.tipo_tarjeta);            	
 	            	this.Cmp.codigo_tarjeta.allowBlank = false;
-	            	
+	            	this.Cmp.tipo_tarjeta.allowBlank = false;
 	            } else {
-	            	this.Cmp.codigo_tarjeta.allowBlank = true;            		
-            		this.ocultarComponente(this.Cmp.codigo_tarjeta);            		
-            		this.Cmp.codigo_tarjeta.reset();            		
+	            	this.Cmp.codigo_tarjeta.allowBlank = true;
+            		this.Cmp.tipo_tarjeta.allowBlank = true;
+            		this.ocultarComponente(this.Cmp.codigo_tarjeta);
+            		this.ocultarComponente(this.Cmp.tipo_tarjeta);
+            		this.Cmp.codigo_tarjeta.reset();
+            		this.Cmp.tipo_tarjeta.reset();
 	            }
             } else {
             	this.ocultarComponente(this.Cmp.numero_tarjeta);
@@ -436,20 +431,22 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             this.cambiarCombo(r.data.field1);
         },this);  
         
+          
+        
         this.Cmp.id_cliente.on('select',function(c,r,i) {
             if (r.data) {
                 this.Cmp.nit.setValue(r.data.nit);
             } else {
                 this.Cmp.nit.setValue(r.nit);
             }            
-        },this);  
+        },this);      
         
         this.Cmp.nit.on('focus',function(c) {
         	this.Cmp.id_cliente.reset();
         },this);      
         
         this.Cmp.nit.on('blur',function(c) {
-        	
+        
         	if (this.Cmp.nit.getValue() != '') {        		
         		this.Cmp.id_cliente.store.baseParams.nit = this.Cmp.nit.getValue();
             	this.Cmp.id_cliente.store.load({params:{start:0,limit:this.tam_pag}, 
@@ -468,7 +465,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         
         this.iniciarEventosProducto();
         
-        this.detCmp.cantidad.on('keyup',function() {
+        this.detCmp.cantidad.on('keyup',function() {  
             this.detCmp.precio_total.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
         },this);
         
@@ -478,7 +475,6 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     }, 
     
     roundTwo: function(can){
-    	
     	 return  Math.round(can*Math.pow(10,2))/Math.pow(10,2);
     },
     
@@ -512,7 +508,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     },
     cargarFormaPago : function () {
         if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {  
-    	   this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
+    	    this.Cmp.id_forma_pago.store.baseParams.id_punto_venta = this.Cmp.id_punto_venta.getValue();
     		this.Cmp.id_forma_pago.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
     	} else {
     		this.Cmp.id_forma_pago.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
@@ -570,9 +566,14 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         
         var cmb_rec = this.detCmp['id_producto'].store.getById(rec.get('id_producto'));
         if(cmb_rec) {
-            
-            rec.set('nombre_producto', cmb_rec.get('nombre_producto') + ' (' + cmb_rec.get('codigo_unidad_medida') + ')'); 
+
+            if (cmb_rec.get('codigo_unidad_medida')) {
+                rec.set('nombre_producto', cmb_rec.get('nombre_producto') + ' (' + cmb_rec.get('codigo_unidad_medida') + ')');
+            } else {
+                rec.set('nombre_producto', cmb_rec.get('nombre_producto'));
+            }
         }
+
                      
        
     },
@@ -741,7 +742,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                             }
                             this.evaluaGrilla();
                         }
-                    }, {
+                    },
+                    {
 
                             text: '<i class="fa fa-plus-circle fa-lg"></i> Duplicar registro',
                             scope:this,
@@ -758,7 +760,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                 }
 
                             }
-                        }],
+                    }],
             
                     columns: [
                     new Ext.grid.RowNumberer(),
@@ -820,13 +822,13 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 						    {
 						        typeAhead: false,
 						        fieldLabel: 'Paquete / Formula',
-						        allowBlank : false,	
-						        tinit:true,
+						        allowBlank : false,
+                                tinit:true,
 							    turl:'../../../sis_ventas_facturacion/vista/formula/Formula.php',
 								ttitle:'Formula',
 								tconfig:{width:'80%',height:'90%'},
 								tdata:{},
-								tcls:'Formula',					        
+								tcls:'Formula',	
 						        store: new Ext.data.JsonStore({
                                                 url: '../../sis_ventas_facturacion/control/SucursalProducto/listarProductoServicioItem',
                                                 id: 'id_producto',
@@ -989,7 +991,8 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 
         this.mestore.commitChanges();
     },
-    onInitAdd : function (r, i) {  
+    onInitAdd : function (r, i) {
+
     	if(this.data.readOnly===true){
     		return false
     	}      
@@ -999,6 +1002,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         var recTem = new Array();
         recTem['id_producto'] = record.data['id_producto'];
         recTem['nombre_producto'] = record.data['nombre_producto'];
+
         
         this.detCmp.id_producto.store.add(new Ext.data.Record(this.arrayToObject(this.detCmp.id_producto.store.fields.keys,recTem), record.data['id_producto']));
         this.detCmp.id_producto.store.commitChanges();
@@ -1075,54 +1079,39 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                                         id_grupo: 1,
                                         items: [],
                                      }]
-                                 }                      
-                                 
-                              ]
-                          },
-                            this.megrid,
-                         {
-                            xtype: 'fieldset',
-                            border: false,
-                            split: true,
-                            layout: 'column',
-                            region: 'south',
-                            autoScroll: false,
-                            autoHeight: false,
-                            height: 110,
-                            collapseFirst : false,
-                            collapsible: true,
-                            width: '100%', 
-                            padding: '0 0 0 10',
-                            items:[{
+                                 },
+                                 {
+                                  bodyStyle: 'padding-right:5px;',
+                                
+                                  border: false,
+                                  autoHeight: true,
+                                  items: [{
                                         xtype: 'fieldset',
                                         frame: true,
-                                        autoScroll: false,
-                                        autoHeight: false,
-                                        //autoHeight: true,:
+                                        layout: 'form',
+                                        title: ' Forma de Pago ',
+                                        width: '33%',
                                         border: false,
-                                        layout: 'form', 
-                                        title: 'Forma de Pago',
-                                        width: '50%',
+                                        //margins: '0 0 0 5',
                                         padding: '0 0 0 10',
                                         bodyStyle: 'padding-left:5px;',
                                         id_grupo: 2,
-                                        items: []
-                                     
+                                        items: [{
+								             xtype:'button',
+								             
+								             text:'Dividir Forma de Pago',
+								             handler: this.onDividirFormaPago,
+								             scope:this,
+								             //makes the button 24px high, there is also 'large' for this config
+								             scale: 'medium'
+								           }],
+                                     }]
                                  },
-                                 {
-                                        xtype: 'button',                                       
-                                        
-                                        //autoHeight: true,
-                                         
-                                        text: 'Dividir Forma de Pago',
-                                                                               
-                                        handler: this.onDividirFormaPago,
-							             scope:this,
-							             //makes the button 24px high, there is also 'large' for this config
-							             scale: 'medium'
-                                   
-                                 }]
-                          }]
+                                 
+                              ]
+                          },
+                            this.megrid
+                         ]
                  }];
         
         
@@ -1144,7 +1133,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	           {name: 'numero_tarjeta',     type: 'string'},
 	           {name: 'codigo_tarjeta',     type: 'string'},
 	           {name: 'registrar_tarjeta',     type: 'string'},
-	            {name: 'registrar_tipo_tarjeta',     type: 'string'},
+               {name: 'registrar_tipo_tarjeta',     type: 'string'},
 	           {name: 'registrar_cc',     type: 'string'},
 	           {name: 'tipo_tarjeta',     type: 'string'}
 	        ]
@@ -1266,12 +1255,12 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 	                	var validado = true;
 	                	for(var i = 0; i < this.storeFormaPago.getTotalCount() ;i++) {
 	                		var fp = this.storeFormaPago.getAt(i);
-	                		if (fp.data.valor > 0 && fp.data.registrar_tarjeta == 'si' && (fp.data.numero_tarjeta == '' || fp.data.codigo_tarjeta == '')) {
+	                		if (fp.data.valor > 0 && fp.data.registrar_tarjeta == 'si' && (fp.data.numero_tarjeta == '' || fp.data.codigo_tarjeta == '' || fp.data.tipo_tarjeta == '')) {
 	                			validado = false;
 	                			alert('La forma de pago ' + fp.data.nombre + ' requiere el tipo, numero de tarjeta y codigo de autorización')
 	                		}
-	                		
-	                		if (fp.data.valor > 0 && fp.data.registrar_tipo_tarjeta == 'si' && fp.data.tipo_tarjeta == '') {
+                            
+                            if (fp.data.valor > 0 && fp.data.registrar_tipo_tarjeta == 'si' && fp.data.tipo_tarjeta == '') {
 	                			validado = false;
 	                			alert('La forma de pago ' + fp.data.nombre + ' requiere el tipo de tarjeta de credito')
 	                		}
@@ -1321,18 +1310,6 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             type:'Field',
             form:true 
         },
-        {
-            config:{
-                name: 'nit',
-                fieldLabel: 'NIT',
-                allowBlank: false,
-                anchor: '80%',                
-                maxLength:20
-            },
-                type:'TextField',                
-                id_grupo:0,                
-                form:true
-        }, 
         {
             config : {
                 name : 'id_cliente',
@@ -1393,7 +1370,57 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 id_grupo:0,                
                 form:true,
                 valorInicial:'0'
-        }, 
+        },
+        
+        {
+            config : {
+                name : 'id_cliente_destino',
+                fieldLabel : 'Destino',
+                allowBlank : false,
+                emptyText : 'Destino...',
+                qtip:'Cliente Destino',
+                store : new Ext.data.JsonStore({
+                    url : '../../sis_ventas_facturacion/control/Cliente/listarCliente',
+                    id : 'id_cliente',
+                    root : 'datos',
+                    sortInfo : {
+                        field : 'nombres',
+                        direction : 'ASC'
+                    },
+                    totalProperty : 'total',
+                    fields : ['id_cliente', 'nombres', 'primer_apellido', 'segundo_apellido','nombre_factura','nit'],
+                    remoteSort : true,
+                    baseParams : {
+                        par_filtro : 'cli.nombres#cli.primer_apellido#cli.segundo_apellido#nombre_factura#nit'
+                    }
+                }),
+                valueField : 'id_cliente',
+                displayField : 'nombre_factura',  
+                gdisplayField : 'cliente_destino',              
+                hiddenName : 'id_cliente_destino',
+                forceSelection : false,
+                typeAhead : false,
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>NIT:</b> {nit}</p><p><b>Razon Social:</b> {nombre_factura}</p><p><b>Nombre:</b> {nombres} {primer_apellido} {segundo_apellido}</p> </div></tpl>',
+                triggerAction : 'all',
+                lazyRender : true,
+                mode : 'remote',
+                pageSize : 10,
+                queryDelay : 1000,
+                turl:'../../../sis_ventas_facturacion/vista/cliente/Cliente.php',
+                ttitle:'Clientes',
+                // tconfig:{width:1800,height:500},
+                tasignacion : true,           
+                tname : 'id_cliente',
+                tdata:{},
+                tcls:'Cliente',
+                gwidth : 170,
+                minChars : 2
+            },
+            type : 'TrigguerCombo',
+            id_grupo : 0,            
+            form : false
+        },
+         
 
         
         {
@@ -1512,7 +1539,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 gdisplayField: 'forma_pago',
                 hiddenName: 'id_forma_pago',
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>Moneda:{desc_moneda}</p> </div></tpl>',
-                forceSelection: false,
+                forceSelection: true,
                 typeAhead: false,
                 triggerAction: 'all',
                 lazyRender: true,
@@ -1734,8 +1761,12 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     title: 'Formulario Venta',
     onEdit:function(){
         
+<<<<<<< HEAD
     	this.accionFormulario = 'EDIT';   
-    	console.log(this.data.datos_originales); 	
+
+=======
+    	this.accionFormulario = 'EDIT';    	
+>>>>>>> 234825f07c2923e911bc9f7f18d5a1f1a5d15dd0
     	this.loadForm(this.data.datos_originales);    	
     	
         //load detalle de conceptos

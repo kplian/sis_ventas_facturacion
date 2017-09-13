@@ -132,7 +132,7 @@ BEGIN
              into
               v_ice
              FROM  conta.f_get_detalle_plantilla_calculo(v_venta.id_plantilla, 'ICE');
-          
+          --raise exception 'llega';
             --crear tabla 
             v_tabla = pxp.f_crear_parametro(ARRAY[	'_nombre_usuario_ai',
                                 '_id_usuario_ai',
@@ -178,7 +178,7 @@ BEGIN
                                 coalesce(v_venta.excento::varchar,'0'),--'importe_excento',
                                 v_venta.id_plantilla::varchar,--'id_plantilla',
                                 to_char(v_venta.fecha,'DD/MM/YYYY'),--'fecha',
-                               v_venta.nro_factura::varchar,--'nro_documento',
+                               COALESCE(v_venta.nro_factura,'0')::varchar,--'nro_documento',
                                 coalesce(v_venta.nit,''),--'nit',
                                 v_venta.total_venta_msuc::varchar,--'importe_ice',
                                 coalesce(v_venta.nroaut,''), --'nro_autorizacion',

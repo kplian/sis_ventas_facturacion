@@ -15,6 +15,7 @@ Phx.vista.VentaVendedor = {
     requireclase:'Phx.vista.Venta',
     title:'Venta',
     nombreVista: 'VentaVendedor',
+    grupoDateFin: [1],
     
     constructor: function(config) {
         this.maestro=config.maestro;  
@@ -29,34 +30,59 @@ Phx.vista.VentaVendedor = {
         
         this.addButton('anular',{grupo:[1],text:'Anular',iconCls: 'bdel',disabled:true,handler:this.anular,tooltip: '<b>Anular la venta</b>',hidden:true});
         this.addButton('sig_estado',{grupo:[0],text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
-        this.addButton('diagrama_gantt',{grupo:[0,1],text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
+        this.addButton('diagrama_gantt',{grupo:[0,1,2],text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
         this.addButton('btnImprimir',
-            {   grupo:[0,1],
+            {   grupo:[0,1,2],
                 text: 'Imprimir',
                 iconCls: 'bpdf32',
                 disabled: true,
                 handler: this.imprimirNota,
                 tooltip: '<b>Imprimir Formulario de Venta</b><br/>Imprime el formulario de la venta'
             }
-        );        
-      
-		      
+        );
+        
+        this.campo_fecha = new Ext.form.DateField({
+	        name: 'fecha_reg',
+	        grupo: this.grupoDateFin,
+				fieldLabel: 'Fecha',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				format: 'd/m/Y', 
+				hidden : true
+	    });
+	    
+		this.tbar.addField(this.campo_fecha);
+		var datos_respuesta = JSON.parse(response.responseText);
+    	var fecha_array = datos_respuesta.datos.fecha.split('/');
+    	this.campo_fecha.setValue(new Date(fecha_array[2],parseInt(fecha_array[1]) - 1,fecha_array[0]));
+        //this.campo_fecha.hide();
+        
         this.finCons = true;
-               
+        
+        this.campo_fecha.on('select',function(value){
+    		this.store.baseParams.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');
+    		this.load();
+    	},this);
 		  
   	},
   	gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-eye"></i> En Registro</h1>',grupo:0,height:0},
-                       {name:'finalizado',title:'<H1 align="center"><i class="fa fa-eye"></i> Emitidas</h1>',grupo:1,height:0}
-                       
+                       {name:'finalizado',title:'<H1 align="center"><i class="fa fa-eye"></i> Finalizados</h1>',grupo:1,height:0},
+                       {name:'anulado',title:'<H1 align="center"><i class="fa fa-eye"></i> Anulados</h1>',grupo:2,height:0}
                        ],
     
     
     actualizarSegunTab: function(name, indice){
-        if(this.finCons) {        	 
+        if(this.finCons){
+        	 if (name == 'finalizado'){
+        	 	this.store.baseParams.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');;
+        	 } else {
+        	 	this.store.baseParams.fecha = '';
+        	 }
              this.store.baseParams.pes_estado = name;
-             this.store.baseParams.interfaz = 'vendedor';              
+             this.store.baseParams.interfaz = 'vendedor';
              this.load({params:{start:0, limit:this.tam_pag}});
-        }
+           }
     },
     beditGroups: [0],
     bdelGroups:  [0],

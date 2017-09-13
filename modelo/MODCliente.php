@@ -41,8 +41,8 @@ class MODCliente extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('direccion','varchar');
+		$this->captura('lugar','varchar');
 		$this->captura('observaciones','varchar');
-		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -71,7 +71,11 @@ class MODCliente extends MODbase{
 		$this->setParametro('otros_telefonos','otros_telefonos','varchar');
 		$this->setParametro('nombres','nombres','varchar');
 		$this->setParametro('direccion','direccion','varchar');
+
+		$this->setParametro('lugar','lugar','varchar');
+
 		$this->setParametro('observaciones','observaciones','varchar');
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -101,8 +105,13 @@ class MODCliente extends MODbase{
 		$this->setParametro('otros_telefonos','otros_telefonos','varchar');
 		$this->setParametro('nombres','nombres','varchar');
 		$this->setParametro('direccion','direccion','varchar');
+
+		$this->setParametro('lugar','lugar','varchar');
+
+
 		$this->setParametro('observaciones','observaciones','varchar');
 		
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
         

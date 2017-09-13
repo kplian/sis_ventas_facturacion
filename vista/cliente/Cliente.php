@@ -6,7 +6,6 @@
 *@date 20-04-2015 08:52:44
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -213,6 +212,25 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		
 		{
 			config:{
+				name: 'lugar',
+				fieldLabel: 'Lugar',
+				qtip: 'para indicar la ciudad de recidencia del cliente, ejemplo, La Paz - Bolivia (esto facilitara as busquedas)',
+	            allowBlank: true,
+				anchor: '100%',
+				gwidth: 150,
+				maxLength:400
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cli.lugar',type:'string'},
+			id_grupo:2,
+			grid:true,
+			form:true,
+            bottom_filter: true
+		},
+		
+		
+		{
+			config:{
 				name: 'observaciones',
 				fieldLabel: 'Observaciones',
 				allowBlank: true,
@@ -350,7 +368,7 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'direccion'
+		{name:'usr_mod', type: 'string'},'direccion','lugar'
 		
 	],
 	sortInfo:{
@@ -429,5 +447,3 @@ Phx.vista.Cliente=Ext.extend(Phx.gridInterfaz,{
 	}
 )
 </script>
-		
-		

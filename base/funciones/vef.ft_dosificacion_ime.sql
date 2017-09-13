@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_dosificacion_ime (
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
-  $body$
+RETURNS varchar AS
+$body$
   /**************************************************************************
    SISTEMA:		Sistema de Ventas
    FUNCION: 		vef.ft_dosificacion_ime
@@ -33,6 +33,8 @@ CREATE OR REPLACE FUNCTION vef.ft_dosificacion_ime (
     v_mensaje			text;
     v_nit				varchar;
     v_cod_control		varchar;
+    v_nombre_sucursal	varchar;
+    v_codigo_sucursal	varchar;
 
   BEGIN
 
@@ -99,7 +101,7 @@ CREATE OR REPLACE FUNCTION vef.ft_dosificacion_ime (
 
         )RETURNING id_dosificacion into v_id_dosificacion;
 
-        select e.nit into v_nit
+        select e.nit,s.nombre,s.codigo into v_nit,v_nombre_sucursal,v_codigo_sucursal
         from vef.tsucursal s
           inner join param.tentidad e on e.id_entidad = s.id_entidad
         where s.id_sucursal = v_parametros.id_sucursal;
@@ -114,7 +116,7 @@ CREATE OR REPLACE FUNCTION vef.ft_dosificacion_ime (
         );
 
         v_mensaje = '
-            	Dosificacion modificada con exito.<br> Por favor valide la siguiente informacion en <b><a href="http://ov.impuestos.gob.bo/Paginas/Publico/VerificacionFactura.aspx">Impuestos</a></b>:<br><br>
+            	Dosificacion registrada con exito para la sucursal ' || v_nombre_sucursal || '-' || v_codigo_sucursal || '.<br> Por favor valide la siguiente informacion en <b><a href="http://ov.impuestos.gob.bo/Paginas/Publico/VerificacionFactura.aspx">Impuestos</a></b>:<br><br>
             		NIT Emisor : ' || v_nit || '<br>
                     Numero Factura : 1 <br>
                     Numero autorizacion : ' || v_parametros.nroaut || ' <br>
@@ -166,7 +168,7 @@ CREATE OR REPLACE FUNCTION vef.ft_dosificacion_ime (
           usuario_ai = v_parametros._nombre_usuario_ai
         where id_dosificacion=v_parametros.id_dosificacion;
 
-        select e.nit into v_nit
+        select e.nit,s.nombre,s.codigo into v_nit,v_nombre_sucursal,v_codigo_sucursal
         from vef.tsucursal s
           inner join param.tentidad e on e.id_entidad = s.id_entidad
         where s.id_sucursal = v_parametros.id_sucursal;
@@ -181,7 +183,7 @@ CREATE OR REPLACE FUNCTION vef.ft_dosificacion_ime (
         );
 
         v_mensaje = '
-            	Dosificacion modificada con exito.<br> Por favor valide la siguiente informacion en <b><a href="http://ov.impuestos.gob.bo/Paginas/Publico/VerificacionFactura.aspx">Impuestos</a></b>:<br><br>
+            	Dosificacion modificada con exito para la sucursal ' || v_nombre_sucursal || '-' || v_codigo_sucursal || '.<br> Por favor valide la siguiente informacion en <b><a href="http://ov.impuestos.gob.bo/Paginas/Publico/VerificacionFactura.aspx">Impuestos</a></b>:<br><br>
             		NIT Emisor : ' || v_nit || '<br>
                     Numero Factura : 1 <br>
                     Numero autorizacion : ' || v_parametros.nroaut || ' <br>
@@ -240,7 +242,7 @@ CREATE OR REPLACE FUNCTION vef.ft_dosificacion_ime (
       raise exception '%',v_resp;
 
   END;
-  $body$
+$body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT

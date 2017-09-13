@@ -533,13 +533,13 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                 forceSelection:true,
                 typeAhead: false,
                 triggerAction: 'all',
-
                 lazyRender:true,
                 mode:'remote',
                 pageSize:10,
                 queryDelay:1000,
                 width:250,
                 minChars:2,
+
                 enableMultiSelect:true,
                 renderer:function(value, p, record){return String.format('{0}', record.data['tipo_interfaz']);}
 
