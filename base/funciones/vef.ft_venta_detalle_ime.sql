@@ -16,9 +16,9 @@ $body$
   ***************************************************************************
    HISTORIAL DE MODIFICACIONES:
 
-   DESCRIPCION:
-   AUTOR:
-   FECHA:
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0              01-06-2015        JRR                 Creacion 
+ #123            25/09/2018        RAC                de adiciona id_venta_fk para guardar nostas de credito debito  
   ***************************************************************************/
 
   DECLARE
@@ -52,6 +52,8 @@ $body$
     v_descripcion				varchar;
     v_id_unidad_medida			integer;
     v_id_boleto					integer;
+    v_sw_ncd                    boolean; -- #123
+    v_id_venta_detalle_fk	    integer; -- #123
 
 
 
@@ -70,12 +72,25 @@ $body$
     if(p_transaccion='VF_VEDET_INS')then
 
       begin
-
-        if (v_parametros.tipo = 'formula') then
+        -- #123  si esxiste el parametro id_venta_fk  se trata de uan nota de credito debito
+        v_sw_ncd = false;
+        if (pxp.f_existe_parametro(p_tabla,'id_venta_fk')) then
+           v_sw_ncd = true;
+        end if;
+      
+        if (v_parametros.tipo = 'formula') and v_sw_ncd then
           v_id_formula = v_parametros.id_producto;
-        elsif (v_parametros.tipo = 'servicio' or
-               (v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'false'))then
+        elsif (
+                (  v_parametros.tipo = 'servicio' 
+                    OR 
+                   (v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'false')
+                 )
+                 and 
+                     not v_sw_ncd
+               ) then
           v_id_sucursal_producto = v_parametros.id_producto;
+        elseif v_sw_ncd THEN  --#123  si es nota de credito el concepto viene de la factura relacionada id_venta_fk
+             v_id_venta_detalle_fk = v_parametros.id_producto;
         else
           v_id_item =  v_parametros.id_producto;
         end if;
@@ -157,7 +172,8 @@ $body$
           bruto,
           ley,
           kg_fino,
-          id_unidad_medida
+          id_unidad_medida,
+          id_venta_detalle_fk
         ) values(
           v_parametros.id_venta,
           v_id_item,
@@ -179,7 +195,8 @@ $body$
           v_bruto,
           v_ley,
           v_kg_fino,
-          v_id_unidad_medida
+          v_id_unidad_medida,
+          v_id_venta_detalle_fk
         )RETURNING id_venta_detalle into v_id_venta_detalle;
 
 

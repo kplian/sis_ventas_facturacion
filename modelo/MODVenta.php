@@ -5,6 +5,15 @@
 *@author  (admin)
 *@date 01-06-2015 05:58:00
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+ * 
+ 
+ *  HISTORIAL DE MODIFICACIONES:
+
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0              01-06-2015          RAC            Creacion
+ #123            25/09/2018          RAC            se adciona manejo de proveedor para facturas de ETR
+ #1            11/10/2018          EGS               se adiciono el campo id_venta_fk
+  
 */
 
 class MODVenta extends MODbase{
@@ -96,6 +105,252 @@ class MODVenta extends MODbase{
 		return $this->respuesta;
 	}
 
+    function listarVentaETR(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENETR_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+
+		$this->setParametro('historico','historico','varchar');
+		$this->setParametro('tipo_factura','tipo_factura','varchar');
+		$this->setParametro('id_sucursal','id_sucursal','integer');
+		$this->setParametro('id_punto_venta','id_punto_venta','integer');
+        $this->setParametro('tipo_usuario','tipo_usuario','varchar');
+
+
+		//Definicion de la lista del resultado del query
+		$this->captura('id_venta','int4');
+		$this->captura('id_proveedor','int4');
+		$this->captura('id_sucursal','int4');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_estado_wf','int4');
+		$this->captura('estado_reg','varchar');
+		$this->captura('correlativo_venta','varchar');
+		$this->captura('a_cuenta','numeric');
+		$this->captura('total_venta','numeric');
+		$this->captura('fecha_estimada_entrega','date');
+		$this->captura('usuario_ai','varchar');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('id_usuario_ai','int4');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+        $this->captura('estado','varchar');
+        $this->captura('nombre_factura','varchar');
+        $this->captura('nombre_sucursal','varchar');
+		$this->captura('nit','varchar');
+		$this->captura('id_punto_venta','int4');
+		$this->captura('nombre_punto_venta','varchar');
+		$this->captura('id_forma_pago','int4');
+		$this->captura('forma_pago','varchar');
+		$this->captura('monto_forma_pago','numeric');
+		$this->captura('numero_tarjeta','varchar');
+		$this->captura('codigo_tarjeta','varchar');
+		$this->captura('tipo_tarjeta','varchar');
+        $this->captura('porcentaje_descuento','numeric');
+        $this->captura('id_vendedor_medico','varchar');
+		$this->captura('comision','numeric');
+		$this->captura('observaciones','text');		
+		$this->captura('fecha','date');
+		$this->captura('nro_factura','integer');
+		$this->captura('excento','numeric');
+		$this->captura('cod_control','varchar');		
+		$this->captura('id_moneda','integer');
+        $this->captura('total_venta_msuc','numeric');
+        $this->captura('transporte_fob','numeric');
+        $this->captura('seguros_fob','numeric');
+        $this->captura('otros_fob','numeric');
+        $this->captura('transporte_cif','numeric');
+        $this->captura('seguros_cif','numeric');
+        $this->captura('otros_cif','numeric');
+		$this->captura('tipo_cambio_venta','numeric');		
+		$this->captura('desc_moneda','varchar');		
+		$this->captura('valor_bruto','numeric');
+		$this->captura('descripcion_bulto','varchar');
+		$this->captura('contabilizable','varchar');
+		$this->captura('hora_estimada_entrega','varchar');		
+        $this->captura('vendedor_medico','varchar');
+		$this->captura('forma_pedido','varchar'); 
+		$this->captura('contrato_numero','varchar');
+		$this->captura('objeto','text');
+		$this->captura('id_cliente_destino','integer');		
+		$this->captura('cliente_destino','varchar');
+		
+		
+		$this->captura('id_contrato','integer');			
+		$this->captura('desc_contrato','varchar');		
+		$this->captura('id_centro_costo','integer');
+		$this->captura('desc_centro_costo','varchar');	
+		$this->captura('codigo_aplicacion','varchar');		
+		
+		 
+                     
+		
+	
+		//Ejecuta la instruccion
+		$this->armarConsulta();		
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+    function listarVentaNCETR(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENNCETR_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+
+		$this->setParametro('historico','historico','varchar');
+		$this->setParametro('tipo_factura','tipo_factura','varchar');
+		$this->setParametro('id_sucursal','id_sucursal','integer');
+		$this->setParametro('id_punto_venta','id_punto_venta','integer');
+        $this->setParametro('tipo_usuario','tipo_usuario','varchar');
+
+
+		//Definicion de la lista del resultado del query
+		$this->captura('id_venta','int4');
+		$this->captura('id_proveedor','int4');
+		$this->captura('id_sucursal','int4');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_estado_wf','int4');
+		$this->captura('estado_reg','varchar');
+		$this->captura('correlativo_venta','varchar');
+		$this->captura('a_cuenta','numeric');
+		$this->captura('total_venta','numeric');
+		$this->captura('fecha_estimada_entrega','date');
+		$this->captura('usuario_ai','varchar');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('id_usuario_ai','int4');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+        $this->captura('estado','varchar');
+        $this->captura('nombre_factura','varchar');
+        $this->captura('nombre_sucursal','varchar');
+		$this->captura('nit','varchar');
+		$this->captura('id_punto_venta','int4');
+		$this->captura('nombre_punto_venta','varchar');
+		$this->captura('id_forma_pago','int4');
+		$this->captura('forma_pago','varchar');
+		$this->captura('monto_forma_pago','numeric');
+		$this->captura('numero_tarjeta','varchar');
+		$this->captura('codigo_tarjeta','varchar');
+		$this->captura('tipo_tarjeta','varchar');
+        $this->captura('porcentaje_descuento','numeric');
+        $this->captura('id_vendedor_medico','varchar');
+		$this->captura('comision','numeric');
+		$this->captura('observaciones','text');		
+		$this->captura('fecha','date');
+		$this->captura('nro_factura','integer');
+		$this->captura('excento','numeric');
+		$this->captura('cod_control','varchar');		
+		$this->captura('id_moneda','integer');
+        $this->captura('total_venta_msuc','numeric');
+        $this->captura('transporte_fob','numeric');
+        $this->captura('seguros_fob','numeric');
+        $this->captura('otros_fob','numeric');
+        $this->captura('transporte_cif','numeric');
+        $this->captura('seguros_cif','numeric');
+        $this->captura('otros_cif','numeric');
+		$this->captura('tipo_cambio_venta','numeric');		
+		$this->captura('desc_moneda','varchar');		
+		$this->captura('valor_bruto','numeric');
+		$this->captura('descripcion_bulto','varchar');
+		$this->captura('contabilizable','varchar');
+		$this->captura('hora_estimada_entrega','varchar');		
+        $this->captura('vendedor_medico','varchar');
+		$this->captura('forma_pedido','varchar'); 
+		$this->captura('contrato_numero','varchar');
+		$this->captura('objeto','text');
+		$this->captura('id_cliente_destino','integer');		
+		$this->captura('cliente_destino','varchar');
+		
+		
+		$this->captura('id_contrato','integer');			
+		$this->captura('desc_contrato','varchar');		
+		$this->captura('id_centro_costo','integer');
+		$this->captura('desc_centro_costo','varchar');	
+		$this->captura('codigo_aplicacion','varchar');
+		
+		$this->captura('id_venta_fk','integer');
+		$this->captura('nro_factura_vo','integer');
+		$this->captura('id_dosificacion_vo','integer');
+		$this->captura('nroaut_vo','varchar');
+		$this->captura('total_venta_vo','numeric');
+		
+		
+		
+			
+		
+		 
+                     
+		
+	
+		//Ejecuta la instruccion
+		$this->armarConsulta();		
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+    function listarVentaCombosETR(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_FACTCMB_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion		
+
+		
+		$this->setParametro('tipo_factura','tipo_factura','varchar');
+		$this->setParametro('id_sucursal','id_sucursal','integer');
+		$this->setParametro('id_punto_venta','id_punto_venta','integer');
+        $this->setParametro('tipo_usuario','tipo_usuario','varchar');
+		
+		
+		//Definicion de la lista del resultado del query
+		$this->captura('id_venta','int4');
+		$this->captura('id_proveedor','int4');
+		$this->captura('id_sucursal','int4');
+		$this->captura('total_venta','NUMERIC');
+		$this->captura('estado','VARCHAR');
+		$this->captura('nombre_factura','VARCHAR');
+		$this->captura('nit','varchar');
+		$this->captura('id_moneda','INTEGER');
+		$this->captura('total_venta_msuc','NUMERIC');
+		$this->captura('tipo_cambio_venta','NUMERIC');
+		$this->captura('desc_moneda','varchar');
+		$this->captura('contrato_numero','VARCHAR');
+		$this->captura('objeto','TEXT');
+		$this->captura('id_contrato','int4');
+		$this->captura('desc_contrato','VARCHAR');
+		$this->captura('id_centro_costo','int4');
+		$this->captura('desc_centro_costo','VARCHAR');
+		$this->captura('codigo_aplicacion','VARCHAR');
+		$this->captura('fecha','date');
+		$this->captura('nro_factura','int4');
+		$this->captura('nroaut','VARCHAR');
+		$this->captura('observaciones','TEXT');
+		
+		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();		
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
+
+
 	function getVariablesBasicas(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='vef.ft_venta_sel';
@@ -130,6 +385,7 @@ class MODVenta extends MODbase{
 		$this->setParametro('total_venta','total_venta','numeric');
 		$this->setParametro('fecha_estimada_entrega','fecha_estimada_entrega','date');
 		$this->setParametro('observaciones','observaciones','text');
+		$this->setParametro('id_proveedor','id_proveedor','int4'); #1 manda id_proveedor
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -233,7 +489,18 @@ class MODVenta extends MODbase{
 			$this->setParametro('id_cliente_destino','id_cliente_destino','varchar');
 			$this->setParametro('hora_estimada_entrega','hora_estimada_entrega','varchar');
 			$this->setParametro('forma_pedido','forma_pedido','varchar');
+			$this->setParametro('id_proveedor','id_proveedor','varchar');
+			
+			
+			$this->setParametro('id_centro_costo','id_centro_costo','int4'); // #123  
+			$this->setParametro('id_contrato','id_contrato','int4');// #123 
+			$this->setParametro('codigo_aplicacion','codigo_aplicacion','varchar');// #123 
+			$this->setParametro('id_venta_fk','id_venta_fk','int4');// #123 
+			
+			
+			
              
+			 
             
             //Ejecuta la instruccion
             $this->armarConsulta();
@@ -298,7 +565,8 @@ class MODVenta extends MODbase{
 				$this->setParametro('bruto','bruto','varchar');
 				$this->setParametro('ley','ley','varchar');
 				$this->setParametro('kg_fino','kg_fino','varchar');
-				$this->setParametro('tipo_factura','tipo_factura','varchar');  
+				$this->setParametro('tipo_factura','tipo_factura','varchar'); 
+				$this->setParametro('id_venta_fk','id_venta_fk','int4');// #123  
 				
                 
                 //Ejecuta la instruccion
@@ -364,6 +632,7 @@ class MODVenta extends MODbase{
 			$this->transaccion = 'VF_VENVALI_MOD';
 			$this->setParametro('id_venta','id_venta','int4');
 			$this->setParametro('tipo_factura','tipo_factura','varchar'); 
+			$this->setParametro('id_venta_fk','id_venta_fk','int4');// #123  
 			//Ejecuta la instruccion
             $this->armarConsulta();
             $stmt = $link->prepare($this->consulta);          
@@ -666,6 +935,7 @@ class MODVenta extends MODbase{
 		$this->captura('glosa_empresa','varchar');//nuevo	
 		$this->captura('pagina_entidad','varchar');//nuevo			
 		$this->captura('id','integer');//nuevo
+		$this->captura('id_venta_fk','integer');   ///#1            11/10/2018          EGS 
 		$this->captura('hora','text');//nuevo
 		$this->captura('nit_entidad','varchar');//nuevo	
 		$this->captura('actividades','varchar');
@@ -709,14 +979,9 @@ class MODVenta extends MODbase{
 		$this->captura('lugar_destino','varchar');
 		
 		
-		
-
-
-
-		
-		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+		//var_dump($this->consulta);exit;
 		
 	     
 		$this->ejecutarConsulta();

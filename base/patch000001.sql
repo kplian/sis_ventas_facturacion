@@ -954,3 +954,96 @@ ALTER TABLE vef.tcliente
 /************************************F-SCP-RAC-VEF-0-11/11/2016*************************************************/
 
 
+
+
+
+/************************************I-SCP-RAC-VEF-0-25/09/2018*************************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_proveedor INTEGER;
+
+COMMENT ON COLUMN vef.tventa.id_proveedor
+IS 'para empresa que emiten facturas grandes lso mismos provewedor son clientes, por ejemplo por tema de venta de pliegos, pra no redunda usaremos opcionalmente en un nuevo tipo de factura  el id_proveedor';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_contrato INTEGER;
+
+COMMENT ON COLUMN vef.tventa.id_contrato
+IS 'hace ferencia al contrato para bancarizacion';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ALTER COLUMN id_cliente DROP NOT NULL;
+  
+ 
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN codigo_aplicacion VARCHAR(2000);
+
+COMMENT ON COLUMN vef.tventa.codigo_aplicacion
+IS 'aplicacion para generar comprobantes';
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_centro_costo INTEGER;
+
+COMMENT ON COLUMN vef.tventa.id_centro_costo
+IS 'centro de costo para contabilizar el ingreso de la factura';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN nit_internacional VARCHAR(2) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.nit_internacional
+IS 'cuadno el nit es internacional el codigo de control segenera con ceroy tambien para libro de ventas';
+
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_doc_compra_venta INTEGER;
+
+COMMENT ON COLUMN vef.tventa.id_doc_compra_venta
+IS 'hace referencia a la factura en libro de venta que fue migrada'; 
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN id_venta_fk INTEGER;
+
+COMMENT ON COLUMN vef.tventa.id_venta_fk
+IS 'se utiliza para nostra de credito sobre venta donde es necesario hacer referencia a la factura sobre la que se recuepra el credito';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa
+  ADD COLUMN ncd VARCHAR(2) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.ncd
+IS 'si o no, es nota de credito debito';
+
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN id_venta_detalle_fk INTEGER;
+
+COMMENT ON COLUMN vef.tventa_detalle.id_venta_detalle_fk
+IS 'para notas de credito so bre ventas, hace referencia al detalle de la factura que vamos devolver';
+
+
+/************************************F-SCP-RAC-VEF-0-25/09/2018*************************************************/
+
+

@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_repventa_sel (
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
-  $body$
+RETURNS varchar AS
+$body$
   /**************************************************************************
    SISTEMA:		Sistema de Ventas
    FUNCION: 		vef.ft_repventa_sel
@@ -16,9 +16,9 @@ CREATE OR REPLACE FUNCTION vef.ft_repventa_sel (
   ***************************************************************************
    HISTORIAL DE MODIFICACIONES:
 
-   DESCRIPCION:
-   AUTOR:
-   FECHA:
+   ISSUE        	FECHA: 			 AUTOR:					DESCRIPCION:
+    #1				22/10/2018		EGS						se aumento las transacciones para facturas en pdf
+
   ***************************************************************************/
 
   DECLARE
@@ -39,6 +39,11 @@ CREATE OR REPLACE FUNCTION vef.ft_repventa_sel (
     v_cod_moneda		varchar;
     v_group_by			varchar;
     v_id_pais			integer;
+    
+ 
+
+    v_join_destino		varchar;
+    v_columnas_destino	varchar;
 
   BEGIN
 
@@ -620,6 +625,7 @@ CREATE OR REPLACE FUNCTION vef.ft_repventa_sel (
     elsif(p_transaccion='VF_NOTVEN_SEL')then
 
       begin
+
         --Sentencia de la consulta
         v_consulta:='select
 						ven.id_venta,
@@ -660,6 +666,471 @@ CREATE OR REPLACE FUNCTION vef.ft_repventa_sel (
         return v_consulta;
 
       end;
+      
+      	/*********************************    
+ 	#TRANSACCION:  'VF_VEN_SEL'
+ 	#DESCRIPCION:	Consulta de datos reporte de ventas
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_REPVEN_SEL')then
+     				
+    	begin
+        	--raise exception 'Ingrese una Sucursal Por Favor %',v_parametros.tipo_reporte;
+        
+        	IF (v_parametros.tipo_reporte='sucursal' or v_parametros.tipo_reporte= 'punto_venta') and v_parametros.id_sucursal is null THEN
+            		
+            		raise exception 'Ingrese una Sucursal Por Favor';
+            
+            END IF;
+        	
+				--Sentencia de la consulta
+			v_consulta:='with forma_pago_temporal as(
+					    	select count(*)as cantidad_forma_pago,vfp.id_venta,
+					        	pxp.list(fp.id_forma_pago::text) as id_forma_pago, pxp.list(fp.nombre) as forma_pago,
+                                sum(monto_transaccion) as monto_transaccion,pxp.list(vfp.numero_tarjeta) as numero_tarjeta,
+                                pxp.list(vfp.codigo_tarjeta) as codigo_tarjeta,pxp.list(vfp.tipo_tarjeta) as tipo_tarjeta
+					        from vef.tventa_forma_pago vfp
+					        inner join vef.tforma_pago fp on fp.id_forma_pago = vfp.id_forma_pago
+					        group by vfp.id_venta        
+					    )
+						select
+						ven.id_venta,
+						ven.id_cliente,
+						ven.id_sucursal,
+						ven.id_proceso_wf,
+						ven.id_estado_wf,
+						ven.estado_reg,
+						ven.correlativo_venta,
+						ven.a_cuenta,
+						ven.total_venta,
+						ven.fecha_estimada_entrega,
+						ven.usuario_ai,
+						ven.fecha_reg,
+						ven.id_usuario_reg,
+						ven.id_usuario_ai,
+						ven.id_usuario_mod,
+						ven.fecha_mod,
+						usu1.cuenta as usr_reg,
+						usu2.cuenta as usr_mod,
+                        ven.estado,
+                        suc.nombre as nombre_sucursal,
+                        puve.id_punto_venta,
+                        puve.nombre as nombre_punto_venta,
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	0::integer
+                        else
+                        	forpa.id_forma_pago::integer
+                        end) as id_forma_pago,
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''DIVIDIDO''::varchar
+                        else
+                        	forpa.forma_pago::varchar
+                        end) as forma_pago,
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	0::numeric
+                        else
+                        	forpa.monto_transaccion::numeric
+                        end) as monto_forma_pago,
+                        
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''''::varchar
+                        else
+                        	forpa.numero_tarjeta::varchar
+                        end) as numero_tarjeta,
+                        
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''''::varchar
+                        else
+                        	forpa.codigo_tarjeta::varchar
+                        end) as codigo_tarjeta,
+                        
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''''::varchar
+                        else
+                        	forpa.tipo_tarjeta::varchar
+                        end) as tipo_tarjeta,
+                        ven.porcentaje_descuento,
+                        ven.id_vendedor_medico,
+                        ven.comision,
+                        ven.observaciones,
+                        ven.fecha,
+                        ven.nro_factura,
+                        ven.excento,
+                        ven.cod_control,
+                        ven.id_moneda,
+                        ven.total_venta_msuc,
+                        ven.transporte_fob,
+                        ven.seguros_fob,
+                        ven.otros_fob,
+                        ven.transporte_cif,
+                        ven.seguros_cif,
+                        ven.otros_cif,
+                        ven.tipo_cambio_venta,
+                        mon.moneda as desc_moneda,
+                        ven.valor_bruto,
+                        ven.descripcion_bulto,
+                        ven.contabilizable,
+                        to_char(ven.hora_estimada_entrega,''HH24:MI'')::varchar,
+                        ven.forma_pedido,
+                        ven.id_cliente_destino,
+                        ''''::varchar as cliente_destino,
+                        ven.nro_tramite,
+                        ven.id_proveedor,
+                        ven.id_contrato,
+                        ven.id_doc_compra_venta,
+                        ven.id_venta_fk,
+                        ven.ncd,
+                        vpro.desc_proveedor,
+                        aux.codigo_auxiliar,
+                        dcv.importe_doc,
+                        dcv.importe_pendiente,
+                        dcv.importe_anticipo,
+                        dcv.importe_retgar,
+                        dcv.nit,
+                        venfk.nro_factura as nro_factura_fk                        	
+						from vef.tventa ven
+						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
+                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
+                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
+                        inner join wf.testado_wf ewf on ewf.id_estado_wf = ven.id_estado_wf
+                        left join param.vproveedor vpro on vpro.id_proveedor = ven.id_proveedor
+                        left join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = ven.id_doc_compra_venta
+                        left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                        left join vef.tventa venfk on venfk.id_venta = ven.id_venta_fk
+                          left join param.tperiodo per on per.id_periodo =  dcv.id_periodo
+                        where ven.estado_reg = ''activo'' and ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            
+            
+            --raise notice 'CONSULTA.... %',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+        
+        /*********************************    
+ 	#TRANSACCION:  'VF_REPVEN_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_REPVEN_CONT')then
+
+		begin
+
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='
+                     with forma_pago_temporal as(
+					    	select count(*)as cantidad_forma_pago,vfp.id_venta,
+					        	pxp.list(fp.id_forma_pago::text) as id_forma_pago, pxp.list(fp.nombre) as forma_pago,
+                                sum(monto_transaccion) as monto_transaccion,pxp.list(vfp.numero_tarjeta) as numero_tarjeta,
+                                pxp.list(vfp.codigo_tarjeta) as codigo_tarjeta,pxp.list(vfp.tipo_tarjeta) as tipo_tarjeta
+					        from vef.tventa_forma_pago vfp
+					        inner join vef.tforma_pago fp on fp.id_forma_pago = vfp.id_forma_pago
+					        group by vfp.id_venta        
+					    )
+            		select count(id_venta)
+					    from vef.tventa ven
+					    inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
+                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
+                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
+                        inner join wf.testado_wf ewf on ewf.id_estado_wf = ven.id_estado_wf
+                        left join param.vproveedor vpro on vpro.id_proveedor = ven.id_proveedor
+                        left join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = ven.id_doc_compra_venta
+                        left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                          left join param.tperiodo per on per.id_periodo =  dcv.id_periodo
+                        where ven.estado_reg = ''activo'' and ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+        
+              
+      	/*********************************    
+ 	#TRANSACCION:  'VF_VENREPORT_SEL'
+ 	#DESCRIPCION:	Consulta de datos de la grilla
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VENGRID_SEL')then
+     				
+    	begin
+        	--raise exception 'Ingrese una Sucursal Por Favor %',v_parametros.tipo_reporte;
+        
+       	
+				--Sentencia de la consulta
+			v_consulta:='with forma_pago_temporal as(
+					    	select count(*)as cantidad_forma_pago,vfp.id_venta,
+					        	pxp.list(fp.id_forma_pago::text) as id_forma_pago, pxp.list(fp.nombre) as forma_pago,
+                                sum(monto_transaccion) as monto_transaccion,pxp.list(vfp.numero_tarjeta) as numero_tarjeta,
+                                pxp.list(vfp.codigo_tarjeta) as codigo_tarjeta,pxp.list(vfp.tipo_tarjeta) as tipo_tarjeta
+					        from vef.tventa_forma_pago vfp
+					        inner join vef.tforma_pago fp on fp.id_forma_pago = vfp.id_forma_pago
+					        group by vfp.id_venta        
+					    )
+						select
+						ven.id_venta,
+						ven.id_cliente,
+						ven.id_sucursal,
+						ven.id_proceso_wf,
+						ven.id_estado_wf,
+						ven.estado_reg,
+						ven.correlativo_venta,
+						ven.a_cuenta,
+						ven.total_venta,
+						ven.fecha_estimada_entrega,
+						ven.usuario_ai,
+						ven.fecha_reg,
+						ven.id_usuario_reg,
+						ven.id_usuario_ai,
+						ven.id_usuario_mod,
+						ven.fecha_mod,
+						usu1.cuenta as usr_reg,
+						usu2.cuenta as usr_mod,
+                        ven.estado,
+                        suc.nombre as nombre_sucursal,
+                        puve.id_punto_venta,
+                        puve.nombre as nombre_punto_venta,
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	0::integer
+                        else
+                        	forpa.id_forma_pago::integer
+                        end) as id_forma_pago,
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''DIVIDIDO''::varchar
+                        else
+                        	forpa.forma_pago::varchar
+                        end) as forma_pago,
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	0::numeric
+                        else
+                        	forpa.monto_transaccion::numeric
+                        end) as monto_forma_pago,
+                        
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''''::varchar
+                        else
+                        	forpa.numero_tarjeta::varchar
+                        end) as numero_tarjeta,
+                        
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''''::varchar
+                        else
+                        	forpa.codigo_tarjeta::varchar
+                        end) as codigo_tarjeta,
+                        
+                        (case when (forpa.cantidad_forma_pago > 1) then
+                        	''''::varchar
+                        else
+                        	forpa.tipo_tarjeta::varchar
+                        end) as tipo_tarjeta,
+                        ven.porcentaje_descuento,
+                        ven.id_vendedor_medico,
+                        ven.comision,
+                        ven.observaciones,
+                        ven.fecha,
+                        ven.nro_factura,
+                        ven.excento,
+                        ven.cod_control,
+                        ven.id_moneda,
+                        ven.total_venta_msuc,
+                        ven.transporte_fob,
+                        ven.seguros_fob,
+                        ven.otros_fob,
+                        ven.transporte_cif,
+                        ven.seguros_cif,
+                        ven.otros_cif,
+                        ven.tipo_cambio_venta,
+                        mon.moneda as desc_moneda,
+                        ven.valor_bruto,
+                        ven.descripcion_bulto,
+                        ven.contabilizable,
+                        to_char(ven.hora_estimada_entrega,''HH24:MI'')::varchar,
+                        ven.forma_pedido,
+                        ven.id_cliente_destino,
+                        ''''::varchar as cliente_destino,
+                        ven.nro_tramite,
+                        ven.id_proveedor,
+                        ven.id_contrato,
+                        ven.id_doc_compra_venta,
+                        ven.id_venta_fk,
+                        ven.ncd,
+                        vpro.desc_proveedor,
+                        aux.codigo_auxiliar,
+                        dcv.importe_doc,
+                        dcv.importe_pendiente,
+                        dcv.importe_anticipo,
+                        dcv.importe_retgar,
+                        dcv.nit,
+                        venfk.nro_factura as nro_factura_fk                        	
+						from vef.tventa ven
+						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
+                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
+                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
+                        inner join wf.testado_wf ewf on ewf.id_estado_wf = ven.id_estado_wf
+                        left join param.vproveedor vpro on vpro.id_proveedor = ven.id_proveedor
+                        left join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = ven.id_doc_compra_venta
+                        left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                        left join vef.tventa venfk on venfk.id_venta = ven.id_venta_fk
+                         left join param.tperiodo per on per.id_periodo =  dcv.id_periodo
+                        where ven.estado_reg = ''activo'' and ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            
+            
+            --raise notice 'CONSULTA.... %',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+        
+        /*********************************    
+ 	#TRANSACCION:  'VF_VENGRID_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VENGRID_CONT')then
+
+		begin
+
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='
+                     with forma_pago_temporal as(
+					    	select count(*)as cantidad_forma_pago,vfp.id_venta,
+					        	pxp.list(fp.id_forma_pago::text) as id_forma_pago, pxp.list(fp.nombre) as forma_pago,
+                                sum(monto_transaccion) as monto_transaccion,pxp.list(vfp.numero_tarjeta) as numero_tarjeta,
+                                pxp.list(vfp.codigo_tarjeta) as codigo_tarjeta,pxp.list(vfp.tipo_tarjeta) as tipo_tarjeta
+					        from vef.tventa_forma_pago vfp
+					        inner join vef.tforma_pago fp on fp.id_forma_pago = vfp.id_forma_pago
+					        group by vfp.id_venta        
+					    )
+            		select count(ven.id_venta)
+					    from vef.tventa ven
+					    inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
+                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
+                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
+                        inner join wf.testado_wf ewf on ewf.id_estado_wf = ven.id_estado_wf
+                        left join param.vproveedor vpro on vpro.id_proveedor = ven.id_proveedor
+                        left join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = ven.id_doc_compra_venta
+                        left join conta.tauxiliar aux on aux.id_auxiliar = dcv.id_auxiliar
+                        left join param.tperiodo per on per.id_periodo =  dcv.id_periodo
+                        where ven.estado_reg = ''activo'' and ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+             /*********************************    
+            #TRANSACCION:  'VF_VENDET_SEL'
+            #DESCRIPCION:   Reporte Detalle de Recibo o Factura
+            #AUTOR:		admin	
+            #FECHA:		01-06-2015 05:58:00
+            ***********************************/
+
+            elsif(p_transaccion='VF_VENDET_SEL')then
+             				
+                begin
+                    --Sentencia de la consulta
+                    v_consulta:='
+                    		select
+                                vedet.id_venta_detalle,
+                    			vedet.id_venta,
+				                (case when vedet.id_item is not null then
+                                    item.nombre
+                                when vedet.id_sucursal_producto is not null then
+                                    cig.desc_ingas
+                                when vedet.id_formula is not null then
+                                    form.nombre
+                                end) as concepto,
+                                vedet.cantidad::numeric,   
+                                vedet.precio,
+                                vedet.precio*vedet.cantidad,
+                                um.codigo,
+                                cig.nandina,
+                                vedet.bruto,
+                                vedet.ley,
+                                vedet.kg_fino,
+                                vedet.descripcion,
+                                umcig.codigo as unidad_concepto,
+                                sum(vedet.precio*vedet.cantidad) OVER (PARTITION BY vedet.descripcion) as precio_grupo
+                                from vef.tventa_detalle vedet						
+                                left join vef.tsucursal_producto sprod on sprod.id_sucursal_producto = vedet.id_sucursal_producto
+                                left join vef.tformula form on form.id_formula = vedet.id_formula
+                                left join alm.titem item on item.id_item = vedet.id_item
+                                left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
+                                left join param.tunidad_medida um on um.id_unidad_medida = vedet.id_unidad_medida
+                                left join param.tunidad_medida umcig on umcig.id_unidad_medida = cig.id_unidad_medida			        
+                               where';
+                               
+                  v_consulta:=v_consulta||v_parametros.filtro;
+      			  v_consulta:=v_consulta||'order by vedet.descripcion,vedet.id_venta_detalle asc';        			        
+                            
+                  --Devuelve la respuesta
+                  return v_consulta;
+      						
+              end; 
+               /*********************************    
+            #TRANSACCION:  'VF_VENDET_CONT'
+            #DESCRIPCION:   count Reporte Detalle de Recibo o Factura
+            #AUTOR:		admin	
+            #FECHA:		01-06-2015 05:58:00
+            ***********************************/
+
+            elsif(p_transaccion='VF_VENDET_CONT')then
+             				
+                begin
+                    --Sentencia de la consulta
+                    v_consulta:='
+                    		select
+                                count(vedet.id_venta_detalle)
+                                from vef.tventa_detalle vedet						
+                                left join vef.tsucursal_producto sprod on sprod.id_sucursal_producto = vedet.id_sucursal_producto
+                                left join vef.tformula form on form.id_formula = vedet.id_formula
+                                left join alm.titem item on item.id_item = vedet.id_item
+                                left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
+                                left join param.tunidad_medida um on um.id_unidad_medida = vedet.id_unidad_medida
+                                left join param.tunidad_medida umcig on umcig.id_unidad_medida = cig.id_unidad_medida			        
+                               where';
+                               
+                  v_consulta:=v_consulta||v_parametros.filtro;
+      			      			        
+                            
+                  --Devuelve la respuesta
+                  return v_consulta;
+      						
+              end; 
+    
+    
 
     else
 
@@ -676,7 +1147,7 @@ CREATE OR REPLACE FUNCTION vef.ft_repventa_sel (
       v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
       raise exception '%',v_resp;
   END;
-  $body$
+$body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT

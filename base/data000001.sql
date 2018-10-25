@@ -171,3 +171,28 @@ select pxp.f_insert_testructura_gui ('VEFAPCIECAJ', 'VENCARP');
 /***********************************F-DAT-JRR-VEF-0-17/03/2017*****************************************/
 
 
+
+/***********************************I-DAT-RAC-VEF-0-08/10/2018*****************************************/
+
+----------------------------------
+--COPY LINES TO SUBSYSTEM data.sql FILE  
+---------------------------------
+
+select param.f_import_tcatalogo_tipo ('insert','tipo_credito_sobre_venta','CONTA','tdoc_compra_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Devolución Peaje Empresas de Grupo','dev_peaje_grupo','tipo_credito_sobre_venta');
+select param.f_import_tcatalogo ('insert','CONTA','Devolución Peaje  Otros','dev_peaje_otros','tipo_credito_sobre_venta');
+
+
+/* Data for the 'pxp.variable_global' table  (Records 1 - 1) */
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'vef_porcentaje_permitodo_ncd', E'0.5', E'porcentaje permitido para  notas de credito por defecto solo el 50% de peude devolver');
+
+
+
+/***********************************F-DAT-RAC-VEF-0-08/10/2018*****************************************/
+
+
+
+

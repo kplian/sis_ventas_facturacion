@@ -80,6 +80,26 @@ class ACTPuntoVenta extends ACTbase{
 		$this->res=$this->objFunc->eliminarPuntoVenta($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function listarPuntoVentaCombo(){
+		$this->objParam->defecto('ordenacion','id_punto_venta');
+        $this->objParam->defecto('dir_ordenacion','asc');
+		$this->objParam->defecto('cantidad',10000000);
+		$this->objParam->defecto('puntero', 0);	
+		
+		
+		if ($this->objParam->getParametro('id_sucursal') != '') {
+            $this->objParam->addFiltro("puve.id_sucursal = " .  $this->objParam->getParametro('id_sucursal'));
+        }
+
+		//var_dump($this->objParam);
+	
+		$this->objFunc=$this->create('MODPuntoVenta');
+			
+		$this->res=$this->objFunc->listarPuntoVentaCombo($this->objParam);
+
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 			
 }
 

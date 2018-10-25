@@ -145,7 +145,7 @@ Phx.vista.TipoVenta=Ext.extend(Phx.gridInterfaz,{
 	            id_grupo: 0,
 	            grid: true,
 	            bottom_filter: true,
-	            form: false
+	            form: true
 	        },
 		
 		

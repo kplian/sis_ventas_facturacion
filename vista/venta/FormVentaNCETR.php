@@ -1,16 +1,19 @@
 <?php
 /**
 *@package pXP
-*@file    FormVenta.php
+*@file    FormVentaNCETR.php
 *@author  Jaime Rivera rojas 
 *@date    30-01-2014
 *@description permites subir archivos a la tabla de documento_sol
+ *  *   HISTORIAL DE MODIFICACIONES:
+
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0              08-10-2018           RAC                 Creacion 
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
-
 <script>
-Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
+Phx.vista.FormVentaNCETR=Ext.extend(Phx.frmInterfaz,{
     ActSave:'../../sis_ventas_facturacion/control/Venta/insertarVentaCompleta',
     tam_pag: 10,    
     layout: 'fit',
@@ -24,7 +27,6 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     constructor:function(config)
     {   
         Ext.apply(this,config);
-        
         if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {  
         	
 			this.Atributos.push({
@@ -185,7 +187,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         this.buildDetailGrid();
         this.buildGrupos();
         
-        Phx.vista.FormVenta.superclass.constructor.call(this,config);
+        Phx.vista.FormVentaNCETR.superclass.constructor.call(this,config);
         this.init();    
         this.iniciarEventos();
         
@@ -213,7 +215,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         	this.Cmp.id_sucursal.allowBlank = true;
         	this.Cmp.id_sucursal.setDisabled(true);
         }
-                
+         
     },
     
     buildComponentesDetalle: function(){
@@ -315,8 +317,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     
     iniciarEventosProducto:function(){
     	this.detCmp.id_producto.on('select',function(c,r,i) {
-            this.detCmp.precio_unitario.setValue(Number(r.data.precio));
-            
+            this.detCmp.precio_unitario.setValue(Number(r.data.precio));            
             var tmp = this.roundTwo(Number(r.data.precio) * Number(this.detCmp.cantidad.getValue()))
             this.detCmp.precio_total.setValue(tmp);
         	
@@ -324,7 +325,9 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         		this.habilitarDescripcion(true);
         	} else {
         		this.habilitarDescripcion(false);
-        	}
+        	}        	
+        	// #123   cargar descripcion
+        	this.detCmp.descripcion.setValue(r.data.descripcion);
         },this);
     	
     },
@@ -433,36 +436,30 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         
           
         
-        this.Cmp.id_cliente.on('select',function(c,r,i) {
+        this.Cmp.id_proveedor.on('select',function(cmb,r,i) {
             if (r.data) {
                 this.Cmp.nit.setValue(r.data.nit);
             } else {
                 this.Cmp.nit.setValue(r.nit);
-            }            
-        },this);      
+            } 
+            
+            this.Cmp.id_venta_fk.enable();
+			this.Cmp.id_venta_fk.reset();
+			this.Cmp.id_venta_fk.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+cmb.getValue()+"\",\"field\":\"CON.id_proveedor\"}]";
+			this.Cmp.id_venta_fk.modificado = true;
+			//#123 reset grilla detalle
+			this.resetGrillaDetalle()
+			
+                       
+        },this); 
         
-        this.Cmp.nit.on('focus',function(c) {
-        	this.Cmp.id_cliente.reset();
-        },this);      
+         this.Cmp.id_venta_fk.on('select',function(cmb,r,i) {
+             this.detCmp.id_producto.store.baseParams.id_venta_fk = this.Cmp.id_venta_fk.getValue();
+             //#123  reset grailla detalle  
+             this.resetGrillaDetalle()         
+        },this);     
         
-        this.Cmp.nit.on('blur',function(c) {
-        
-        	if (this.Cmp.nit.getValue() != '') {        		
-        		this.Cmp.id_cliente.store.baseParams.nit = this.Cmp.nit.getValue();
-            	this.Cmp.id_cliente.store.load({params:{start:0,limit:this.tam_pag}, 
-		           callback : function (r) {
-		           		this.Cmp.id_cliente.store.baseParams.nit = '';
-		           		if (r.length == 1) {
-		           			this.Cmp.id_cliente.setValue(r[0].data.id_cliente);
-		           			//this.Cmp.id_cliente.fireEvent('select',this.Cmp.id_cliente, this.Cmp.id_cliente.store.getById(r[0].data.id_cliente));
-		           		}          	                   
-		                                
-		            }, scope : this
-		        });
-		    }        
-        },this);          
-        
-        
+       
         this.iniciarEventosProducto();
         
         this.detCmp.cantidad.on('keyup',function() {  
@@ -473,6 +470,18 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             this.detCmp.precio_total.setValue(this.roundTwo(Number(this.detCmp.precio_unitario.getValue()) * Number(this.detCmp.cantidad.getValue())));
         },this);
     }, 
+    
+    //#123  reset grailla detalle  
+    resetGrillaDetalle: function(){
+    	 console.log('resetear grilla del detalle....');
+    	 this.editorDetail.stopEditing();
+         var me = this;
+         this.mestore.each(function(rec){
+         	  me.mestore.remove(rec);
+         });
+         
+    	
+    },
     
     roundTwo: function(can){
     	 return  Math.round(can*Math.pow(10,2))/Math.pow(10,2);
@@ -503,6 +512,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     	} else {
     		this.detCmp.id_producto.store.baseParams.id_sucursal = this.Cmp.id_sucursal.getValue();
     	}
+    	this.detCmp.id_producto.store.baseParams.id_venta_fk = this.Cmp.id_venta_fk.getValue();
     	this.detCmp.id_producto.modificado = true;
     	this.detCmp.id_producto.reset();
     },
@@ -1297,7 +1307,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     },
     loadValoresIniciales:function() 
     {                
-       Phx.vista.FormVenta.superclass.loadValoresIniciales.call(this);
+       Phx.vista.FormVentaNCETR.superclass.loadValoresIniciales.call(this);
     },
     Atributos:[
         {
@@ -1310,53 +1320,63 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
             type:'Field',
             form:true 
         },
+        
         {
-            config : {
-                name : 'id_cliente',
-                fieldLabel : 'Cliente',
-                allowBlank : false,
-                emptyText : 'Cliente...',
-                store : new Ext.data.JsonStore({
-                    url : '../../sis_ventas_facturacion/control/Cliente/listarCliente',
-                    id : 'id_cliente',
-                    root : 'datos',
-                    sortInfo : {
-                        field : 'nombres',
-                        direction : 'ASC'
-                    },
-                    totalProperty : 'total',
-                    fields : ['id_cliente', 'nombres', 'primer_apellido', 'segundo_apellido','nombre_factura','nit'],
-                    remoteSort : true,
-                    baseParams : {
-                        par_filtro : 'cli.nombres#cli.primer_apellido#cli.segundo_apellido#nombre_factura#nit'
-                    }
-                }),
-                valueField : 'id_cliente',
-                displayField : 'nombre_factura',  
-                gdisplayField : 'nombre_factura',              
-                hiddenName : 'id_cliente',
-                forceSelection : false,
-                typeAhead : false,
-                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>NIT:</b> {nit}</p><p><b>Razon Social:</b> {nombre_factura}</p><p><b>Nombre:</b> {nombres} {primer_apellido} {segundo_apellido}</p> </div></tpl>',
-                triggerAction : 'all',
-                lazyRender : true,
-                mode : 'remote',
-                pageSize : 10,
-                queryDelay : 1000,
-                turl:'../../../sis_ventas_facturacion/vista/cliente/Cliente.php',
-                ttitle:'Clientes',
-                // tconfig:{width:1800,height:500},
-                tasignacion : true,           
-                tname : 'id_cliente',
-                tdata:{},
-                tcls:'Cliente',
-                gwidth : 170,
-                minChars : 2
-            },
-            type : 'TrigguerCombo',
-            id_grupo : 0,            
+			config:{
+				name: 'id_proveedor',
+				fieldLabel: 'Cliente',
+				allowBlank: false,
+				emptyText: 'Cliente ...',
+				store: new Ext.data.JsonStore({
+
+	    					url: '../../sis_parametros/control/Proveedor/listarProveedorCombos',
+	    					id: 'id_proveedor',
+	    					root: 'datos',
+	    					sortInfo:{
+	    						field: 'desc_proveedor',
+	    						direction: 'ASC'
+	    					},
+	    					totalProperty: 'total',
+	    					fields: ['id_proveedor','codigo','desc_proveedor','nit', 'desc_proveedor2'],
+	    					// turn on remote sorting
+	    					remoteSort: true,
+	    					baseParams:{par_filtro:'codigo#desc_proveedor#nit'}
+	    				}),
+	    		tpl:'<tpl for=".">\
+		                       <div class="x-combo-list-item"><p><b>Codigo: </b>{codigo}</p>\
+		                      <p><b>Proveedor: </b>{desc_proveedor2}</p>\
+		                      <p><b>Nit:</b>{nit}</p> \
+		                     </div></tpl>',
+        	    valueField: 'id_proveedor',
+        	    displayField: 'desc_proveedor2',
+        	    gdisplayField: 'nombre_factura',
+        	    hiddenName: 'id_proveedor',
+        	    triggerAction: 'all',
+        	    //queryDelay:1000,
+        	    pageSize:10,
+				forceSelection: true,
+				typeAhead: false,
+				allowBlank: false,
+				anchor: '100%',
+				gwidth: 180,
+				mode: 'remote',
+				minChars:1,
+				renderer: function(value,p,record){
+                        if(record.data.estado=='anulado'){
+                             return String.format('<b><font color="red">{0}</font></b>', record.data['desc_proveedor']);
+                         }
+                        else if(record.data.estado=='adjudicado'){
+                             return String.format('<div title="Esta cotización tiene items adjudicados"><b><font color="green">{0}</font></b></div>', record.data['desc_proveedor']);
+                        }
+                        else{
+                            return String.format('{0}', record.data['desc_proveedor']);
+                        }}
+			},	           			
+			type:'ComboBox', 
+			id_grupo : 0,            
             form : true
-        },
+		},
+       
 
         {
             config:{
@@ -1366,7 +1386,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 anchor: '80%',                
                 maxLength:20
             },
-                type:'NumberField',                
+                type:'TextField',                
                 id_grupo:0,                
                 form:true,
                 valorInicial:'0'
@@ -1753,6 +1773,107 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                 id_grupo: 4,                 
                 valorInicial: 0,               
                 form: false
+        },
+        {
+        	 config:{
+						name:'codigo_aplicacion',
+						qtip:'Aplicación para filtro prioritario, primero busca uan relación contable especifica para la aplicación definida si no la encuentra busca un relación contable sin aplicación',
+						fieldLabel : 'Aplicación:',
+						resizable:true,
+						allowBlank:false,
+		   				emptyText:'Seleccione un catálogo...',
+		   				store: new Ext.data.JsonStore({
+							url: '../../sis_parametros/control/Catalogo/listarCatalogoCombo',
+							id: 'id_catalogo',
+							root: 'datos',
+							sortInfo:{
+								field: 'orden',
+								direction: 'ASC'
+							},
+							totalProperty: 'total',
+							fields: ['id_catalogo','codigo','descripcion'],
+							// turn on remote sorting
+							remoteSort: true,
+							baseParams: {par_filtro:'descripcion',catalogo_tipo:'tipo_credito_sobre_venta'}
+						}),
+	       			    enableMultiSelect:false,    				
+						valueField: 'codigo',
+		   				displayField: 'descripcion',
+		   				gdisplayField: 'codigo_aplicacion',
+		   				forceSelection:true,
+		   				typeAhead: false,
+		       			triggerAction: 'all',
+		       			lazyRender:true,
+		   				mode:'remote',
+		   				pageSize:10,
+		   				queryDelay:1000,
+		   				anchor: '80%',
+		   				minChars:2
+		   		},
+                type:'ComboBox',                
+                id_grupo: 0,               
+                form : true 
+		 },
+		 
+		 {
+        	 config:{
+						name:'id_venta_fk', 
+						qtip:'Factura sobre la que se generará la Nota de Crédito sobre Ventas',
+						fieldLabel : 'Factura:',
+						resizable:true,
+						allowBlank:false,
+		   				emptyText:'Factura...',
+		   				store: new Ext.data.JsonStore({
+							url: '../../sis_ventas_facturacion/control/Venta/listarVentaCombosETR',
+							id: 'id_venta',
+							root: 'datos',
+							sortInfo:{
+								field: 'ven.fecha',
+								direction: 'DESC'
+							},
+							totalProperty: 'total',
+							fields: ['id_venta','fecha','nro_factura','nroaut','observaciones','contrato_numero','objeto','nit','nombre_factura','total_venta_msuc','desc_moneda'],
+							// turn on remote sorting
+							remoteSort: true,
+							baseParams: {par_filtro:'ven.nro_factura#dos.nroaut#ven.observaciones#ven.fecha#con.objeto#con.numero'}
+						}),
+						 tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Nombre:</b> {nombre_factura}</p><p><b>Nro:</b> {nro_factura}</p><p><b>Auto:</b> {nroaut}</p><p><b>Fecha:</b> {fecha}</p><p><b>Contrato:</b> {contrato_numero}</p><p><b>Obs:</b> {observaciones}</p><p><b>Importe</b>{total_venta_msuc} {desc_moneda}(s)</p></div></tpl>',
+	       			    enableMultiSelect:false,    				
+						valueField: 'id_venta',
+		   				displayField: 'nro_factura',
+		   				gdisplayField: 'nro_factura_vo',
+		   				forceSelection:true,
+		   				typeAhead: false,
+		       			triggerAction: 'all',
+		       			lazyRender:true,
+		   				mode:'remote',
+		   				pageSize:10,
+		   				queryDelay:1000,
+		   				anchor: '80%',
+		   				minChars:2
+		   		},
+                type:'ComboBox',                
+                id_grupo: 0,               
+                form : true 
+		 },
+		   
+        {
+            config:{
+                    name:'id_centro_costo',
+                    origen:'CENTROCOSTO',
+                    fieldLabel: 'Centro de Costos',                                 
+                    url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXUsuaio',
+                    emptyText : 'Centro Costo...',
+                    allowBlank:false,
+                    gdisplayField:'desc_centro_costo',//mapea al store del grid
+                    gwidth:200,
+                    baseParams:{'tipo_pres':'recurso'}
+                },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{pfiltro:'cc.codigo_cc',type:'string'},
+            grid:true,
+            form:true
         }
            
           
@@ -1772,6 +1893,9 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
         this.mestore.load();  
         this.crearStoreFormaPago();    	
         
+        // #123  definir filtro de proveedor 
+        this.Cmp.id_venta_fk.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+this.Cmp.id_proveedor.getValue()+"\",\"field\":\"CON.id_proveedor\"}]";
+		this.Cmp.id_venta_fk.modificado = true;
     },    
     onNew: function(){    	
     	this.accionFormulario = 'NEW';
@@ -1809,7 +1933,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
                         'tipo_factura':this.data.objPadre.tipo_factura};
         
         if( i > 0 &&  !this.editorDetail.isVisible()){
-             Phx.vista.FormVenta.superclass.onSubmit.call(this,o);
+             Phx.vista.FormVentaNCETR.superclass.onSubmit.call(this,o);
         }
         else{
             alert('La venta no tiene registrado ningun detalle');
@@ -1841,8 +1965,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
 		    this.panel.close();
     	}
         
-    }, 
-    
+    } 
     
     
 })    

@@ -5,8 +5,13 @@
 *@author  (admin)
 *@date 01-06-2015 05:58:00
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
-*/
+ *    HISTORIAL DE MODIFICACIONES:
 
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0              08-10-2018           RAC                 Creacion 
+ #1234           08-10-2018           RAC                 Se agregan datos para proveedor y facturas NCD en ETR 
+ #1				 15-10-2018			  EGS				 se agrego validacion para tipo de reporte pdf o nativo del sistema ventas con el prefijo PDF- 
+*/
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -597,6 +602,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	fields: [
 		{name:'id_venta', type: 'numeric'},
 		{name:'id_cliente', type: 'numeric'},
+		{name:'id_proveedor', type: 'numeric'},
 		{name:'id_sucursal', type: 'numeric'},
 		{name:'id_punto_venta', type: 'numeric'},
 		{name:'id_proceso_wf', type: 'numeric'},
@@ -641,7 +647,12 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		'id_moneda','total_venta_msuc','transporte_fob','seguros_fob',
 		'otros_fob','transporte_cif','seguros_cif','otros_cif',
 		'tipo_cambio_venta','desc_moneda','valor_bruto',
-		'descripcion_bulto','cliente_destino','id_cliente_destino'
+		'descripcion_bulto','cliente_destino','id_cliente_destino',
+		'id_contrato',  'desc_contrato',  
+		'id_centro_costo', 
+		'desc_centro_costo',
+		'codigo_aplicacion',
+		'id_venta_fk','nro_factura_vo','id_dosificacion_vo','nroaut_vo','total_venta_vo'   // #1234  
 		
 		
 	],
@@ -697,9 +708,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     
     onButtonEdit : function () {
         //abrir formulario de solicitud
-        this.openForm('edit', this.sm.getSelected());  
-        
-        console.log(' this.sm.getSelected()........', this.sm.getSelected())      
+        this.openForm('edit', this.sm.getSelected());               
     },    
     
     arrayDefaultColumHidden:['estado_reg','usuario_ai',
@@ -773,7 +782,12 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         var rec=this.sm.getSelected();
         var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
         if (objRes.ROOT.datos.estado == 'finalizado' && this.tipo_factura != 'manual') {
-            this.imprimirNota();
+            
+            ///#1				 15-10-2018			  EGS	
+            
+             this.elegirFormato();
+            //this.imprimirNota();
+        	 ///#1				 15-10-2018			  EGS	
         }
         Phx.CP.loadingHide();
         resp.argument.wizard.panel.destroy();
@@ -798,7 +812,37 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                scope:this
              })
    },
+   ///#1				 15-10-2018			  EGS	 
+   elegirFormato: function(){
+   	var rec = this.sm.getSelected(),
+		data = rec.data,
+		me = this;
+   	
+   	 
+   var formato_comprobante = this.variables_globales.formato_comprobante.split("-");   
+                      
+     formato_comprobante = formato_comprobante[0];
+      //console.log('data normal',formato_comprobante);
+     formato_comprobante = formato_comprobante.toUpperCase();
+     console.log('data',formato_comprobante);
+   	
+   	if (formato_comprobante == 'PDF') {
+   		
+		console.log('imprimirPdf');
+   		this.imprimirPdf();
+   		
+   	} else{
+   		
+   		console.log('imprimirNota');
+   		this.imprimirNota();
+   		
+
+   	 }
+
+   },
    
+    ///#1				 15-10-2018			  EGS	
+
    imprimirNota: function(){
 		//Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
 			
@@ -831,7 +875,32 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 
 
     },
-   
+    
+    
+     ///#1				 15-10-2018			  EGS	
+    imprimirPdf : function() {
+			var rec = this.sm.getSelected();
+			var data = rec.data;
+			me = this;			
+			if (data) {
+				Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_ventas_facturacion/control/Venta/reporteFacturaReciboPdf',
+					params : {
+							'id_venta' : data.id_venta,
+							'formato_comprobante' : me.variables_globales.formato_comprobante,
+							'tipo_factura': me.tipo_factura
+					},
+					success : this.successExport,
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			}
+
+	},
+    
+    ///#1				 15-10-2018			  EGS	
    onAntEstado:function(wizard,resp){
             Phx.CP.loadingShow(); 
             Ext.Ajax.request({ 

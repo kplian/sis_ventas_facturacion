@@ -14,11 +14,13 @@ $body$
    FECHA:	        01-06-2015 05:58:00
    COMENTARIOS:
   ***************************************************************************
-   HISTORIAL DE MODIFICACIONES:
+   
+    HISTORIAL DE MODIFICACIONES:
 
-   DESCRIPCION:
-   AUTOR:
-   FECHA:
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0              01/06/2016        JRR                 Creacion 
+ #123            25/09/2018        RAC                 Se adicionan datos de proveedor al guardar la factura  
+    
   ***************************************************************************/
 
   DECLARE
@@ -108,6 +110,19 @@ $body$
     v_hora_estimada_entrega	time;
     v_tiene_formula			varchar;
     v_forma_pedido			varchar;
+    v_id_proveedor          integer;
+    v_id_contrato           integer;
+    v_id_centro_costo       integer;
+    v_codigo_aplicacion     varchar;
+    v_nit_internacional     varchar;
+    v_sw_ncd                boolean; --#123
+    v_ncd                   varchar; --#123
+    v_id_venta_fk           integer; --#123
+    v_vef_por_per_ncd       varchar; --#123
+    v_total_venta           numeric; --#123
+    v_total_venta_ncd       numeric; --#123
+    v_importe_codigo_control    numeric; --#123
+    v_tipo_dosificacion         varchar; --#123
 
 
   BEGIN
@@ -126,7 +141,17 @@ $body$
 
       begin
         v_tiene_formula = 'no';
+        v_nit_internacional = 'no';
         --obtener correlativo
+        
+        --#123    validar si viene  de una nota de credito
+        v_sw_ncd = false;
+        v_ncd = 'no';
+        if (pxp.f_existe_parametro(p_tabla,'id_venta_fk')) then
+           v_sw_ncd = true;
+           v_ncd = 'si';
+           v_id_venta_fk = v_parametros.id_venta_fk;
+        end if;
 
         select id_periodo into v_id_periodo from
           param.tperiodo per
@@ -181,7 +206,12 @@ $body$
         ELSIF(v_tipo_base = 'manual') then
           v_fecha = v_parametros.fecha;
           v_nro_factura = v_parametros.nro_factura;
-          v_excento = v_parametros.excento;
+          IF  pxp.f_existe_parametro(p_tabla, 'excento') THEN --#1234 validacion del excento
+               v_excento = v_parametros.excento;
+          ELSE
+               v_excento = 0;
+          END IF;
+          
           v_id_dosificacion = v_parametros.id_dosificacion;
 
           --validaciones de factura manual
@@ -208,13 +238,18 @@ $body$
 
         ELSE
 
-          IF   v_tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin')  THEN
+          IF   v_tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg')  THEN --#123  agrega computarizadareg  
             -- la fecha es abierta
             v_fecha = v_parametros.fecha;
 
           ELSE
             v_fecha = now()::date;
-            v_excento = v_parametros.excento;
+            IF  pxp.f_existe_parametro(p_tabla, 'excento') THEN
+               v_excento = v_parametros.excento;
+            ELSE
+               v_excento = 0;
+            END IF;
+           
           END IF;
 
         end if;
@@ -317,39 +352,61 @@ $body$
         else
           v_forma_pedido =NULL;
         end if;
+        
+        --#123 verifica si no existe el id_cliente entonces es id_proveedor
+        IF  pxp.f_existe_parametro(p_tabla,'id_cliente')  THEN
+     
+              if (pxp.f_is_positive_integer(v_parametros.id_cliente)) THEN
+                v_id_cliente = v_parametros.id_cliente::integer;
 
+                update vef.tcliente
+                set nit = v_parametros.nit
+                where id_cliente = v_id_cliente;
 
-        if (pxp.f_is_positive_integer(v_parametros.id_cliente)) THEN
-          v_id_cliente = v_parametros.id_cliente::integer;
+                select c.nombre_factura into v_nombre_factura
+                from vef.tcliente c
+                where c.id_cliente = v_id_cliente;
+              else
+                INSERT INTO
+                  vef.tcliente
+                  (
+                    id_usuario_reg,
+                    fecha_reg,
+                    estado_reg,
+                    nombre_factura,
+                    nit
+                  )
+                VALUES (
+                  p_id_usuario,
+                  now(),
+                  'activo',
+                  v_parametros.id_cliente,
+                  v_parametros.nit
+                ) returning id_cliente into v_id_cliente;
 
-          update vef.tcliente
-          set nit = v_parametros.nit
-          where id_cliente = v_id_cliente;
+                v_nombre_factura = v_parametros.id_cliente;
 
-          select c.nombre_factura into v_nombre_factura
-          from vef.tcliente c
-          where c.id_cliente = v_id_cliente;
-        else
-          INSERT INTO
-            vef.tcliente
-            (
-              id_usuario_reg,
-              fecha_reg,
-              estado_reg,
-              nombre_factura,
-              nit
-            )
-          VALUES (
-            p_id_usuario,
-            now(),
-            'activo',
-            v_parametros.id_cliente,
-            v_parametros.nit
-          ) returning id_cliente into v_id_cliente;
-
-          v_nombre_factura = v_parametros.id_cliente;
-
-        end if;
+              end if;
+        ELSE
+        
+                v_id_proveedor = v_parametros.id_proveedor; 
+                
+                
+                select 
+                     p.desc_proveedor2,
+                     tp.internacional   
+                into 
+                v_nombre_factura,
+                v_nit_internacional
+                from param.vproveedor p
+                inner join param.tproveedor tp on tp.id_proveedor = p.id_proveedor 
+                where p.id_proveedor =  v_parametros.id_proveedor::integer; 
+           
+                
+        
+        END IF;
+        
+        
         
         v_id_cliente_destino = null;
         --si tenemos cliente destino
@@ -433,9 +490,23 @@ $body$
         if (pxp.f_existe_parametro(p_tabla,'tipo_cambio_venta')) then
           v_tipo_cambio_venta = v_parametros.tipo_cambio_venta;
         end if;
-
-
-
+        
+        
+        --#123  verifica si tiene contrato
+        if (pxp.f_existe_parametro(p_tabla,'id_contrato')) then
+          v_id_contrato = v_parametros.id_contrato;
+        end if;
+        
+        --#123 verifica si tiene centro de costo
+        if (pxp.f_existe_parametro(p_tabla,'id_centro_costo')) then
+          v_id_centro_costo = v_parametros.id_centro_costo;
+        end if;
+        
+        --#123 verifica si tiene aplicacion        
+        if (pxp.f_existe_parametro(p_tabla,'codigo_aplicacion')) then
+          v_codigo_aplicacion = v_parametros.codigo_aplicacion;
+        end if;
+         
 
         --Sentencia de la insercion
         insert into vef.tventa(
@@ -482,9 +553,14 @@ $body$
           id_cliente_destino,
           hora_estimada_entrega,
           tiene_formula,
-          forma_pedido
-
-
+          forma_pedido,
+          id_proveedor,--#123 
+          id_contrato,--#123 
+          id_centro_costo,--#123 
+          codigo_aplicacion, --#123 
+          nit_internacional, --#123 
+          ncd,
+          id_venta_fk
         ) values(
           v_id_venta,
           v_id_cliente,
@@ -530,10 +606,20 @@ $body$
           v_id_cliente_destino,
           v_hora_estimada_entrega,
           v_tiene_formula,
-          v_forma_pedido
+          v_forma_pedido,
+          v_id_proveedor,--#123 
+          v_id_contrato,--#123 
+          v_id_centro_costo,--#123 
+          v_codigo_aplicacion, --#123 
+          v_nit_internacional, --#123 
+          v_ncd, --#123
+          v_id_venta_fk   -- #123
 
 
         ) returning id_venta into v_id_venta;
+        
+        
+        
         
         if (v_parametros.id_forma_pago != 0 ) then
 
@@ -591,12 +677,25 @@ $body$
     elsif(p_transaccion='VF_VEN_MOD')then
 
       begin
+      
         select
           v.*
         into
           v_registros
         from vef.tventa v
         where v.id_venta = v_parametros.id_venta;
+        
+        --  #123    validar si viene de una nota de credito
+        v_sw_ncd = false;
+        v_ncd = 'no';
+        if (pxp.f_existe_parametro(p_tabla,'id_venta_fk')) then
+           v_sw_ncd = true;
+           v_ncd = 'si';
+           v_id_venta_fk = v_parametros.id_venta_fk;
+        end if;
+        
+        
+        v_nit_internacional = 'no'; --#123   para identificar proveedor con nit internacional, por defecto valor no
 
         v_tiene_formula = 'no';
         if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
@@ -669,17 +768,27 @@ $body$
         IF(v_tipo_base = 'manual') then
           v_fecha = v_parametros.fecha;
           v_nro_factura = v_parametros.nro_factura;
-          v_excento = v_parametros.excento;
+          
+          IF  pxp.f_existe_parametro(p_tabla, 'excento') THEN  --#123 validacion del excento
+               v_excento = v_parametros.excento;
+          ELSE
+               v_excento = 0;
+          END IF;
+          
           v_id_dosificacion = v_parametros.id_dosificacion;
         elsif (v_tipo_base = 'computarizada')  then
 
-          IF   v_tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin')  THEN
+          IF   v_tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg')  THEN
             v_fecha = v_parametros.fecha;
             v_nro_factura = v_venta.nro_factura;
             v_id_dosificacion = v_venta.id_dosificacion;
 
           ELSE
-            v_excento = v_parametros.excento;
+            IF  pxp.f_existe_parametro(p_tabla, 'excento') THEN  --#123 validacion del excento
+               v_excento = v_parametros.excento;
+            ELSE
+               v_excento = 0;
+            END IF;
           END IF;
 
         end if;
@@ -740,37 +849,58 @@ $body$
         else
           v_forma_pedido =NULL;
         end if;
+        
+         --#123 verifica si no existe el id_cliente entonces es id_proveedor
+        IF  pxp.f_existe_parametro(p_tabla,'id_cliente')  THEN
 
-        if (pxp.f_is_positive_integer(v_parametros.id_cliente)) THEN
-          v_id_cliente = v_parametros.id_cliente::integer;
+              if (pxp.f_is_positive_integer(v_parametros.id_cliente)) THEN
+                v_id_cliente = v_parametros.id_cliente::integer;
 
-          update vef.tcliente
-          set nit = v_parametros.nit
-          where id_cliente = v_id_cliente;
+                update vef.tcliente
+                set nit = v_parametros.nit
+                where id_cliente = v_id_cliente;
 
-          select c.nombre_factura into v_nombre_factura
-          from vef.tcliente c
-          where c.id_cliente = v_id_cliente;
-        else
-          INSERT INTO
-            vef.tcliente
-            (
-              id_usuario_reg,
-              fecha_reg,
-              estado_reg,
-              nombre_factura,
-              nit
-            )
-          VALUES (
-            p_id_usuario,
-            now(),
-            'activo',
-            v_parametros.id_cliente,
-            v_parametros.nit
-          ) returning id_cliente into v_id_cliente;
+                select c.nombre_factura into v_nombre_factura
+                from vef.tcliente c
+                where c.id_cliente = v_id_cliente;
+              else
+                INSERT INTO
+                  vef.tcliente
+                  (
+                    id_usuario_reg,
+                    fecha_reg,
+                    estado_reg,
+                    nombre_factura,
+                    nit
+                  )
+                VALUES (
+                  p_id_usuario,
+                  now(),
+                  'activo',
+                  v_parametros.id_cliente,
+                  v_parametros.nit
+                ) returning id_cliente into v_id_cliente;
 
-          v_nombre_factura = v_parametros.id_cliente;
-        end if;
+                v_nombre_factura = v_parametros.id_cliente;
+              end if;
+         ELSE   
+         
+              v_id_proveedor = v_parametros.id_proveedor; 
+              
+               
+                select 
+                     p.desc_proveedor2,
+                     tp.internacional   
+                into 
+                v_nombre_factura,
+                v_nit_internacional
+                from param.vproveedor p
+                inner join param.tproveedor tp on tp.id_proveedor = p.id_proveedor 
+                where p.id_proveedor =  v_parametros.id_proveedor::integer; 
+           
+              
+         
+         END IF; --#123
 
              v_id_cliente_destino = null;
 
@@ -798,6 +928,21 @@ $body$
                 	
                 end if;
            end if; 
+           
+         --#123  verifica si tiene contrato
+        if (pxp.f_existe_parametro(p_tabla,'id_contrato')) then
+          v_id_contrato = v_parametros.id_contrato;
+        end if;
+        
+        --#123 verifica si tiene centro de costo
+        if (pxp.f_existe_parametro(p_tabla,'id_centro_costo')) then
+          v_id_centro_costo = v_parametros.id_centro_costo;
+        end if;
+        
+        --#123 verifica si tiene aplicacion        
+        if (pxp.f_existe_parametro(p_tabla,'codigo_aplicacion')) then
+          v_codigo_aplicacion = v_parametros.codigo_aplicacion;
+        end if;
 	        
 	        
 	        
@@ -839,9 +984,18 @@ $body$
           valor_bruto = COALESCE(v_valor_bruto,0),
           descripcion_bulto = COALESCE(v_descripcion_bulto,''),
           nit = v_parametros.nit,
-              nombre_factura = v_nombre_factura ,
-              id_cliente_destino = v_id_cliente_destino
+          nombre_factura = v_nombre_factura ,
+          id_cliente_destino = v_id_cliente_destino,
+          id_proveedor = v_id_proveedor ,           -- #123 add id_proveedor
+          nit_internacional = v_nit_internacional,  -- #123
+          id_venta_fk = v_id_venta_fk,              -- #123
+          id_centro_costo = v_id_centro_costo,      -- #123
+          codigo_aplicacion = v_codigo_aplicacion,  -- #123
+          id_contrato = v_id_contrato               -- #123
         where id_venta=v_parametros.id_venta;
+        
+        
+         
 
 
 
@@ -913,7 +1067,7 @@ $body$
 
 
 
-        IF  v_registros.tipo_factura not in  ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
+        IF  v_registros.tipo_factura not in  ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN
 
 
 
@@ -997,9 +1151,16 @@ $body$
     elsif(p_transaccion='VF_VENVALI_MOD')then
 
       begin
-        vef_estados_validar_fp = pxp.f_get_variable_global('vef_estados_validar_fp');
+         vef_estados_validar_fp = pxp.f_get_variable_global('vef_estados_validar_fp');
         --obtener datos de la venta y la moneda base
-
+        
+        --#123    validar si biene de para el registros de uan nota de credito
+        v_sw_ncd = false; 
+        if (pxp.f_existe_parametro(p_tabla,'id_venta_fk')) then
+           v_sw_ncd = true;
+           v_id_venta_fk = v_parametros.id_venta_fk;
+        end if;
+        
         select
           v.* ,
           sm.id_moneda as id_moneda_base,
@@ -1019,7 +1180,7 @@ $body$
         ELSE
           v_id_moneda_venta = v_venta.id_moneda_base;
         END IF;
-
+        
         v_id_moneda_suc = v_venta.id_moneda_base;
 
         --Validar que solo haya conceptos contabilizables o no contabilizables
@@ -1027,19 +1188,45 @@ $body$
         from vef.tventa_detalle vd
           left join vef.tsucursal_producto sp on sp.id_sucursal_producto = vd.id_sucursal_producto
         where vd.id_venta = v_parametros.id_venta;
-
-
-        if (v_cantidad > 1) then
-          raise exception 'No puede utilizar conceptos contabilizables y no contabilizables en la misma venta';
-        else
-          update vef.tventa set contabilizable = (
-            select distinct sp.contabilizable
-            from vef.tventa_detalle vd
-              left join vef.tsucursal_producto sp on sp.id_sucursal_producto = vd.id_sucursal_producto
-            where vd.id_venta = v_parametros.id_venta)
-          where id_venta = v_parametros.id_venta;
-        end if;
-
+        
+       
+        
+       IF not v_sw_ncd THEN   --#123 validar solo si no es una nota de credito
+          if (v_cantidad > 1) then
+            raise exception 'No puede utilizar conceptos contabilizables y no contabilizables en la misma venta';
+          else
+            update vef.tventa set contabilizable = (
+              select distinct sp.contabilizable
+              from vef.tventa_detalle vd
+                left join vef.tsucursal_producto sp on sp.id_sucursal_producto = vd.id_sucursal_producto
+              where vd.id_venta = v_parametros.id_venta)
+            where id_venta = v_parametros.id_venta;
+          end if;
+          
+          
+        ELSE
+            --#123 si es una nota de credito sobre venta tenemos que validar , que la factura no haya sido devuelta es mas de un 50%, (peude ser acumulado)          
+           --obteermos la variable global de configuracion de porcentaje permitido
+           v_vef_por_per_ncd =  pxp.f_get_variable_global('vef_porcentaje_permitodo_ncd'); 
+           
+           --calcula el porcetaje de la factura vinculada
+           select 
+              vef.total_venta into v_total_venta
+           from vef.tventa vef
+           where vef.id_venta = v_id_venta_fk;
+           
+           --calcularmos todas las notas de credito
+           select 
+              sum(vef.total_venta) into v_total_venta_ncd
+           from vef.tventa vef
+           where vef.id_venta_fk = v_id_venta_fk;
+           --si el total de la notas de credito sobre pasa el porcetaje permitido, mostramos un error
+           IF  v_total_venta_ncd > (v_total_venta * (v_vef_por_per_ncd::numeric))  THEN
+              raise exception 'El total de NCD no puede superar el % %' , (v_vef_por_per_ncd::numeric)*100,'%';
+           END IF;
+        
+        END IF;
+       
 
         select count(*) into v_cantidad
         from vef.tventa_detalle vd
@@ -1125,9 +1312,8 @@ $body$
           IF v_parametros.tipo_factura != 'computarizadaexpo' THEN
             v_suma_det = COALESCE(v_suma_det,0) + COALESCE(v_venta.transporte_fob ,0)  + COALESCE(v_venta.seguros_fob ,0)+ COALESCE(v_venta.otros_fob ,0) + COALESCE(v_venta.transporte_cif ,0) +  COALESCE(v_venta.seguros_cif ,0) + COALESCE(v_venta.otros_cif ,0);
           END IF;
-
-
-
+          
+          
           if (v_suma_fp < v_venta.total_venta) then
             raise exception 'El importe recibido es menor al valor de la venta, falta %', v_venta.total_venta - v_suma_fp;
           end if;
@@ -1144,6 +1330,11 @@ $body$
         select sum(cambio) into v_suma_fp
         from vef.tventa_forma_pago
         where id_venta =   v_parametros.id_venta;
+        
+          --#123  se bloquea que el monto percibido pueda ser mayor que el pagado
+          if (v_suma_fp >0) then
+            raise exception 'El importe recibido es mayor al valor de la venta, sobra %',  v_suma_fp;
+          end if;
 
 
 
@@ -1160,7 +1351,7 @@ $body$
         where v.id_venta = v_parametros.id_venta;
 
         --si es factura comercial de exportacion generamos el numero de factura y validamos la fecha
-        IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
+        IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN
           IF  v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin') THEN
             update vef.tventa v set
               excento = total_venta_msuc
@@ -1196,6 +1387,7 @@ $body$
                   d.fecha_limite >= v_venta.fecha and d.tipo = 'F' and d.tipo_generacion = 'computarizada' and
                   d.id_sucursal = v_venta.id_sucursal and
                   d.id_activida_economica @> v_id_actividad_economica FOR UPDATE;
+                      
 
             v_nro_factura = v_dosificacion.nro_siguiente;
 
@@ -1297,7 +1489,12 @@ $body$
 
 
         END IF;
-        if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si') then
+        
+        --#123   29/09/2018 
+        --... se migran solo facturas con autizacion, nro y fecha  por que al no tener numero  de factura el LCV no permite registrar mas de dos facturas en borrador
+        --    Se insertar el LCV al momento de generar el numero de la factura y codigo de control solamente 
+         
+        if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si')   AND   v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN 
           v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'INS',v_parametros.id_venta);
         end if;
 
@@ -1411,44 +1608,65 @@ $body$
        $this->setParametro('obs','obs','text');
        $this->setParametro('json_procesos','json_procesos','text');
        */
-
+       
+       
         select
           ew.id_tipo_estado ,
           ew.id_estado_wf
         into
           v_id_tipo_estado,
           v_id_estado_wf
+          
 
         from wf.testado_wf ew
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
         where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
 
-        select v.*,s.id_entidad,tv.tipo_base into v_venta
+        select 
+           v.*,s.id_entidad,tv.tipo_base into v_venta
         from vef.tventa v
-          inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal
-          inner join vef.tcliente c on c.id_cliente = v.id_cliente
+          inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal          
           inner join vef.ttipo_venta tv on tv.codigo = v.tipo_factura and tv.estado_reg = 'activo'
+          left  join vef.tcliente c on c.id_cliente = v.id_cliente
         where v.id_proceso_wf = v_parametros.id_proceso_wf_act;
-
-        v_tabla = pxp.f_crear_parametro(ARRAY[	'_nombre_usuario_ai',
-        '_id_usuario_ai',
-        'id_venta',
-        'tipo_factura'],
-                                        ARRAY[	coalesce(v_parametros._nombre_usuario_ai,''),
-                                        coalesce(v_parametros._id_usuario_ai::varchar,''),
-                                        v_venta.id_venta::varchar,
-                                        v_venta.tipo_factura],
-                                        ARRAY[	'varchar',
-                                        'integer',
-                                        'integer',
-                                        'varchar']
+        
+        
+        -- #123  identifica si es una nota de credito o no
+        IF v_venta.id_venta_fk is null THEN
+           v_ncd = 'no';
+        ELSE
+           v_ncd = 'si';
+        END IF;
+        
+       IF v_venta.nit is null THEN
+          raise exception 'el nit no puede ser nulo';  --NIT internacional
+       END IF;
+        
+       -- raise EXCEPTION 'sasdasd  1 %, 2 %, 3 %, 4 %, 5 %', coalesce(v_parametros._nombre_usuario_ai,'x'), v_parametros._id_usuario_ai   ,v_venta.id_venta ,v_venta.tipo_factura, v_venta.id_venta_fk  ;
+       
+       v_tabla = pxp.f_crear_parametro(ARRAY[	'_nombre_usuario_ai',
+                                                '_id_usuario_ai',
+                                                'id_venta',
+                                                'tipo_factura',
+                                                'id_venta_fk'
+                                              ], 
+                                       ARRAY[	coalesce(v_parametros._nombre_usuario_ai,''),
+                                                coalesce(v_parametros._id_usuario_ai::varchar,''),
+                                                v_venta.id_venta::varchar,
+                                                v_venta.tipo_factura,
+                                                coalesce(v_venta.id_venta_fk::varchar,'')::varchar
+                                            ],  
+                                      ARRAY[	'varchar',
+                                                'integer',
+                                                'integer',
+                                                'varchar',
+                                                'integer'
+                                            ]
         );
+        
+        
         v_resp = vef.ft_venta_ime(p_administrador,p_id_usuario,v_tabla,'VF_VENVALI_MOD');
-
-
-
-
-
+        
         -- obtener datos tipo estado
 
         select
@@ -1505,7 +1723,7 @@ $body$
 
         if (v_venta.tipo_base = 'computarizada' and v_es_fin = 'si') then
 
-          IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
+          IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin', 'computarizadareg') THEN
             v_fecha_venta = now()::date;
             if (EXISTS(	select 1
                          from vef.tventa v
@@ -1518,80 +1736,106 @@ $body$
           --no validamos la fecha en las facturas de exportacion
           --por que  valida al insertar la factura, donde se genera el nro de la factura
           END IF;
-
-          select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica
-          from vef.tventa_detalle vd
-            inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
-            inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
-          where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo';
-
+          
+          -- #123 si no es una nota de credito botiene de sucusal producto la actividad economica 
+          IF v_ncd = 'no' THEN  
+              select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica
+              from vef.tventa_detalle vd
+                inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
+                inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
+              where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo';
+              v_tipo_dosificacion = 'F';-- #123
+          ELSE  
+             --#123 para notas de credito la actividad economica se dereiva de la factura relacionada
+             
+             select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica
+             from vef.tventa_detalle vd
+                inner join vef.tventa_detalle vdo on vdo.id_venta_detalle = vd.id_venta_detalle_fk   
+                inner join vef.tsucursal_producto sp on vdo.id_sucursal_producto = sp.id_sucursal_producto
+                inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
+             where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo';
+             v_tipo_dosificacion = 'N';
+             
+             --raise exception 'v_id_actividad_economica.....(%)',v_id_actividad_economica; 
+          
+          END IF;
           --genera el numero de factura
 
-          IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin') THEN
+          IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN  --#123 se agrega el tipo computarizadareg
 			
-            select d.* into v_dosificacion
-            from vef.tdosificacion d
-            where d.estado_reg = 'activo' and d.fecha_inicio_emi <= v_venta.fecha and
-                  d.fecha_limite >= v_venta.fecha and d.tipo = 'F' and d.tipo_generacion = 'computarizada' and
-                  d.id_sucursal = v_venta.id_sucursal and
-                  d.id_activida_economica @> v_id_actividad_economica FOR UPDATE;
+                select d.* into v_dosificacion
+                from vef.tdosificacion d
+                where d.estado_reg = 'activo' and d.fecha_inicio_emi <= v_venta.fecha and
+                      d.fecha_limite >= v_venta.fecha and d.tipo = v_tipo_dosificacion and d.tipo_generacion = 'computarizada' and    --#123 considerar tipo de sosificcion
+                      d.id_sucursal = v_venta.id_sucursal and
+                      d.id_activida_economica @> v_id_actividad_economica FOR UPDATE;
 
-            v_nro_factura = v_dosificacion.nro_siguiente;
+                v_nro_factura = v_dosificacion.nro_siguiente;
+
+              
+                if (v_dosificacion is null) then
+                  raise exception 'No existe una dosificacion activa para emitir la factura';
+                end if;
+                --validar que el nro de factura no supere el maximo nro de factura de la dosificaiocn
+                if (exists(	select 1
+                             from vef.tventa ven
+                             where ven.nro_factura =  v_dosificacion.nro_siguiente and ven.id_dosificacion = v_dosificacion.id_dosificacion)) then
+                  raise exception 'El numero de factura ya existe para esta dosificacion. Por favor comuniquese con el administrador del sistema';
+                end if;
+     
+                IF  v_ncd = 'no' THEN --#123  si no es una nota de credito el codigo de control se genera con el total de la venta
+                   v_importe_codigo_control = v_venta.total_venta;
+                ELSE    --#123 si es una nota de credito el codigo de contro se genera con el 13% de la total devuelto
+                   v_importe_codigo_control = v_venta.total_venta * 0.13;
+                END IF;
+                
+                --la factura de exportacion no altera la fecha
+                update vef.tventa  set
+                  id_dosificacion = v_dosificacion.id_dosificacion,
+                  nro_factura = v_nro_factura,
+                  fecha = v_fecha_venta,
+                  cod_control = pxp.f_gen_cod_control(v_dosificacion.llave,
+                                                      v_dosificacion.nroaut,
+                                                      v_nro_factura::varchar,
+                                                      pxp.f_iif((v_venta.nit_internacional = 'no') ,v_venta.nit, '0'),  --#123  cuadno es internacional el codigo de control se debe generrar con  cero
+                                                      to_char(v_fecha_venta,'YYYYMMDD')::varchar,
+                                                      round(v_venta.total_venta,0))
+                where id_venta = v_venta.id_venta;
 
 
-
-            if (v_dosificacion is null) then
-              raise exception 'No existe una dosificacion activa para emitir la factura';
-            end if;
-            --validar que el nro de factura no supere el maximo nro de factura de la dosificaiocn
-            if (exists(	select 1
-                         from vef.tventa ven
-                         where ven.nro_factura =  v_dosificacion.nro_siguiente and ven.id_dosificacion = v_dosificacion.id_dosificacion)) then
-              raise exception 'El numero de factura ya existe para esta dosificacion. Por favor comuniquese con el administrador del sistema';
-            end if;
-
-            --la factura de exportacion no altera la fecha
-            update vef.tventa  set
-              id_dosificacion = v_dosificacion.id_dosificacion,
-              nro_factura = v_nro_factura,
-              fecha = v_fecha_venta,
-              cod_control = pxp.f_gen_cod_control(v_dosificacion.llave,
-                                                  v_dosificacion.nroaut,
-                                                  v_nro_factura::varchar,
-                                                  v_venta.nit,
-                                                  to_char(v_fecha_venta,'YYYYMMDD')::varchar,
-                                                  round(v_venta.total_venta,0))
-            where id_venta = v_venta.id_venta;
-
-
-            update vef.tdosificacion
-            set nro_siguiente = nro_siguiente + 1
-            where id_dosificacion = v_dosificacion.id_dosificacion;
+                update vef.tdosificacion
+                set nro_siguiente = nro_siguiente + 1
+                where id_dosificacion = v_dosificacion.id_dosificacion;
 
 
           ELSE
-            -- en las facturas de exportacion y minera  el numero se genera al inserta
-            v_nro_factura =  v_venta.nro_factura;
+              -- en las facturas de exportacion y minera  el numero se genera al inserta
+              -- #123 amtien la facturas computarizadareg,    añaden la fecha al isnertar el documento en borrador
+              v_nro_factura =  v_venta.nro_factura;
 
-            select
-              *
-            into  v_dosificacion
-            from  vef.tdosificacion d where d.id_dosificacion = v_venta.id_dosificacion;
+              select
+                *
+              into  v_dosificacion
+              from  vef.tdosificacion d where d.id_dosificacion = v_venta.id_dosificacion;
+              
+              --raise exception '...  %  - ID %',v_dosificacion, v_venta.id_dosificacion;
 
 
-            --la factura de exportacion no altera la fecha
-            update vef.tventa  set
-              cod_control = pxp.f_gen_cod_control(v_dosificacion.llave,
-                                                  v_dosificacion.nroaut,
-                                                  v_nro_factura::varchar,
-                                                  v_venta.nit,
-                                                  to_char(v_fecha_venta,'YYYYMMDD')::varchar,
-                                                  round(v_venta.total_venta_msuc,0))
-            where id_venta = v_venta.id_venta;
+              --la factura de exportacion no altera la fecha
+              update vef.tventa  set
+                  cod_control = pxp.f_gen_cod_control(v_dosificacion.llave,
+                                                      v_dosificacion.nroaut,
+                                                      v_nro_factura::varchar,
+                                                      pxp.f_iif((v_venta.nit_internacional = 'no') ,v_venta.nit, '0'),  --#123  cuadno es internacional el codigo de control se debe generrar con  cero
+                                                      to_char(v_fecha_venta,'YYYYMMDD')::varchar,
+                                                      round(v_venta.total_venta_msuc,0))
+              where id_venta = v_venta.id_venta;
 
 
           END IF;
+          
         end if;
+        
         if (v_es_fin = 'si' and pxp.f_get_variable_global('vef_tiene_apertura_cierre') = 'si') then
 
           if (exists(	select 1
@@ -1620,8 +1864,10 @@ $body$
 
         --inserta o modifical el libro de ventas
         if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si' and v_es_fin = 'si') then
-          v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'FIN',v_venta.id_venta);
+         v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'FIN',v_venta.id_venta);
         end if;
+        
+        --raise exception 'pasa..... % , %', v_es_fin , pxp.f_get_variable_global('vef_integracion_lcv');
 
         -- si hay mas de un estado disponible  preguntamos al usuario
         v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado de la planilla)');

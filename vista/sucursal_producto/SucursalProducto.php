@@ -5,6 +5,8 @@
 *@author  (admin)
 *@date 21-04-2015 03:18:44
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ * Issue 					Fecha			Author				Descripcion					
+ * #1					25/09/2018			EGS					Comentado por que no carga los conceptos de gasto al elegir por entidad
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -198,8 +200,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                     fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot','descripcion_larga','ruta_foto','codigo','nandina'],
                     // turn on remote sorting
                     remoteSort: true,
-                    baseParams:{par_filtro:'desc_ingas',movimiento:'recurso',start:0,
-                        limit:99999}
+                    baseParams:{par_filtro:'desc_ingas',movimiento:'recurso',start:0,limit:99999}
                     }),
                 valueField: 'id_concepto_ingas',
                 displayField: 'desc_ingas',
@@ -217,7 +218,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                 resizable:true,
                 anchor:'100%', 
                 gwidth: 200,  
-                minChars : 3,    
+                minChars : 1,    
                 renderer:function(value, p, record){return String.format('{0}', record.data['nombre_producto']);}
             },
             type:'ComboBox',
@@ -573,7 +574,9 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
         this.Atributos[1].valorInicial = this.maestro.id_sucursal;
         this.store.baseParams={id_sucursal:this.maestro.id_sucursal};
         this.load({params:{start:0, limit:50}});
-        this.Cmp.nombre_producto.store.baseParams.id_entidad = this.maestro.id_entidad;
+        
+        /////Comentado por que no carga los conceptos de gasto al elegir
+        //this.Cmp.nombre_producto.store.baseParams.id_entidad = this.maestro.id_entidad;
             
     },
     iniciarEventos :  function () {

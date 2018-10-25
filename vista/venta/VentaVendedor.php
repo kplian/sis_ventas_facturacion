@@ -36,7 +36,7 @@ Phx.vista.VentaVendedor = {
                 text: 'Imprimir',
                 iconCls: 'bpdf32',
                 disabled: true,
-                handler: this.imprimirNota,
+                handler: this.elegirFormato,
                 tooltip: '<b>Imprimir Formulario de Venta</b><br/>Imprime el formulario de la venta'
             }
         );

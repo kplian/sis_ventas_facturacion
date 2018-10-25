@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -15,12 +13,12 @@ $body$
  AUTOR: 		 (admin)
  FECHA:	        01-06-2015 09:21:07
  COMENTARIOS:	
-***************************************************************************
- HISTORIAL DE MODIFICACIONES:
+  ***************************************************************************
+   HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0              01-06-2015        JRR                 Creacion 
+ #123            10/10/2018        RAC                se adiciona id_venta_detalle_fx para notas de credito sobre ventas	
 ***************************************************************************/
 
 DECLARE
@@ -55,6 +53,8 @@ BEGIN
                                 vedet.id_sucursal_producto
                             when vedet.id_formula is not null then
                                 vedet.id_formula
+                            when vedet.id_venta_detalle_fk is not null then    --#123
+                                vedet.id_venta_detalle_fk
                             end) as id_producto,
                             vedet.tipo,
                             vedet.estado_reg,
@@ -73,6 +73,8 @@ BEGIN
                                 item.codigo  || '' - '' ||  item.nombre
                             when vedet.id_sucursal_producto is not null then
                                 cig.desc_ingas
+                            when vedet.id_venta_detalle_fk is not null then  --#123
+                                cigvo.desc_ingas
                             when vedet.id_formula is not null then
                                 form.nombre
                             end)::varchar as nombre_producto,
@@ -94,6 +96,8 @@ BEGIN
                              end)::varchar as nombre_vendedor_medico,
                              (case when vedet.id_sucursal_producto is not null then
                                 sprod.requiere_descripcion
+                              when vedet.id_venta_detalle_fk is not null then  --#123
+                                spvo.requiere_descripcion 
                             else
                                 ''no''::varchar
                             end) as requiere_descripcion,
@@ -118,12 +122,15 @@ BEGIN
                         left join segu.vusuario ven on ven.id_usuario = vedet.id_vendedor
                         left join param.tunidad_medida um on um.id_unidad_medida = vedet.id_unidad_medida
                         left join param.tunidad_medida umcig on umcig.id_unidad_medida = cig.id_unidad_medida
+                        left join vef.tventa_detalle vdfo  ON vdfo.id_venta_detalle = vedet.id_venta_detalle_fk    --#123
+                        left join vef.tsucursal_producto spvo on spvo.id_sucursal_producto = vdfo.id_sucursal_producto  --#123
+                        left join param.tconcepto_ingas cigvo on cigvo.id_concepto_ingas = spvo.id_concepto_ingas --#123
                         where  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+            raise notice  '...%...', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -140,7 +147,7 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_venta_detalle)
+			v_consulta:='select count(vedet.id_venta_detalle)
 					    from vef.tventa_detalle vedet
 					    inner join segu.tusuario usu1 on usu1.id_usuario = vedet.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = vedet.id_usuario_mod

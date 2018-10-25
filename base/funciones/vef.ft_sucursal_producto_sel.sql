@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_sel (
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
-  $body$
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_sucursal_producto_sel
@@ -14,11 +14,11 @@ CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_sel (
  FECHA:	        21-04-2015 03:18:44
  COMENTARIOS:	
 ***************************************************************************
- HISTORIAL DE MODIFICACIONES:
+   HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0              21-04-2015        JRR                 Creacion 
+ #123              08/10/2018        RAC                 Logica para listar conceptos de facturas relacionas para notas de credito sobre ventas	
 ***************************************************************************/
 
 DECLARE
@@ -36,6 +36,8 @@ DECLARE
     v_id_moneda_venta	integer;
     v_tipo_cambio_venta		numeric;
     v_tipo					varchar;
+    v_ncd                   boolean;  --#123
+    v_id_venta_fk         integer;  --#123
 			    
 BEGIN
 
@@ -146,8 +148,15 @@ BEGIN
     	begin
     		v_where = '';
             v_join = '';
+            v_ncd = false; --#123
+            
+            --#123   adciona logica para cocnepto de gastos para notas de credito, el detaqlle viene de la factura previa seleccionada
+            if (pxp.f_existe_parametro(p_tabla,'id_venta_fk')) then
+               v_ncd = true;
+               v_id_venta_fk = v_parametros.id_venta_fk;
+            end if;
     		
-    		if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
+    		if (pxp.f_existe_parametro(p_tabla,'id_punto_venta'))  then
     			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tpunto_venta pv
     			inner join vef.tsucursal suc on suc.id_sucursal = pv.id_sucursal
@@ -181,7 +190,7 @@ BEGIN
            
     		
     		--Items si se integra con almacenes
-    		if (v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'true') then
+    		if (v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'true') and  not v_ncd  then
 				if (v_sucursal.tiene_precios_x_sucursal = 'si') then
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
@@ -218,7 +227,7 @@ BEGIN
 			
 			
 			--Cocneptos de gasto para productos(sin integracion con almacenes) o servicios
-			elsif (v_parametros.tipo = 'producto_terminado' or v_parametros.tipo = 'servicio') then
+			elsif (v_parametros.tipo = 'producto_terminado' or v_parametros.tipo = 'servicio') and  not v_ncd  then
 				
                 if (v_parametros.tipo = 'producto_terminado') then
 					v_where = v_where || ' and  sp.tipo_producto = ''producto''';
@@ -247,7 +256,39 @@ BEGIN
 									sp.id_sucursal = ' || v_sucursal.id_sucursal || v_where ||'
 									)';
 			
-			else
+			elseif (v_ncd  ) then   --#123 son nostas de credito debito
+            
+                v_consulta := 'with tabla_temporal as (
+								
+                                      
+                                      select
+                                         vd.id_venta_detalle as id_producto,
+                                         ''servicio''::varchar as tipo ,
+                                         cig.desc_ingas as nombre,
+                                         vd.descripcion::text as descripcion,
+                                         (vd.cantidad*vd.precio)*0.5 as precio,
+                                         vd.cantidad as cantidad, 
+                                         
+                                         ''''::varchar as medico,
+                                         spd.requiere_descripcion,
+										 spd.contabilizable,
+										 spd.excento,
+                                         um.id_unidad_medida,
+                                         um.codigo as codigo_unidad_medida,
+                                         COALESCE(cig.ruta_foto,'''')::varchar as ruta_foto
+                                         
+                                         
+                                      from  vef.tsucursal_producto  spd
+                                      inner join  vef.tventa_detalle vd on vd.id_sucursal_producto = spd.id_sucursal_producto and vd.id_venta = '|| v_id_venta_fk ||'
+                                      inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = spd.id_concepto_ingas
+                                      left join param.tunidad_medida um on um.id_unidad_medida = cig.id_unidad_medida
+                                      
+                                      
+									) ';
+            
+               
+            
+            else
 			--Formulas o paquetes
             	v_having = '' ;            	
                 v_having = 'having array_remove (array_agg(fd.id_concepto_ingas),NULL) <@ array_remove (array_agg(sp.id_concepto_ingas),NULL)';
@@ -309,7 +350,7 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			raise notice '%',v_consulta;
+			raise notice  '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -328,6 +369,14 @@ BEGIN
     		
     		v_where = '';
             v_join = '';
+            v_ncd = false; --#123
+                        
+            --#123   adciona logica para cocnepto de gastos para notas de credito, el detaqlle viene de la factura previa seleccionada
+            if (pxp.f_existe_parametro(p_tabla,'id_venta_fk')) then
+               v_ncd = true;
+               v_id_venta_fk = v_parametros.id_venta_fk;
+            end if;
+            
     		if (pxp.f_existe_parametro(p_tabla,'id_punto_venta')) then
     			select suc.*,sucmon.id_moneda into v_sucursal
     			from vef.tpunto_venta pv
@@ -351,7 +400,7 @@ BEGIN
     		end if;
     		
     		--Items si se integra con almacenes
-    		if (v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'true') then
+    		if (v_parametros.tipo = 'producto_terminado' and pxp.f_get_variable_global('vef_integracion_almacenes') = 'true') and not v_ncd then
 				if (v_sucursal.tiene_precios_x_sucursal = 'si') then
 					v_consulta := 'with tabla_temporal as (
 									select it.id_item as id_producto, ''producto_terminado''::varchar as tipo,
@@ -380,7 +429,7 @@ BEGIN
 			
 			
 			--Cocneptos de gasto para productos(sin integracion con almacenes) o servicios
-			elsif (v_parametros.tipo = 'producto_terminado' or v_parametros.tipo = 'servicio') then
+			elsif (v_parametros.tipo = 'producto_terminado' or v_parametros.tipo = 'servicio')  and not v_ncd  then
 				
                 if (v_parametros.tipo = 'producto_terminado') then
 					v_where = v_where || ' and  sp.tipo_producto = ''producto''';
@@ -403,7 +452,37 @@ BEGIN
 									sp.id_sucursal = ' || v_sucursal.id_sucursal || v_where ||'
 									)';
 			
-			else
+			elseif (v_ncd  ) then   --#123 son nostas de credito debito
+            
+                v_consulta := 'with tabla_temporal as (
+								
+                                      
+                                      select
+                                         vd.id_venta_detalle as id_producto,
+                                         ''servicio''::varchar as tipo ,
+                                         cig.desc_ingas as nombre,
+                                         vd.descripcion::text as descripcion,
+                                         (vd.cantidad*vd.precio)*0.5 as precio,
+                                         vd.cantidad as cantidad, 
+                                         
+                                         ''''::varchar as medico,
+                                         spd.requiere_descripcion,
+										 spd.contabilizable,
+										 spd.excento,
+                                         um.id_unidad_medida,
+                                         um.codigo as codigo_unidad_medida,
+                                         COALESCE(cig.ruta_foto,'''')::varchar as ruta_foto
+                                         
+                                         
+                                      from  vef.tsucursal_producto  spd
+                                      inner join  vef.tventa_detalle vd on vd.id_sucursal_producto = spd.id_sucursal_producto and vd.id_venta = '|| v_id_venta_fk ||'
+                                      inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = spd.id_concepto_ingas
+                                      left join param.tunidad_medida um on um.id_unidad_medida = cig.id_unidad_medida
+                                      
+                                      
+									) ';
+            
+            else
 			--Formulas o paquetes
             	v_having = '' ;            	
                 v_having = 'having array_remove (array_agg(fd.id_concepto_ingas),NULL) <@ array_remove (array_agg(sp.id_concepto_ingas),NULL)';
@@ -584,3 +663,4 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+COST 100;

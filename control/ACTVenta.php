@@ -5,9 +5,21 @@
 *@author  (admin)
 *@date 01-06-2015 05:58:00
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ * 
+  HISTORIAL DE MODIFICACIONES:
+
+ ISSUE            FECHA:		      AUTOR               DESCRIPCION
+ #0              01-06-2015          RAC            Creacion
+ #123            25/09/2018          RAC           se adicionar controlador para  facturas, notas de credito debito y combos ETR
+  
 */
+
+require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
+
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 include(dirname(__FILE__).'/../reportes/RFacturaRecibo.php');
+include(dirname(__FILE__).'/../reportes/RFacturaReciboPdf.php');
+
 class ACTVenta extends ACTbase{    
 			
 	function listarVenta(){
@@ -76,6 +88,169 @@ class ACTVenta extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function listarVentaETR(){
+		$this->objParam->defecto('ordenacion','id_venta');
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+        
+        
+        if ($this->objParam->getParametro('pes_estado') != '') {
+            if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
+                $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
+            }elseif ($this->objParam->getParametro('pes_estado') == 'finalizado') {
+                $this->objParam->addFiltro(" ven.estado in( ''finalizado'', ''anulado'') ");
+				
+				if ($this->objParam->getParametro('interfaz') == 'vendedor' || $this->objParam->getParametro('interfaz') == 'caja') {
+					$this->objParam->addFiltro(" ven.fecha::date = ''".$this->objParam->getParametro('fecha')."''::date");
+				}
+            } else {
+                if ($this->objParam->getParametro('historico') != 'si') {
+                    	
+					
+					if ($this->objParam->getParametro('pes_estado') == 'pedido_en_proceso') {
+		                $this->objParam->addFiltro(" ven.estado not in( ''borrador'', ''comprado'', ''anulado'') ");
+		            }
+					else if ($this->objParam->getParametro('pes_estado') == 'pedido_finalizado') {
+		                $this->objParam->addFiltro(" ven.estado in( ''entregado'', ''anulado'') ");
+		            }
+					else{
+					  $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
+                	}	
+							
+				}
+            }
+            
+        } 
+		
+		 if ($this->objParam->getParametro('nombreVista') == 'VentaVbPedido') { 
+              $this->objParam->addFiltro(" ven.estado not in ( ''borrador'') ");
+        } 
+		 
+		
+		if ($this->objParam->getParametro('id_sucursal') != '') {
+			$this->objParam->addFiltro(" ven.id_sucursal = ". $this->objParam->getParametro('id_sucursal'));
+		}
+		
+		if ($this->objParam->getParametro('tipo_factura') != '') {
+			$this->objParam->addFiltro(" ven.tipo_factura = ''". $this->objParam->getParametro('tipo_factura')."''");
+		}
+		
+		if ($this->objParam->getParametro('id_punto_venta') != '') {
+			$this->objParam->addFiltro(" ven.id_punto_venta = ". $this->objParam->getParametro('id_punto_venta'));
+		}
+		
+		 
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarVentaETR');
+		} else{
+			$this->objFunc=$this->create('MODVenta');
+			
+			$this->res=$this->objFunc->listarVentaETR($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+   // #123  para llenar grilla  de nostas de credito
+   function listarVentaNCETR(){
+		$this->objParam->defecto('ordenacion','id_venta');
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+        
+        
+        if ($this->objParam->getParametro('pes_estado') != '') {
+            if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
+                $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
+            }elseif ($this->objParam->getParametro('pes_estado') == 'finalizado') {
+                $this->objParam->addFiltro(" ven.estado in( ''finalizado'', ''anulado'') ");
+				
+				if ($this->objParam->getParametro('interfaz') == 'vendedor' || $this->objParam->getParametro('interfaz') == 'caja') {
+					$this->objParam->addFiltro(" ven.fecha::date = ''".$this->objParam->getParametro('fecha')."''::date");
+				}
+            } else {
+                if ($this->objParam->getParametro('historico') != 'si') {
+                    	
+					
+					if ($this->objParam->getParametro('pes_estado') == 'pedido_en_proceso') {
+		                $this->objParam->addFiltro(" ven.estado not in( ''borrador'', ''comprado'', ''anulado'') ");
+		            }
+					else if ($this->objParam->getParametro('pes_estado') == 'pedido_finalizado') {
+		                $this->objParam->addFiltro(" ven.estado in( ''entregado'', ''anulado'') ");
+		            }
+					else{
+					  $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
+                	}	
+							
+				}
+            }
+            
+        } 
+		
+		 if ($this->objParam->getParametro('nombreVista') == 'VentaVbPedido') { 
+              $this->objParam->addFiltro(" ven.estado not in ( ''borrador'') ");
+        } 
+		 
+		
+		if ($this->objParam->getParametro('id_sucursal') != '') {
+			$this->objParam->addFiltro(" ven.id_sucursal = ". $this->objParam->getParametro('id_sucursal'));
+		}
+		
+		if ($this->objParam->getParametro('tipo_factura') != '') {
+			$this->objParam->addFiltro(" ven.tipo_factura = ''". $this->objParam->getParametro('tipo_factura')."''");
+		}
+		
+		if ($this->objParam->getParametro('id_punto_venta') != '') {
+			$this->objParam->addFiltro(" ven.id_punto_venta = ". $this->objParam->getParametro('id_punto_venta'));
+		}
+		
+		 
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarVentaETR');
+		} else{
+			$this->objFunc=$this->create('MODVenta');
+			
+			$this->res=$this->objFunc->listarVentaNCETR($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+
+    // #123  para combo de facturas en interface de NCD 
+    function listarVentaCombosETR(){
+		$this->objParam->defecto('ordenacion','id_venta');
+		$this->objParam->defecto('dir_ordenacion','asc');
+        
+		if ($this->objParam->getParametro('id_sucursal') != '') {
+			$this->objParam->addFiltro(" ven.id_sucursal = ". $this->objParam->getParametro('id_sucursal'));
+		}
+		
+		if ($this->objParam->getParametro('tipo_factura') != '') {
+			$this->objParam->addFiltro(" ven.tipo_factura = ''". $this->objParam->getParametro('tipo_factura')."''");
+		}
+		
+		if ($this->objParam->getParametro('id_punto_venta') != '') {
+			$this->objParam->addFiltro(" ven.id_punto_venta = ". $this->objParam->getParametro('id_punto_venta'));
+		}
+		
+		if ($this->objParam->getParametro('id_proveedor') != '') {
+			$this->objParam->addFiltro(" ven.id_proveedor = ". $this->objParam->getParametro('id_proveedor'));
+		}
+		
+		 
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarVentaCombosETR');
+		} else{
+			$this->objFunc=$this->create('MODVenta');
+			
+			$this->res=$this->objFunc->listarVentaCombosETR($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+
 
 	function getVariablesBasicas() {	        
 		
@@ -221,12 +396,20 @@ class ACTVenta extends ACTbase{
 	        exit;
 	    }
     }
+ 
 	function reporteFacturaRecibo(){
 		$this->objFunc = $this->create('MODVenta');
 		$datos = array();
 		$this->res = $this->objFunc->listarReciboFactura($this->objParam);
 		
 		$datos = $this->res->getDatos();
+		
+		//if ($this->res['tipo_respuesta']=='ERROR') {
+         //    throw new Exception("Error al ejecutar en la bd", 3);
+        //}
+		//var_dump( $this->res);
+		//exit;
+		
 		$datos = $datos[0];
 		
 		if ($datos['cantidad_descripciones'] > 0){
@@ -239,7 +422,7 @@ class ACTVenta extends ACTbase{
 		$this->res = $this->objFunc->listarReciboFacturaDetalle($this->objParam);
 		
 		$datos['detalle'] = $this->res->getDatos();
-		
+	
 		$reporte = new RFacturaRecibo();
 		$temp = array();
 		
@@ -247,7 +430,102 @@ class ACTVenta extends ACTbase{
 		$this->res->setDatos($temp);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 		
+	}
 
+	function reporteFacturaReciboPdf(){
+		$this->objFunc = $this->create('MODVenta');
+		$datos = array();
+		$this->res = $this->objFunc->listarReciboFactura($this->objParam);
+		
+		$datos = $this->res->getDatos();
+		
+		//var_dump( 'datos bruto',$datos);
+		
+		//if ($this->res['tipo_respuesta']=='ERROR') {
+         //    throw new Exception("Error al ejecutar en la bd", 3);
+        //}
+		//var_dump( $this->res);
+		//exit;
+		
+		$datos = $datos[0];
+		
+		//var_dump( 'datos',$datos);
+		//var_dump( 'datos',$datos['id_venta_fk']);
+		$dataSource = new DataSource();	
+		
+		$dataSource->putParameter('cabecera',$datos);
+		
+		
+		if ($datos['cantidad_descripciones'] > 0){
+			$this->objFunc = $this->create('MODVenta');
+			$this->res = $this->objFunc->listarReciboFacturaDescripcion($this->objParam);
+			
+		    $dataSource->putParameter('detalle_descripcion',$this->res->getDatos());
+			
+			//$datos['detalle_descripcion'] = $this->res->getDatos();
+		}
+		//var_dump($this->objParam);
+
+		$this->objFunc = $this->create('MODVenta');
+		$this->res = $this->objFunc->listarReciboFacturaDetalle($this->objParam);
+		
+		$dataSource->putParameter('detalle',$this->res->getDatos());
+		
+		//$datos['detalle'] = $this->res->getDatos();
+		
+		if ($datos['id_venta_fk']!= '') {
+			
+			$this->objParam->addParametro('id_venta',$datos['id_venta_fk']);
+			
+			//var_dump('$this->objParam',$this->objParam);
+			
+			$this->objFunc=$this->create('MODVenta');
+				
+			$this->res=$this->objFunc->listarReciboFactura($this->objParam);
+			//var_dump('$this->res',$this->res);
+			$this->res=$this->res->getDatos();
+			$this->res=$this->res[0];
+			$dataSource->putParameter('facturaCabecera',$this->res);
+			
+			//var_dump('$dataSource',$dataSource);
+			
+			$this->objFunc = $this->create('MODVenta');
+			$this->res = $this->objFunc->listarReciboFacturaDetalle($this->objParam);
+			$dataSource->putParameter('facturaDetalle',$this->res->getDatos());
+			//var_dump('$dataSource',$dataSource);
+		}
+		
+	
+		
+		
+	
+	
+	
+		$nombreArchivo = uniqid(md5(session_id()).'-Cbte') . '.pdf'; 
+	  		
+	  		//var_dump($dataSource);
+		
+		
+		//parametros basicos
+		$tamano = 'LETTER';
+		$orientacion = 'p';
+		$this->objParam->addParametro('orientacion',$orientacion);
+		$this->objParam->addParametro('tamano',$tamano);		
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		//Instancia la clase de pdf
+		
+		$reporte = new RFacturaReciboPdf($this->objParam); 
+		
+		$reporte->datosHeader($dataSource);
+		$reporte->generarReporte();
+		$reporte->output($reporte->url_archivo,'F');
+		
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		
 	}
 			
 }

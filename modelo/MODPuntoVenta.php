@@ -110,6 +110,40 @@ class MODPuntoVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function listarPuntoVentaCombo(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_punto_venta_sel';
+		$this->transaccion='VF_PUVECOMBO_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('id_punto_venta','int4');
+		$this->captura('estado_reg','varchar');
+		$this->captura('id_sucursal','int4');
+		$this->captura('nombre','varchar');
+		$this->captura('descripcion','text');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_ai','int4');
+		$this->captura('usuario_ai','varchar');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		$this->captura('codigo','varchar');
+		$this->captura('habilitar_comisiones','varchar');
+		$this->captura('formato_comprobante','varchar');
+		$this->captura('tipo','varchar');
+		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>

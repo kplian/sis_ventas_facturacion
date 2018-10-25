@@ -3,6 +3,7 @@ require_once(dirname(__FILE__).'/../../lib/tcpdf/tcpdf_barcodes_2d.php');
 class RFacturaRecibo
 {
 	function generarHtml ($codigo_reporte,$datos) {
+			//var_dump($datos);
 			
 		if ($codigo_reporte == 'RECPAPELTERM' || $codigo_reporte == 'RECPAPELMATRI') {	
 			setlocale(LC_ALL,"es_ES@euro","es_ES","esp");
@@ -327,6 +328,7 @@ class RFacturaRecibo
 									<tbody>
 										<tr>
 											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACEXPORTCARTAVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_reporte.png') .'" alt="logo" width="60" height="60" /></td>
+												
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong></td>
@@ -906,6 +908,9 @@ class RFacturaRecibo
                                 </html>';
 			} else if ($codigo_reporte == 'FACMEDIACAR' || $codigo_reporte == 'FACMEDIACARVINTO') {
 				
+				////////FACTURA USADA 	PARA EL ERP
+				
+				
 				$cadena_qr = 	$datos['nit_entidad'] . '|' . 
 						$datos['numero_factura'] . '|' . 
 						$datos['autorizacion'] . '|' . 
@@ -928,7 +933,26 @@ class RFacturaRecibo
 						    
 					
 					  <link rel="stylesheet" href="../../../sis_ventas_facturacion/control/print_media_carta.css" type="text/css"  charset="utf-8">
-					  
+					
+					<style type="text/css"> 
+					
+					@page 
+						    {
+						        size:  auto;   /* auto es el valor inicial */
+						       
+							   margin: 4mm;
+							   margin-top: 5mm;  /* afecta el margen en la configuración de impresión */
+						        margin-right: 5mm;
+								margin-left: 5mm;  
+								
+						    	@bottom {
+								content: "Page " counter(page) " of " counter(pages)
+							    }
+						       
+						    }
+							
+					
+					</style> 
 					</head>';
 				
 					
@@ -951,7 +975,8 @@ class RFacturaRecibo
 								<table style="height: 130px;" width="230">   
 									<tbody>
 										<tr>
-											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_reporte.png') .'" alt="logo" width="60" height="60" /></td>
+											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_3.jpg') .'" alt="logo" width="200" height="200" /></td>
+												
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong><br />' . $datos['direccion_sucursal'] . '<br />' . $datos['telefono_sucursal'] . '<br />' . $datos['lugar_sucursal'] . '</td>
@@ -1144,6 +1169,7 @@ class RFacturaRecibo
 									<tbody>
 										<tr>
 											<td style="text-align:center;"><img src="../../../lib/images/logo.png" alt="logo" width="120" height="60" /></td>
+										
 										</tr>
 										<tr>
 											<td style="text-align: center;"><strong>' . $datos['direccion_sucursal'] . '<br> Telf. '. $datos['telefono_sucursal'] . '</strong></td>

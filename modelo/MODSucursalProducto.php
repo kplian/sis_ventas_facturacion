@@ -77,6 +77,7 @@ class MODSucursalProducto extends MODbase{
 		
 		$this->setParametro('tipo_cambio_venta','tipo_cambio_venta','numeric');
 		$this->setParametro('id_moneda','id_moneda','int4');
+		$this->setParametro('id_venta_fk','id_venta_fk','int4');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_producto','integer');
@@ -90,7 +91,7 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('excento','varchar');
 		$this->captura('id_unidad_medida','integer');
 		$this->captura('codigo_unidad_medida','varchar');		
-		$this->captura('ruta_foto','varchar');
+		$this->captura('ruta_foto','varchar'); 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
