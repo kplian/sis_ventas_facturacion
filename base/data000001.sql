@@ -194,5 +194,14 @@ VALUES
 /***********************************F-DAT-RAC-VEF-0-08/10/2018*****************************************/
 
 
+/***********************************I-DAT-EGS-VEF-0-25/10/2018*****************************************/
+select pxp.f_insert_testructura_gui ('NCETR', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VENETR', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VEPEETR', 'VENCARP');
 
+select pxp.f_insert_tgui ('Notas de Crédito ETR', 'Nos ta Credito Sobre Ventas', 'NCETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaVendedorNCETR.php', 3, '', 'VentaVendedorNCETR', 'VEF');
+select pxp.f_insert_tgui ('Ventas ETR', 'Ventas ETR', 'VENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaVendedorETR.php', 3, '', 'VentaVendedorETR', 'VEF');
+select pxp.f_insert_tgui ('Ventas Peaje ETR', 'Ventas Peaje ETR', 'VEPEETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaVendedorPeajeETR.php', 3, '', 'VentaVendedorPeajeETR', 'VEF');
+
+/***********************************F-DAT-EGS-VEF-0-25/10/2018*****************************************/
 

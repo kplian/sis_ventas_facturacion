@@ -26,11 +26,14 @@ class RFacturaReciboPdf extends  ReportePDF {
 	var $png;
 	var $nombre_archivo;
 	var $moneda;
+	var $texto_estado;
+	var $img_texto_estado;
+	
 	
 	function datosHeader ( $datasource) {
 		
 		//var_dump($datasource);
-		//var_dump($this->objParam);
+		//var_dump('pdf',$this->objParam);
 		
 			$this->codigo_reporte= $this->objParam->getParametro('formato_comprobante');
 			$this->codigo_reporte = explode("-",$this->codigo_reporte);
@@ -98,14 +101,21 @@ class RFacturaReciboPdf extends  ReportePDF {
         imagepng($this->im, dirname(__FILE__) . "/../../reportes_generados/" .$this->nombre_archivo . ".png");
         imagedestroy($this->im);
         $this->img_qr = dirname(__FILE__) . "/../../reportes_generados/" . $this->nombre_archivo . ".png";
-
+		
+		/*
+		$this->texto_estado = imagecreatefromstring( 'BORRADOR');
+        header('Content-Type: image/png');
+        imagepng($this->texto_estado, dirname(__FILE__) . "/../../reportes_generados/" .$this->nombre_archivo . ".png");
+        imagedestroy($this->texto_estado);
+        $this->img_texto_estado = dirname(__FILE__) . "/../../reportes_generados/" . $this->nombre_archivo . ".png";
+*/
 		//        								cordenadas    x  y anchura altura
 		//$this->write2DBarcode($this->cadena_qr, 'QRCODE,H', 80,0,  30,   30, $style,'T',true);		
 
 		//adiciona glosa
 		if ( $this->cabecera ['estado'] == 'finalizado') {
 			
-					
+				
 					if ($this->codigo_reporte =='NOTAFACMEDIACAR') {
 					$this->SetFont ('helvetica', '', 10 , '', 'default', true );
 					$this->pagina ='<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>ORIGINAL CLIENTE</strong></h3></td></tr>';
@@ -114,6 +124,15 @@ class RFacturaReciboPdf extends  ReportePDF {
 					$this->SetFont ('helvetica', '', 10 , '', 'default', true );
 					$this->pagina ='<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>ORIGINAL</strong></h3></td></tr>';
 					}
+					
+					if ($this->objParam->getParametro('nombre_vista') !='VentaEmisor' ) {
+						$this->SetAlpha(0.50);
+		
+						$this->Image(dirname(__FILE__) . "/../../lib/imagenes/estados/".$this->cabecera['estado'].".png", 30, 50, 150,150, '', 'http://www.tcpdf.org', '', true, 72);
+					
+						$this->SetAlpha(1);
+					};
+					
 					
 					ob_start();
 					include(dirname(__FILE__).'/../reportes/tpl/pdf/formatoFactura.php');
@@ -141,11 +160,17 @@ class RFacturaReciboPdf extends  ReportePDF {
 					} 
 					elseif ($this->cabecera['estado'] == 'anulado'){
 					$this->pagina ='<tr><td style="text-align: center;" colspan="2" > <h3>&nbsp;<strong>Anulado</strong></h3></td></tr>';
+					}elseif ($this->cabecera['estado'] == 'emision'){
+					$this->pagina ='<tr><td style="text-align: center;" colspan="2" > <h3>&nbsp;<strong>Emision</strong></h3></td></tr>';
 					} else {
 						$this->estado = ' ';
 					}
+		
+		$this->SetAlpha(0.50);
+		
+		$this->Image(dirname(__FILE__) . "/../../lib/imagenes/estados/".$this->cabecera['estado'].".png", 30, 50, 150,150, '', 'http://www.tcpdf.org', '', true, 72);
 	
-		//$this->pagina ='<tr><td style="text-align: center;" colspan="2" > <h3>&nbsp;<strong>Borrador</strong></h3></td></tr>';
+		$this->SetAlpha(1);
 		ob_start();
 		include(dirname(__FILE__).'/../reportes/tpl/pdf/formatoFactura.php');
         $content = ob_get_clean();
@@ -217,7 +242,14 @@ function Footer() {
 		 	$this->SetMargins(15, 30, 5);	
 			
 		    $this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>ORIGINAL EMISOR</strong></h3></td></tr>';
+			
+				if ($this->objParam->getParametro('nombre_vista') !='VentaEmisor' && $this->cabecera ['estado'] == 'finalizado') {
+						$this->SetAlpha(0.50);
+		
+						$this->Image(dirname(__FILE__) . "/../../lib/imagenes/estados/".$this->cabecera['estado'].".png", 30, 50, 150,150, '', 'http://www.tcpdf.org', '', true, 72);
 					
+						$this->SetAlpha(1);
+					};
 					
 					$this->SetFont ('helvetica', '', 10 , '', 'default', true );
 					ob_start();
@@ -239,8 +271,15 @@ function Footer() {
 			$this->datos_detalle = $detalle;
 		 	$this->SetMargins(15, 30, 5);	
 			
-		$this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Contabilidad</strong></h3></td></tr>';
+			$this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Contabilidad</strong></h3></td></tr>';
 					
+				 if ($this->objParam->getParametro('nombre_vista') !='VentaEmisor' ) {
+						$this->SetAlpha(0.50);
+		
+						$this->Image(dirname(__FILE__) . "/../../lib/imagenes/estados/".$this->cabecera['estado'].".png", 30, 50, 150,150, '', 'http://www.tcpdf.org', '', true, 72);
+					
+						$this->SetAlpha(1);
+					};
 					
 					$this->SetFont ('helvetica', '', 10 , '', 'default', true );
 					ob_start();
@@ -264,7 +303,15 @@ function Footer() {
 			$this->datos_detalle = $detalle;
 		 	$this->SetMargins(15, 30, 5);
 			
-		$this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Tesoreria</strong></h3></td></tr>';
+			$this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Tesoreria</strong></h3></td></tr>';
+			
+			if ($this->objParam->getParametro('nombre_vista') !='VentaEmisor') {
+						$this->SetAlpha(0.50);
+		
+						$this->Image(dirname(__FILE__) . "/../../lib/imagenes/estados/".$this->cabecera['estado'].".png", 30, 50, 150,150, '', 'http://www.tcpdf.org', '', true, 72);
+					
+						$this->SetAlpha(1);
+			};
 		
 					$this->SetFont ('helvetica', '', 10, '', 'default', true );
 					ob_start();

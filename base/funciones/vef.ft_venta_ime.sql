@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -1902,35 +1904,47 @@ $body$
         if (v_venta.id_punto_venta is null) then
           select  su.tipo_usuario into v_tipo_usuario
           from vef.tsucursal_usuario su
-          where id_sucursal = v_venta.id_sucursal;
+          where id_sucursal = v_venta.id_sucursal and  su.tipo_usuario = 'administrador';
         else
           select  su.tipo_usuario into v_tipo_usuario
           from vef.tsucursal_usuario su
-          where su.id_punto_venta = v_venta.id_punto_venta;
+          where su.id_punto_venta = v_venta.id_punto_venta and  su.tipo_usuario = 'administrador';
         end if;
+        
+        --#123 
+        -- solo pueden borrar en estos casos :
+        --  es un usuario adminsitrador de sistemas p_administrador != 1  
+        --  es un usuario administrador del punto de venta v_tipo_usuario = administrador
+        -- o es un usuario vendedor , epro solo si es el mismo dia
+        
 
-        if ((v_tipo_usuario = 'vendedor' and v_venta.fecha != now()::date) or p_administrador != 1) then
-          raise exception 'La venta solo puede ser anulada el mismo dia o por un administrador';
-        end if;
+        
+        IF     (v_tipo_usuario = 'vendedor' and v_venta.fecha = now()::date)
+            or (v_tipo_usuario = 'administrador' )
+            or (p_administrador = 1) THEN
 
-        --obtenemos datos basicos
-        select
-          ven.id_estado_wf,
-          ven.id_proceso_wf,
-          ven.estado,
-          ven.id_venta,
-          ven.nro_tramite
-        into
-          v_registros
-        from vef.tventa ven
-        where ven.id_venta = v_parametros.id_venta;
+              --obtenemos datos basicos
+              select
+                ven.id_estado_wf,
+                ven.id_proceso_wf,
+                ven.estado,
+                ven.id_venta,
+                ven.nro_tramite
+              into
+                v_registros
+              from vef.tventa ven
+              where ven.id_venta = v_parametros.id_venta;
 
 
-        v_res = vef.f_anula_venta(p_administrador,p_id_usuario,p_tabla, v_registros.id_proceso_wf,v_registros.id_estado_wf, v_parametros.id_venta);
+              v_res = vef.f_anula_venta(p_administrador,p_id_usuario,p_tabla, v_registros.id_proceso_wf,v_registros.id_estado_wf, v_parametros.id_venta);
 
-        --Definicion de la respuesta
-        v_resp = pxp.f_agrega_clave(v_resp,'mensaje','venta anulada');
-        v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+              --Definicion de la respuesta
+              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','venta anulada');
+              v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+        
+        ELSE
+            raise exception 'La venta solo puede ser anulada el mismo dia o por un administrador';
+        END IF;
 
         --Devuelve la respuesta
         return v_resp;

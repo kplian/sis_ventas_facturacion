@@ -23,8 +23,9 @@ Phx.vista.VentaVendedorETR = {
     constructor: function(config) {
         this.maestro = config.maestro;  
         Phx.vista.VentaVendedorETR.superclass.constructor.call(this,config);
-                
+        console.log(this.variables_globales.id_punto_venta) ;    
     } ,
+    
     arrayDefaultColumHidden:['estado_reg','usuario_ai','fecha_reg','fecha_mod','usr_reg','usr_mod','excento','cod_control','nroaut'],
     rowExpander: new Ext.ux.grid.RowExpander({
             tpl : new Ext.Template(
@@ -37,7 +38,24 @@ Phx.vista.VentaVendedorETR = {
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Modificado por:&nbsp;&nbsp;</b> {usr_mod}</p><br>'
             )
-    })
+    }),
+    SubirArchivo : function(rec)
+	{	 console.log('id_punto_venta',this.variables_globales.id_punto_venta) ; 
+		Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/venta/SubirArchivoFac.php',
+		'Subir Facturas',
+		{
+			modal:true,
+			width:450,
+			height:150
+		},
+		{ data: {  //objPadre: me ,
+			    maestro: this.maestro,
+				id_punto_venta:this.variables_globales.id_punto_venta,
+				tipo_factura:this.tipo_factura
+		 }},
+		this.idContenedor,
+		'SubirArchivoFac');
+	}
     
     
 };

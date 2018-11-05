@@ -93,18 +93,25 @@ class ACTVenta extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_venta');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		if ($this->objParam->getParametro('fecha') != '') {
+			$this->objParam->addFiltro(" ven.fecha::date = ''".$this->objParam->getParametro('fecha')."''::date");
+		}
         
         
         if ($this->objParam->getParametro('pes_estado') != '') {
             if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
                 $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
-            }elseif ($this->objParam->getParametro('pes_estado') == 'finalizado') {
+            }
+            elseif ($this->objParam->getParametro('pes_estado') == 'finalizado'  ) {
                 $this->objParam->addFiltro(" ven.estado in( ''finalizado'', ''anulado'') ");
-				
-				if ($this->objParam->getParametro('interfaz') == 'vendedor' || $this->objParam->getParametro('interfaz') == 'caja') {
-					$this->objParam->addFiltro(" ven.fecha::date = ''".$this->objParam->getParametro('fecha')."''::date");
-				}
-            } else {
+            } 
+			
+			elseif ($this->objParam->getParametro('pes_estado') == 'emision') {
+                $this->objParam->addFiltro(" ven.estado in( ''emision'') ");
+            }
+            
+            else {
                 if ($this->objParam->getParametro('historico') != 'si') {
                     	
 					
@@ -152,22 +159,24 @@ class ACTVenta extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 
+  
    // #123  para llenar grilla  de nostas de credito
    function listarVentaNCETR(){
 		$this->objParam->defecto('ordenacion','id_venta');
-
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		
+		if ($this->objParam->getParametro('fecha') != '') {
+			$this->objParam->addFiltro(" ven.fecha::date = ''".$this->objParam->getParametro('fecha')."''::date");
+		}
+        
         
         
         if ($this->objParam->getParametro('pes_estado') != '') {
             if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
                 $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
             }elseif ($this->objParam->getParametro('pes_estado') == 'finalizado') {
-                $this->objParam->addFiltro(" ven.estado in( ''finalizado'', ''anulado'') ");
-				
-				if ($this->objParam->getParametro('interfaz') == 'vendedor' || $this->objParam->getParametro('interfaz') == 'caja') {
-					$this->objParam->addFiltro(" ven.fecha::date = ''".$this->objParam->getParametro('fecha')."''::date");
-				}
+                $this->objParam->addFiltro(" ven.estado in( ''finalizado'', ''anulado'') ");				
             } else {
                 if ($this->objParam->getParametro('historico') != 'si') {
                     	
@@ -175,9 +184,9 @@ class ACTVenta extends ACTbase{
 					if ($this->objParam->getParametro('pes_estado') == 'pedido_en_proceso') {
 		                $this->objParam->addFiltro(" ven.estado not in( ''borrador'', ''comprado'', ''anulado'') ");
 		            }
-					else if ($this->objParam->getParametro('pes_estado') == 'pedido_finalizado') {
-		                $this->objParam->addFiltro(" ven.estado in( ''entregado'', ''anulado'') ");
-		            }
+					elseif ($this->objParam->getParametro('pes_estado') == 'emision') {
+			                $this->objParam->addFiltro(" ven.estado in( ''emision'') ");
+			        }
 					else{
 					  $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
                 	}	
@@ -246,6 +255,69 @@ class ACTVenta extends ACTbase{
 			$this->objFunc=$this->create('MODVenta');
 			
 			$this->res=$this->objFunc->listarVentaCombosETR($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+   /*Listado de ventas para interface de emisor  estado=emision*/
+   function listarVentaEmisor( ){
+		$this->objParam->defecto('ordenacion','id_venta');
+		$this->objParam->defecto('dir_ordenacion','asc');
+        
+        
+        if ($this->objParam->getParametro('pes_estado') != '') {
+            if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
+                $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
+            }elseif ($this->objParam->getParametro('pes_estado') == 'finalizado') {
+                $this->objParam->addFiltro(" ven.estado in( ''finalizado'', ''anulado'') ");
+				
+				if ($this->objParam->getParametro('interfaz') == 'vendedor' || $this->objParam->getParametro('interfaz') == 'caja') {
+					$this->objParam->addFiltro(" ven.fecha::date = ''".$this->objParam->getParametro('fecha')."''::date");
+				}
+            } else {
+                if ($this->objParam->getParametro('historico') != 'si') {
+                    	
+					
+					if ($this->objParam->getParametro('pes_estado') == 'pedido_en_proceso') {
+		                $this->objParam->addFiltro(" ven.estado not in( ''borrador'', ''comprado'', ''anulado'') ");
+		            }
+					else if ($this->objParam->getParametro('pes_estado') == 'pedido_finalizado') {
+		                $this->objParam->addFiltro(" ven.estado in( ''entregado'', ''anulado'') ");
+		            }
+					else{
+					  $this->objParam->addFiltro(" ven.estado = ''". $this->objParam->getParametro('pes_estado') . "'' ");
+                	}	
+							
+				}
+            }
+            
+        } 
+		
+		 if ($this->objParam->getParametro('nombreVista') == 'VentaEmisor') { 
+              $this->objParam->addFiltro(" ven.estado not in ( ''borrador'') ");
+        } 
+		 
+		
+		if ($this->objParam->getParametro('id_sucursal') != '') {
+			$this->objParam->addFiltro(" ven.id_sucursal = ". $this->objParam->getParametro('id_sucursal'));
+		}
+		
+		if ($this->objParam->getParametro('tipo_factura') != '') {
+			$this->objParam->addFiltro(" ven.tipo_factura = ''". $this->objParam->getParametro('tipo_factura')."''");
+		}
+		
+		if ($this->objParam->getParametro('id_punto_venta') != '') {
+			$this->objParam->addFiltro(" ven.id_punto_venta = ". $this->objParam->getParametro('id_punto_venta'));
+		}
+		
+		 
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarVentaEmisor');
+		} else{
+			$this->objFunc=$this->create('MODVenta');
+			
+			$this->res=$this->objFunc->listarVentaEmisor($this->objParam);
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
@@ -505,7 +577,7 @@ class ACTVenta extends ACTbase{
 	  		
 	  		//var_dump($dataSource);
 		
-		
+		//var_dump($this->objParam);
 		//parametros basicos
 		$tamano = 'LETTER';
 		$orientacion = 'p';

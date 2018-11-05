@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.ft_venta_detalle_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -73,6 +75,8 @@ $body$
 
       begin
         -- #123  si esxiste el parametro id_venta_fk  se trata de uan nota de credito debito
+        
+       
         v_sw_ncd = false;
         if (pxp.f_existe_parametro(p_tabla,'id_venta_fk')) then
            v_sw_ncd = true;
@@ -105,7 +109,8 @@ $body$
         --verificar si existe vendedor o medico
         v_id_vendedor = NULL;
         v_id_medico = NULL;
-
+		
+		 
         if (pxp.f_existe_parametro(p_tabla,'id_vendedor_medico')) then
           if (split_part(v_parametros.id_vendedor_medico,'_',2) = 'usuario') then
             v_id_vendedor =  split_part(v_parametros.id_vendedor_medico::text,'_'::text,1)::integer;
@@ -114,7 +119,7 @@ $body$
           end if;
         end if;
 
-
+		
         if (pxp.f_existe_parametro(p_tabla,'descripcion')) then
           v_descripcion =  v_parametros.descripcion;
         else
@@ -139,7 +144,8 @@ $body$
         if (pxp.f_existe_parametro(p_tabla,'id_unidad_medida')) then
           v_id_unidad_medida = v_parametros.id_unidad_medida;
         end if;
-
+		
+        
         --Si el total a pagar debe estar redondeado a entero
         if (pxp.f_get_variable_global('vef_redondeo_detalle') = 'true') then
           --si el total no es entero
@@ -148,7 +154,7 @@ $body$
             v_parametros.precio = v_total / v_parametros.cantidad_det*100/(100 - v_porcentaje_descuento);
           end if;
         end if;
-
+		--raise exception 'hola % ',v_parametros.precio;
 
         --Sentencia de la insercion
         insert into vef.tventa_detalle(

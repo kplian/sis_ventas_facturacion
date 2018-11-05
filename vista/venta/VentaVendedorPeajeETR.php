@@ -20,6 +20,8 @@ Phx.vista.VentaVendedorPeajeETR = {
     formUrl: '../../../sis_ventas_facturacion/vista/venta/FormVentaETR.php',
     formClass : 'FormVentaETR',
     
+    
+    
     constructor: function(config) {
         this.maestro = config.maestro;  
         Phx.vista.VentaVendedorPeajeETR.superclass.constructor.call(this,config);
@@ -37,7 +39,44 @@ Phx.vista.VentaVendedorPeajeETR = {
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Modificado por:&nbsp;&nbsp;</b> {usr_mod}</p><br>'
             )
-    })
+    }),
+    
+    // Funcion eliminar del toolbar
+	onButtonDel:function(){
+		if(confirm('¿Está seguro de anular  la factura?')){
+			//recupera los registros seleccionados
+			var filas=this.sm.getSelections(),
+			    data= {},aux={};
+			 
+			
+            //arma una matriz de los identificadores de registros que se van a eliminar
+            this.agregarArgsExtraSubmit();
+            
+			for(var i=0;i<this.sm.getCount();i++){
+				aux={};
+				aux[this.id_store]=filas[i].data[this.id_store];
+				
+				data[i]=aux;
+				data[i]._fila=this.store.indexOf(filas[i])+1
+				//rac 22032012
+				Ext.apply(data[i],this.argumentExtraSubmit);
+			}
+		
+			Phx.CP.loadingShow();
+			
+			//llama el metodo en la capa de control para eliminación
+			Ext.Ajax.request({
+				url:this.ActDel,
+				success:this.successDel,
+				failure:this.conexionFailure,
+				//params:this.id_store+"="+this.sm.getSelected().data[this.id_store],
+				params:{_tipo:'matriz','row':Ext.util.JSON.encode(data)},
+				//argument :{'foo':'xxx'},
+				timeout:this.timeout,
+				scope:this
+			})
+		}
+	},
     
     
 };

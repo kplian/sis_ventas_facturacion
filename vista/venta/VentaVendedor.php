@@ -26,13 +26,26 @@ Phx.vista.VentaVendedor = {
     successGetVariables :function (response,request) {   
     	Phx.vista.VentaVendedor.superclass.successGetVariables.call(this,response,request);  				  		
   		this.store.baseParams.pes_estado = 'borrador';        
+		
+		console.log('nombre',this.nombreVista);
+		if (this.nombreVista=='VentaVendedorETR') {
+			this.addButton('btnXls',
+			{
+				text: 'Subir Factura',
+				iconCls: 'bchecklist',
+				disabled: false	,
+				handler: this.SubirArchivo,
+				tooltip: '<b>Subir Archivo</b>'
+			}
+		); 
+			
+		};      
         
-        
-        this.addButton('anular',{grupo:[1],text:'Anular',iconCls: 'bdel',disabled:true,handler:this.anular,tooltip: '<b>Anular la venta</b>',hidden:true});
+        this.addButton('anular',{grupo:[],text:'Anular',iconCls: 'bdel',disabled:true,handler:this.anular,tooltip: '<b>Anular la venta</b>',hidden:true});
         this.addButton('sig_estado',{grupo:[0],text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
-        this.addButton('diagrama_gantt',{grupo:[0,1,2],text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
+        this.addButton('diagrama_gantt',{grupo:[0,1,2,3],text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
         this.addButton('btnImprimir',
-            {   grupo:[0,1,2],
+            {   grupo:[0,1,2,3],
                 text: 'Imprimir',
                 iconCls: 'bpdf32',
                 disabled: true,
@@ -44,37 +57,38 @@ Phx.vista.VentaVendedor = {
         this.campo_fecha = new Ext.form.DateField({
 	        name: 'fecha_reg',
 	        grupo: this.grupoDateFin,
-				fieldLabel: 'Fecha',
-				allowBlank: false,
-				anchor: '80%',
-				gwidth: 100,
-				format: 'd/m/Y', 
-				hidden : true
+			fieldLabel: 'Fecha',
+			allowBlank: true,  //#123 ya no es obligatorio
+			anchor: '80%',
+			gwidth: 100,
+			format: 'd/m/Y', 
+			hidden : true
 	    });
 	    
 		this.tbar.addField(this.campo_fecha);
 		var datos_respuesta = JSON.parse(response.responseText);
     	var fecha_array = datos_respuesta.datos.fecha.split('/');
-    	this.campo_fecha.setValue(new Date(fecha_array[2],parseInt(fecha_array[1]) - 1,fecha_array[0]));
+    	//this.campo_fecha.setValue(new Date(fecha_array[2],parseInt(fecha_array[1]) - 1,fecha_array[0])); //#123  por dejamos el valor incial, ya no es obligatoria para busquedas
         //this.campo_fecha.hide();
         
         this.finCons = true;
         
-        this.campo_fecha.on('select',function(value){
+        this.campo_fecha.on('change',function(value){
     		this.store.baseParams.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');
     		this.load();
     	},this);
 		  
   	},
-  	gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-eye"></i> En Registro</h1>',grupo:0,height:0},
-                       {name:'finalizado',title:'<H1 align="center"><i class="fa fa-eye"></i> Finalizados</h1>',grupo:1,height:0},
-                       {name:'anulado',title:'<H1 align="center"><i class="fa fa-eye"></i> Anulados</h1>',grupo:2,height:0}
+  	gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-play"></i> En Registro</h1>',grupo:0, height:0},
+  	                   {name:'emision',title:'<H1 align="center"><i class="fa fa-eye"></i> Pendientes</h1>',grupo:3,  height:0},
+                       {name:'finalizado',title:'<H1 align="center"><i class="fa fa-thumbs-up"></i> Finalizados</h1>',grupo:1, height:0},
+                       {name:'anulado',title:'<H1 align="center"><i class="fa fa-thumbs-down"></i> Anulados</h1>',grupo:2, height:0}
                        ],
     
     
     actualizarSegunTab: function(name, indice){
         if(this.finCons){
-        	 if (name == 'finalizado'){
+        	 if (name == 'finalizado' && this.campo_fecha.getValue()){
         	 	this.store.baseParams.fecha = this.campo_fecha.getValue().dateFormat('d/m/Y');;
         	 } else {
         	 	this.store.baseParams.fecha = '';
@@ -86,27 +100,25 @@ Phx.vista.VentaVendedor = {
     },
     beditGroups: [0],
     bdelGroups:  [0],
-    bactGroups:  [0,1,2],
+    bactGroups:  [0,1,2,3],
     btestGroups: [0],
-    bexcelGroups: [0,1,2],       
-    preparaMenu:function()
-    {   var rec = this.sm.getSelected();
-        
+    bexcelGroups: [0,1,2,3],  
+         
+    preparaMenu:function() {   
+    	var rec = this.sm.getSelected();
         if (rec.data.estado == 'borrador') {              
               this.getBoton('sig_estado').enable();
-                          
         } 
         
         if (rec.data.estado == 'finalizado') {              
               this.getBoton('anular').enable();
-                          
         } 
         this.getBoton('btnImprimir').enable();       
         this.getBoton('diagrama_gantt').enable(); 
         Phx.vista.VentaVendedor.superclass.preparaMenu.call(this);
     },
-    liberaMenu:function()
-    {   this.getBoton('btnImprimir').disable(); 
+    liberaMenu:function() {   
+    	this.getBoton('btnImprimir').disable(); 
         this.getBoton('diagrama_gantt').disable();
         this.getBoton('anular').disable();        
         this.getBoton('sig_estado').disable();        

@@ -10,7 +10,7 @@
  ISSUE            FECHA:		      AUTOR               DESCRIPCION
  #0              08-10-2018           RAC                 Creacion 
  #1234           08-10-2018           RAC                 Se agregan datos para proveedor y facturas NCD en ETR 
- #1				 15-10-2018			  EGS				 se agrego validacion para tipo de reporte pdf o nativo del sistema ventas con el prefijo PDF- 
+ #1				 15-10-2018			  EGS				  se agrego validacion para tipo de reporte pdf o nativo del sistema ventas con el prefijo PDF- 
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -36,7 +36,9 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 arguments:config,
                 timeout:this.timeout,
                 scope:this
-            });	  			
+            });	 
+            
+             			
         
 	},
 	successGetVariables : function (response,request) {
@@ -256,17 +258,20 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	anular : function () {
 		Phx.CP.loadingShow();
         var rec=this.sm.getSelected();
-        
-        Ext.Ajax.request({
-            url:'../../sis_ventas_facturacion/control/Venta/anularVenta',
-            params:{                    
-                id_venta:  rec.data.id_venta
-                },
-            success:this.successSave,
-            failure: this.conexionFailure,            
-            timeout:this.timeout,
-            scope:this
-        });
+        if(confirm('¿Está seguro de anular la factura?')){
+        	 if(confirm('¿De verdad, anulamos la factura?')){
+			        Ext.Ajax.request({
+			            url:'../../sis_ventas_facturacion/control/Venta/anularVenta',
+			            params:{                    
+			                id_venta:  rec.data.id_venta
+			                },
+			            success:this.successSave,
+			            failure: this.conexionFailure,            
+			            timeout:this.timeout,
+			            scope:this
+			        });
+			  }
+	   }
 	},	
 	Atributos:[
 		{
@@ -652,7 +657,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 		'id_centro_costo', 
 		'desc_centro_costo',
 		'codigo_aplicacion',
-		'id_venta_fk','nro_factura_vo','id_dosificacion_vo','nroaut_vo','total_venta_vo'   // #1234  
+		'id_venta_fk','nro_factura_vo','id_dosificacion_vo','nroaut_vo',
+		'total_venta_vo','formato_comprobante','tipo_factura'   // #1234  
 		
 		
 	],
@@ -787,7 +793,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
             
              this.elegirFormato();
             //this.imprimirNota();
-        	 ///#1				 15-10-2018			  EGS	
+        	//#1				 15-10-2018			  EGS	
         }
         Phx.CP.loadingHide();
         resp.argument.wizard.panel.destroy();
@@ -827,16 +833,10 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
      console.log('data',formato_comprobante);
    	
    	if (formato_comprobante == 'PDF') {
-   		
-		console.log('imprimirPdf');
    		this.imprimirPdf();
    		
    	} else{
-   		
-   		console.log('imprimirNota');
    		this.imprimirNota();
-   		
-
    	 }
 
    },

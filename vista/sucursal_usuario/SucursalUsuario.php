@@ -71,7 +71,7 @@ Phx.vista.SucursalUsuario=Ext.extend(Phx.gridInterfaz,{
                 lazyRender:true,
                 mode: 'local',                                  
                // displayField: 'descestilo',
-                store:['vendedor','administrador','cajero']
+                store:['vendedor','administrador','cajero','emisor'] //#123 se agrega usuario emisor
             },
             type:'ComboBox',
             //filters:{pfiltro:'promac.inicio',type:'string'},
@@ -79,7 +79,7 @@ Phx.vista.SucursalUsuario=Ext.extend(Phx.gridInterfaz,{
             filters:{   
                          type: 'list',
                          pfiltro:'ucusu.tipo_usuario',
-                         options: ['vendedor','administrador','cajero']
+                         options: ['vendedor','administrador','cajero','emisor']  //#123 se agrega usuario emisor
                     },
             grid:true,
             form:true
