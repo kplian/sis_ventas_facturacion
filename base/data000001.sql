@@ -212,7 +212,7 @@ select pxp.f_insert_testructura_gui ('VEPEETR', 'VENCARP');
 
 
 /***********************************I-DAT-RAC-VEF-0-05/11/2018*****************************************/
-elect pxp.f_insert_tgui ('Pendiente Emisión ETR', 'Pendientes Emisión ETR', 'PENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaEmisor.php', 3, '', 'VentaEmisor', 'VEF');
+select pxp.f_insert_tgui ('Pendiente Emisión ETR', 'Pendientes Emisión ETR', 'PENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaEmisor.php', 3, '', 'VentaEmisor', 'VEF');
 select pxp.f_insert_testructura_gui ('PENETR', 'VENCARP');
 
 
