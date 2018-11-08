@@ -1043,7 +1043,79 @@ ALTER TABLE vef.tventa_detalle
 COMMENT ON COLUMN vef.tventa_detalle.id_venta_detalle_fk
 IS 'para notas de credito so bre ventas, hace referencia al detalle de la factura que vamos devolver';
 
+--------------- SQL ---------------
+
+ALTER TABLE vef.tventa_detalle
+  ADD COLUMN id_doc_concepto INTEGER;
+
+COMMENT ON COLUMN vef.tventa_detalle.id_doc_concepto
+IS 'referencia el concepto en libro de ventas';
+
+ALTER TABLE vef.tventa
+  ALTER COLUMN correlativo_venta TYPE VARCHAR(40);
+
 
 /************************************F-SCP-RAC-VEF-0-25/09/2018*************************************************/
+
+/************************************I-SCP-EGS-VEF-0-08/11/2018*************************************************/
+--------------- SQL ---------------
+CREATE TABLE vef.ttemp_factura_excel (
+  razon_social VARCHAR,
+  nit VARCHAR,
+  precio_total_usd NUMERIC,
+  precio_total_bs NUMERIC,
+  centro_costo VARCHAR,
+  nro_factura VARCHAR,
+  observaciones VARCHAR,
+  fecha DATE,
+  id_punto_venta INTEGER,
+  tipo_factura VARCHAR,
+  nro_contrato VARCHAR,
+  id_funcionario_usu INTEGER,
+  clase_costo VARCHAR,
+  id_sucursal INTEGER,
+  id_proveedor INTEGER,
+  id_centro_costo INTEGER,
+  id_contrato INTEGER,
+  id_factura_excel SERIAL,
+  venta_generada BOOLEAN DEFAULT false NOT NULL,
+  forma_pago VARCHAR,
+  aplicacion VARCHAR,
+  id_forma_pago INTEGER,
+  codigo_aplicacion VARCHAR,
+  CONSTRAINT ttemp_factura_excel_pkey PRIMARY KEY(id_factura_excel)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+--------------- SQL ---------------
+CREATE TABLE vef.ttemp_factura_detalle_excel (
+  id_producto INTEGER,
+  tipo VARCHAR,
+  cantidad_det INTEGER,
+  precio_uni_bs NUMERIC,
+  precio_uni_usd NUMERIC,
+  tipo_factura VARCHAR,
+  detalle VARCHAR,
+  observaciones VARCHAR,
+  nro_factura VARCHAR,
+  unidad VARCHAR,
+  fecha DATE,
+  id_factura_excel_det SERIAL,
+  id_factura_excel_fk INTEGER,
+  CONSTRAINT ttemp_factura_detalle_excel_pkey PRIMARY KEY(id_factura_excel_det)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+--------------- SQL ---------------
+CREATE TABLE vef.ttemporal_data (
+  id_dato_temporal SERIAL,
+  nro_factura VARCHAR,
+  razon_social VARCHAR,
+  total_venta NUMERIC,
+  total_detalle NUMERIC,
+  CONSTRAINT ttemporal_excel_pkey PRIMARY KEY(id_dato_temporal)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+/************************************F-SCP-EGS-VEF-0-08/11/2018*************************************************/
 
 

@@ -8,6 +8,9 @@
 */
 include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
 class ACTSubirArchivoFac extends ACTbase{
+		var $objFuncD ;
+		var $resD;
+	
 		function SubirArchivoFactura(){
 			
 				$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
@@ -27,7 +30,9 @@ class ACTSubirArchivoFac extends ACTbase{
 		                $archivoExcel = new ExcelInput($arregloFiles['archivo']['tmp_name'], 'SUBFACTURA');
 		                $archivoExcel->recuperarColumnasExcel();
 		                $arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
-		                $conteo = 1;
+						$tamano=sizeof($arrayArchivo);
+						//var_dump($arrayArchivo);
+		                $conteo = 0;
 						
 		                foreach ($arrayArchivo as $fila) {
 		                	//var_dump($fila)	;echo"<br>";
@@ -47,14 +52,25 @@ class ACTSubirArchivoFac extends ACTbase{
 		                    $this->objParam->addParametro('observaciones', $fila['observaciones']);
 		                    $this->objParam->addParametro('fecha', $fila['fecha']);
 							$this->objParam->addParametro('nro_contrato', $fila['nro_contrato']);
+							$this->objParam->addParametro('forma_pago', $fila['forma_pago']);
+							$this->objParam->addParametro('aplicacion', $fila['aplicacion']);
 							
 							$this->objParam->addParametro('conteo', $conteo);
+							
+							$this->objParam->addParametro('bandera', 'FALSE');
+							
+							$conteo ++;
+							
+							if($tamano == $conteo ){
+								
+								$this->objParam->addParametro('bandera', 'TRUE');
+							}
 
 		                    //var_dump($this->objParam);
 		                    $this->objFunc = $this->create('MODSubirArchivoFac');
-		                    $this->res = $this->objFunc->subirArchivoFac($this->objParam);
-		                    
-		                    if ($this->res->getTipo() == 'ERROR') {
+		                   //$this->res = $this->objFunc->subirArchivoFac($this->objParam);
+		                    $this->res = $this->objFunc->insertarVentaCompletoXLS($this->objParam);
+		                    if ($this->res->getTipo() == 'ERROR'){
 		                    	
 								$this->res->imprimirRespuesta($this->res->generarJson());
 					            exit;
@@ -63,9 +79,11 @@ class ACTSubirArchivoFac extends ACTbase{
 		                        $mensaje_completo = "Error al guardar el fila en tabla :  " . $this->res->getMensajeTec();
 		                        break;
 		                    }
-							$conteo ++;
+							
 		                }
-						$this->res = $this->objFunc->insertarVentaExcel($this->objParam);	 
+/*
+						$this->objFunc = $this->create('MODSubirArchivoFac');
+						$this->res = $this->objFunc->insertarVentaExcel($this->objParam);	*/
 		            }
 		        } else {
 		            $mensaje_completo = "No se subio el archivo";
@@ -97,7 +115,24 @@ class ACTSubirArchivoFac extends ACTbase{
 		
 		        //devolver respuesta
 		        $this->mensajeRes->imprimirRespuesta($this->mensajeRes->generarJson());
-		    }	
+		  }
+	function listarExcelEliminado(){
+		
+		$this->objParam->defecto('ordenacion','id_dato_temporal');
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODSubirArchivoFac','listarTemporalData');
+		} else{
+			$this->objFunc=$this->create('MODSubirArchivoFac');
+			
+			$this->res=$this->objFunc->listarTemporalData($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+		
+	}	
+
 }
 
 ?>

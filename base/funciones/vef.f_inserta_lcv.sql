@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION vef.f_inserta_lcv (
   p_administrador integer,
   p_id_usuario integer,
@@ -59,6 +61,9 @@ DECLARE
     v_consulta_mig_det	         varchar; -- #123
     v_tipo_doc_mig               varchar; -- #123
     v_liquido                    numeric; -- #123
+    v_codigo_trans_det           varchar; -- #123
+    va_id_doc_concepto	         varchar[]; -- #123
+
     
 BEGIN
 
@@ -110,7 +115,8 @@ BEGIN
      	raise exception 'No se puede generar el libro de ventas debido a que no existe un depto contable parametrizado (%)',v_venta.id_depto;
      end if;
      --verificar si existe el documento
-     select dcv.id_doc_compra_venta into v_id_doc_compra_venta
+     select dcv.id_doc_compra_venta 
+     into v_id_doc_compra_venta
      from conta.tdoc_compra_venta dcv
      where dcv.tabla_origen = 'vef.tventa' and dcv.id_origen = v_venta.id_venta and
      	dcv.estado_reg = 'activo';
@@ -380,7 +386,7 @@ BEGIN
             --recueprar id_doc_compra_venta
              va_id_doc_compra_venta = pxp.f_recupera_clave(v_resp,'id_doc_compra_venta');
             
-            
+           
             -- updata venta
             update vef.tventa set
               id_doc_compra_venta = va_id_doc_compra_venta[1]::integer
@@ -404,7 +410,8 @@ BEGIN
                                             vd.estado,
                                             vd.obs,
                                             vd.serie,
-                                            sp.id_concepto_ingas
+                                            sp.id_concepto_ingas,
+                                            vd.id_doc_concepto
                                           FROM 
                                             vef.tventa_detalle vd
                                           INNER JOIN vef.tsucursal_producto sp on sp.id_sucursal_producto = vd.id_sucursal_producto
@@ -423,7 +430,8 @@ BEGIN
                                             vd.estado,
                                             vd.obs,
                                             vd.serie,
-                                            sp.id_concepto_ingas
+                                            sp.id_concepto_ingas,
+                                            vd.id_doc_concepto
                                           FROM 
                                             vef.tventa_detalle vd
                                           INNER JOIN vef.tventa_detalle  vdo on vdo.id_venta_detalle = vd.id_venta_detalle_fk
@@ -434,61 +442,83 @@ BEGIN
             END IF;
             
             
-            --listar el detalle de la factura
-            FOR v_det_factura in execute(v_consulta_mig_det)LOOP
-                                      
-                          
-                -- insertar concepto de la factura
-                --raise exception '... % ', v_det_factura.id_concepto_ingas;
+            -- #123  solo migra el detalle de la factura al llegar al estado emitido
+            IF p_opcion = 'FIN' THEN
+           
+                -- borrar todos los cconcepto previos
+                  delete from conta.tdoc_concepto 
+                  where id_doc_compra_venta = va_id_doc_compra_venta[1]::integer;
+                --listar el detalle de la factura
                 
-                v_tabla_det = pxp.f_crear_parametro(ARRAY[	
-                                    '_nombre_usuario_ai',
-                                    '_id_usuario_ai',
-                                    'estado_reg',
-                                    'id_doc_compra_venta',
-                                    'id_orden_trabajo',
-                                    'id_centro_costo',
-                                    'id_concepto_ingas',
-                                    'descripcion',
-                                    'cantidad_sol',
-                                    'precio_unitario',
-                                    'precio_total',
-                                    'precio_total_final'],
-                                ARRAY[	
-                                    coalesce(v_parametros._nombre_usuario_ai,''),
-                                    coalesce(v_parametros._id_usuario_ai::varchar,''),
-                                    'activo',  -- estado_reg
-                                     va_id_doc_compra_venta[1],--'id_doc_compra_venta',
-                                    '',--'id_orden_trabajo',
-                                    v_venta.id_centro_costo::varchar,--'id_centro_costo',
-                                    v_det_factura.id_concepto_ingas::varchar,--'id_concepto_ingas',
-                                    v_det_factura.descripcion::varchar,--'descripcion',
-                                    v_det_factura.cantidad::varchar,--'cantidad_sol',
-                                    v_det_factura.precio::varchar,--'precio_unitario',
-                                    (v_det_factura.cantidad *  v_det_factura.precio)::varchar,--'precio_total'
-                                    (v_det_factura.cantidad *  v_det_factura.precio)::varchar--precio_total_final
-                                   
-                                    ],
-                                ARRAY[
-                                    'varchar',
-                                    'int4',  
-                                    'varchar',
-                                    'int4',                              			
-                                    'int4',
-                                    'int4',
-                                    'int4',                               
-                                    'text',                               
-                                    'numeric',
-                                    'numeric',
-                                    'numeric',
-                                    'numeric']
-                                );
-                
-                v_resp = conta.ft_doc_concepto_ime(p_administrador,p_id_usuario,v_tabla_det,'CONTA_DOCC_INS');           
-                                      
-                
-            END LOOP; 
-            
+                FOR v_det_factura in execute(v_consulta_mig_det)LOOP
+                    
+                  
+       
+                    -- insertar concepto de la factura
+                    
+                    v_codigo_trans_det = 'CONTA_DOCC_INS';
+                    
+                    
+                    v_tabla_det = pxp.f_crear_parametro(ARRAY[	
+                                        '_nombre_usuario_ai',
+                                        '_id_usuario_ai',
+                                        'estado_reg',
+                                        'id_doc_compra_venta',
+                                        'id_orden_trabajo',
+                                        'id_centro_costo',
+                                        'id_concepto_ingas',
+                                        'descripcion',
+                                        'cantidad_sol',
+                                        'precio_unitario',
+                                        'precio_total',
+                                        'precio_total_final',
+                                        'id_doc_concepto'],
+                                    ARRAY[	
+                                        coalesce(v_parametros._nombre_usuario_ai,''),
+                                        coalesce(v_parametros._id_usuario_ai::varchar,''),
+                                        'activo',  -- estado_reg
+                                         va_id_doc_compra_venta[1],--'id_doc_compra_venta',
+                                        '',--'id_orden_trabajo',
+                                        v_venta.id_centro_costo::varchar,--'id_centro_costo',
+                                        v_det_factura.id_concepto_ingas::varchar,--'id_concepto_ingas',
+                                        v_det_factura.descripcion::varchar,--'descripcion',
+                                        v_det_factura.cantidad::varchar,--'cantidad_sol',
+                                        v_det_factura.precio::varchar,--'precio_unitario',
+                                        (v_det_factura.cantidad *  v_det_factura.precio)::varchar,--'precio_total'
+                                        (v_det_factura.cantidad *  v_det_factura.precio)::varchar,--precio_total_final
+                                         coalesce(v_det_factura.id_doc_concepto::varchar,'')
+                                       
+                                        ],
+                                    ARRAY[
+                                        'varchar',
+                                        'int4',  
+                                        'varchar',
+                                        'int4',                              			
+                                        'int4',
+                                        'int4',
+                                        'int4',                               
+                                        'text',                               
+                                        'numeric',
+                                        'numeric',
+                                        'numeric',
+                                        'numeric',
+                                        'int4']
+                                    );
+                    
+                        
+                    v_resp = conta.ft_doc_concepto_ime(p_administrador,p_id_usuario,v_tabla_det,v_codigo_trans_det);
+                    
+                    --recueprar id_doc_compra_venta
+                    va_id_doc_concepto = pxp.f_recupera_clave(v_resp,'id_doc_concepto');
+                    
+                    -- updata venta
+                   update vef.tventa_detalle   set
+                      id_doc_concepto = va_id_doc_concepto[1]::integer
+                   where id_venta_detalle = v_det_factura.id_venta_detalle;        
+                                          
+                    
+                END LOOP; 
+         END IF;  --FIN de la opracion
         end if;
         
         

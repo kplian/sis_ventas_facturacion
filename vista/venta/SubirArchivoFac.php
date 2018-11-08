@@ -37,7 +37,25 @@ Phx.vista.SubirArchivoFac=Ext.extend(Phx.frmInterfaz,{
         Phx.CP.loadingHide();
         Phx.CP.getPagina(this.idContenedorPadre).reload();
         this.panel.close();
+        this.ventanaEliminado();
+        
     },
+    
+     ventanaEliminado : function(rec)
+	{	 
+		Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/venta/ExcelEliminado.php',
+		'Datos Eliminados',
+		{
+			modal:true,
+			width:500,
+			height:400
+		},
+		{ data: {  //objPadre: me ,
+			    maestro: this.maestro,
+		 }},
+		this.idContenedor,
+		'TemporalData');
+	},
                 
     
     Atributos:[

@@ -101,18 +101,7 @@ class RFacturaReciboPdf extends  ReportePDF {
         imagepng($this->im, dirname(__FILE__) . "/../../reportes_generados/" .$this->nombre_archivo . ".png");
         imagedestroy($this->im);
         $this->img_qr = dirname(__FILE__) . "/../../reportes_generados/" . $this->nombre_archivo . ".png";
-		
-		/*
-		$this->texto_estado = imagecreatefromstring( 'BORRADOR');
-        header('Content-Type: image/png');
-        imagepng($this->texto_estado, dirname(__FILE__) . "/../../reportes_generados/" .$this->nombre_archivo . ".png");
-        imagedestroy($this->texto_estado);
-        $this->img_texto_estado = dirname(__FILE__) . "/../../reportes_generados/" . $this->nombre_archivo . ".png";
-*/
-		//        								cordenadas    x  y anchura altura
-		//$this->write2DBarcode($this->cadena_qr, 'QRCODE,H', 80,0,  30,   30, $style,'T',true);		
-
-		//adiciona glosa
+	
 		if ( $this->cabecera ['estado'] == 'finalizado') {
 			
 				

@@ -56,6 +56,7 @@ $body$
     v_id_boleto					integer;
     v_sw_ncd                    boolean; -- #123
     v_id_venta_detalle_fk	    integer; -- #123
+    v_id_doc_concepto           integer; -- #123
 
 
 
@@ -323,13 +324,21 @@ $body$
     elsif(p_transaccion='VF_VEDET_ELI')then
 
       begin
-        select id_venta into v_id_venta
-        from vef.tventa_detalle
+        select id_venta, v.id_doc_concepto into v_id_venta, v_id_doc_concepto  --#123 add v_id_doc_concepto
+        from vef.tventa_detalle v 
         where id_venta_detalle = v_parametros.id_venta_detalle;
 
         --Sentencia de la eliminacion
         delete from vef.tventa_detalle
         where id_venta_detalle=v_parametros.id_venta_detalle;
+        
+        --#123 si existe el conepto eliminamos en libro de ventas en contabilidad
+        IF v_id_doc_concepto is not null THEN
+           delete from conta.tdoc_concepto 
+           where id_doc_concepto = v_id_doc_concepto;
+        END IF;
+        
+        
         /*Verificar si todavia existe una formula*/
         v_tiene_formula = 'no';
         if (exists (select 1 from vef.tventa_detalle where id_venta = v_id_venta

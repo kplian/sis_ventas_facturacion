@@ -215,6 +215,9 @@ select pxp.f_insert_testructura_gui ('VEPEETR', 'VENCARP');
 select pxp.f_insert_tgui ('Pendiente Emisión ETR', 'Pendientes Emisión ETR', 'PENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaEmisor.php', 3, '', 'VentaEmisor', 'VEF');
 select pxp.f_insert_testructura_gui ('PENETR', 'VENCARP');
 
+select param.f_import_tcatalogo_tipo ('insert','tipo_punto_venta','VEF','tpunto_venta');
+select param.f_import_tcatalogo ('insert','VEF','aeropuerto','ato','tipo_punto_venta');
+
 
 /***********************************F-DAT-RAC-VEF-0-05/11/2018*****************************************/
 
