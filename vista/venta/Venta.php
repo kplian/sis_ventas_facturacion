@@ -44,7 +44,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	},
 	successGetVariables : function (response,request) {
 		var respuesta = JSON.parse(response.responseText);
-		 console.log('VAri',respuesta)
+		
    		if('datos' in respuesta){
 		    this.variables_globales = respuesta.datos;
 		   
