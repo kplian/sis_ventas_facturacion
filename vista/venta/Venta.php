@@ -11,6 +11,7 @@
  #0              08-10-2018           RAC                 Creacion 
  #1234           08-10-2018           RAC                 Se agregan datos para proveedor y facturas NCD en ETR 
  #1				 15-10-2018			  EGS				  se agrego validacion para tipo de reporte pdf o nativo del sistema ventas con el prefijo PDF- 
+ #2				 12-11-2018			  EGS				  se agrego el campo tipo de usuario cuando el usuario esta asignado a mas de dos puntos de venta
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -43,9 +44,10 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	},
 	successGetVariables : function (response,request) {
 		var respuesta = JSON.parse(response.responseText);
-		
+		 console.log('VAri',respuesta)
    		if('datos' in respuesta){
 		    this.variables_globales = respuesta.datos;
+		   
 		}
 		
 		if (this.variables_globales.vef_tiene_punto_venta === 'true') {
@@ -141,6 +143,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	    
 	    storeCombo.load({params:{start: 0, limit: this.tam_pag}, 
 	           callback : function (r) {
+	           	console.log('R',r)
 	                if (r.length == 1 ) {   
 	                	if (this.variables_globales.vef_tiene_punto_venta === 'true') {                    
 	                    	this.variables_globales.id_punto_venta = r[0].data.id_punto_venta;
@@ -208,9 +211,12 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 							                    	this.variables_globales.id_punto_venta = combo2.getValue();							                    	
 							                    	this.variables_globales.id_sucursal = storeCombo.getById(combo2.getValue()).data.id_sucursal;
 							                    	this.store.baseParams.id_punto_venta = this.variables_globales.id_punto_venta;
+							                    	this.store.baseParams.tipo_usuario = this.tipo_usuario; ///#2		12-11-2018	 EGS	
+
 							                    } else {
 							                    	this.variables_globales.id_sucursal = combo2.getValue();
 							                    	this.store.baseParams.id_sucursal = this.variables_globales.id_sucursal;
+							                    	this.store.baseParams.tipo_usuario = this.tipo_usuario; //#2	     12-11-2018	EGS	
 							                    }
 							                    
 							                    this.store.baseParams.tipo_factura = this.tipo_factura;
