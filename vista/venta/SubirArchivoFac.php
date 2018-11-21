@@ -22,7 +22,10 @@ Phx.vista.SubirArchivoFac=Ext.extend(Phx.frmInterfaz,{
         console.log('config',config);
         console.log('id_punto_venta',this.data.id_punto_venta);
         console.log('tipo factura',this.data.tipo_factura);
+
     },
+    
+    
     
     loadValoresIniciales:function()
     {        

@@ -8,7 +8,7 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 				
 				setlocale(LC_ALL,"es_ES@euro","es_ES","esp");
 ?>
-		<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+		<!--DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
 					   "http://www.w3.org/TR/html4/strict.dtd">
 		<html >
 			<head>
@@ -17,7 +17,6 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 						<meta name="author" content="kplian">
 						    
 					
-					  <!--link rel="stylesheet" href="../../../sis_ventas_facturacion/control/print_media_carta.css" type="text/css"  charset="utf-8"-->
 					
 				</head>
 				
@@ -82,9 +81,9 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 				  		<td  style="text-align: center;"><?php echo $this->cabecera['lugar_sucursal'] ; ?></td>
 				  	</tr>
        
-			  </table>
+			  </table!-->
 				
-				<h2 style="text-align: center;">FACTURA</h2>		
+				<!--h2 style="text-align: center;">FACTURA</h2>		
 						
 				<table style="border: thin solid black;" width="645">
 					<tbody>
@@ -125,17 +124,19 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 							<td style="text-align: center; border: thin solid black;" width="15%"><strong>PRECIO UNITARIO</strong></td>
 							<td style="text-align: center; border: thin solid black;" width="20%"><strong>SUBTOTAL</strong></td>
 						</tr>
+				</table!-->
+				<table style="border:thin solid black ;border-collapse: collapse; height: 33px;" width="645px">
 <?php
 					$valor_bruto = 0;
 					$i = 1;
 					foreach ($this->detalle as $item_detalle) {
 						$valor_bruto += $item_detalle['precio_total']; 
 						echo '<tr>
-							<td style="text-align: right; border-bottom: thin solid black;">'.$i.'</td>							
-							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
-							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', ',') . '</td>
-							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', ',') . '</td>
-							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
+							<td width="10%" style="text-align: center; border-bottom: thin solid black; border-left: thin solid black;">'.$i.'</td>							
+							<td width="40%" style="text-align: left ; border-bottom: thin solid black; border-left: thin solid black;">' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
+							<td width="15%" style="text-align: right; border-bottom: thin solid black; border-left: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', ',') . '</td>
+							<td width="15%" style="text-align: right; border-bottom: thin solid black; border-left: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', ',') . '</td>
+							<td width="20%" style="text-align: right; border-bottom: thin solid black; border-left: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
 						</tr>';
 						$i++;
 					}
@@ -158,12 +159,14 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 							<td width="53%" style="text-align:center;"><br></td>
 							<td width="32.5%"><strong>TOTAL  <?php echo $this->cabecera['moneda_venta'] ; ?>:</strong> </td>
 							<td style="text-align: right;" width="14%"><strong><?php echo number_format($this->cabecera['total_venta_msuc'], 2, '.', ',') ; ?></strong></td>
-						</tr>						
+						</tr>
+						<tr>
+							<td><p>Son : <strong><?php echo $this->cabecera['total_venta_msuc_literal'] ; ?> <?php echo $this->moneda; ?></strong></p></td>
+						</tr>							
 					
 				</table>
-	
-				<p>Son : <strong><?php echo $this->cabecera['total_venta_msuc_literal'] ; ?> <?php echo $this->moneda; ?></strong></p>
-				<table  >
+				
+				<!-- table  >
 						<tr>
 							<td width="65%">
 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -171,12 +174,7 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 							</td>
 							<td width="35%" rowspan="3">
 							<?php
-							
-							//echo $this->write2DBarcode($this->cadena_qr, 'QRCODE,H', 10,10,30,0, $style,'T',true);
-							
-							//echo $this->barcodeobj->getBarcodeSVG(2, 30, 'black');
-							//echo  '<img src = "'.$this->barcodeobj->getBarcodePNG(2, 30, array(0,128,0)).'.png ">';
-							//echo '<img src = "'. $this->barcodeobj->getBarcodePngData (10, 10, array (0,0,0)).'.png ">';
+
 						    echo  '<img src = "'.$this->img_qr.'" width="130" height="130">';
 							
 					
@@ -216,24 +214,7 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 					
 				</table>
 				
-				 
-				
-<?php
-/*
-				if ($this->cabecera['estado'] == 'finalizado') {
-					$pagina = str_replace('<h3>&nbsp;<strong>ORIGINAL</strong></h3>', '<h3>&nbsp;<strong>COPIA CONTABILIDAD</strong></h3>', $pagina);
-					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
-					
-					$pagina = str_replace('<h3>&nbsp;<strong>COPIA CONTABILIDAD</strong></h3>', '<h3>&nbsp;<strong>COPIA TESORERIA</strong></h3>', $pagina);
-					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
-					
-					$pagina = str_replace('<h3>&nbsp;<strong>COPIA TESORERIA</strong></h3>', '<h3>&nbsp;<strong>COPIA ARCHIVO</strong></h3>', $pagina);
-					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
-				}*/
 
-				
-	
-?>						
 				<script type="text/javascript"> 
 
 <?php
@@ -247,7 +228,7 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 										}, 2000);';
 						}
 ?>					
-				</script>                                                                                   
+				</script!-->                                                                                   
                  </body>
             </html>
 
@@ -256,7 +237,7 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 'FACMEDIACARVINTO')  {
 	
 ?>
-		<!DOCTYPE html>
+		<!--DOCTYPE html>
 		<html lang="es">
 			<head>
 					
@@ -357,7 +338,7 @@ elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 
 						
 					</tbody>
 				
-				</table>
+				</table!-->
 			<table>
 				<tr>
 					<td style="text-align: center;" colspan="6"> <strong>Datos de la Transaccion Original</strong> </td>
@@ -389,6 +370,7 @@ elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 
 					$valor_bruto = 0;
 					$i = 1;
 					foreach ($this->factura_detalle as $item_detalle) {
+
 						$valor_bruto += $item_detalle['precio_total']; 
 						echo '<tr>
 							<td style="text-align: right; border-bottom: thin solid black;">'.$i.'</td>							
@@ -413,7 +395,7 @@ elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 
 					
 				</table>
 		
-				<hr style="color: black; background-color: black; width:93%;"  />
+				<hr style="color: black; background-color: black; width:645px;"  />
 				<br/>
 					
 			
@@ -438,10 +420,21 @@ elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 
 					$valor_bruto = 0;
 					$i = 1;
 					foreach ($this->detalle as $item_detalle) {
+						
+						
+						foreach ($this->factura_detalle as $value) {
+							//var_dump($value['id_venta_detalle']);
+							if ($value['id_venta_detalle'] == $item_detalle['id_venta_detalle_fk']){
+									
+								$descripcion_factura = $value['descripcion'];
+								$concepto_factura = $value['concepto'];
+							}
+						}
+						
 						$valor_bruto += $item_detalle['precio_total']; 
 						echo '<tr>
 							<td style="text-align: right; border-bottom: thin solid black;">'.$i.'</td>							
-							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
+							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] .' '.$concepto_factura.' '.$descripcion_factura.' - '. $item_detalle['descripcion'] . '</td>
 							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', ',') . '</td>
 							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', ',') . '</td>
 							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
@@ -468,11 +461,12 @@ elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 
 							<td width="32.5%"><strong>Importe Total Devuelto <?php echo $this->cabecera['moneda_venta'] ; ?>:</strong> </td>
 							<td style="text-align: right;" width="14%"><strong><?php echo number_format($this->cabecera['total_venta_msuc'], 2, '.', ',') ; ?></strong></td>
 						</tr>						
-					
+						<tr>
+							<td>				<p>Son : <strong><?php echo $this->cabecera['total_venta_msuc_literal'] ; ?> <?php echo $this->moneda; ?></strong></p></td>	
+						</tr>
 				</table>
-				<p>Son : <strong><?php echo $this->cabecera['total_venta_msuc_literal'] ; ?> <?php echo $this->moneda; ?></strong></p>
 				
-				<table >
+				<!--table >
 						<tr>
 							<td width="85%">Monto Efectivo del Credito o debito (13% del importe Total Devuelto)</td>
 							<td><?php echo number_format($this->cabecera['total_venta_msuc']*0.13, 2, '.', ',') ;echo ' '; echo $this->cabecera['moneda_venta'] ; ?></td>
@@ -516,31 +510,7 @@ elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 
 					
 				</table>
 				
-<?php
-/*
-				if ($this->cabecera['estado'] == 'finalizado') {
-					$pagina = str_replace('<h3>&nbsp;<strong>ORIGINAL</strong></h3>', '<h3>&nbsp;<strong>COPIA CONTABILIDAD</strong></h3>', $pagina);
-					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
-					
-					$pagina = str_replace('<h3>&nbsp;<strong>COPIA CONTABILIDAD</strong></h3>', '<h3>&nbsp;<strong>COPIA TESORERIA</strong></h3>', $pagina);
-					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
-					
-					$pagina = str_replace('<h3>&nbsp;<strong>COPIA TESORERIA</strong></h3>', '<h3>&nbsp;<strong>COPIA ARCHIVO</strong></h3>', $pagina);
-					$html .= '<p style="page-break-after:always;"></p>' . $pagina;
-				}
 
-				
-			echo'<script language="VBScript">
-					
-						Sub Print()
-						       OLECMDID_PRINT = 6
-						       OLECMDEXECOPT_DONTPROMPTUSER = 2
-						       OLECMDEXECOPT_PROMPTUSER = 1
-						       call WB.ExecWB(OLECMDID_PRINT, OLECMDEXECOPT_DONTPROMPTUSER,1)
-						End Sub
-						document.write "<object ID="WB" WIDTH=0 HEIGHT=0 CLASSID="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2"></object>"
-				</script>';*/
-?>						
 				<script type="text/javascript"> 
 
 <?php
@@ -554,7 +524,7 @@ elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 
 										}, 2000);';
 						}
 ?>					
-				</script>                                                                                   
+				</script!-->                                                                                   
                  </body>
             </html>
 

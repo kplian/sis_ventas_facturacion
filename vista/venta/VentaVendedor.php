@@ -5,6 +5,8 @@
 *@author  (rarteaga)
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+* 		ISSUE 			Fecha				Autor				Descripcion
+ * 		#1				19/11/2018			EGS					se aumento botones para subir y descargar plantillas para facturas en excel		
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -28,6 +30,7 @@ Phx.vista.VentaVendedor = {
   		this.store.baseParams.pes_estado = 'borrador';        
 		
 		console.log('nombre',this.nombreVista);
+		///#1 19/11/2018 EGS	
 		if (this.nombreVista=='VentaVendedorETR') {
 			this.addButton('btnXls',
 			{
@@ -36,10 +39,18 @@ Phx.vista.VentaVendedor = {
 				disabled: false	,
 				handler: this.SubirArchivo,
 				tooltip: '<b>Subir Archivo</b>'
-			}
-		); 
+			});
+			this.addButton('btnPlantExcel', {
+				text : 'Plantilla',
+				iconCls : 'bprint',
+				disabled : false,
+				handler : this.descargaPlantilla,
+				tooltip : '<b>Descarga ejemplo de Plantilla Excel para subir Facturas</b><br/>'
+			});  
 			
-		};      
+		}; 
+			///#1 19/11/2018 EGS	      
+        
         
         this.addButton('anular',{grupo:[],text:'Anular',iconCls: 'bdel',disabled:true,handler:this.anular,tooltip: '<b>Anular la venta</b>',hidden:true});
         this.addButton('sig_estado',{grupo:[0],text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});

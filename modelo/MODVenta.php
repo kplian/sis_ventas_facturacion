@@ -1120,6 +1120,8 @@ class MODVenta extends MODbase{
 		$this->setParametro('id_venta','id_venta','integer');
 
 		//Definicion de la lista del resultado del query
+		$this->captura('id_venta_detalle','integer');
+		$this->captura('id_venta_detalle_fk','integer');
 		$this->captura('concepto','varchar');
 		$this->captura('cantidad','numeric');
 		$this->captura('precio_unitario','numeric');

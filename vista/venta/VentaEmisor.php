@@ -45,9 +45,8 @@ Phx.vista.VentaEmisor = {
                 handler: this.elegirFormato,
                 tooltip: '<b>Imprimir Formulario de Venta</b><br/>Imprime el formulario de la venta'
             }
-        );        
-      
-		      
+        );
+        this.addBottoCarta();
         this.finCons = true; 
         //primera carga
 		this.store.baseParams.pes_estado = 'emision';
@@ -68,6 +67,33 @@ Phx.vista.VentaEmisor = {
              this.store.baseParams.interfaz = 'emision';              
              this.load({params:{start:0, limit:this.tam_pag}});
         }
+    },
+    addBottoCarta: function() {
+        this.menuAdq = new Ext.Toolbar.SplitButton({
+            id: 'b-btnCarta-' + this.idContenedor,
+            text: 'Cartas',
+            disabled: true,
+            grupo:[0,1,2],
+            iconCls : 'bpdf32',
+            handler:this.imprimirCarta,
+            scope: this,
+            menu:{
+                items: [{
+                    id:'b-btnCartaSN-' + this.idContenedor,
+                    text: 'Carta SN',
+                    iconCls : 'blist',
+                    handler:this.imprimirCarta,
+                    scope: this
+                }, {
+                    id:'b-btnCartaCN-' + this.idContenedor,
+                    text: 'Carta CN',
+                    iconCls : 'blist',
+                    handler:this.imprimirCartaCn,
+                    scope: this
+                }
+                ]}
+        });
+        this.tbar.add(this.menuAdq);
     },
     beditGroups: [0],
     bdelGroups:  [0],
@@ -90,13 +116,15 @@ Phx.vista.VentaEmisor = {
               this.getBoton('sig_estado').disable();
                           
         } 
-        this.getBoton('btnImprimir').enable();       
+        this.getBoton('btnImprimir').enable();
+        this.getBoton('btnCarta').enable();
         this.getBoton('diagrama_gantt').enable(); 
         Phx.vista.VentaEmisor.superclass.preparaMenu.call(this);
     },
     
     liberaMenu:function()
-    {   this.getBoton('btnImprimir').disable(); 
+    {   this.getBoton('btnImprimir').disable();
+        this.getBoton('btnCarta').disable();
         this.getBoton('diagrama_gantt').disable();
         this.getBoton('anular').disable();        
         this.getBoton('sig_estado').disable();
@@ -144,7 +172,51 @@ Phx.vista.VentaEmisor = {
 				});
 			}
 	},
-    
-    
+    imprimirCarta:function () {
+        var rec = this.sm.getSelected();
+        var data = rec.data;
+        me = this;
+        if (data) {
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url : '../../sis_ventas_facturacion/control/Venta/PlantillaCarta',
+                params : {
+                    'id_venta' : data.id_venta,
+                    'formato_comprobante' : data.formato_comprobante,
+                    'tipo_factura': data.tipo_factura,
+                    'nombre_vista': this.nombreVista,
+                    'tipo':'sn'
+                },
+                success : this.successExport,
+                failure : this.conexionFailure,
+                timeout : this.timeout,
+                scope : this
+            });
+        }
+
+    },
+    imprimirCartaCn:function () {
+        var rec = this.sm.getSelected();
+        var data = rec.data;
+        me = this;
+        if (data) {
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url : '../../sis_ventas_facturacion/control/Venta/PlantillaCarta',
+                params : {
+                    'id_venta' : data.id_venta,
+                    'formato_comprobante' : data.formato_comprobante,
+                    'tipo_factura': data.tipo_factura,
+                    'nombre_vista': this.nombreVista,
+                    'tipo':'cn'
+                },
+                success : this.successExport,
+                failure : this.conexionFailure,
+                timeout : this.timeout,
+                scope : this
+            });
+        }
+
+    }
 };
 </script>

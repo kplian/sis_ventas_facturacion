@@ -445,7 +445,7 @@ Phx.vista.FormVentaNCETR=Ext.extend(Phx.frmInterfaz,{
             
             this.Cmp.id_venta_fk.enable();
 			this.Cmp.id_venta_fk.reset();
-			this.Cmp.id_venta_fk.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+cmb.getValue()+"\",\"field\":\"CON.id_proveedor\"}]";
+			this.Cmp.id_venta_fk.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+cmb.getValue()+"\",\"field\":\"VEN.id_proveedor\"}]";
 			this.Cmp.id_venta_fk.modificado = true;
 			//#123 reset grilla detalle
 			this.resetGrillaDetalle()
@@ -1894,7 +1894,7 @@ Phx.vista.FormVentaNCETR=Ext.extend(Phx.frmInterfaz,{
         this.crearStoreFormaPago();    	
         
         // #123  definir filtro de proveedor 
-        this.Cmp.id_venta_fk.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+this.Cmp.id_proveedor.getValue()+"\",\"field\":\"CON.id_proveedor\"}]";
+        this.Cmp.id_venta_fk.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+this.Cmp.id_proveedor.getValue()+"\",\"field\":\"VEN.id_proveedor\"}]";
 		this.Cmp.id_venta_fk.modificado = true;
     },    
     onNew: function(){    	

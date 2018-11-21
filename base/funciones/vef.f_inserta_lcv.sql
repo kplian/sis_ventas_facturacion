@@ -161,15 +161,25 @@ BEGIN
               v_descuento_porc,
               v_descuento
              FROM  conta.f_get_descuento_plantilla_calculo(v_venta.id_plantilla);
-            
-            --obtener iva
-             select  
-               ps_monto_porc
-             into
-              v_iva
-             FROM  conta.f_get_detalle_plantilla_calculo(v_venta.id_plantilla, 'IVA-DF');
              
-           
+             IF  v_venta.ncd = 'no' THEN
+                 --obtener iva
+                 select  
+                   ps_monto_porc
+                 into
+                  v_iva
+                 FROM  conta.f_get_detalle_plantilla_calculo(v_venta.id_plantilla, 'IVA-DF');
+             
+             ELSE
+                 --obtener iva
+                 select  
+                   ps_monto_porc
+                 into
+                  v_iva
+                 FROM  conta.f_get_detalle_plantilla_calculo(v_venta.id_plantilla, 'IVA-CF');
+             
+             END IF;
+             
             --recupera IT           
             select  
                ps_monto_porc

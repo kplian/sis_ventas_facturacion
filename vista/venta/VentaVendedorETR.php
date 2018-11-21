@@ -5,6 +5,9 @@
 *@author  (rarteaga)
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+* 		ISSUE 			Fecha				Autor				Descripcion
+ * 		#1				19/11/2018			EGS					se aumento funciones para subir y descargar plantillas para facturas en excel 
+ 
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -23,7 +26,7 @@ Phx.vista.VentaVendedorETR = {
     constructor: function(config) {
         this.maestro = config.maestro;  
         Phx.vista.VentaVendedorETR.superclass.constructor.call(this,config);
-        console.log(this.variables_globales.id_punto_venta) ;    
+       // console.log(this.variables_globales.id_punto_venta) ;    
     } ,
     
     arrayDefaultColumHidden:['estado_reg','usuario_ai','fecha_reg','fecha_mod','usr_reg','usr_mod','excento','cod_control','nroaut'],
@@ -39,6 +42,8 @@ Phx.vista.VentaVendedorETR = {
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Modificado por:&nbsp;&nbsp;</b> {usr_mod}</p><br>'
             )
     }),
+    
+    //	#1				19/11/2018			EGS		
     SubirArchivo : function(rec)
 	{	 console.log('id_punto_venta',this.variables_globales.id_punto_venta) ; 
 		Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/venta/SubirArchivoFac.php',
@@ -55,8 +60,19 @@ Phx.vista.VentaVendedorETR = {
 		 }},
 		this.idContenedor,
 		'SubirArchivoFac');
-	}
-    
+	},
+	
+	descargaPlantilla: function(){
+		var     data  = "&extension=xlsx";
+	            data += "&sistema=sis_ventas_facturacion";
+	            data += "&clase=plantilla";
+	            data += "&url=./../../../uploaded_files/sis_ventas_facturacion/plantilla/plantillaExcelFactura.xlsx";
+	            //return  String.format('{0}',"<div style='text-align:center'><a target=_blank href = '../../../lib/lib_control/CTOpenFile.php?"+ data+"' align='center' width='70' height='70'>Abrir</a></div>");
+	            window.open('../../../lib/lib_control/CTOpenFile.php?' + data);
+		
+		
+	},
+    //	#1				19/11/2018			EGS		
     
 };
 </script>

@@ -19,6 +19,7 @@ require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 include(dirname(__FILE__).'/../reportes/RFacturaRecibo.php');
 include(dirname(__FILE__).'/../reportes/RFacturaReciboPdf.php');
+include(dirname(__FILE__).'/../reportes/RPlantillaCarta.php');
 
 class ACTVenta extends ACTbase{    
 			
@@ -510,74 +511,36 @@ class ACTVenta extends ACTbase{
 		$this->res = $this->objFunc->listarReciboFactura($this->objParam);
 		
 		$datos = $this->res->getDatos();
-		
-		//var_dump( 'datos bruto',$datos);
-		
-		//if ($this->res['tipo_respuesta']=='ERROR') {
-         //    throw new Exception("Error al ejecutar en la bd", 3);
-        //}
-		//var_dump( $this->res);
-		//exit;
-		
 		$datos = $datos[0];
-		
-		//var_dump( 'datos',$datos);
-		//var_dump( 'datos',$datos['id_venta_fk']);
 		$dataSource = new DataSource();	
-		
 		$dataSource->putParameter('cabecera',$datos);
 		
 		
 		if ($datos['cantidad_descripciones'] > 0){
 			$this->objFunc = $this->create('MODVenta');
 			$this->res = $this->objFunc->listarReciboFacturaDescripcion($this->objParam);
-			
 		    $dataSource->putParameter('detalle_descripcion',$this->res->getDatos());
-			
-			//$datos['detalle_descripcion'] = $this->res->getDatos();
 		}
-		//var_dump($this->objParam);
-
 		$this->objFunc = $this->create('MODVenta');
 		$this->res = $this->objFunc->listarReciboFacturaDetalle($this->objParam);
-		
 		$dataSource->putParameter('detalle',$this->res->getDatos());
-		
-		//$datos['detalle'] = $this->res->getDatos();
-		
 		if ($datos['id_venta_fk']!= '') {
 			
 			$this->objParam->addParametro('id_venta',$datos['id_venta_fk']);
-			
-			//var_dump('$this->objParam',$this->objParam);
-			
-			$this->objFunc=$this->create('MODVenta');
-				
+			$this->objFunc=$this->create('MODVenta');	
 			$this->res=$this->objFunc->listarReciboFactura($this->objParam);
-			//var_dump('$this->res',$this->res);
 			$this->res=$this->res->getDatos();
 			$this->res=$this->res[0];
 			$dataSource->putParameter('facturaCabecera',$this->res);
-			
-			//var_dump('$dataSource',$dataSource);
-			
+
 			$this->objFunc = $this->create('MODVenta');
 			$this->res = $this->objFunc->listarReciboFacturaDetalle($this->objParam);
 			$dataSource->putParameter('facturaDetalle',$this->res->getDatos());
-			//var_dump('$dataSource',$dataSource);
+
 		}
-		
-	
-		
-		
-	
-	
-	
+
 		$nombreArchivo = uniqid(md5(session_id()).'-Cbte') . '.pdf'; 
-	  		
-	  		//var_dump($dataSource);
-		
-		//var_dump($this->objParam);
+
 		//parametros basicos
 		$tamano = 'LETTER';
 		$orientacion = 'p';
@@ -599,6 +562,20 @@ class ACTVenta extends ACTbase{
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 		
 	}
+    function PlantillaCarta(){
+        $this->objFunc=$this->create('MODVenta');
+        $dataSource = $this->objFunc->listarReciboFactura();
+        $this->dataSource=$dataSource->getDatos();
+        $nombreArchivo = uniqid(md5(session_id()).'Carta').'.docx';
+        $reporte = new RPlantillaCarta($this->objParam);
+        $reporte->datosHeader($this->dataSource);
+        $reporte->tipoCarta($this->objParam->getParametro('tipo'));
+        $reporte->write(dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
 			
 }
 
