@@ -1110,6 +1110,7 @@ CREATE TABLE vef.ttemp_factura_detalle_excel (
   nro VARCHAR,
   id_venta_detalle_fk INTEGER,
   id_venta_fk INTEGER,
+  codigo_ingas VARCHAR,
   CONSTRAINT ttemp_factura_detalle_excel_pkey PRIMARY KEY(id_factura_excel_det)
 ) INHERITS (pxp.tbase)
 WITH (oids = false);
