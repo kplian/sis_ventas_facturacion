@@ -382,7 +382,7 @@ BEGIN
          FROM param.tconcepto_ingas cing
          WHERE	UPPER(cing.codigo) = UPPER(v_codigo) ;
 
-         IF v_record_concepto_ingas is null THEN
+         IF v_record_concepto_ingas is  null THEN
          	RAISE EXCEPTION 'El codigo del concepto de gasto % no esta registrado como un Conceptos-ingas  ',v_codigo;          
          END IF;
          
@@ -498,9 +498,9 @@ BEGIN
         FROM vef.ttemp_factura_excel tfe
         WHERE  tfe.nro = v_parametros.nro and tfe.fecha_reg::date = NOW()::date and  tfe.ncd = true;
         
-        IF v_record_data_excel is null THEN
 			--verificando si el codigo existe en el detalle de la factura y relaciona cada detalle de la nota con cada detalle de la factura
-       	  v_detalle_existe = false;
+       	  
+          v_detalle_existe = false;
           v_record_detalle_factura = ' ';
           v_count = 0;
           FOR ITEM IN (
@@ -520,22 +520,22 @@ BEGIN
             left join vef.tsucursal_producto sp on sp.id_sucursal_producto = vend.id_sucursal_producto
             left join param.tconcepto_ingas cing on cing.id_concepto_ingas = sp.id_concepto_ingas
             left join temp_detalle tempd  on tempd.id_venta_detalle = vend.id_venta_detalle
-            WHERE  tempd.id_venta_detalle is  null and vend.id_venta = v_record_factura.id_venta 
+            WHERE  tempd.id_venta_detalle is null and vend.id_venta_detalle_fk is null and vend.id_venta = v_record_factura.id_venta 
          	)LOOP
+           
             IF upper(item.codigo) = upper(v_codigo)  THEN
             	v_count = v_count+1;
-            	v_id_venta_detalle_fk=item.id_venta_detalle;
+            	v_id_venta_detalle_fk = item.id_venta_detalle;
                 v_detalle_existe = true;             
             END IF;
 
           END LOOP;
      		--RAISE EXCEPTION '%',v_count;
             IF v_detalle_existe = false  THEN
-                RAISE EXCEPTION 'El codigo de concepto de gasto % no existe como detalle en la factura % ',v_codigo,v_nro_factura;          
+                RAISE EXCEPTION 'El codigo de concepto de gasto % no existe como detalle en la factura % o este detalle ya se encuentra en una nota de Credito registrada ',v_codigo,v_nro_factura;          
             END IF;
-		END IF;
     	--validacion que el detalle no se repita si se repite no se inserta 
-       FOR item_validacion_detalle IN(  
+        FOR item_validacion_detalle IN(  
        SELECT
         	tfed.fecha_reg::date	,
             tfed.cantidad_det		,		
@@ -593,7 +593,8 @@ BEGIN
                                         codigo_aplicacion	,
                                         nro_factura			,
                                         ncd					,
-                                        id_venta_fk
+                                        id_venta_fk			
+                                        
                                         
                                    )VALUES
                                     (	
@@ -623,6 +624,7 @@ BEGIN
                                         TRUE					,
                                         v_record_factura.id_venta
                                         
+                                        
                ) returning id_factura_excel into v_id_factura_excel;
                
                --la misma fila la primera vez se le considera parte del detalle e insertando la misma
@@ -642,7 +644,8 @@ BEGIN
                                         id_producto			,
                                         id_venta_detalle_fk ,
                                         nro_factura			,
-                                        id_venta_fk
+                                        id_venta_fk			,
+                                        codigo_ingas
                                    )VALUES
                                     (	
                                         v_record_persona.id_usuario		,
@@ -659,7 +662,8 @@ BEGIN
                                         v_record_sucursal_producto.id_sucursal_producto,
                                         v_id_venta_detalle_fk	,
                                         v_nro_factura			,
-                                        v_record_factura.id_venta
+                                        v_record_factura.id_venta,
+                                        v_codigo
                                         
                )returning id_factura_excel_det into v_id_factura_excel_det;
            
@@ -681,7 +685,8 @@ BEGIN
                                         id_producto			,
                                         id_venta_detalle_fk ,
                                         nro_factura			,
-                                        id_venta_fk	
+                                        id_venta_fk			,
+                                        codigo_ingas
                                    )VALUES
                                     (	
                                         v_record_persona.id_usuario	,
@@ -698,7 +703,8 @@ BEGIN
                                         v_record_sucursal_producto.id_sucursal_producto,
                                         v_id_venta_detalle_fk	,
                                         v_nro_factura			,
-                                        v_record_factura.id_venta
+                                        v_record_factura.id_venta,
+                                        v_codigo
                )returning id_factura_excel_det into v_id_factura_excel_det;
             
             END IF;
@@ -1014,8 +1020,8 @@ BEGIN
                      tfe.id_centro_costo	,
                      tfe.id_contrato		,
                      tfe.fecha_reg::date	,
-                     tfe.forma_pago		,
-                     tfe.aplicacion		,
+                     tfe.forma_pago			,
+                     tfe.aplicacion			,
                      tfe.id_forma_pago		,
                      tfe.codigo_aplicacion	,
                      tfe.nro_factura		,
@@ -1025,9 +1031,9 @@ BEGIN
                 FROM vef.ttemp_factura_excel  tfe
                 WHERE tfe.venta_generada = FALSE
        )LOOP
-
-       	
-          --raise exception 'record %',item;
+			
+            --raise exception 'record %',item;
+       
           --crear tabla       
             v_codigo_trans = 'VF_VEN_INS';
             v_tabla = pxp.f_crear_parametro(ARRAY[
@@ -1174,8 +1180,10 @@ BEGIN
           	v_id_venta = pxp.f_recupera_clave(v_resp,'id_venta');
             v_id_venta	=  split_part(v_id_venta, '{', 2);
             v_id_venta	=  split_part(v_id_venta, '}', 1);
-           --raise exception 'venta %',v_id_venta;
-           
+          
+     
+            --raise exception 'venta %',v_id_venta;
+       
          	
           
        		v_contador=1;
@@ -1200,7 +1208,7 @@ BEGIN
             	where   tfed.id_factura_excel_fk = item.id_factura_excel
             )LOOP
             /*
-            if v_contador = 2then
+            if v_contador = 2 then
             	raise exception 'conteo % ,id venta %, item %' ,item_detalle,v_id_venta,item;
             end if ;*/
             
@@ -1276,14 +1284,15 @@ BEGIN
             v_id_venta_det = pxp.f_recupera_clave(v_resp_2,'id_venta_detalle');
             v_id_venta_det	=  split_part(v_id_venta_det, '{', 2);
             v_id_venta_det	=  split_part(v_id_venta_det, '}', 1);
-            --raise exception 'venta det %',v_id_venta_det;
-            
-			
+            /*
+             if v_contador = 2 then
+              raise exception 'venta det %',v_id_venta_det;
+             end if;
+			*/
             
             
                 --crear tabla 
           
-            --raise exception 'fin';
             v_contador = 1+v_contador;
             
             END LOOP;
@@ -1309,6 +1318,8 @@ BEGIN
            	 --raise exception 'v_tabla_3 %',p_id_usuario;
 		            
             v_resp_3 = vef.ft_venta_ime(p_administrador,p_id_usuario,v_tabla_3,v_codigo_trans_3);
+            
+              --raise exception 'fin';
             
             UPDATE vef.ttemp_factura_excel 
             SET venta_generada = TRUE
