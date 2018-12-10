@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION vef.f_inserta_factura (
+CREATE OR REPLACE FUNCTION vef.f_inserta_nota (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
@@ -8,7 +8,7 @@ RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas y facturacion
- FUNCION: 		vef.f_inserta_factura
+ FUNCION: 		vef.f_inserta_Nota
  DESCRIPCION:   Funcion que gestiona la Validacion e insercion desde un excel a un punto de punto de venta en el sistema
  AUTOR: 		 (EGS)
  FECHA:	        08/11/2018
@@ -22,6 +22,7 @@ ISSUE  						AUTHOR  				FECHA   					DESCRIPCION
 DECLARE
 	
 	v_consulta					varchar;
+    count						integer;
 	v_nombre_funcion   	 		text;
     v_resp    			 		varchar;
     v_resp_2    			 	varchar;
@@ -68,6 +69,7 @@ DECLARE
     v_record_sucursal_producto	record;
     v_record_punto_venta_producto	record;
     v_record_factura			record;
+    v_record_dosificacion		record;
     
     v_record_data_excel			record;
     v_record_data_excel_det		record;
@@ -109,24 +111,32 @@ DECLARE
     v_contrato					varchar;
     
     v_nro_autori_fac			varchar;
+    v_detalle_existe			boolean;
+    v_id_venta_detalle_fk		integer;
+    v_record_detalle_factura    varchar;
+    v_count						integer;
+    v_vef_por_per_ncd			varchar;
+    v_total_venta           	numeric; 
+    v_total_venta_ncd       	numeric;
     v_error						varchar;
     
 BEGIN
 
-	 v_nombre_funcion = 'vef.f_inserta_factura';
+	 v_nombre_funcion = 'vef.f_inserta_nota';
 	 v_parametros = pxp.f_get_record(p_tabla);
-     
-	/*********************************
-     #TRANSACCION:  'VF_INSTEM_INS'
+             
+    /*********************************
+     #TRANSACCION:  'VF_INSNOT_INS'
      #DESCRIPCION:	Insercion de registros
      #AUTOR:		admin
      #FECHA:		01-06-2015 09:21:07
     ***********************************/
 
-    if(p_transaccion='VF_INSTEM_INS')then
+   	 IF(p_transaccion='VF_INSNOT_INS')then
     	begin  	
         v_bandera_validacion = false;
-        --raise exception 'forma pago %',v_parametros.forma_pago;
+     
+     --raise exception 'ENTRA %' ,v_parametros.nro_autori_fac;
           SELECT
               usu.id_usuario,
               fun.id_funcionario,
@@ -135,9 +145,8 @@ BEGIN
             v_record_persona
           FROM orga.tfuncionario fun
           left join segu.tusuario usu on usu.id_persona = fun.id_persona
-          WHERE fun.id_funcionario = v_parametros.id_funcionario_usu;
-         
-        
+          WHERE fun.id_funcionario = v_parametros.id_funcionario_usu;     	 
+       
          IF  pxp.f_existe_parametro(p_tabla,'razon_social')  THEN  
          	v_razon_social = UPPER(v_parametros.razon_social);
          ELSE
@@ -147,10 +156,31 @@ BEGIN
          IF  pxp.f_existe_parametro(p_tabla,'nro')  THEN  
          	v_nro = v_parametros.nro;
          ELSE
-         	raise exception  'Debe ingresar un Nro relacionado con la razon social %',v_parametros.razon_social ;
+         	raise exception  'Debe ingresar un Nro de Fac/Doc relacionado con la razon social %',v_parametros.razon_social ;
+		 END IF;
+         
+
+        
+         IF  pxp.f_existe_parametro(p_tabla,'nro')  THEN  
+         	v_nro = v_parametros.nro;
+         ELSE
+         	raise exception  'Debe ingresar un Nro de Fac/Doc relacionado con la razon social %',v_parametros.razon_social ;
+		 END IF;
+         
+                 
+         IF  pxp.f_existe_parametro(p_tabla,'nro_factura')  THEN  
+         	v_nro_factura = v_parametros.nro_factura;
+         ELSE
+         	raise exception  'Debe ingresar un Nro de Factura relacionado con el Nro %',v_nro_factura ;
+		 END IF;
+        
+     	 IF  pxp.f_existe_parametro(p_tabla,'nro_autori_fac')  THEN  
+         	v_nro_autori_fac = v_parametros.nro_autori_fac;
+         ELSE
+         	raise exception  'Falta nro de Autoriazacion para la factura  %',v_nro_factura ;
 		 END IF;
 
-         
+        
         --verificamos si el nro de fact/doc ya ingreso el dia del registro 	
          SELECT 
          		teff.id_factura_excel,
@@ -160,24 +190,34 @@ BEGIN
          INTO
           		v_record_data_excel
          FROM vef.ttemp_factura_excel teff
-         WHERE	teff.nro = v_nro and teff.fecha_reg::date = now()::date and teff.ncd = FALSE ;
+         WHERE	teff.nro = v_nro and teff.fecha_reg::date = now()::date and teff.ncd = TRUE;
         	
          IF v_record_data_excel.nro = v_nro and  v_record_data_excel.razon_social <> v_razon_social THEN
          	raise exception  'El Nro  % ya ingreso con la razon zocial % y ya no ingresara con  % ',v_nro,v_record_data_excel.razon_social,v_razon_social ;
- 
          END IF;
+
 
          IF  pxp.f_existe_parametro(p_tabla,'nit')  THEN  
          	v_nit = v_parametros.nit;
          ELSE
-         	    select
-                    vpro.nit
-                INTO
-                v_nit
-                from param.vproveedor	vpro
-                where upper(vpro.desc_proveedor) = v_razon_social;
-                if v_nit is null then
-         		raise exception  'No tiene un Nit Registrado en Sistema ni en el excel con razon social % y nro %  ',v_parametros.razon_social, v_nro;
+                    select
+                        vpro.nit
+                    INTO
+                    v_nit
+                    from param.vproveedor	vpro
+                    where upper(vpro.desc_proveedor) = v_razon_social;
+               
+         	   if v_nit is null then
+                    select
+                        vpro.nit
+                    INTO
+                    v_nit
+                    from param.vproveedor	vpro
+                    where upper(vpro.codigo) = v_razon_social;
+                
+                     if v_nit is null then
+                         raise exception  'No tiene un Nit Registrado en Sistema ni en el excel con razon social % y nro %  ',v_parametros.razon_social, v_nro;
+                     end if;
                 end if;
 		 END IF; 
          
@@ -239,7 +279,7 @@ BEGIN
          ELSE
          	v_clase_costo = ' ';
 		 END IF;
-         
+     
         
          IF  pxp.f_existe_parametro(p_tabla,'observaciones')  THEN  
          	v_observaciones = UPPER(v_parametros.observaciones);
@@ -287,9 +327,41 @@ BEGIN
          ELSE
          	v_aplicacion =' ';
 		 END IF;
-
          
-         --recuperando id y nombre sucursal  
+         
+        -----verificando si existe el nro de autoriazacion 
+         SELECT
+         	dosi.nroaut
+         INTO
+         	v_record_dosificacion
+         FROM vef.tdosificacion dosi
+         Where dosi.nroaut = v_nro_autori_fac;
+         
+         IF v_record_dosificacion.nroaut is null THEN
+         	RAISE EXCEPTION 'El numero de Autorizacion  % ingresado no  existe de la factura %',v_nro_autori_fac,v_nro_factura;          
+         END IF; 
+
+         --verificando si existe la factura  y que el nro de autoriazacion este relacionada con la factura
+         SELECT
+         	ven.id_venta,
+         	ven.nro_factura,
+            dosi.nroaut
+         INTO
+          	v_record_factura
+         FROM vef.tventa ven
+         Left join vef.tdosificacion dosi on dosi.id_dosificacion = ven.id_dosificacion
+         WHERE ven.nro_factura=v_nro_factura::integer and dosi.nroaut = v_nro_autori_fac ;
+         
+         
+         IF v_record_factura.nro_factura is null THEN
+         	RAISE EXCEPTION 'El numero de Factura  % ingresado no  existe o la dosificacion no corresponde a esta factura',v_nro_factura;          
+         END IF; 
+         
+         --Verificando si el codigo de concepto de gasto existe en la factura
+        
+         
+
+           --recuperando id y nombre sucursal  
            select  
                 pdv.id_sucursal,
                 sucu.nombre as nombre_sucursal,
@@ -299,8 +371,7 @@ BEGIN
            from vef.tpunto_venta pdv
            left join vef.tsucursal sucu on sucu.id_sucursal = pdv.id_sucursal
            where pdv.id_punto_venta = v_id_punto_venta;
-            --raise	exception 'sucursal %',v_record_punto_venta.id_sucursal;
-         
+       
          --validadon producto si existe el concepto de gatos
          SElECT 
           cing.id_concepto_ingas,
@@ -310,7 +381,6 @@ BEGIN
          v_record_concepto_ingas
          FROM param.tconcepto_ingas cing
          WHERE	UPPER(cing.codigo) = UPPER(v_codigo) ;
-        -- raise	exception 'v_record_concepto_ingas %',v_detalle;
 
          IF v_record_concepto_ingas is null THEN
          	RAISE EXCEPTION 'El codigo del concepto de gasto % no esta registrado como un Conceptos-ingas  ',v_codigo;          
@@ -328,18 +398,7 @@ BEGIN
       	IF v_record_sucursal_producto is null  THEN
       		RAISE EXCEPTION 'El codigo de concepto de gasto % no esta registrado como Producto en el Modulo de Ventas %',v_codigo,v_record_sucursal.nombre_sucursal;          
         END IF;
-        --validado si el detalle esta activado en un punto de venta
-        SELECT
-        		pvp.id_punto_venta_producto,
-                pvp.id_sucursal_producto
-        INTO  	
-        		v_record_punto_venta_producto
-        FROM vef.tpunto_venta_producto  pvp
-        WHERE pvp.id_sucursal_producto = v_record_sucursal_producto.id_sucursal_producto and pvp.id_punto_venta = v_id_punto_venta;
-        
-        IF v_record_punto_venta_producto is null  THEN
-      		RAISE EXCEPTION 'El codigo de concepto de gasto % no esta activado como Producto en el punto de venta %',v_codigo,v_record_sucursal.nombre_punto_venta;          
-        END IF;
+
         v_detalle = v_record_concepto_ingas.desc_ingas;
         
         ---recuperando id de forma de pago      
@@ -350,9 +409,9 @@ BEGIN
             INTO
                 v_record_forma_pago
             FROM vef.tforma_pago  fp
-            WHERE UPPER(fp.nombre) = v_forma_pago;
+            WHERE UPPER(fp.codigo) = v_forma_pago;
             
-            IF v_record_forma_pago.nombre is null THEN
+            IF v_record_forma_pago.codigo is null THEN
             RAISE EXCEPTION 'No existe la forma de pago  %',v_forma_pago;          
             END IF; 
          
@@ -363,15 +422,16 @@ BEGIN
             INTO
                 v_record_aplicacion
             FROM param.tcatalogo  cat
-            WHERE upper(cat.descripcion) = v_aplicacion;
+            WHERE upper(cat.codigo) = UPPER(v_aplicacion);
             
             IF v_record_aplicacion.codigo is null THEN
             RAISE EXCEPTION 'No existe la Aplicacion o Finalidad   %',v_aplicacion;          
             END IF;
 
+			  
     	  ----RECUPERANDO IDS
 
-              --recuperando el proveedor por razon social
+            --recuperando el proveedor por razon social
                 select
                     vpro.id_proveedor,
                     vpro.desc_proveedor,
@@ -380,8 +440,7 @@ BEGIN
                 v_record_proveedor
                 from param.vproveedor	vpro
                 where UPPER(vpro.desc_proveedor) = v_razon_social;
-                
-          
+
             
             IF v_record_proveedor.id_proveedor is null THEN
              	--Si no se encontro con la razon social se busca por codigo del proveedor
@@ -397,11 +456,10 @@ BEGIN
             	 IF v_record_proveedor.id_proveedor is null THEN
            				RAISE EXCEPTION 'no existe proveedor registrado para esta razon social %',v_razon_social;          
           		 END IF; 
-            END IF;
-            --RAISE EXCEPTION 'id_proveedor %',v_record_proveedor.id_proveedor;
+           END IF;
 
             --recuperando el centro de costo
-
+				
                 SELECT
                     cc.id_centro_costo,
                     cc.codigo_tcc,
@@ -416,7 +474,6 @@ BEGIN
             RAISE EXCEPTION 'no existe centro de costo registrado para este dato de centro de costo en el excel %',v_centro_costo;          
             END IF;    
             	
-            --RAISE EXCEPTION 'centro_costo %',v_record_centro_costo.id_centro_costo;
 			
                 --recuperando el contrato
                SELECT 
@@ -429,23 +486,55 @@ BEGIN
               IF v_record_contrato is null THEN
               	v_record_contrato.id_contrato = 0;
               END IF; 
-              
-
-            --RAISE EXCEPTION 'contrato %',v_record_contrato.id_contrato;
 
         ---verificando si existe la fila del excel en base datos el dia de la creacion  
        	SELECT
         	tfe.id_factura_excel,
          	tfe.nro,
             tfe.fecha,
-            tfe.fecha_reg::date,
-            tfe.ncd 
+            tfe.fecha_reg::date 
         INTO
         	v_record_data_excel
         FROM vef.ttemp_factura_excel tfe
-        WHERE  tfe.nro = v_parametros.nro and tfe.fecha_reg::date = NOW()::date and  tfe.ncd = false ;
+        WHERE  tfe.nro = v_parametros.nro and tfe.fecha_reg::date = NOW()::date and  tfe.ncd = true;
+        
+        IF v_record_data_excel is null THEN
+			--verificando si el codigo existe en el detalle de la factura y relaciona cada detalle de la nota con cada detalle de la factura
+       	  v_detalle_existe = false;
+          v_record_detalle_factura = ' ';
+          v_count = 0;
+          FOR ITEM IN (
+            WITH temp_detalle(	id_venta_detalle
+                        )AS(
+                        SELECT
+                            tfde.id_venta_detalle_fk        	
+                        FROM vef.ttemp_factura_detalle_excel tfde       
+                        )
+            SELECT	
+            		vend.id_venta_detalle,
+                    tempd.id_venta_detalle,
+            	 	vend.id_sucursal_producto,
+                    cing.codigo,
+                    vend.precio
+            FROM	vef.tventa_detalle vend
+            left join vef.tsucursal_producto sp on sp.id_sucursal_producto = vend.id_sucursal_producto
+            left join param.tconcepto_ingas cing on cing.id_concepto_ingas = sp.id_concepto_ingas
+            left join temp_detalle tempd  on tempd.id_venta_detalle = vend.id_venta_detalle
+            WHERE  tempd.id_venta_detalle is  null and vend.id_venta = v_record_factura.id_venta 
+         	)LOOP
+            IF upper(item.codigo) = upper(v_codigo)  THEN
+            	v_count = v_count+1;
+            	v_id_venta_detalle_fk=item.id_venta_detalle;
+                v_detalle_existe = true;             
+            END IF;
 
-    	--validacion que el detalle no se repita si se repite no se inserta  
+          END LOOP;
+     		--RAISE EXCEPTION '%',v_count;
+            IF v_detalle_existe = false  THEN
+                RAISE EXCEPTION 'El codigo de concepto de gasto % no existe como detalle en la factura % ',v_codigo,v_nro_factura;          
+            END IF;
+		END IF;
+    	--validacion que el detalle no se repita si se repite no se inserta 
        FOR item_validacion_detalle IN(  
        SELECT
         	tfed.fecha_reg::date	,
@@ -461,17 +550,15 @@ BEGIN
         FROM vef.ttemp_factura_detalle_excel tfed
         WHERE  tfed.nro = v_parametros.nro and tfed.fecha_reg::date = NOW()::date)LOOP
         			
-        IF (item_validacion_detalle.fecha_reg::date	= NOW()::DATE	and
+        IF (	item_validacion_detalle.fecha_reg::date	= NOW()::DATE	and
             	item_validacion_detalle.cantidad_det =	v_cantidad_det	and		
             	item_validacion_detalle.unidad	=	v_unidad			and
             	item_validacion_detalle.detalle	=	v_detalle			and
             	item_validacion_detalle.precio_uni_usd	=	v_precio_uni_usd 	and
             	item_validacion_detalle.precio_uni_bs 	=	v_precio_uni_bs		and
-            	item_validacion_detalle.fecha			= v_fecha 				and
             	item_validacion_detalle.nro			 	= v_nro				and
             	item_validacion_detalle.observaciones 	= v_observaciones		and
             	item_validacion_detalle.tipo_factura	= v_tipo_factura )THEN
-                	
                 v_bandera_validacion = true;
 
          END IF;
@@ -479,7 +566,8 @@ BEGIN
         END LOOP;
 		------insertando la fila del excel si este no existe en base de datos
         
-         IF(v_record_data_excel.nro is null)THEN                    
+         IF(v_record_data_excel.nro is null)THEN 
+
             INSERT INTO vef.ttemp_factura_excel(
                                         id_usuario_reg		,		
                                         id_funcionario_usu	,
@@ -503,7 +591,10 @@ BEGIN
                                         aplicacion			,
                                         id_forma_pago		,
                                         codigo_aplicacion	,
-                                        ncd
+                                        nro_factura			,
+                                        ncd					,
+                                        id_venta_fk
+                                        
                                    )VALUES
                                     (	
                                         v_record_persona.id_usuario		,
@@ -528,11 +619,12 @@ BEGIN
                                         v_aplicacion			,
                                         v_record_forma_pago.id_forma_pago,
                                         v_record_aplicacion.codigo,
-                                        FALSE
+                                        v_nro_factura			,
+                                        TRUE					,
+                                        v_record_factura.id_venta
                                         
                ) returning id_factura_excel into v_id_factura_excel;
                
-               --raise exception 'id_factura_excel %',v_id_factura_excel;
                --la misma fila la primera vez se le considera parte del detalle e insertando la misma
                
                INSERT INTO vef.ttemp_factura_detalle_excel(
@@ -547,7 +639,10 @@ BEGIN
                                         observaciones 		,
                                         tipo_factura		,
                                         id_factura_excel_fk	,
-                                        id_producto
+                                        id_producto			,
+                                        id_venta_detalle_fk ,
+                                        nro_factura			,
+                                        id_venta_fk
                                    )VALUES
                                     (	
                                         v_record_persona.id_usuario		,
@@ -561,13 +656,15 @@ BEGIN
                                         v_observaciones 		,                                                                
                                         v_tipo_factura			,
                                         v_id_factura_excel		,
-                                        v_record_punto_venta_producto.id_sucursal_producto
+                                        v_record_sucursal_producto.id_sucursal_producto,
+                                        v_id_venta_detalle_fk	,
+                                        v_nro_factura			,
+                                        v_record_factura.id_venta
                                         
                )returning id_factura_excel_det into v_id_factura_excel_det;
            
             ELSIF ( v_bandera_validacion = false) THEN
                 
-               -- raise exception 'v_bandera_validacion %',v_bandera_validacion;
              --si el detalle no es repetido se inserta 
              INSERT INTO vef.ttemp_factura_detalle_excel(
                                         id_usuario_reg		,
@@ -581,7 +678,10 @@ BEGIN
                                         observaciones 		,
                                         tipo_factura		,
                                         id_factura_excel_fk	,
-                                        id_producto
+                                        id_producto			,
+                                        id_venta_detalle_fk ,
+                                        nro_factura			,
+                                        id_venta_fk	
                                    )VALUES
                                     (	
                                         v_record_persona.id_usuario	,
@@ -595,24 +695,32 @@ BEGIN
                                         v_observaciones 		,                                                                
                                         v_tipo_factura			,
                                         v_record_data_excel.id_factura_excel,
-                                        v_record_punto_venta_producto.id_sucursal_producto
+                                        v_record_sucursal_producto.id_sucursal_producto,
+                                        v_id_venta_detalle_fk	,
+                                        v_nro_factura			,
+                                        v_record_factura.id_venta
                )returning id_factura_excel_det into v_id_factura_excel_det;
             
             END IF;
-           	
+           
+        	
 		RETURN   v_resp;
     	END;
         
      /*********************************
-     #TRANSACCION:  'VF_VALIFAC_INS'
+     #TRANSACCION:  'VF_VALINOT_INS'
      #DESCRIPCION:	validacion de los registros de los totales de  excel insertados en la tabla
      #AUTOR:		admin
      #FECHA:		01-06-2015 09:21:07
     ***********************************/
 
-    ELSIF(p_transaccion='VF_VALIFAC_INS')THEN
+    ELSIF(p_transaccion='VF_VALINOT_INS')THEN
     BEGIN
     	--RAISE EXCEPTION 'hola';
+        
+        --borramos los errores ya ingresados anteriormente
+        	DELETE From vef.ttemporal_data ;
+        
 		FOR v_item IN(
        			SELECT
 					 tffe.id_factura_excel	,
@@ -636,7 +744,8 @@ BEGIN
                      tffe.forma_pago		,
                      tffe.aplicacion		,
                      tffe.id_forma_pago		,
-                     tffe.codigo_aplicacion	
+                     tffe.codigo_aplicacion	,
+                     tffe.id_venta_fk
                      			
                 FROM vef.ttemp_factura_excel  tffe
                 WHERE tffe.venta_generada = FALSE
@@ -674,11 +783,68 @@ BEGIN
             INTO
             v_record_data_temporal
             WHERE	ttd.nro = v_item.nro and ttd.razon_social= v_item.razon_social and ttd.fecha_reg::date = now()::date ;
-              
-            
-            
+           
+           
+            --validando precios unitarios de cada uno de los detalles de la nota contra la factura
+            	v_bandera_validacion = FALSE;
+            	FOR item in(
+                	SELECT
+                    tfeed.id_venta_detalle_fk,
+                    tfeed.nro,
+                    tfeed.nro_factura,
+                    tfeed.detalle, 
+                    tfeed.precio_uni_bs,
+                    tfeed.precio_uni_usd
+                    FROM vef.ttemp_factura_detalle_excel tfeed
+                  )LOOP
+                	SELECT
+                    	vefd.precio
+                    into
+                    v_precio_uni_bs
+                    FROM vef.tventa_detalle vefd
+                    WHERE  vefd.id_venta_detalle = item.id_venta_detalle_fk;
+                  	IF item.precio_uni_bs > v_precio_uni_bs  THEN
+                    		v_error = 'El precio '||item.precio_uni_bs||' registrado en el excel del producto '||item.detalle||' del nro '||item.nro||' es mayor al precio del producto registrado en la factura '||item.nro_factura||' que es '||v_precio_uni_bs||'';
+                          --insertando a la tabla de eliminacion si se encuentra un error en los totales
+                          -- no inserta si este ya existe en la tabla el dia de ingreso del excel
+                            IF  v_record_data_temporal is null THEN
+                            
+                             INSERT INTO vef.ttemporal_data(
+                                                        nro	,
+                                                        razon_social,
+                                                        total_venta,
+                                                        total_detalle,
+                                                        error
+                                                   )VALUES
+                                                    (	
+                                                        v_item.nro,
+                                                        v_item.razon_social,
+                                                        v_record_precio_total.precio_total_bs,
+                                                        v_record_precio_uni_cant.precio_bs,
+                                                        v_error
+                                            
+                               )returning id_temporal_data into v_id_dato_temporal;
+                     
+                            END IF;  
+                           
+                           
+                           --Elimina los datos de las tablas si este se encuentra con error  
+                            Delete from vef.ttemp_factura_excel
+                                where id_factura_excel = v_item.id_factura_excel;
+            				
+                            Delete from vef.ttemp_factura_detalle_excel
+                                where id_factura_excel_fk = v_item.id_factura_excel;
+                  
+				            	  							                    	
+                    END IF;
+                    
+                    
+                    
+                END LOOP;
+
+            ------------validando  totales sean igual a la suma de lo detalles
             IF (v_record_precio_total.precio_total_bs <  v_record_precio_uni_cant.precio_bs )THEN
-            		v_error = 'El total de la Factura es menor a la suma de los detalles';
+            		v_error = 'El total de la nota es menor a la suma de los detalles';
           		--insertando a la tabla de eliminacion si se encuentra un error en los totales
                 -- no inserta si este ya existe en la tabla el dia de ingreso del excel
                   IF  v_record_data_temporal is null THEN
@@ -699,19 +865,22 @@ BEGIN
                                               			
                                              
                      )returning id_temporal_data into v_id_dato_temporal;
-                    
+                  ELSE
+                     UPDATE vef.ttemporal_data ttd
+                     set error = v_error,
+                     	 total_venta=v_record_precio_total.precio_total_bs,
+                         total_detalle= v_record_precio_uni_cant.precio_bs
+                     WHERE ttd.nro = v_item.nro;
                 END IF;  
-                 --Elimina de las tablas si este se encuentra con error la relacion suma de detalle = total para su nuevo ingreso  
+                 --Elimina de las tablas si este se encuentra con error  
                 Delete from vef.ttemp_factura_excel
  					where id_factura_excel = v_item.id_factura_excel;
 				
                 Delete from vef.ttemp_factura_detalle_excel
  					where id_factura_excel_fk = v_item.id_factura_excel;
-				
-                RAISE NOTICE 'El total del Nro % es menor a la suma de los detalles',v_item.nro;
-                
+                                   
             ELSIF(v_record_precio_total.precio_total_bs >  v_record_precio_uni_cant.precio_bs )THEN
-			  v_error = 'El total de la Factura es mayor a la suma de los detalles';
+			  	v_error = 'El total de la nota es mayor a la suma de los detalles';
               	--insertando a la tabla de eliminacion si se encuentra un error en los totales 
                 -- no inserta si este ya existe en la tabla el dia de ingreso del excel
                  IF v_record_data_temporal is  null THEN
@@ -730,36 +899,82 @@ BEGIN
                                             v_error		
                                            
                    )returning id_temporal_data into v_id_dato_temporal;
-                     
+                        
                  END IF;  
-               --Elimina de las tablas si este se encuentra con error la relacion suma de detalle = total para su nuevo ingreso  
-                  delete from vef.ttemp_factura_excel
+               --Elimina de los datos de las tablas si este se encuentra con error 
+                 delete from vef.ttemp_factura_excel
  					where id_factura_excel = v_item.id_factura_excel;
                  delete from vef.ttemp_factura_detalle_excel
  					where id_factura_excel_fk = v_item.id_factura_excel;               
-                 RAISE NOTICE 'El total de la factura % es mayor a la suma de los detalles',v_item.nro;
-                ELSIF(v_record_precio_total.precio_total_bs =  v_record_precio_uni_cant.precio_bs and v_record_precio_total.precio_total_usd  =  v_record_precio_uni_cant.precio_usd)THEN
-            
-            	--una vez ingresada la fila correctamente del excel y si tiene un historico en filas eliminadas por un mal ingreso de datos en los totales 
-                --lo borra de la tabla de eliminados
-            	IF v_record_data_temporal IS NOT NULL then
-            	 	DELETE FROM  vef.ttemporal_data
- 					WHERE nro = v_item.nro and fecha_reg::date = v_item.fecha_reg::date;
-				END IF;                       
+                                 
         	END IF;
             
+           -------------------------validacion para que no se sobrepase el porcentaje de nota -------------------------------
+           --esta validacion se realiza aunque la misma ya existe al insertar la nota por que es necesario para borrar los datos 
+           --de las tablas que almacenan los datos erroreneos y poder volver a ingresarlos correctamente 
+           v_vef_por_per_ncd =  pxp.f_get_variable_global('vef_porcentaje_permitodo_ncd'); 
+           
+           --calcula el porcetaje de la factura vinculada
+           select 
+              vef.total_venta into v_total_venta
+           from vef.tventa vef
+           where vef.estado_reg = 'activo' and vef.id_venta = v_item.id_venta_fk;
+           
+           --calcularmos todas las notas de credito
+           select 
+              sum(vef.total_venta) into v_total_venta_ncd
+           from vef.tventa vef
+           where vef.estado_reg = 'activo' and vef.id_venta_fk = v_item.id_venta_fk;
+           
+           IF v_total_venta_ncd is null THEN
+           		v_total_venta_ncd = 0;
+           END IF;
+          
+           SELECT
+           	sum(tedf.precio_uni_bs)
+           into
+           	v_precio_total_bs
+           FROM vef.ttemp_factura_detalle_excel tedf
+           WHERE tedf.id_venta_fk = v_item.id_venta_fk  ;
+           
+           --si el total de la notas de credito sobre pasa el porcetaje permitido, cargamos un error 
+           IF  (v_total_venta_ncd + v_precio_total_bs ) > (v_total_venta * (v_vef_por_per_ncd::numeric))  THEN
+           	  	v_error = 'El total de NCD no puede superar el '||(v_vef_por_per_ncd::numeric)*100||' %';
+           		INSERT INTO vef.ttemporal_data(
+                                            nro				,
+                                            razon_social	,
+                                            total_venta		,
+                                            total_detalle	,
+                                            error			
+                                       )VALUES
+                                        (	
+                                            v_item.nro		,
+                                            v_item.razon_social,
+                                            v_record_precio_total.precio_total_bs,
+                                            v_record_precio_uni_cant.precio_bs,
+                                            v_error		
+                                           
+                   )returning id_temporal_data into v_id_dato_temporal;
+                delete from vef.ttemp_factura_excel
+ 				where id_factura_excel = v_item.id_factura_excel;
+                delete from vef.ttemp_factura_detalle_excel
+ 				where id_factura_excel_fk = v_item.id_factura_excel; 
+                
+           END IF;
+
        END LOOP;
+   
        RETURN   v_resp;
     END;
 
 	/*********************************
-     #TRANSACCION:  'VF_INSFAC_INS'
-     #DESCRIPCION:	Insercion de registros en la tabla de ventas
+     #TRANSACCION:  'VF_INSFACNOT_INS'
+     #DESCRIPCION:	Insercion de registros en la tabla de ventas como una nota
      #AUTOR:		admin
      #FECHA:		01-06-2015 09:21:07
     ***********************************/
 
-    elsif(p_transaccion='VF_INSFAC_INS')then
+    elsif(p_transaccion='VF_INSFACNOT_INS')then
     	begin
       
        	 --raise exception 'venta ';
@@ -774,7 +989,11 @@ BEGIN
           FROM orga.tfuncionario fun
           left join segu.tusuario usu on usu.id_persona = fun.id_persona
           WHERE fun.id_funcionario = v_parametros.id_funcionario_usu;
+ 
 			p_id_usuario=v_record_persona.id_usuario;
+  
+        
+        
        FOR item IN(
        			SELECT
 					 tfe.id_factura_excel	,
@@ -798,14 +1017,17 @@ BEGIN
                      tfe.forma_pago		,
                      tfe.aplicacion		,
                      tfe.id_forma_pago		,
-                     tfe.codigo_aplicacion	
+                     tfe.codigo_aplicacion	,
+                     tfe.nro_factura		,
+                     tfe.id_venta_fk		
+                     
                      			
                 FROM vef.ttemp_factura_excel  tfe
                 WHERE tfe.venta_generada = FALSE
        )LOOP
 
        	
-           --raise exception 'record %',item;
+          --raise exception 'record %',item;
           --crear tabla       
             v_codigo_trans = 'VF_VEN_INS';
             v_tabla = pxp.f_crear_parametro(ARRAY[
@@ -849,9 +1071,9 @@ BEGIN
                                 --'forma_pedido',	
                                 'id_proveedor',					
                                 'id_centro_costo',
-                                'id_contrato',
-                                'codigo_aplicacion'
-                                --'id_venta_fk' 
+                                --'id_contrato',
+                                'codigo_aplicacion',
+                                'id_venta_fk' 
                                 ],
             				ARRAY[	
                            		'NULL', ---'_nombre_usuario_ai',
@@ -894,57 +1116,57 @@ BEGIN
                                 --'',--'forma_pedido',					
                                 item.id_proveedor::varchar,--'id_proveedor',					
                                 item.id_centro_costo::varchar,--'id_centro_costo',
-                                item.id_contrato::varchar,--'id_contrato',
-                                item.codigo_aplicacion::varchar--'codigo_aplicacion',
-								--''--'id_venta_fk' 
+                               ---item.id_contrato::varchar,--'id_contrato',
+                                item.codigo_aplicacion::varchar,--'codigo_aplicacion',
+								item.id_venta_fk::varchar--'id_venta_fk' 
                                 ],
                             ARRAY[
-                            		'varchar',
-                                	'integer',
-                          			--'varchar',
-									'varchar',
-            						'int4',    
-            						'varchar',
-            						--'numeric',	
-	               					'numeric',
-        							'date',
-									'int4',
-									'int4',
-									'numeric', 
-									'varchar', 
-									'varchar', 
-									'varchar', 
-            						--'integer', 
-            						--'varchar', 
-									--'numeric', 
-									'text',
-									'varchar',
-									--'date',
-            						'varchar', 
-                                    'integer',
-                                    --'numeric',
-                                    --'int4',
-                                    --'numeric',
-                                    --'numeric',
-                                    'numeric',			
-                                    'numeric',
-                                    'numeric',
-                                    'numeric',
-                                    'numeric',
-                                    'numeric',
-                                    'numeric',
-                                    'varchar',
-                                    'varchar',
-                                    --'varchar',
-                                    --'varchar',
-                                    'varchar',					
-                                    'int4', 
-                                    'int4',
-                                    'varchar'
-									--'int4'
+                            		'varchar',---'_nombre_usuario_ai',
+                                	'integer', -----'_id_usuario_ai',
+                          			--'varchar',--'id_cliente',
+									'varchar',--'nit',
+            						'int4', --'id_sucursal',   
+            						'varchar',--'nro_tramite',
+            						--'numeric',--'a_cuenta',		
+	               					'numeric',--'total_venta',
+        							'date',--'fecha_estimada_entrega',
+									'int4',--'id_punto_venta'
+									'int4',--'id_forma_pago',
+									'numeric', --'monto_forma_pago' 
+									'varchar', --'numero_tarjeta',
+									'varchar', --'codigo_tarjeta',
+									'varchar', --'tipo_tarjeta',
+            						--'integer', --'porcentaje_descuento', 
+            						--'varchar', --'id_vendedor_medico',
+									--'numeric', --'comision',
+									'text',--'observaciones',
+									'varchar',--'tipo_factura',
+									--'date',--'fecha',
+            						'varchar', --'nro_factura', 
+                                    'integer',--'id_dosificacion', 
+                                    --'numeric',--'excento',
+                                    --'int4',--'id_moneda',
+                                    --'numeric',--'tipo_cambio_venta',
+                                    --'numeric',--'total_venta_msuc',
+                                    'numeric',	--'transporte_fob',		
+                                    'numeric',--'seguros_fob',
+                                    'numeric',--'otros_fob',
+                                    'numeric',--'transporte_cif',
+                                    'numeric',--'seguros_cif',
+                                    'numeric',--'otros_cif',
+                                    'numeric',--'valor_bruto',
+                                    'varchar',--'descripcion_bulto',
+                                    'varchar',--'id_cliente_destino',
+                                    --'varchar',--'hora_estimada_entrega'
+                                    --'varchar',--'forma_pedido',	
+                                    'varchar',	--'id_proveedor',				
+                                    'int4', --'id_centro_costo',
+                                  -- 'int4',--'id_contrato'
+                                    'varchar',--'codigo_aplicacion',
+									'int4'--'id_venta_fk' 
                                ]
                             );
- 			
+ 			  --raise exception '%',v_tabla;
             v_resp = vef.ft_venta_ime(p_administrador,p_id_usuario,v_tabla,v_codigo_trans);
             
             --raise exception '%',v_resp;
@@ -952,7 +1174,8 @@ BEGIN
           	v_id_venta = pxp.f_recupera_clave(v_resp,'id_venta');
             v_id_venta	=  split_part(v_id_venta, '{', 2);
             v_id_venta	=  split_part(v_id_venta, '}', 1);
-          -- raise exception 'venta%',v_id_venta;
+           --raise exception 'venta %',v_id_venta;
+           
          	
           
        		v_contador=1;
@@ -969,7 +1192,9 @@ BEGIN
                         tfed.observaciones 		,
                         tfed.tipo_factura		,
                         tfed.id_factura_excel_fk,
-                        tfed.id_producto	
+                        tfed.id_producto		,
+                        tfed.id_venta_detalle_fk,
+                        tfed.id_venta_fk		
 	
                 FROM  vef.ttemp_factura_detalle_excel tfed
             	where   tfed.id_factura_excel_fk = item.id_factura_excel
@@ -979,6 +1204,8 @@ BEGIN
             	raise exception 'conteo % ,id venta %, item %' ,item_detalle,v_id_venta,item;
             end if ;*/
             
+            --raise exception 'item %' ,item_detalle;
+
             v_codigo_trans_2 = 'VF_VEDET_INS';	
 
                 --crear tabla 
@@ -999,13 +1226,13 @@ BEGIN
 						--'bruto',
 						--'ley',
 						--'kg_fino',
-						'tipo_factura'
-						--'id_venta_fk'  
+						'tipo_factura',
+						'id_venta_fk'  
                                     ],
             				ARRAY[	
                           	v_id_venta::varchar,--'id_venta',
                             '',--'id_item',
-                            item_detalle.id_producto::varchar,--'id_producto',
+                            item_detalle.id_venta_detalle_fk::varchar,--'id_producto',
                             '',--'id_formula',
                             'servicio'::varchar,--'tipo',
                             '',--'estado_reg',
@@ -1019,8 +1246,8 @@ BEGIN
                             --'',--'bruto',
                             --'',--'ley',
                             --'',--'kg_fino',
-                            item_detalle.tipo_factura::varchar--'tipo_factura'
-                            --''--'id_venta_fk'        
+                            item_detalle.tipo_factura::varchar,--'tipo_factura'
+                            item_detalle.id_venta_fk::varchar--'id_venta_fk'        
                                 ],
                             ARRAY[          
                                   'int4',
@@ -1039,8 +1266,8 @@ BEGIN
                                   --'varchar',
                                   --'varchar',
                                   --'varchar',
-                                  'varchar'
-                                  --'int4'
+                                  'varchar',
+                                  'int4'
                                ]
                             );
            	 --raise exception 'v_tabla_2 %',p_id_usuario;
@@ -1070,13 +1297,13 @@ BEGIN
                                     ],
             				ARRAY[	
                              v_id_venta::varchar,--'id_venta',
-                             'computarizada'::varchar--'tipo_factura',
-               				--'id_venta_fk'
+                             'computarizada'::varchar,--'tipo_factura',
+               				item.id_venta_fk::varchar --'id_venta_fk'
                                 ],
                             ARRAY[          
                                   'int4',
-                                  'varchar'                                 
-                                  --'int4'
+                                  'varchar',                                 
+                                  'int4'
                                ]
                             );
            	 --raise exception 'v_tabla_3 %',p_id_usuario;
@@ -1090,68 +1317,8 @@ BEGIN
        END LOOP;
 		RETURN   v_resp;
     END;
-                
-           /*********************************
-           #TRANSACCION:  'VF_ELIEXC_SEL'
-           #DESCRIPCION:	lista los registros del excel eliminados en dia actual
-           #AUTOR:		admin
-           #FECHA:		01-06-2015 09:21:07
-          ***********************************/
 
-          ELSIF(p_transaccion='VF_ELIEXC_SEL')THEN
-          BEGIN
-                  --Sentencia de la consulta
-                  v_consulta:='select
-                              dad.id_temporal_data,
-                              dad.razon_social,
-                              dad.estado_reg,
-                              dad.nro			,
-                              dad.nro_factura,
-                              dad.id_usuario_ai,
-                              dad.id_usuario_reg,
-                              dad.usuario_ai,
-                              dad.fecha_reg,
-                              dad.id_usuario_mod,
-                              dad.fecha_mod,
-                              dad.total_venta,
-                              dad.total_detalle,
-                              dad.error
-                              from vef.ttemporal_data dad
-                              where  ';
-      			
-                  --Definicion de la respuesta
-                  v_consulta:=v_consulta||v_parametros.filtro;
-                  v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
-                  --Devuelve la respuesta
-                  return v_consulta;
-          END;
-          
-          /*********************************    
-          #TRANSACCION:  'VF_ELIEXC_CONT'
-          #DESCRIPCION:	Conteo de registros
-          #AUTOR:		admin	
-          #FECHA:		02-12-2017 02:49:10
-          ***********************************/
-
-          elsif(p_transaccion='VF_ELIEXC_CONT')then
-
-              begin
-                  --Sentencia de la consulta de conteo de registros
-                  v_consulta:='select count(id_temporal_data)
-                              from vef.ttemporal_data dad
-                              where ';
-      			
-                  --Definicion de la respuesta		    
-                  v_consulta:=v_consulta||v_parametros.filtro;
-
-                  --Devuelve la respuesta
-                  return v_consulta;
-
-              end;
- 
-
-  END IF;	
+END IF;
 EXCEPTION
 					
 	WHEN OTHERS THEN

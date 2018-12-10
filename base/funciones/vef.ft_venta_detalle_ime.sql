@@ -20,7 +20,8 @@ $body$
 
  ISSUE            FECHA:		      AUTOR               DESCRIPCION
  #0              01-06-2015        JRR                 Creacion 
- #123            25/09/2018        RAC                de adiciona id_venta_fk para guardar nostas de credito debito  
+ #123            25/09/2018        RAC                de adiciona id_venta_fk para guardar nostas de credito debito 
+ #124            29/11/2018        EGS                validacion para que el precio unitario de la nota no sea mayor al concepto de gasto relacionado a la factura
   ***************************************************************************/
 
   DECLARE
@@ -57,6 +58,7 @@ $body$
     v_sw_ncd                    boolean; -- #123
     v_id_venta_detalle_fk	    integer; -- #123
     v_id_doc_concepto           integer; -- #123
+   
 
 
 
@@ -95,7 +97,7 @@ $body$
                ) then
           v_id_sucursal_producto = v_parametros.id_producto;
         elseif v_sw_ncd THEN  --#123  si es nota de credito el concepto viene de la factura relacionada id_venta_fk
-             v_id_venta_detalle_fk = v_parametros.id_producto;
+             v_id_venta_detalle_fk = v_parametros.id_producto;           
         else
           v_id_item =  v_parametros.id_producto;
         end if;
@@ -145,8 +147,19 @@ $body$
         if (pxp.f_existe_parametro(p_tabla,'id_unidad_medida')) then
           v_id_unidad_medida = v_parametros.id_unidad_medida;
         end if;
-		
         
+        -- Si el precio de un producto es mayor al producto relacionado a la factura -- #124            29/11/2018        EGS 
+         SELECT
+              vefd.precio
+             into
+              v_precio
+              FROM vef.tventa_detalle vefd
+             WHERE  vefd.id_venta_detalle =  v_id_venta_detalle_fk;
+            IF v_precio < v_parametros.precio THEN 
+            	RAISE EXCEPTION 'El precio de % sobre un producto de la nota no puede ser mayor al precio del producto relacionado de la factura que es de  % ',v_parametros.precio,v_precio;
+            END IF; 
+            
+            
         --Si el total a pagar debe estar redondeado a entero
         if (pxp.f_get_variable_global('vef_redondeo_detalle') = 'true') then
           --si el total no es entero
@@ -181,7 +194,7 @@ $body$
           kg_fino,
           id_unidad_medida,
           id_venta_detalle_fk
-        ) values(
+          )values(
           v_parametros.id_venta,
           v_id_item,
           v_id_sucursal_producto,

@@ -29,9 +29,9 @@ Phx.vista.VentaVendedor = {
     	Phx.vista.VentaVendedor.superclass.successGetVariables.call(this,response,request);  				  		
   		this.store.baseParams.pes_estado = 'borrador';        
 		
-		console.log('nombre',this.nombreVista);
+		
 		///#1 19/11/2018 EGS	
-		if (this.nombreVista=='VentaVendedorETR') {
+		if (this.nombreVista=='VentaVendedorETR'|| this.nombreVista=='VentaVendedorNCETR' ) {
 			this.addButton('btnXls',
 			{
 				text: 'Subir Factura',

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -1214,14 +1212,14 @@ $body$
            --calcula el porcetaje de la factura vinculada
            select 
               vef.total_venta into v_total_venta
-           from vef.tventa vef
-           where vef.id_venta = v_id_venta_fk;
+           from  vef.tventa vef
+           where vef.estado_reg = 'activo' and vef.id_venta = v_id_venta_fk;
            
            --calcularmos todas las notas de credito
            select 
               sum(vef.total_venta) into v_total_venta_ncd
            from vef.tventa vef
-           where vef.id_venta_fk = v_id_venta_fk;
+           where  vef.estado_reg = 'activo' and vef.id_venta_fk = v_id_venta_fk;
            --si el total de la notas de credito sobre pasa el porcetaje permitido, mostramos un error
            IF  v_total_venta_ncd > (v_total_venta * (v_vef_por_per_ncd::numeric))  THEN
               raise exception 'El total de NCD no puede superar el % %' , (v_vef_por_per_ncd::numeric)*100,'%';
@@ -1304,6 +1302,8 @@ $body$
           select sum(round(monto_mb_efectivo,2)) into v_suma_fp
           from vef.tventa_forma_pago
           where id_venta =   v_parametros.id_venta;
+          
+          --raise exception '%',v_suma_fp;
 
           select sum(round(cantidad*precio,2)) into v_suma_det
           from vef.tventa_detalle

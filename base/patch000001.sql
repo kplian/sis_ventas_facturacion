@@ -1083,10 +1083,15 @@ CREATE TABLE vef.ttemp_factura_excel (
   aplicacion VARCHAR,
   id_forma_pago INTEGER,
   codigo_aplicacion VARCHAR,
+  nro VARCHAR,
+  ncd BOOLEAN DEFAULT false,
+  id_venta_fk INTEGER,
   CONSTRAINT ttemp_factura_excel_pkey PRIMARY KEY(id_factura_excel)
 ) INHERITS (pxp.tbase)
 WITH (oids = false);
 
+COMMENT ON COLUMN vef.ttemp_factura_excel.id_venta_fk
+IS 'solo si es una nota';
 --------------- SQL ---------------
 CREATE TABLE vef.ttemp_factura_detalle_excel (
   id_producto INTEGER,
@@ -1102,17 +1107,22 @@ CREATE TABLE vef.ttemp_factura_detalle_excel (
   fecha DATE,
   id_factura_excel_det SERIAL,
   id_factura_excel_fk INTEGER,
+  nro VARCHAR,
+  id_venta_detalle_fk INTEGER,
+  id_venta_fk INTEGER,
   CONSTRAINT ttemp_factura_detalle_excel_pkey PRIMARY KEY(id_factura_excel_det)
 ) INHERITS (pxp.tbase)
 WITH (oids = false);
 --------------- SQL ---------------
 CREATE TABLE vef.ttemporal_data (
-  id_dato_temporal SERIAL,
+  id_temporal_data SERIAL,
   nro_factura VARCHAR,
   razon_social VARCHAR,
   total_venta NUMERIC,
   total_detalle NUMERIC,
-  CONSTRAINT ttemporal_excel_pkey PRIMARY KEY(id_dato_temporal)
+  nro VARCHAR,
+  error VARCHAR,
+  CONSTRAINT ttemporal_excel_pkey PRIMARY KEY(id_temporal_data)
 ) INHERITS (pxp.tbase)
 WITH (oids = false);
 

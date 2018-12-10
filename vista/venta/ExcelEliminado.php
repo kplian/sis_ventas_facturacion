@@ -26,7 +26,7 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
-					name: 'id_dato_temporal'
+					name: 'id_temporal_data'
 			},
 			type:'Field',
 			form:true 
@@ -58,20 +58,20 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 				type:'TextField',
 				filters:{pfiltro:'dad.estado_reg',type:'string'},
 				id_grupo:1,
-				grid:true,
+				grid:false,
 				form:false
 		},
 		{
 			config:{
-				name: 'nro_factura',
-				fieldLabel: 'Nro Fact/Doc',
+				name: 'nro',
+				fieldLabel: 'Nro',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:-5
 			},
 				type:'TextField',
-				filters:{pfiltro:'dad.nro_factura',type:'string'},
+				filters:{pfiltro:'dad.nro',type:'string'},
 				id_grupo:1,
 				grid:true,
 				form:true
@@ -106,7 +106,7 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
-				{
+		{
 			config:{
 				name: 'total_detalle_usd',
 				fieldLabel: 'Total Detalle USD',
@@ -132,6 +132,21 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'TextField',
 				filters:{pfiltro:'dad.nro_factura',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:true
+		},
+		{
+			config:{
+				name: 'error',
+				fieldLabel: 'Error',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 300,
+				maxLength:-5
+			},
+				type:'TextField',
+				filters:{pfiltro:'dad.error',type:'string'},
 				id_grupo:1,
 				grid:true,
 				form:true
@@ -238,9 +253,9 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 	
 	ActList:'../../sis_ventas_facturacion/control/SubirArchivoFac/listarExcelEliminado',
 
-	id_store:'id_dato_temporal',
+	id_store:'id_temporal_data',
 	fields: [
-		{name:'id_dato_temporal', type: 'numeric'},
+		{name:'id_temporal_data', type: 'numeric'},
 		{name:'razon_social', type: 'string'},
 		{name:'estado_reg', type: 'string'},
 		{name:'nro_factura', type: 'string'},
@@ -256,11 +271,14 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 		{name:'total_detalle', type: 'numeric'},
 		{name:'total_venta_usd', type: 'numeric'},
 		{name:'total_detalle_usd', type: 'numeric'},
+		{name:'nro', type: 'string'},
+		{name:'error', type: 'string'},
+
 		
 		
 	],
 	sortInfo:{
-		field: 'id_dato_temporal',
+		field: 'id_temporal_data',
 		direction: 'ASC'
 	},
 	bdel:false,

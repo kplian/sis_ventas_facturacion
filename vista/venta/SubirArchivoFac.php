@@ -12,21 +12,38 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.SubirArchivoFac=Ext.extend(Phx.frmInterfaz,{
     //ActSave:'../../sis_ventas_facturacion/control/SubirArchivoFac/SubirArchivoFac',
     
-    ActSave:'../../sis_ventas_facturacion/control/SubirArchivoFac/SubirArchivoFactura',
-
+	
+    
     constructor:function(config)
     {   
         Phx.vista.SubirArchivoFac.superclass.constructor.call(this,config);
         this.init();    
         this.loadValoresIniciales();
+		
+		
         console.log('config',config);
         console.log('id_punto_venta',this.data.id_punto_venta);
         console.log('tipo factura',this.data.tipo_factura);
+      	console.log('nombreVista',this.data.nombreVista);
 
+		this.iniciarEventos(); 
     },
     
+   
     
-    
+     iniciarEventos:function (){
+     	
+	  if (this.data.nombreVista=='VentaVendedorETR') {
+		this.ActSave = '../../sis_ventas_facturacion/control/SubirArchivoFac/SubirArchivoFactura';
+		
+	  }
+	  else if(this.data.nombreVista=='VentaVendedorNCETR'){
+		this.ActSave = '../../sis_ventas_facturacion/control/SubirArchivoFac/SubirArchivoNota';
+	  }
+     },
+     
+     
+     
     loadValoresIniciales:function()
     {        
         Phx.vista.SubirArchivoFac.superclass.loadValoresIniciales.call(this);
@@ -44,13 +61,14 @@ Phx.vista.SubirArchivoFac=Ext.extend(Phx.frmInterfaz,{
         
     },
     
+
      ventanaEliminado : function(rec)
 	{	 
 		Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/venta/ExcelEliminado.php',
 		'Datos Eliminados',
 		{
 			modal:true,
-			width:500,
+			width:1000,
 			height:400
 		},
 		{ data: {  //objPadre: me ,

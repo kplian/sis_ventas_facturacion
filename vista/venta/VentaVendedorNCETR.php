@@ -41,7 +41,36 @@ Phx.vista.VentaVendedorNCETR = {
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Modificado por:&nbsp;&nbsp;</b> {usr_mod}</p><br>'
             )
-    })
+    }),
+   
+   SubirArchivo : function(rec)
+	{	 console.log('id_punto_venta',this.variables_globales.id_punto_venta) ; 
+		Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/venta/SubirArchivoFac.php',
+		'Subir Facturas',
+		{
+			modal:true,
+			width:450,
+			height:150
+		},
+		{ data: {  //objPadre: me ,
+			    maestro: this.maestro,
+				id_punto_venta:this.variables_globales.id_punto_venta,
+				tipo_factura:this.tipo_factura,
+				nombreVista:this.nombreVista
+		 }},
+		this.idContenedor,
+		'SubirArchivoFac');
+	},	
+	descargaPlantilla: function(){
+		var     data  = "&extension=xlsx";
+	            data += "&sistema=sis_ventas_facturacion";
+	            data += "&clase=plantilla";
+	            data += "&url=./../../../sis_ventas_facturacion/reportes/plantillaExcelNota.xlsx";
+	            //return  String.format('{0}',"<div style='text-align:center'><a target=_blank href = '../../../lib/lib_control/CTOpenFile.php?"+ data+"' align='center' width='70' height='70'>Abrir</a></div>");
+	            window.open('../../../lib/lib_control/CTOpenFile.php?' + data);
+		
+		
+	},
     
     
 };

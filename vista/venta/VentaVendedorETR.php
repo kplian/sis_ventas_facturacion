@@ -56,7 +56,9 @@ Phx.vista.VentaVendedorETR = {
 		{ data: {  //objPadre: me ,
 			    maestro: this.maestro,
 				id_punto_venta:this.variables_globales.id_punto_venta,
-				tipo_factura:this.tipo_factura
+				tipo_factura:this.tipo_factura,
+				nombreVista:this.nombreVista
+
 		 }},
 		this.idContenedor,
 		'SubirArchivoFac');
@@ -66,7 +68,7 @@ Phx.vista.VentaVendedorETR = {
 		var     data  = "&extension=xlsx";
 	            data += "&sistema=sis_ventas_facturacion";
 	            data += "&clase=plantilla";
-	            data += "&url=./../../../uploaded_files/sis_ventas_facturacion/plantilla/plantillaExcelFactura.xlsx";
+	            data += "&url=./../../../sis_ventas_facturacion/reportes/plantillaExcelFactura.xlsx";
 	            //return  String.format('{0}',"<div style='text-align:center'><a target=_blank href = '../../../lib/lib_control/CTOpenFile.php?"+ data+"' align='center' width='70' height='70'>Abrir</a></div>");
 	            window.open('../../../lib/lib_control/CTOpenFile.php?' + data);
 		

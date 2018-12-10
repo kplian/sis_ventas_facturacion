@@ -159,7 +159,7 @@ class RFacturaReciboPdf extends  ReportePDF {
 		}
 		else {
 			
-		$this->SetFont ('helvetica', '', 5 , '', 'default', true );// tamaño de letras y tipo 
+		$this->SetFont ('helvetica', '', 10 , '', 'default', true );// tamaño de letras y tipo 
 		
 		ob_start();
 		include(dirname(__FILE__).'/../reportes/tpl/pdf/formatoFactura.php');

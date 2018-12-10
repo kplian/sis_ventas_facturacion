@@ -609,7 +609,9 @@ BEGIN
     	begin
     		--Sentencia de la consulta
 			v_consulta:='
-                        select												
+                        select	
+                        id_venta_detalle,
+                        id_venta_detalle_fk,											
 						(case when vedet.id_item is not null then
 							item.nombre
 						when vedet.id_sucursal_producto is not null then
