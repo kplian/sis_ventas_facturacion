@@ -247,9 +247,9 @@ select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA17',
 /***********************************I-DAT-EGS-VEF-2-10/12/2018*****************************************/
 select param.f_import_tplantilla_archivo_excel ('insert','SUBNOTA','SubirNota','activo',NULL,'2',NULL,'','csv',',');
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA18','SUBNOTA','si','',NULL,'16','nro_factura','nro_factura','string','','activo');
-select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA19','SUBNOTA19','si','',NULL,'18','codigo_factura','codigo_factura','string','','activo');
-select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA20','SUBNOTA20','si','',NULL,'19','precio_uni_bs_fac','precio_uni_bs_fac','numeric','.','activo');
-select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA21','SUBNOTA21','si','',NULL,'17','nro_autori_fac','nro_autori_fac','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA19','SUBNOTA','si','',NULL,'18','codigo_factura','codigo_factura','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA20','SUBNOTA','si','',NULL,'19','precio_uni_bs_fac','precio_uni_bs_fac','numeric','.','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA21','SUBNOTA','si','',NULL,'17','nro_autori_fac','nro_autori_fac','string','','activo');
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA2','SUBNOTA','si','',NULL,'6','codigo conIng','codigo','string','','activo');
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA3','SUBNOTA','si','',NULL,'4','cantidad','cantidad','entero','','activo');
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA4','SUBNOTA','si','',NULL,'5','unidad','unidad','string','','activo');
@@ -263,8 +263,8 @@ select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA14','SU
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA15','SUBNOTA','si','',NULL,'10','precio total bs','precio_total_bs','numeric','.','activo');
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA16','SUBNOTA','si','',NULL,'11','centro de costo','centro_costo','string','','activo');
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA17','SUBNOTA','si','',NULL,'12','clase de costo','clase_costo','string','','activo');
-select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA11','SUBNOTA11','si','',NULL,'14','forma de pago','forma_pago','string','','activo');
-select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA1','SUBNOTA1','si','',NULL,'15','aplicacion','aplicacion','string','','activo');
-/***********************************I-DAT-EGS-VEF-2-10/10/2018*****************************************/
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA11','SUBNOTA','si','',NULL,'14','forma de pago','forma_pago','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA1','SUBNOTA','si','',NULL,'15','aplicacion','aplicacion','string','','activo');
+/***********************************I-DAT-EGS-VEF-2-10/12/2018*****************************************/
 
 
