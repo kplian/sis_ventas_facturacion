@@ -265,7 +265,7 @@ select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA16','SU
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA17','SUBNOTA','si','',NULL,'12','clase de costo','clase_costo','string','','activo');
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA11','SUBNOTA','si','',NULL,'14','forma de pago','forma_pago','string','','activo');
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA1','SUBNOTA','si','',NULL,'15','aplicacion','aplicacion','string','','activo');
-/***********************************I-DAT-EGS-VEF-2-10/12/2018*****************************************/
+/***********************************F-DAT-EGS-VEF-2-10/12/2018*****************************************/
 
 /***********************************I-DAT-EGS-VEF-3-13/12/2018*****************************************/
 
@@ -299,4 +299,4 @@ select pxp.f_insert_tgui ('Ventas Peaje ETR', 'Ventas Peaje ETR', 'VEPEETR', 'si
 select pxp.f_insert_tgui ('Pendiente Emisión ETR', 'Pendientes Emisión ETR', 'PENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaEmisor.php', 3, '', 'VentaEmisor', 'VEF');
 select pxp.f_insert_tgui ('Cuenta Bancaria Proveedor', 'Cuenta Bancaria Proveedor', 'CBP', 'si', 6, 'sis_ventas_facturacion/vista/proveedor_cuenta_banco_cobro/ProveedorCuentaBancoCobro.php', 2, '', 'ProveedorCuentaBancoCobro', 'VEF');
 
-/***********************************I-DAT-EGS-VEF-3-10/13/2018*****************************************/
+/***********************************F-DAT-EGS-VEF-3-13/12/2018*****************************************/
