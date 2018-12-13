@@ -477,3 +477,37 @@ ALTER TABLE vef.tpunto_venta
     NOT DEFERRABLE;
 
 /************************************F-DEP-JRR-VEF-0-14/03/2017*************************************************/
+
+/************************************I-DEP-EGS-VEF-0-13/12/2018*************************************************/
+
+select pxp.f_insert_testructura_gui ('SUCUR', 'VEF');
+select pxp.f_insert_testructura_gui ('ACTECO', 'VEF');
+select pxp.f_insert_testructura_gui ('ENFORPA', 'VEF');
+select pxp.f_insert_testructura_gui ('VEFCLI', 'VEF');
+select pxp.f_insert_testructura_gui ('VEF', 'SISTEMA');
+select pxp.f_insert_testructura_gui ('REGBOL', 'VEF');
+select pxp.f_insert_testructura_gui ('VEFREP', 'VEF');
+select pxp.f_insert_testructura_gui ('VEFREM', 'VEFREP');
+select pxp.f_insert_testructura_gui ('FORM', 'VEF');
+select pxp.f_insert_testructura_gui ('TIPVEN', 'VEF');
+select pxp.f_insert_testructura_gui ('CONVEF', 'VEF');
+select pxp.f_insert_testructura_gui ('VENCARP', 'VEF');
+select pxp.f_insert_testructura_gui ('VENFACVE', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VENFACOM', 'VENCARP');
+select pxp.f_insert_testructura_gui ('FACMAN', 'VENCARP');
+select pxp.f_insert_testructura_gui ('REVVEN', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VENELABO', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VFVENTA', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VEFACEX', 'VENCARP');
+select pxp.f_insert_testructura_gui ('EXPOMIN', 'VENCARP');
+select pxp.f_insert_testructura_gui ('COMMIN', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VEFCAJE', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VEFAPCIECAJ', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VENETR', 'VENCARP');
+select pxp.f_insert_testructura_gui ('NCETR', 'VENCARP');
+select pxp.f_insert_testructura_gui ('RPV', 'VEFREP');
+select pxp.f_insert_testructura_gui ('VEPEETR', 'VENCARP');
+select pxp.f_insert_testructura_gui ('PENETR', 'VENCARP');
+select pxp.f_insert_testructura_gui ('CBP', 'VEF');
+
+/************************************F-DEP-EGS-VEF-0-13/12/2018*************************************************/

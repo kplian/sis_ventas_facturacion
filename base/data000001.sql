@@ -13,7 +13,7 @@ VALUES (1, NULL, E'2015-12-03 00:00:00', E'2015-12-03 09:38:53', E'activo', NULL
 /***********************************F-DAT-JRR-VEF-0-02/05/2015*****************************************/
 
 /***********************************I-DAT-JRR-VEF-0-05/07/2015*****************************************/
-
+/*
 select pxp.f_insert_tgui ('SISTEMA DE VENTAS', '', 'VEF', 'si', 1, '', 1, '', '', 'VEF');
 select pxp.f_insert_tgui ('Sucursal', 'Sucursal', 'SUCUR', 'si', 1, 'sis_ventas_facturacion/vista/sucursal/Sucursal.php', 2, '', 'Sucursal', 'VEF');
 select pxp.f_insert_tgui ('Ventas Farmacia', 'Ventas Farmacia', 'VFVENTA', 'si', 0, 'sis_ventas_facturacion/vista/venta_farmacia/VentaVendedorFarmacia.php', 2, '', 'VentaVendedorFarmacia', 'VEF');
@@ -51,7 +51,7 @@ select pxp.f_insert_testructura_gui ('VENFACOM', 'VENCARP');
 select pxp.f_insert_testructura_gui ('FACMAN', 'VENCARP');
 select pxp.f_insert_testructura_gui ('REVVEN', 'VENCARP');
 select pxp.f_insert_testructura_gui ('VENELABO', 'VENCARP');
-select pxp.f_insert_testructura_gui ('VFVENTA', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VFVENTA', 'VENCARP');*/
 
 /***********************************F-DAT-JRR-VEF-0-05/07/2015*****************************************/
 
@@ -267,4 +267,36 @@ select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA11','SU
 select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBNOTA1','SUBNOTA','si','',NULL,'15','aplicacion','aplicacion','string','','activo');
 /***********************************I-DAT-EGS-VEF-2-10/12/2018*****************************************/
 
+/***********************************I-DAT-EGS-VEF-3-13/12/2018*****************************************/
 
+select pxp.f_insert_tgui ('<i class="fa fa-openid fa-2x"></i> SISTEMA DE  FACTURACIÓN', '', 'VEF', 'si', 1, '', 1, '', '', 'VEF');
+select pxp.f_insert_tgui ('Modulo de ventas', 'Sucursal', 'SUCUR', 'si', 1, 'sis_ventas_facturacion/vista/sucursal/Sucursal.php', 2, '', 'Sucursal', 'VEF');
+select pxp.f_insert_tgui ('Ventas Farmacia', 'Ventas Farmacia', 'VFVENTA', 'si', 0, 'sis_ventas_facturacion/vista/venta_farmacia/VentaVendedorFarmacia.php', 2, '', 'VentaVendedorFarmacia', 'VEF');
+select pxp.f_insert_tgui ('Revisión de Venta', 'Revisión de Venta', 'REVVEN', 'si', 0, 'sis_ventas_facturacion/vista/venta/VentaRevision.php', 2, '', 'VentaRevision', 'VEF');
+select pxp.f_insert_tgui ('Elaboración de Formulas', 'Elaboración de Formulas', 'VENELABO', 'si', 0, 'sis_ventas_facturacion/vista/formula/Formula.php', 2, '', 'Formula', 'VEF');
+select pxp.f_insert_tgui ('Actividad Economica', 'Actividad Economica', 'ACTECO', 'si', 1, 'sis_ventas_facturacion/vista/actividad_economica/ActividadEconomica.php', 2, '', 'ActividadEconomica', 'VEF');
+select pxp.f_insert_tgui ('Entidad Forma de Pago', 'Entidad Forma de Pago', 'ENFORPA', 'si', 1, 'sis_ventas_facturacion/vista/forma_pago/EntidadFormaPago.php', 2, '', 'EntidadFormaPago', 'VEF');
+select pxp.f_insert_tgui ('Cliente', 'Cliente', 'VEFCLI', 'si', 1, 'sis_ventas_facturacion/vista/cliente/Cliente.php', 2, '', 'Cliente', 'VEF');
+select pxp.f_insert_tgui ('Ventas con Recibo', 'Ventas', 'VENFACVE', 'si', 0, 'sis_ventas_facturacion/vista/venta/VentaVendedor.php', 2, '', 'VentaVendedor', 'VEF');
+select pxp.f_insert_tgui ('Registro de Boletos', 'Registro de Boletos', 'REGBOL', 'si', 7, 'sis_ventas_facturacion/vista/boleto/Boleto.php', 2, '', 'Boleto', 'VEF');
+select pxp.f_insert_tgui ('Reportes', 'Reportes', 'VEFREP', 'si', 8, '', 2, '', '', 'VEF');
+select pxp.f_insert_tgui ('Resumen de Ventas', 'Resumen de Ventas', 'VEFREM', 'si', 1, 'sis_ventas_facturacion/vista/reporte_resumen_ventas/ReporteResumenVentas.php', 3, '', 'ReporteResumenVentas', 'VEF');
+select pxp.f_insert_tgui ('Formula', 'Formula', 'FORM', 'si', 6, 'sis_ventas_facturacion/vista/formula/Formula.php', 2, '', 'Formula', 'VEF');
+select pxp.f_insert_tgui ('Ventas con Factura Manual', 'Factura Manual', 'FACMAN', 'si', 0, 'sis_ventas_facturacion/vista/venta/VentaVendedorManual.php', 2, '', 'VentaVendedorManual', 'VEF');
+select pxp.f_insert_tgui ('Ventas con Factura Computarizada', 'Ventas con Factura Computarizada', 'VENFACOM', 'si', 0, 'sis_ventas_facturacion/vista/venta/VentaVendedorComputarizada.php', 2, '', 'VentaVendedorComputarizada', 'VEF');
+select pxp.f_insert_tgui ('Tipo de Venta', 'Tipo de Venta', 'TIPVEN', 'si', 1, 'sis_ventas_facturacion/vista/tipo_venta/TipoVenta.php', 2, '', 'TipoVenta', 'VEF');
+select pxp.f_insert_tgui ('Proceso de Contabilización', 'Proceso de Contabilización', 'CONVEF', 'si', 7, 'sis_ventas_facturacion/vista/proceso_venta/ProcesoVenta.php', 2, '', 'ProcesoVenta', 'VEF');
+select pxp.f_insert_tgui ('Ventas', 'Ventas', 'VENCARP', 'si', 3, '', 2, '', '', 'VEF');
+select pxp.f_insert_tgui ('Venta Computarizada Exportación', 'Factura de Exportación', 'VEFACEX', 'si', 5, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacion.php', 3, '', 'VentaVendedorExportacion', 'VEF');
+select pxp.f_insert_tgui ('Exportación Minera', 'Factura de exportación para mineria', 'EXPOMIN', 'si', 7, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacionMin.php', 3, '', 'VentaVendedorExportacionMin', 'VEF');
+select pxp.f_insert_tgui ('Computarizada minera', 'Computarizada minera', 'COMMIN', 'si', 8, 'sis_ventas_facturacion/vista/venta/VentaVendedorMin.php', 3, '', 'VentaVendedorMin', 'VEF');
+select pxp.f_insert_tgui ('Ventas en Caja', 'Ventas en Caja', 'VEFCAJE', 'si', 8, 'sis_ventas_facturacion/vista/venta/VentaCaja.php', 3, '', 'VentaCaja', 'VEF');
+select pxp.f_insert_tgui ('Apertura de Caja', 'Apertura de Caja', 'VEFAPCIECAJ', 'si', 1, 'sis_ventas_facturacion/vista/apertura_cierre_caja/AperturaCierreCaja.php', 3, '', 'AperturaCierreCaja', 'VEF');
+select pxp.f_insert_tgui ('Ventas ETR', 'Ventas ETR', 'VENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaVendedorETR.php', 3, '', 'VentaVendedorETR', 'VEF');
+select pxp.f_insert_tgui ('Notas de Crédito ETR', 'Nos ta Credito Sobre Ventas', 'NCETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaVendedorNCETR.php', 3, '', 'VentaVendedorNCETR', 'VEF');
+select pxp.f_insert_tgui ('Reporte Ventas y Notas', 'Reportes de Ventasy Notas', 'RPV', 'si', 1, 'sis_ventas_facturacion/vista/reporteVenta/FormFiltro.php', 3, '', 'FormFiltro', 'VEF');
+select pxp.f_insert_tgui ('Ventas Peaje ETR', 'Ventas Peaje ETR', 'VEPEETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaVendedorPeajeETR.php', 3, '', 'VentaVendedorPeajeETR', 'VEF');
+select pxp.f_insert_tgui ('Pendiente Emisión ETR', 'Pendientes Emisión ETR', 'PENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaEmisor.php', 3, '', 'VentaEmisor', 'VEF');
+select pxp.f_insert_tgui ('Cuenta Bancaria Proveedor', 'Cuenta Bancaria Proveedor', 'CBP', 'si', 6, 'sis_ventas_facturacion/vista/proveedor_cuenta_banco_cobro/ProveedorCuentaBancoCobro.php', 2, '', 'ProveedorCuentaBancoCobro', 'VEF');
+
+/***********************************I-DAT-EGS-VEF-3-10/13/2018*****************************************/
