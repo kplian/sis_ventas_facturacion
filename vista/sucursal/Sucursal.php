@@ -377,6 +377,7 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'formato_comprobante',
                 fieldLabel: 'Formato Comprobante',
+                qtip: 'Los formatos por defecto son:FACMEDIACAR (para un formato para imprimir con el navegador),pdf-FACMEDIACAR(formato para imprimir en pdf para el uso de cualquier formato en pdf siempre colocar el prefijo(pdf-)y luego el formato correspondiente)',
                 allowBlank: true,
                 anchor: '100%',
                 gwidth: 230,

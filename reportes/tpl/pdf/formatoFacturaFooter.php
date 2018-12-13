@@ -13,18 +13,18 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
  
 				<table   width="645px" >
 						<tr>
-							<td height="25px" >  </td>
-							<td >   </td>
+							<td height="25px" width="445px">  </td>
+							<td width="200px">   </td>
 						</tr>
 					
 						<tr>
-							<td style="text-align:left;" width="400px" height="25px">
+							<td style="text-align:left;" width="445px" height="25px">
 							&nbsp;C&oacute;digo de Control : <strong><?php echo $this->cabecera['codigo_control'] ; ?></strong>
 							
 							</td>
-							<td width="245px" rowspan="2" >
+							<td width="100px" rowspan="2" >
 							<?php
-						   				 echo  '<img src = "'.$this->img_qr.'" width="130px" height="130px">';
+						   				 echo  '<img src = "'.$this->img_qr.'" width="140px" height="140px">';
 							
 										 //echo  $this->cadena_qr;
 						  		?>
@@ -67,18 +67,18 @@ elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 
 				
 				<table width="645px" >
 						<tr>
-							<td width="400px" height="25px">Monto Efectivo del Credito o debito (13% del importe Total Devuelto)</td>
-							<td width="250px"><?php echo number_format($this->cabecera['total_venta_msuc']*0.13, 2, '.', ',') ;echo ' '; echo $this->cabecera['moneda_venta'] ; ?></td>
+							<td width="445px" height="25px">Monto Efectivo del Credito o debito (13% del importe Total Devuelto)</td>
+							<td width="200px"><?php echo number_format($this->cabecera['total_venta_msuc']*0.13, 2, '.', ',') ;echo ' '; echo $this->cabecera['moneda_venta'] ; ?></td>
 						</tr>
 					
 						<tr>
-							<td style="text-align:left;" width="400px"  height="25px">
+							<td style="text-align:left;" width="445px"  height="25px">
 							&nbsp;C&oacute;digo de Control : <strong><?php echo $this->cabecera['codigo_control'] ; ?></strong>
 							
 							</td>
-							<td width="250px" rowspan="2">
+							<td width="100px" rowspan="2" align="center">
 							<?php
-						   				 echo  '<img src = "'.$this->img_qr.'" width="130" height="130">';
+						   				 echo  '<img src = "'.$this->img_qr.'" width="140" height="140">';
 							
 										 //echo  $this->cadena_qr;
 						  		?>

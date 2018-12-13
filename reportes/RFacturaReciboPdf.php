@@ -130,6 +130,7 @@ class RFacturaReciboPdf extends  ReportePDF {
         imagedestroy($this->im);
         $this->img_qr = dirname(__FILE__) . "/../../reportes_generados/" . $this->nombre_archivo . ".png";
 	
+	   //inicia originales y copias de la factura
 		if ( $this->cabecera['estado'] == 'finalizado') {
 				
 					ob_start();
@@ -140,6 +141,7 @@ class RFacturaReciboPdf extends  ReportePDF {
 				  
 					//$this->revisarfinPagina($content);
 					$this->countUltimo = $this->count;
+					
 					 //inicia el original del emisor cuando es nota de credito
 				    if ($this->codigo_reporte =='NOTAFACMEDIACAR') {
 				    
@@ -149,12 +151,13 @@ class RFacturaReciboPdf extends  ReportePDF {
 				    }
 					
 					//inicia copias de las facturas
-					$this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Contabilidad</strong></h3></td></tr>';
-					$this->count = 0;
-			        $this->copiaContabilidad();
 					$this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Tesoreria</strong></h3></td></tr>';
 					$this->count = 0;
 					$this->copiaTesoreria();
+					$this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Contabilidad </strong></h3></td></tr>';
+					$this->count = 0;
+					$this->copiaContabilidad();
+					
 
 		}
 		else {
@@ -194,7 +197,7 @@ class RFacturaReciboPdf extends  ReportePDF {
 				}
 		}
 		
-		//genera cuerpo de de la factura
+		//genera el header de de la factura
 		$this->SetFont ('helvetica', '', 10 , '', 'default', true );
 		ob_start();
 		include(dirname(__FILE__).'/../reportes/tpl/pdf/formatoFacturaHeader.php');
@@ -260,7 +263,7 @@ class RFacturaReciboPdf extends  ReportePDF {
 			if ($this->objParam->getParametro('nombre_vista') !='VentaEmisor' or $this->objParam->getParametro('nombre_vista') !='VentaEmisor' && $this->cabecera ['estado'] == 'finalizado') {
 						$this->SetAlpha(0.50);
 		
-						$this->Image(dirname(__FILE__) . "/../../lib/imagenes/estados/".$this->cabecera['estado'].".png", 50, 70, 100,100, '', 'http://www.tcpdf.org', '', true, 72);
+						$this->Image(dirname(__FILE__) . "/../../lib/imagenes/estados/".$this->cabecera['estado'].".png", 50, 70, 100,100, '', 'http://www.endetransmision.bo', '', true, 72);
 					
 						$this->SetAlpha(1);
 					};
@@ -310,7 +313,6 @@ class RFacturaReciboPdf extends  ReportePDF {
 			        $content = ob_get_clean();
 
 					$this->writeHTML($content,false, false, true, false, '');
-
 					//$this->revisarfinPagina($content);
 				
 	}
