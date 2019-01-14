@@ -3,11 +3,7 @@
 ALTER TABLE ONLY vef.tformula
     ADD CONSTRAINT fk_tformula__id_medico
     FOREIGN KEY (id_medico) REFERENCES vef.tmedico(id_medico);
-    
-
-ALTER TABLE ONLY vef.tformula_detalle
-    ADD CONSTRAINT fk_tformula_detalle__id_item
-    FOREIGN KEY (id_item) REFERENCES alm.titem(id_item);
+   
     
 ALTER TABLE ONLY vef.tformula_detalle
     ADD CONSTRAINT fk_tformula_detalle__id_formula
@@ -26,17 +22,10 @@ ALTER TABLE ONLY vef.tsucursal_almacen
     ADD CONSTRAINT fk_tsucursal_almacen__id_sucursal
     FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(id_sucursal);    
     
-ALTER TABLE ONLY vef.tsucursal_almacen
-    ADD CONSTRAINT fk_tsucursal_almacen__id_almacen
-    FOREIGN KEY (id_almacen) REFERENCES alm.talmacen(id_almacen);
     
 ALTER TABLE ONLY vef.tsucursal_producto
     ADD CONSTRAINT fk_tsucursal_producto__id_sucursal
-    FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(id_sucursal);    
-    
-ALTER TABLE ONLY vef.tsucursal_producto
-    ADD CONSTRAINT fk_tsucursal_producto__id_item
-    FOREIGN KEY (id_item) REFERENCES alm.titem(id_item); 
+    FOREIGN KEY (id_sucursal) REFERENCES vef.tsucursal(id_sucursal);   
     
 ALTER TABLE ONLY vef.tformula
     ADD CONSTRAINT fk_tformula__id_tipo_presentacion
@@ -70,9 +59,7 @@ ALTER TABLE ONLY vef.tventa_detalle
     ADD CONSTRAINT fk_tventa_detalle__id_venta
     FOREIGN KEY (id_venta) REFERENCES vef.tventa(id_venta);
     
-ALTER TABLE ONLY vef.tventa_detalle
-    ADD CONSTRAINT fk_tventa_detalle__id_item
-    FOREIGN KEY (id_item) REFERENCES alm.titem(id_item); 
+
     
 ALTER TABLE ONLY vef.tventa_detalle
     ADD CONSTRAINT fk_tventa_detalle__id_sucursal_producto
@@ -511,3 +498,46 @@ select pxp.f_insert_testructura_gui ('PENETR', 'VENCARP');
 select pxp.f_insert_testructura_gui ('CBP', 'VEF');
 
 /************************************F-DEP-EGS-VEF-0-13/12/2018*************************************************/
+
+/************************************I-DEP-JRR-VEF-0-10/01/2019*************************************************/
+
+-- jrr: se movio esto aca porq las estructuras gui deben ir a dependencias y no debera tener problemas
+select pxp.f_insert_testructura_gui ('VEFACEX', 'VENCARP');
+select pxp.f_insert_testructura_gui ('EXPOMIN', 'VENCARP');
+select pxp.f_insert_testructura_gui ('COMMIN', 'VENCARP');
+
+select wf.f_import_testructura_estado ('insert','borrador','finalizado','VEN',1,'');
+select wf.f_import_tfuncionario_tipo_estado ('insert','borrador','VEN','3483198',NULL,'');
+select wf.f_import_tfuncionario_tipo_estado ('insert','finalizado','VEN','2738127',NULL,'');
+
+select pxp.f_insert_testructura_gui ('VEFCAJE', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VEFAPCIECAJ', 'VENCARP');
+
+select pxp.f_insert_testructura_gui ('NCETR', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VENETR', 'VENCARP');
+select pxp.f_insert_testructura_gui ('VEPEETR', 'VENCARP');
+
+select pxp.f_insert_testructura_gui ('PENETR', 'VENCARP');
+
+/************************************F-DEP-JRR-VEF-0-10/01/2019*************************************************/
+
+
+/************************************I-DEP-JRR-VEF-1-10/01/2019*************************************************/
+-- jrr: se movio esto aca por si es que no existe almacenes solo la creacion de este fk fallara (si ya tienen estos fk solo anadir el codigo)
+ALTER TABLE ONLY vef.tsucursal_producto
+    ADD CONSTRAINT fk_tsucursal_producto__id_item
+    FOREIGN KEY (id_item) REFERENCES alm.titem(id_item);   
+
+ALTER TABLE ONLY vef.tformula_detalle
+    ADD CONSTRAINT fk_tformula_detalle__id_item
+    FOREIGN KEY (id_item) REFERENCES alm.titem(id_item);
+    
+ALTER TABLE ONLY vef.tventa_detalle
+    ADD CONSTRAINT fk_tventa_detalle__id_item
+    FOREIGN KEY (id_item) REFERENCES alm.titem(id_item); 
+    
+ALTER TABLE ONLY vef.tsucursal_almacen
+    ADD CONSTRAINT fk_tsucursal_almacen__id_almacen
+    FOREIGN KEY (id_almacen) REFERENCES alm.talmacen(id_almacen);
+    
+/************************************F-DEP-JRR-VEF-1-10/01/2019*************************************************/
