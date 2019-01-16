@@ -23,7 +23,6 @@ Phx.vista.ProveedorCuentaBancoCobro=Ext.extend(Phx.gridInterfaz,{
 			
 	Atributos:[
 		{
-			//configuracion del componente
 			config:{
 					labelSeparator:'',
 					inputType:'hidden',
@@ -32,6 +31,40 @@ Phx.vista.ProveedorCuentaBancoCobro=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
+        {
+            config: {
+                name: 'id_institucion',
+                fieldLabel: 'Institucion',
+                tinit: true,
+                allowBlank: false,
+                origen: 'INSTITUCION',
+                baseParams:{es_banco:'si'},
+                gdisplayField: 'nombre_institucion',
+                gwidth: 200,
+                renderer:function (value, p, record){return String.format('{0}', record.data['desc_nombre']);}
+            },
+            type: 'ComboRec',
+            id_grupo: 0,
+            filters:{pfiltro:'ins.nombre',type:'string'},
+            grid: true,
+            form: true
+        },
+        {
+            config:{
+                name: 'nro_cuenta_bancario',
+                fieldLabel: 'Nro Cuenta',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 200,
+                maxLength:50
+            },
+            type:'TextField',
+            filters:{pfiltro:'pcc.nro_cuenta_bancario',type:'string'},
+            id_grupo:1,
+            bottom_filter: true,
+            grid:true,
+            form:true
+        },
 		{
 			config: {
 				name: 'id_proveedor',
@@ -63,7 +96,7 @@ Phx.vista.ProveedorCuentaBancoCobro=Ext.extend(Phx.gridInterfaz,{
 				pageSize: 15,
 				queryDelay: 1000,
 				anchor: '100%',
-				gwidth: 150,
+                gwidth: 230,
 				minChars: 2,
 				renderer : function(value, p, record) {
 					return String.format('{0}', record.data['desc_proveedor']);
@@ -71,52 +104,60 @@ Phx.vista.ProveedorCuentaBancoCobro=Ext.extend(Phx.gridInterfaz,{
 			},
 			type: 'ComboBox',
 			id_grupo: 0,
-			filters: {pfiltro: 'movtip.nombre',type: 'string'},
+			filters: {pfiltro: 'pr.desc_proveedor',type: 'string'},
 			grid: true,
 			form: true
 		},
         {
-            config: {
-                name: 'id_cuenta_bancaria',
-                fieldLabel: 'Cuenta Bancaria',
+            config:{
+                name: 'fecha_alta',
+                fieldLabel: 'Fecha Alta',
                 allowBlank: true,
-                emptyText: 'Elija una opción...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_tesoreria/control/CuentaBancaria/listarCuentaBancaria',
-                    id: 'id_cuenta_bancaria',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nro_cuenta',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_cuenta_bancaria', 'nro_cuenta', 'nombre_institucion'],
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'nombre_institucion'}
-                }),
-                valueField: 'id_cuenta_bancaria',
-                displayField: 'nro_cuenta',
-                gdisplayField: 'nro_cuenta',
-                hiddenName: 'id_cuenta_bancaria',
-                forceSelection: true,
-                typeAhead: false,
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 15,
-                queryDelay: 1000,
-                anchor: '100%',
-                gwidth: 150,
-                minChars: 2,
-                renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['nro_cuenta']);
-                }
+                anchor: '80%',
+                gwidth: 100,
+                format: 'd/m/Y',
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {pfiltro: 'movtip.nombre',type: 'string'},
-            grid: true,
-            form: true
+            type:'DateField',
+            filters:{pfiltro:'pcc.fecha_alta',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name:'id_moneda',
+                origen:'MONEDA',
+                allowBlank:true,
+                fieldLabel:'Moneda',
+                gdisplayField:'codigo_moneda',//mapea al store del grid
+                gwidth:50,
+                  renderer:function (value, p, record){return String.format('{0}', record.data['desc_moneda']);}
+            },
+            type:'ComboRec',
+            id_grupo:1,
+            filters:{
+                pfiltro:'mo.codigo_internacional',
+                type:'string'
+            },
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'fecha_baja',
+                fieldLabel: 'Fecha Baja',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                format: 'd/m/Y',
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'pcc.fecha_baja',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:true
         },
         {
             config:{
@@ -133,7 +174,6 @@ Phx.vista.ProveedorCuentaBancoCobro=Ext.extend(Phx.gridInterfaz,{
             },
             type:'ComboBox',
             id_grupo:0,
-           // valorInicial: 'no',
             grid:true,
             form:true
         },
@@ -254,9 +294,16 @@ Phx.vista.ProveedorCuentaBancoCobro=Ext.extend(Phx.gridInterfaz,{
 	fields: [
 		{name:'id_proveedor_cuenta_banco_cobro', type: 'numeric'},
 		{name:'id_proveedor', type: 'numeric'},
+        {name:'id_institucion', type: 'numeric'},
+        {name:'id_moneda', type: 'numeric'},
+        {name:'desc_proveedor', type: 'string'},
+        {name:'tipo', type: 'string'},
+        {name:'desc_nombre', type: 'string'},
+        {name:'desc_moneda', type: 'string'},
+        {name:'fecha_alta', type: 'date',dateFormat:'Y-m-d'},
+        {name:'fecha_baja', type: 'date',dateFormat:'Y-m-d'},
+        {name:'nro_cuenta_bancario', type: 'string'},
 		{name:'estado_reg', type: 'string'},
-		{name:'tipo', type: 'string'},
-		{name:'id_cuenta_bancaria', type: 'numeric'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usuario_ai', type: 'string'},
 		{name:'id_usuario_reg', type: 'numeric'},
@@ -264,13 +311,7 @@ Phx.vista.ProveedorCuentaBancoCobro=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
-        {name:'id_institucion', type: 'numeric'},
-        {name:'desc_proveedor', type: 'string'},
-        {name:'rotulo_comercial', type: 'string'},
-        {name:'nro_cuenta', type: 'string'},
-        {name:'denominacion', type: 'string'}
-		
+		{name:'usr_mod', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_proveedor_cuenta_banco_cobro',
@@ -279,16 +320,8 @@ Phx.vista.ProveedorCuentaBancoCobro=Ext.extend(Phx.gridInterfaz,{
 	bdel:true,
 	bsave:true,
     onButtonNew:function(){
-
         Phx.vista.ProveedorCuentaBancoCobro.superclass.onButtonNew.call(this);
         this.iniciarEvento();
-
-
-    },
-    iniciarEvento:function () {
-
-        //this.Cmp.id_proveedor.store.baseParams ={par_filtro: 'nombre_institucion'};
-        //var f = this.Cmp.formulario.getValue();
     }
 	}
 )

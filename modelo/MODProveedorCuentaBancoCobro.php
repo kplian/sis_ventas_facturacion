@@ -22,14 +22,16 @@ class MODProveedorCuentaBancoCobro extends MODbase{
 		//Definicion de la lista del resultado del query
 		$this->captura('id_proveedor_cuenta_banco_cobro','int4');
 		$this->captura('id_proveedor','int4');
-        $this->captura('id_cuenta_bancaria','int4');
         $this->captura('id_institucion','int4');
+        $this->captura('id_moneda','int4');
         $this->captura('desc_proveedor','varchar');
-        $this->captura('rotulo_comercial','varchar');
-        $this->captura('nro_cuenta','varchar');
-        $this->captura('denominacion','varchar');
+        $this->captura('tipo','varchar');
+        $this->captura('desc_nombre','varchar');
+        $this->captura('desc_moneda','varchar');
+        $this->captura('fecha_alta','date');
+        $this->captura('fecha_baja','date');
+        $this->captura('nro_cuenta_bancario','text');
 		$this->captura('estado_reg','varchar');
-		$this->captura('tipo','varchar');
 		$this->captura('fecha_reg','timestamp');
 		$this->captura('usuario_ai','varchar');
 		$this->captura('id_usuario_reg','int4');
@@ -54,11 +56,14 @@ class MODProveedorCuentaBancoCobro extends MODbase{
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
+        $this->setParametro('id_institucion','id_institucion','int4');
 		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo','tipo','varchar');
-		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
-
+		$this->setParametro('nro_cuenta_bancario','nro_cuenta_bancario','text');
+		$this->setParametro('fecha_alta','fecha_alta','date');
+        $this->setParametro('id_moneda','id_moneda','int4');
+        $this->setParametro('fecha_baja','fecha_baja','date');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -75,11 +80,14 @@ class MODProveedorCuentaBancoCobro extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_proveedor_cuenta_banco_cobro','id_proveedor_cuenta_banco_cobro','int4');
-		$this->setParametro('id_proveedor','id_proveedor','int4');
-		$this->setParametro('estado_reg','estado_reg','varchar');
-		$this->setParametro('tipo','tipo','varchar');
-		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
-
+        $this->setParametro('id_institucion','id_institucion','int4');
+        $this->setParametro('id_proveedor','id_proveedor','int4');
+        $this->setParametro('estado_reg','estado_reg','varchar');
+        $this->setParametro('tipo','tipo','varchar');
+        $this->setParametro('nro_cuenta_bancario','nro_cuenta_bancario','text');
+        $this->setParametro('fecha_alta','fecha_alta','date');
+        $this->setParametro('id_moneda','id_moneda','int4');
+        $this->setParametro('fecha_baja','fecha_baja','date');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
