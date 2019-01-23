@@ -15,7 +15,7 @@ Phx.vista.VentaVendedorPeajeETR = {
     requireclase: 'Phx.vista.VentaVendedor',
     ActList:'../../sis_ventas_facturacion/control/Venta/listarVentaETR',
     title: 'Venta',
-    nombreVista: 'VentaVendedorETR',
+    nombreVista: 'VentaVendedorPeajeETR',
     tipo_factura:'computarizadareg',
     formUrl: '../../../sis_ventas_facturacion/vista/venta/FormVentaETR.php',
     formClass : 'FormVentaETR',
