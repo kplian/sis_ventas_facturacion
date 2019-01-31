@@ -1363,6 +1363,71 @@ BEGIN
 		end;
       
      
+     
+/*********************************    
+ 	#TRANSACCION:  'VF_FACTREPOREMITIDAS_SEL'
+ 	#DESCRIPCION:	Listado de facturas validadas para reporte des sistema siat 
+ 	#AUTOR:		rac	
+ 	#FECHA:		25-01-2019 05:58:00  
+	***********************************/
+
+	elsif(p_transaccion='VF_FACTEMITIDAS_SEL')then
+
+		begin
+        
+             v_consulta='select
+                          ven.id_venta,
+                          ven.id_proveedor,
+                          ven.id_sucursal,
+                          ven.total_venta,
+                          ven.estado,
+                          cli.desc_proveedor as nombre_factura,                      
+                          cli.nit,                         
+                          ven.total_venta_msuc,         
+                          ven.fecha,
+                          ven.nro_factura,                   
+                          ven.observaciones,
+                          ent.nombre as nombre_entidad,
+                          ent.nit as nit_entidad
+                   		from vef.tventa ven				 				
+				        inner join param.vproveedor cli on cli.id_proveedor  = ven.id_proveedor        
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join param.tentidad ent on ent.id_entidad = suc.id_entidad
+                   where ven.estado_reg = ''activo'' and ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+		end;
+        
+    /*********************************    
+ 	#TRANSACCION:  'VF_FACTEMITIDAS_CONT'
+ 	#DESCRIPCION:	Listado de facturas validadas para reporte des sistema siat 
+ 	#AUTOR:		rac	
+ 	#FECHA:		25-01-2019 05:58:00  
+	***********************************/
+
+	elsif(p_transaccion='VF_FACTEMITIDAS_CONT')then
+
+		begin
+        
+             v_consulta='select
+                          COUNT(*)
+                   		from vef.tventa ven				 				
+				        inner join param.vproveedor cli on cli.id_proveedor  = ven.id_proveedor        
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join param.tentidad ent on ent.id_entidad = suc.id_entidad
+                   where ven.estado_reg = ''activo'' and ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+		end;
+
       /*********************************    
  	#TRANSACCION:  'VF_VENEMISOR_SEL'
  	#DESCRIPCION:	Consulta para listar facturas pendientes de emision 

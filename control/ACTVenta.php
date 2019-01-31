@@ -323,8 +323,81 @@ class ACTVenta extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 
+  /* lista ventas de Documentos Fiscales Emitidos para el sistema siat reportes*/
+  
+  function listarDocFiscalesEmitidosReporteSiat(){
+		
+		$this->objParam->defecto('ordenacion','id_venta');
+		
+	    if ($this->objParam->getParametro('fecha_ini') != '') {
+        	$this->objParam->addFiltro(" ven.fecha::date >= ''" .  $this->objParam->getParametro('fecha_ini')."''::date ");   
+        }   
+        if ($this->objParam->getParametro('fecha_fin') != '') {
+       		$this->objParam->addFiltro(" ven.fecha::date <= ''" .  $this->objParam->getParametro('fecha_fin')."''::date ");
+	    }	 
+	    if ($this->objParam->getParametro('nit') != '') {
+       		$this->objParam->addFiltro(" cli.nit = ''" .  $this->objParam->getParametro('nit')."''");  
+        }   
+	   
+        /*if ($this->objParam->getParametro('id_sucursal') != '') {
+       		$this->objParam->addFiltro(" fk_sucursal = " .  $this->objParam->getParametro('id_sucursal')." ");  
+        }	*/	
 
+		$this->objParam->defecto('dir_ordenacion','asc');
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarDocFiscalesEmitidosReporteSiat');
+			
+		} else{
+			
+			$this->objFunc=$this->create('MODVenta');    
+	        $this->res=$this->objFunc->listarDocFiscalesEmitidosReporteSiat($this->objParam);
+		}
+		    $this->res->imprimirRespuesta($this->res->generarJson());
+	}
+  
+  /**/
 
+  /* lista ventas de Documentos Fiscales Emitidos para el sistema siat reportes*/
+  
+  function listarDocFiscalesAnuladasReporteSiat(){
+		
+		$this->objParam->defecto('ordenacion','id_venta');
+		
+	    if ($this->objParam->getParametro('fecha_ini') != '') {
+        	$this->objParam->addFiltro(" ven.fecha::date >= ''" .  $this->objParam->getParametro('fecha_ini')."''::date ");   
+        }   
+        
+        if ($this->objParam->getParametro('fecha_fin') != '') {
+       		$this->objParam->addFiltro(" ven.fecha::date <= ''" .  $this->objParam->getParametro('fecha_fin')."''::date ");
+	    }	
+	     
+	    if ($this->objParam->getParametro('nit') != '') {
+       		$this->objParam->addFiltro(" cli.nit = ''" .  $this->objParam->getParametro('nit')."''");  
+        }   
+
+        if ($this->objParam->getParametro('estado') != '') {
+       		$this->objParam->addFiltro(" ven.estado = ''" .  $this->objParam->getParametro('estado')."''");  
+        }     
+	   
+        /*if ($this->objParam->getParametro('id_sucursal') != '') {
+       		$this->objParam->addFiltro(" fk_sucursal = " .  $this->objParam->getParametro('id_sucursal')." ");  
+        }	*/	
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarDocFiscalesAnuladasReporteSiat');
+			
+		} else{
+			
+			$this->objFunc=$this->create('MODVenta');    
+	        $this->res=$this->objFunc->listarDocFiscalesEmitidosReporteSiat($this->objParam);
+		}
+		    $this->res->imprimirRespuesta($this->res->generarJson());
+	}
+  
+  /**/
 	function getVariablesBasicas() {	        
 		
 		$this->objFunc=$this->create('MODVenta');
