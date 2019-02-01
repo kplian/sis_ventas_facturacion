@@ -37,6 +37,8 @@ DECLARE
 	v_fecha_ini			date;
 	v_fecha_fin			date;
 	v_id_periodo		integer;
+	v_cont				integer;
+	v_rec				record;
 
 
 BEGIN
