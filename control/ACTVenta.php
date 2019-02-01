@@ -329,11 +329,11 @@ class ACTVenta extends ACTbase{
 		
 		$this->objParam->defecto('ordenacion','id_venta');
 		
-	    if ($this->objParam->getParametro('fecha_ini') != '') {
-        	$this->objParam->addFiltro(" ven.fecha::date >= ''" .  $this->objParam->getParametro('fecha_ini')."''::date ");   
+	    if ($this->objParam->getParametro('desde') != '') {
+        	$this->objParam->addFiltro(" ven.fecha::date >= ''" .  $this->objParam->getParametro('desde')."''::date ");   
         }   
-        if ($this->objParam->getParametro('fecha_fin') != '') {
-       		$this->objParam->addFiltro(" ven.fecha::date <= ''" .  $this->objParam->getParametro('fecha_fin')."''::date ");
+        if ($this->objParam->getParametro('hasta') != '') {
+       		$this->objParam->addFiltro(" ven.fecha::date <= ''" .  $this->objParam->getParametro('hasta')."''::date ");
 	    }	 
 	    if ($this->objParam->getParametro('nit') != '') {
        		$this->objParam->addFiltro(" cli.nit = ''" .  $this->objParam->getParametro('nit')."''");  
@@ -364,12 +364,12 @@ class ACTVenta extends ACTbase{
 		
 		$this->objParam->defecto('ordenacion','id_venta');
 		
-	    if ($this->objParam->getParametro('fecha_ini') != '') {
-        	$this->objParam->addFiltro(" ven.fecha::date >= ''" .  $this->objParam->getParametro('fecha_ini')."''::date ");   
+	    if ($this->objParam->getParametro('desde') != '') {
+        	$this->objParam->addFiltro(" ven.fecha::date >= ''" .  $this->objParam->getParametro('desde')."''::date ");   
         }   
         
-        if ($this->objParam->getParametro('fecha_fin') != '') {
-       		$this->objParam->addFiltro(" ven.fecha::date <= ''" .  $this->objParam->getParametro('fecha_fin')."''::date ");
+        if ($this->objParam->getParametro('hasta') != '') {
+       		$this->objParam->addFiltro(" ven.fecha::date <= ''" .  $this->objParam->getParametro('hasta')."''::date ");
 	    }	
 	     
 	    if ($this->objParam->getParametro('nit') != '') {
@@ -378,7 +378,7 @@ class ACTVenta extends ACTbase{
 
         if ($this->objParam->getParametro('estado') != '') {
        		$this->objParam->addFiltro(" ven.estado = ''" .  $this->objParam->getParametro('estado')."''");  
-        }     
+        }  
 	   
         /*if ($this->objParam->getParametro('id_sucursal') != '') {
        		$this->objParam->addFiltro(" fk_sucursal = " .  $this->objParam->getParametro('id_sucursal')." ");  

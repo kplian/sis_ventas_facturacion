@@ -1376,12 +1376,12 @@ BEGIN
 		begin
         
              v_consulta='select
-                          ven.id_venta,
+                           ven.id_venta,
                           ven.id_proveedor,
                           ven.id_sucursal,
                           ven.total_venta,
                           ven.estado,
-                          cli.desc_proveedor as nombre_factura,                      
+                          cli.nombre_factura as nombre_factura,                      
                           cli.nit,                         
                           ven.total_venta_msuc,         
                           ven.fecha,
@@ -1390,7 +1390,7 @@ BEGIN
                           ent.nombre as nombre_entidad,
                           ent.nit as nit_entidad
                    		from vef.tventa ven				 				
-				        inner join param.vproveedor cli on cli.id_proveedor  = ven.id_proveedor        
+				        left join vef.tcliente cli on cli.id_cliente  = ven.id_cliente        
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         inner join param.tentidad ent on ent.id_entidad = suc.id_entidad
                    where ven.estado_reg = ''activo'' and ';
@@ -1416,7 +1416,7 @@ BEGIN
              v_consulta='select
                           COUNT(*)
                    		from vef.tventa ven				 				
-				        inner join param.vproveedor cli on cli.id_proveedor  = ven.id_proveedor        
+				        left join vef.tcliente cli on cli.id_cliente  = ven.id_cliente        
                         inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
                         inner join param.tentidad ent on ent.id_entidad = suc.id_entidad
                    where ven.estado_reg = ''activo'' and ';
