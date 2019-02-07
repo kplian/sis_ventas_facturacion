@@ -248,8 +248,8 @@ BEGIN
 	
 	if (v_id_concepto_ingas is null) then
 		INSERT INTO param.tconcepto_ingas
-		(id_usuario_reg, tipo, desc_ingas, movimiento, sw_tes, id_oec, activo_fijo, almacenable, pago_automatico, sw_autorizacion, descripcion_larga, id_entidad, id_actividad_economica, codigo, id_grupo_ots, id_unidad_medida, nandina, ruta_foto, id_cat_concepto, "version", requiere_ot, filtro_ot)
-		VALUES(1, 'Servicio', 'Energia Electrica', 'recurso', NULL, NULL, 'no', 'no', 'no', NULL, '', 1, 1, 'ENE', NULL, 1, '', NULL, NULL, 1, 'opcional', 'todos') returning id_concepto_ingas into v_id_concepto_ingas;
+		(id_usuario_reg, tipo, desc_ingas, movimiento, sw_tes, id_oec, activo_fijo, almacenable, pago_automatico, sw_autorizacion, descripcion_larga, id_entidad, id_actividad_economica, codigo, id_grupo_ots, id_unidad_medida, nandina, ruta_foto, id_cat_concepto, "version")
+		VALUES(1, 'Servicio', 'Energia Electrica', 'recurso', NULL, NULL, 'no', 'no', 'no', NULL, '', 1, 1, 'ENE', NULL, 1, '', NULL, NULL, 1) returning id_concepto_ingas into v_id_concepto_ingas;
 	
 		INSERT INTO vef.tsucursal_producto
 		( id_usuario_reg,precio, id_sucursal, id_item, tipo_producto, id_concepto_ingas, requiere_descripcion, id_moneda, contabilizable, excento)
