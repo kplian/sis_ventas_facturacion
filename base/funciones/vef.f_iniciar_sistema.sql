@@ -86,7 +86,7 @@ BEGIN
 	
 	if not exists (select 1 from param.tgestion where gestion = 2019) then
 		INSERT INTO param.tgestion
-		(id_usuario, gestion, estado, id_moneda_base, id_empresa, fecha_ini, fecha_fin, tipo)
+		(id_usuario_reg, gestion, estado, id_moneda_base, id_empresa, fecha_ini, fecha_fin, tipo)
 		VALUES(1, 2019, 'activo', 1, v_id_empresa, NULL, NULL, 'MES');
 		
 		--(3) Generación de los Períodos y Períodos Subsistema
