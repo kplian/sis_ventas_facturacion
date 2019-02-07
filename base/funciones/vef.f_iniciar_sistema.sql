@@ -79,7 +79,7 @@ BEGIN
 	
 	if (v_id_empresa is null) then	
 		INSERT INTO param.tempresa
-		(id_usuario,nombre, logo, nit, codigo)
+		(id_usuario_reg,nombre, logo, nit, codigo)
 		VALUES(1,'Empresa Electrica Corani', './../../sis_parametros/control/_archivo//docLog1.jpg', '111', 'CORANI') --cambiar nombre de empresa
 		returning id_empresa into v_id_empresa;		
 	end if;
