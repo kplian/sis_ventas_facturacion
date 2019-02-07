@@ -289,3 +289,11 @@ select pxp.f_insert_tgui ('Pendiente Emisión ETR', 'Pendientes Emisión ETR', '
 select pxp.f_insert_tgui ('Cuenta Bancaria Proveedor', 'Cuenta Bancaria Proveedor', 'CBP', 'si', 6, 'sis_ventas_facturacion/vista/proveedor_cuenta_banco_cobro/ProveedorCuentaBancoCobro.php', 2, '', 'ProveedorCuentaBancoCobro', 'VEF');
 
 /***********************************F-DAT-EGS-VEF-3-13/12/2018*****************************************/
+
+/***********************************I-DAT-JRR-VEF-0-29/01/2019*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'vef_sig_estado_automatico', E'no', E'Permite pasar al siguiente estado una venta una vez q ha sido registrado');
+
+/***********************************F-DAT-JRR-VEF-0-29/01/2019*****************************************/
