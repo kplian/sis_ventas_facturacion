@@ -561,6 +561,7 @@ class ACTVenta extends ACTbase{
 		if ($datos['cantidad_descripciones'] > 0){
 			$this->objFunc = $this->create('MODVenta');
 			$this->res = $this->objFunc->listarReciboFacturaDescripcion($this->objParam);
+			
 			$datos['detalle_descripcion'] = $this->res->getDatos();
 		}
 		
