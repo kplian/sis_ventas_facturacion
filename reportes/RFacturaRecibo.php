@@ -1620,7 +1620,7 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
                                         
 									    <tr>
 											
-											<td style="text-align: center;" colspan="2"> lugar ' . $datos['lugar_sucursal'] . '</td>
+											<td style="text-align: center;" colspan="2">' . $datos['lugar_sucursal'] . '</td>
 										</tr>
 										<tr>
 											<td style="text-align: right;"><strong>NIT:</strong></td>
@@ -1628,8 +1628,7 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 										</tr>
 										<tr>
 											<td style="text-align: right;"><strong>Documento Fiscal Nro.:</strong></td>
-                                            
-											<td style="text-align: left;">' . $datos['numero_factura'] . '</td>
+                                            <td style="text-align: left;">' . $datos['numero_factura'] . '</td>
 										</tr>
 										<tr>
 											<td style="text-align: right;"><strong>CUF:</strong></td>
@@ -1643,7 +1642,7 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
                                          <tr>
 											<td style="text-align: center;" colspan="2">
 											  <h3>FACTURA</h3>
-												FACTURACIÓN ELECTRÓNICA </br>	
+												FACTURACIÓN ELECTRÓNICA 
 												  <br> 
                                                
 												  REPRESENTACIÓN GRÁFICA </br>
@@ -1667,6 +1666,11 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 							           <td>&nbsp;</td>
 						           </tr>			
                                     
+									 <tr>
+							           <td style="text-align: right;"><strong>Código de Cliente: </strong></td>
+							           <td>' . $datos['cliente'] . '</td>
+							           <td>&nbsp;</td>
+						           </tr>	
 								</table>
 						  </td>
 						</tr>
@@ -1710,7 +1714,7 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 					<tbody>
 						<tr>
 							<td width="53.5%" style="text-align:center;"><br><h1><strong>' . $estado . '</strong></h1></td>
-							<td width="42.5%"><strong>Totalll  ' . $datos['moneda_venta'] . ':</strong></td>							
+							<td width="42.5%"><strong>Total  ' . $datos['moneda_venta'] . ':</strong></td>							
 							<td style="text-align: right;" width="4%"><strong>' . number_format($datos['total_venta_msuc'], 2, '.', ',') . '</strong></td>
 						</tr>	
 						<tr>
@@ -1720,15 +1724,42 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 						</tr>	
 						<tr>
 							<td style="text-align:right;"><br><h1><strong>' . $estado . '</strong></h1></td>
-							<td ><strong>Total a Pagar' . $datos['moneda_venta'] . ':</strong></td>							
+							<td ><strong>Total a Pagar ' . $datos['moneda_venta'] . ':</strong></td>							
 							<td style="text-align: right;"><strong>' . number_format($datos['total_venta_msuc'], 2, '.', ',') . '</strong></td>
 						</tr>	
 						<tr>
 						   <td width="53.5%"></td>
 							<td width="42.5%" colspan="2">Son : <strong>' . $datos['total_venta_msuc_literal'] . ' ' . $datos['desc_moneda_sucursal'] . '</strong></td>							
 						
-						</tr>						
+						</tr>	
+						
+						<tr>
+							<td width="53.5%"></td>
+							<td width="42.5%" colspan="1"><strong> Importe Base para Crédito Fiscal ' . $datos['moneda_venta'] . ':</strong></td>							
+							<td><strong>' . number_format($datos['total_venta_msuc'], 2, '.', ',') . '</strong></td>
+						</tr>		
+						 
+						<tr>
+						   <td width="53.5%"></td>
+						   <td width="42.5%"></td>
+						   <td ></td>
+						</tr>	
+						<tr>
+						   <td ></td>
+						   <td width="42.5%" colspan="5"><strong>  </strong></td>
+						   <td ></td>
+						</tr>					
 					</tbody>
+				</table>
+				
+				<table style="border-collapse: collapse;">
+				 <tbody>
+				 <tr>
+						 
+						   <td width="42.5%" colspan="5" style="text-align:center;"><strong> ESTE DOCUMENTO FISCAL CONTRIBUYE AL DESARROLLO DE NUESTRO PAÍS, EL USO ILÍCITO </strong></td>
+						  
+						</tr>
+				 </tbody>
 				</table>
 				
 				<table width="741">
