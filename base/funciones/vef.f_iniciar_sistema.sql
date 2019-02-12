@@ -79,14 +79,14 @@ BEGIN
 	
 	if (v_id_empresa is null) then	
 		INSERT INTO param.tempresa
-		(id_usuario,nombre, logo, nit, codigo)
+		(id_usuario_reg,nombre, logo, nit, codigo)
 		VALUES(1,'Empresa Electrica Corani', './../../sis_parametros/control/_archivo//docLog1.jpg', '111', 'CORANI') --cambiar nombre de empresa
 		returning id_empresa into v_id_empresa;		
 	end if;
 	
 	if not exists (select 1 from param.tgestion where gestion = 2019) then
 		INSERT INTO param.tgestion
-		(id_usuario, gestion, estado, id_moneda_base, id_empresa, fecha_ini, fecha_fin, tipo)
+		(id_usuario_reg, gestion, estado, id_moneda_base, id_empresa, fecha_ini, fecha_fin, tipo)
 		VALUES(1, 2019, 'activo', 1, v_id_empresa, NULL, NULL, 'MES');
 		
 		--(3) Generación de los Períodos y Períodos Subsistema
@@ -248,8 +248,8 @@ BEGIN
 	
 	if (v_id_concepto_ingas is null) then
 		INSERT INTO param.tconcepto_ingas
-		(id_usuario_reg, tipo, desc_ingas, movimiento, sw_tes, id_oec, activo_fijo, almacenable, pago_automatico, sw_autorizacion, descripcion_larga, id_entidad, id_actividad_economica, codigo, id_grupo_ots, id_unidad_medida, nandina, ruta_foto, id_cat_concepto, "version", requiere_ot, filtro_ot)
-		VALUES(1, 'Servicio', 'Energia Electrica', 'recurso', NULL, NULL, 'no', 'no', 'no', NULL, '', 1, 1, 'ENE', NULL, 1, '', NULL, NULL, 1, 'opcional', 'todos') returning id_concepto_ingas into v_id_concepto_ingas;
+		(id_usuario_reg, tipo, desc_ingas, movimiento, sw_tes, id_oec, activo_fijo, almacenable, pago_automatico, sw_autorizacion, descripcion_larga, id_entidad, id_actividad_economica, codigo, id_grupo_ots, id_unidad_medida, nandina, ruta_foto, id_cat_concepto, "version")
+		VALUES(1, 'Servicio', 'Energia Electrica', 'recurso', NULL, NULL, 'no', 'no', 'no', NULL, '', 1, 1, 'ENE', NULL, 1, '', NULL, NULL, 1) returning id_concepto_ingas into v_id_concepto_ingas;
 	
 		INSERT INTO vef.tsucursal_producto
 		( id_usuario_reg,precio, id_sucursal, id_item, tipo_producto, id_concepto_ingas, requiere_descripcion, id_moneda, contabilizable, excento)
