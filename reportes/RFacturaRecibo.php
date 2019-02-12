@@ -1594,80 +1594,87 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 				
 				$pagina .= ' 
 			
-				<table style="height: 130px;" width="605">  
+				<table style="height: 30px;" width="540">  
 					<tbody>
 						<tr>
 							<td>
-								<table style="height: 130px;" width="230">   
-									<tbody>
-										<tr>
-											<td style="text-align:center;"><img src="../../../lib' . ($codigo_reporte == 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_reporte.png') .'" alt="logo" width="60" height="60" /></td>
-										</tr>
-										<tr>
-											<td style="text-align: center;"><strong>' . $datos['nombre_sucursal'] . '</strong><br />' . $datos['direccion_sucursal'] . '<br />' . $datos['telefono_sucursal'] . '<br />' . $datos['lugar_sucursal'] . '</td>
-										</tr>
-									</tbody> 
+								<table style="height: 30px;" width="30">   
+									
 								</table>
 							</td>
-							<td style="text-align: left;" width="172">
-								<table style="height: 74px;" width="172">
-									<tbody>
+							<td style="text-align: left;" width="463">
+								<table style="height: 74px;" width="400">
+									<tbody> 
+                                         				
+										
+											<td width="179" style="text-align: center; " colspan="2">
+                                            <strong>' . $datos['nombre_sucursal'] . '</strong><br /> </td>
 										<tr>
-											<td style="text-align: left;"><strong>NIT:</strong></td>
+											
+											<td width="209" style="text-align: center;" colspan="2">' . $datos['direccion_sucursal'] . '</td>
+										</tr>
+                                        <tr>
+											<td style="text-align: right;"><strong>Teléfono </strong></td>
+											<td style="text-align: left;">' . $datos['telefono_sucursal'] . '</td>
+										</tr>
+                                        
+									    <tr>
+											
+											<td style="text-align: center;" colspan="2"> lugar ' . $datos['lugar_sucursal'] . '</td>
+										</tr>
+										<tr>
+											<td style="text-align: right;"><strong>NIT:</strong></td>
 											<td style="text-align: left;">' . $datos['nit_entidad'] . '</td>
 										</tr>
 										<tr>
-											<td><strong>FACTURA:</strong></td>
-											<td>' . $datos['numero_factura'] . '</td>
+											<td style="text-align: right;"><strong>Documento Fiscal Nro.:</strong></td>
+                                            
+											<td style="text-align: left;">' . $datos['numero_factura'] . '</td>
 										</tr>
 										<tr>
-											<td><strong>AUTORIZACION:</strong></td>
-											<td>' . $datos['autorizacion'] . '</td>
+											<td style="text-align: right;"><strong>CUF:</strong></td>
+											<td style="text-align: left;">' . $datos['autorizacion'] . '</td>
 										</tr>
 										<tr>
 											<td style="text-align: center;" colspan="2">
-												<h3>&nbsp;<strong>ORIGINAL</strong></h3></br>
+												<h3>&nbsp;</h3></br>
 												'.$datos['actividades'].'	
 											</td>
+                                         <tr>
+											<td style="text-align: center;" colspan="2">
+											  <h3>FACTURA</h3>
+												FACTURACIÓN ELECTRÓNICA </br>	
+												  <br> 
+                                               
+												  REPRESENTACIÓN GRÁFICA </br>
+											  </h3></td>
 										</tr>
-									</tbody>
+                                        
+                                        <tr>
+											<td style="text-align: right;"><strong>Fecha de Emisión:</strong></td>
+											<td style="text-align: left;">' . $datos['fecha_literal'] . '</td>
+										</tr>
+									
+                                    <tr>
+							             <td style="text-align: right;"> <strong>NIT/CI </strong></td>
+							            <td>' . $datos['nit_cliente'] . '</td>
+							            <td>&nbsp;</td>
+						            </tr>
+                                    
+                                    <tr>
+							           <td style="text-align: right;"><strong>Nombre/Razón Social: </strong></td>
+							           <td>' . $datos['cliente'] . '</td>
+							           <td>&nbsp;</td>
+						           </tr>			
+                                    
 								</table>
-							</td>
+						  </td>
 						</tr>
-					</tbody>
+					<td height="39"></tbody>
 				</table>
 				<h2 style="text-align: center;">FACTURA SIAT</h2>				
-				<table style="border: thin solid black;" width="645">
-					<tbody>
-						<tr>
-							<td>Lugar y Fecha</td>
-							<td><strong>' . $datos['departamento_sucursal'] . ', ' . $datos['fecha_literal'] . '</strong></td>
-							<td>&nbsp;</td>
-						</tr>
-						<tr>
-							<td>Señor(es):</td>
-							<td><strong>' . $datos['cliente'] . '</strong></td>
-							<td>&nbsp;</td>
-						</tr>						
-						<tr>
-							<td>NIT/CI</td>
-							<td><strong>' . $datos['nit_cliente'] . '</strong></td>
-							<td>&nbsp;</td>
-						</tr>
-						<tr>
-							<td>Observaciones</td>
-							<td><strong>' . $datos['observaciones']	 . '</strong></td>
-							<td>&nbsp;</td>
-						</tr>	
-										
-						<tr>
-							<td style="border-top: thin solid black;" colspan="3">
-								<h3 style="text-align: center;">DETALLE&nbsp;</h3>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-				<table style="border:thin solid black ;border-collapse: collapse; height: 33px;" width="645">
+				
+				<table style="border:thin solid black ;border-collapse: collapse; height: 33px;" >
 					<tbody>
 						<tr>
 							<td style="text-align: center; border: thin solid black;" width="10%"><strong>ITEM</strong></td>							
@@ -1682,9 +1689,9 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 						$valor_bruto += $item_detalle['precio_total']; 
 						$pagina .= '<tr>
 							<td style="text-align: right; border-bottom: thin solid black;">'.$i.'</td>							
-							<td style="border-bottom: thin solid black;">' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
-							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', ',') . '</td>
-							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', ',') . '</td>
+							<td style="border: thin solid black;">' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
+							<td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', ',') . '</td>
+							<td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', ',') . '</td>
 							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
 						</tr>';
 						$i++;
@@ -1699,24 +1706,37 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 					$pagina .= '	
 					</tbody>
 				</table>
-				<table style="border-collapse: collapse;" width="645">
+				<table style="border-collapse: collapse;">
 					<tbody>
 						<tr>
 							<td width="53.5%" style="text-align:center;"><br><h1><strong>' . $estado . '</strong></h1></td>
-							<td width="32.5%"><strong>TOTAL  ' . $datos['moneda_venta'] . ':</strong></td>
-							<td style="text-align: right;" width="14%"><strong>' . number_format($datos['total_venta_msuc'], 2, '.', ',') . '</strong></td>
+							<td width="42.5%"><strong>Totalll  ' . $datos['moneda_venta'] . ':</strong></td>							
+							<td style="text-align: right;" width="4%"><strong>' . number_format($datos['total_venta_msuc'], 2, '.', ',') . '</strong></td>
+						</tr>	
+						<tr>
+							<td width="53.5%" style="text-align:center;"><br><h1><strong>' . $estado . '</strong></h1></td>
+							<td width="42.5%"><strong>Descuento  ' . $datos['moneda_venta'] . ':</strong></td>							
+							<td style="text-align: right;" width="4%"><strong>0.00 </strong></td>
+						</tr>	
+						<tr>
+							<td style="text-align:right;"><br><h1><strong>' . $estado . '</strong></h1></td>
+							<td ><strong>Total a Pagar' . $datos['moneda_venta'] . ':</strong></td>							
+							<td style="text-align: right;"><strong>' . number_format($datos['total_venta_msuc'], 2, '.', ',') . '</strong></td>
+						</tr>	
+						<tr>
+						   <td width="53.5%"></td>
+							<td width="42.5%" colspan="2">Son : <strong>' . $datos['total_venta_msuc_literal'] . ' ' . $datos['desc_moneda_sucursal'] . '</strong></td>							
+						
 						</tr>						
 					</tbody>
 				</table>
-				<p>Son : <strong>' . $datos['total_venta_msuc_literal'] . ' ' . $datos['desc_moneda_sucursal'] . '</strong></p>
-				<table width="605">
+				
+				<table width="741">
 					<tbody>
 						<tr>
-							<td style="text-align:left;" width="50%">&nbsp;C&oacute;digo de Control : <strong>' . $datos['codigo_control'] . '</strong></br>
-							&nbsp;Fecha L&iacute;mite de Emisi&oacute;n : <strong>' . $datos['fecha_limite_emision'] . '</strong>
-							</td>
-							<td width="50%"><div align="center">
-								    '.$barcodeobj->getBarcodeSVGcode(2, 2, 'black').'
+							
+					  <td width="35%"><div align="center">
+								    '.$barcodeobj->getBarcodeSVGcode(3, 3, 'black').'
 								</div></td>
 						</tr>
 					</tbody>
