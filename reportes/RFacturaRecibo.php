@@ -1681,22 +1681,22 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 				<table style="border:thin solid black ;border-collapse: collapse; height: 33px;" >
 					<tbody>
 						<tr>
-							<td style="text-align: center; border: thin solid black;" width="10%"><strong>ITEM</strong></td>							
-							<td style="text-align: center; border: thin solid black;" width="40%"><strong>DESCRIPCION</strong></td>
-							<td style="text-align: center; border: thin solid black;" width="15%"><strong>CANTIDAD</strong></td>							
-							<td style="text-align: center; border: thin solid black;" width="15%"><strong>PRECIO UNITARIO</strong></td>
-							<td style="text-align: center; border: thin solid black;" width="20%"><strong>SUBTOTAL</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="10%"><strong>Código Producto</strong></td>							
+							<td style="text-align: center; border: thin solid black;" width="15%"><strong>Cantidad</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="40%"><strong>Descripción</strong></td>														
+							<td style="text-align: center; border: thin solid black;" width="15%"><strong>Precio Unitario</strong></td>
+							<td style="text-align: center; border: thin solid black;" width="20%"><strong>Subtotal</strong></td>
 						</tr>';
 					$valor_bruto = 0;
 					$i = 1;
 					foreach ($datos['detalle'] as $item_detalle) {
 						$valor_bruto += $item_detalle['precio_total']; 
 						$pagina .= '<tr>
-							<td style="text-align: right; border-bottom: thin solid black;">'.$i.'</td>							
-							<td style="border: thin solid black;">' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
-							<td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', ',') . '</td>
-							<td style="text-align: right; border: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', ',') . '</td>
-							<td style="text-align: right; border-bottom: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
+							<td style="text-align: center; border-bottom: thin solid black;">'.$i.'</td>		
+							<td style="text-align: center; border: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', ',') . '</td>					
+							<td style="border: thin solid black;">' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>							
+							<td style="text-align: center; border: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', ',') . '</td>
+							<td style="text-align: center; border-bottom: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
 						</tr>';
 						$i++;
 					}
@@ -1712,6 +1712,11 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 				</table>
 				<table style="border-collapse: collapse;">
 					<tbody>
+					    <tr>
+						   <td width="53.5%"></td>
+						   <td width="42.5%"></td>
+						   <td ></td>
+						</tr>
 						<tr>
 							<td width="53.5%" style="text-align:center;"><br><h1><strong>' . $estado . '</strong></h1></td>
 							<td width="42.5%"><strong>Total  ' . $datos['moneda_venta'] . ':</strong></td>							
@@ -1754,11 +1759,33 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 				
 				<table style="border-collapse: collapse;">
 				 <tbody>
-				 <tr>
-						 
-						   <td width="42.5%" colspan="5" style="text-align:center;"><strong> ESTE DOCUMENTO FISCAL CONTRIBUYE AL DESARROLLO DE NUESTRO PAÍS, EL USO ILÍCITO </strong></td>
-						  
+				        <tr>
+						  <td width="42.5%" colspan="5" style="text-align:center;"><strong> </strong></td>
 						</tr>
+				        <tr>
+						  <td width="42.5%" colspan="5" style="text-align:center;"><strong> ESTE DOCUMENTO FISCAL CONTRIBUYE AL DESARROLLO DE NUESTRO PAÍS, EL USO ILÍCITO </strong></td>
+						</tr>
+						<tr>
+						  <td width="42.5%" colspan="5" style="text-align:center;"><strong> ES SANCIONADO PENALMENTE </strong></td>
+						</tr>
+						<tr>
+						  <td width="42.5%" colspan="5" style="text-align:center;"><strong> </strong></td>
+						</tr>
+						<tr>
+						  <td width="42.5%" colspan="5" style="text-align:center;"><strong> </strong></td>
+						</tr>
+						<tr>
+						  <td width="42.5%" colspan="5" style="text-align:center;"> Ley N° 453: “Los medios de comunicación deben promover el respeto de los derechos de los usuarios y consumidores”</td>
+						</tr>
+						<tr>
+						  <td width="42.5%" colspan="5" style="text-align:center;"><strong> </strong></td>
+						</tr>
+						<tr>
+						  <td width="42.5%" colspan="5" style="text-align:center;"><strong> </strong></td>
+					    </tr>
+					    <tr>
+						  <td width="42.5%" colspan="5" style="text-align:center;"> RECIBIDO POR LA ADMINISTRACIÓN TRIBUTARIA </td>
+					   </tr>
 				 </tbody>
 				</table>
 				

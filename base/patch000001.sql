@@ -1002,12 +1002,12 @@ IS 'centro de costo para contabilizar el ingreso de la factura';
 
 
 --------------- SQL ---------------
-
-ALTER TABLE vef.tventa
-  ADD COLUMN nit_internacional VARCHAR(2) DEFAULT 'no' NOT NULL;
-
-COMMENT ON COLUMN vef.tventa.nit_internacional
-IS 'cuadno el nit es internacional el codigo de control segenera con ceroy tambien para libro de ventas';
+	
+	ALTER TABLE vef.tventa
+	  ADD COLUMN nit_internacional VARCHAR(2) DEFAULT 'no' NOT NULL;
+	
+	COMMENT ON COLUMN vef.tventa.nit_internacional
+	IS 'cuadno el nit es internacional el codigo de control segenera con ceroy tambien para libro de ventas';
 
 
 ALTER TABLE vef.tventa
@@ -1128,5 +1128,13 @@ CREATE TABLE vef.ttemporal_data (
 WITH (oids = false);
 
 /************************************F-SCP-EGS-VEF-0-08/11/2018*************************************************/
+/************************************I-SCP-FPT-VEF-0-13/02/2019*************************************************/
+
+ALTER TABLE vef.tventa
+  ADD COLUMN cuf VARCHAR(100) NOT NULL;
+
+COMMENT ON COLUMN vef.tventa.cuf
+IS 'Código cuf en ves del código de control';
+  /************************************F-SCP-FPT-VEF-0-13/02/2019*************************************************/
 
 
