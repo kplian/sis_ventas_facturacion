@@ -487,9 +487,9 @@ BEGIN
 		end;
     /*********************************    
  	#TRANSACCION:  'VF_VENREP_SEL'
- 	#DESCRIPCION:   Reporte de Recibo o Factura
+ 	#DESCRIPCION:   Reporte de Recibo o Factura para colocar en formato html en la vista
  	#AUTOR:		admin	
- 	#FECHA:		01-06-2015 05:58:00
+ 	#FECHA:		01-06-2015 05:58:00 modificado 14/02/2019
 	***********************************/
 
 	elsif(p_transaccion='VF_VENREP_SEL')then
@@ -533,7 +533,7 @@ BEGIN
                         ven.nro_factura,
                         dos.nroaut,
                         ven.nit,
-                        ven.cod_control,
+                        ven.cod_control,                        
                         to_char(dos.fecha_limite,''DD/MM/YYYY''),
                         dos.glosa_impuestos,
                         dos.glosa_empresa,
@@ -560,6 +560,7 @@ BEGIN
                         ven.transporte_cif,
                         ven.seguros_cif,
                         ven.otros_cif,
+                        
                         (to_char(ven.fecha,''DD'')::integer || '' de '' ||param.f_literal_periodo(to_char(ven.fecha,''MM'')::integer) || '' de '' || to_char(ven.fecha,''YYYY''))::varchar as fecha_literal,
 			(select count(*) from vef.ttipo_descripcion td where td.estado_reg = ''activo'' and td.id_sucursal = suc.id_sucursal)::integer as descripciones, 
 			ven.estado,
@@ -572,6 +573,10 @@ BEGIN
             ven.nro_tramite,
             tc.codigo as codigo_cliente,
             cli.lugar as lugar_cliente,
+            ven.cuf,
+            tc.codigo_sin,
+            suc.tipo_doc_fiscal,
+            suc.tipo_doc_sector,
             
             '||v_columnas_destino||'
             from vef.tventa ven						

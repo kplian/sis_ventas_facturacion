@@ -1556,14 +1556,11 @@ else if ($codigo_reporte == 'FACMEDIACAR' || $codigo_reporte == 'FACMEDIACARVINT
 
 If ($codigo_reporte == 'FACSIAT') {
 				
-				$cadena_qr = 	$datos['nit_entidad'] . '|' . 
-						$datos['numero_factura'] . '|' . 
-						$datos['autorizacion'] . '|' . 
-						$datos['fecha_venta'] . '|' . 
-						$datos['total_venta'] . '|' . 
-						$datos['total_venta'] . '|' . 
-						$datos['codigo_control'] . '|' . 
-						$datos['nit_cliente'] . '|0.00|0.00|0.00|0.00';
+				$cadena_qr = 	$_SESSION['_URL_IMPUESTOS'] . '?var1=' . 
+						$datos['cuf'] . '&var2=' . 
+						$datos['numero_factura'] . '&var3=' . 
+						$datos['tipo_doc_fiscal'] . '&var4=' . 
+						$datos['tipo_doc_sector'] . '';
 						
 				$barcodeobj = new TCPDF2DBarcode($cadena_qr, 'QRCODE,H');
 				
