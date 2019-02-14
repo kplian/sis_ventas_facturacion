@@ -1143,5 +1143,21 @@ ALTER TABLE vef.tcliente
 COMMENT ON COLUMN vef.tcliente.codigo_sin
 IS 'codigo otorgado por servicio de impuestos';
 /************************************F-SCP-FPT-VEF-0-14/02/2019*************************************************/
+/************************************I-SCP-FPT-VEF-0-14/02/2019*************************************************/
+ALTER TABLE vef.tsucursal
+  ADD COLUMN tipo_doc_fiscal SMALLINT DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tsucursal.tipo_doc_fiscal
+IS 'Parámetro var3 representa el TIPO DE DOCUMENTO FISCAL , código otorgado por impuestos.';
+
+/************************************F-SCP-FPT-VEF-0-14/02/2019*************************************************/
+/************************************I-SCP-FPT-VEF-0-14/02/2019*************************************************/
+
+ALTER TABLE vef.tsucursal
+  ADD COLUMN tipo_doc_sector SMALLINT DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tsucursal.tipo_doc_sector
+IS 'Parámetro var4 representa el TIPO DOCUMENTO SECTOR, codigo otorgado por impuestos.';
+/************************************F-SCP-FPT-VEF-0-14/02/2019*************************************************/
 
 

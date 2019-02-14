@@ -1162,6 +1162,8 @@ class MODVenta extends MODbase{
 		$this->captura('lugar_cliente','varchar');
 		$this->captura('cuf','varchar');//nuevo	
 		$this->captura('codigo_sin','varchar');//nuevo	
+		$this->captura('tipo_doc_fiscal','SMALLINT'); 
+		$this->captura('tipo_doc_sector','SMALLINT');            
 		$this->captura('cliente_destino','varchar');
 		$this->captura('lugar_destino','varchar');
 			
