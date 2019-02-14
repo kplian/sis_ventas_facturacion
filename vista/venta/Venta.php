@@ -603,6 +603,17 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:false
         },
+        /* {
+            config:{
+                name: 'cuf',
+                fieldLabel: 'Cuf',              
+                gwidth: 110
+            },
+                type:'TextField',
+                filters:{pfiltro:'ven.cuf',type:'string'},              
+                grid:true,
+                form:false
+        },*/
 	],
 	tam_pag:50,	
 	title:'Ventas',

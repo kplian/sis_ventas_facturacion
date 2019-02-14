@@ -1554,7 +1554,7 @@ else if ($codigo_reporte == 'FACMEDIACAR' || $codigo_reporte == 'FACMEDIACARVINT
                                 </html>';
 			}
 
-If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
+If ($codigo_reporte == 'FACSIAT') {
 				
 				$cadena_qr = 	$datos['nit_entidad'] . '|' . 
 						$datos['numero_factura'] . '|' . 
@@ -1606,9 +1606,10 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 								<table style="height: 74px;" width="400">
 									<tbody> 
                                          				
-										
+									   <tr>	
 											<td width="179" style="text-align: center; " colspan="2">
                                             <strong>' . $datos['nombre_sucursal'] . '</strong><br /> </td>
+                                        </tr>    
 										<tr>
 											
 											<td width="209" style="text-align: center;" colspan="2">' . $datos['direccion_sucursal'] . '</td>
@@ -1632,11 +1633,11 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 										</tr>
 										<tr>
 											<td style="text-align: right;"><strong>CUF:</strong></td>
-											<td style="text-align: left;">' . $datos['autorizacion'] . '</td>
+											<td style="text-align: left;">' . $datos['cuf'] . '</td>
 										</tr>
 										<tr>
 											<td style="text-align: center;" colspan="2">
-												<h3>&nbsp;</h3></br>
+												
 												'.$datos['actividades'].'	
 											</td>
                                          <tr>
@@ -1655,7 +1656,7 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 										</tr>
 									
                                     <tr>
-							             <td style="text-align: right;"> <strong>NIT/CI </strong></td>
+							             <td style="text-align: right;"> <strong>NIT/CI :</strong></td>
 							            <td>' . $datos['nit_cliente'] . '</td>
 							            <td>&nbsp;</td>
 						            </tr>
@@ -1668,7 +1669,7 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
                                     
 									 <tr>
 							           <td style="text-align: right;"><strong>Código de Cliente: </strong></td>
-							           <td>' . $datos['cliente'] . '</td>
+							           <td>' . $datos['codigo_sin'] . '</td>
 							           <td>&nbsp;</td>
 						           </tr>	
 								</table>
@@ -1676,7 +1677,7 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 						</tr>
 					<td height="39"></tbody>
 				</table>
-				<h2 style="text-align: center;">FACTURA SIAT</h2>				
+					
 				
 				<table style="border:thin solid black ;border-collapse: collapse; height: 33px;" >
 					<tbody>
@@ -1734,7 +1735,7 @@ If ($codigo_reporte == 'FACSIAT' || $codigo_reporte == 'FACMEDIACARVINTO') {
 						</tr>	
 						<tr>
 						   <td width="53.5%"></td>
-							<td width="42.5%" colspan="2">Son : <strong>' . $datos['total_venta_msuc_literal'] . ' ' . $datos['desc_moneda_sucursal'] . '</strong></td>							
+							<td width="42.5%" colspan="2">Son : '. $datos['total_venta_msuc_literal'] . ' ' . $datos['desc_moneda_sucursal'] . '</td>							
 						
 						</tr>	
 						

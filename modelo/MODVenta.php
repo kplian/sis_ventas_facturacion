@@ -1159,11 +1159,12 @@ class MODVenta extends MODbase{
 		$this->captura('codigo_cliente','varchar');
 		
 			
-		$this->captura('lugar_cliente','varchar');	
+		$this->captura('lugar_cliente','varchar');
+		$this->captura('cuf','varchar');//nuevo	
+		$this->captura('codigo_sin','varchar');//nuevo	
 		$this->captura('cliente_destino','varchar');
 		$this->captura('lugar_destino','varchar');
-		
-		
+			
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		//var_dump($this->consulta);exit;

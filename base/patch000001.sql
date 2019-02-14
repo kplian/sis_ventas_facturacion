@@ -1131,10 +1131,17 @@ WITH (oids = false);
 /************************************I-SCP-FPT-VEF-0-13/02/2019*************************************************/
 
 ALTER TABLE vef.tventa
-  ADD COLUMN cuf VARCHAR(100) NOT NULL;
+  ADD COLUMN cuf VARCHAR(50) NOT NULL;
 
 COMMENT ON COLUMN vef.tventa.cuf
-IS 'Código cuf en ves del código de control';
+IS 'Código cuf en ves del código de control, nuevo codigo unico de factura';
 /************************************F-SCP-FPT-VEF-0-13/02/2019*************************************************/
+/************************************I-SCP-FPT-VEF-0-14/02/2019*************************************************/
+ALTER TABLE vef.tcliente
+  ADD COLUMN codigo_sin VARCHAR(10) DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tcliente.codigo_sin
+IS 'codigo otorgado por servicio de impuestos';
+/************************************F-SCP-FPT-VEF-0-14/02/2019*************************************************/
 
 
