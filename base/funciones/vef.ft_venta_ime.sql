@@ -115,7 +115,9 @@
     v_total_venta_ncd       numeric; --#123
     v_importe_codigo_control    numeric; --#123
     v_tipo_dosificacion         varchar; --#123
-
+    v_tabla_aux			        varchar;
+	va_id_estado_wf			varchar[];
+	va_codigo_estado		varchar[];
 
   BEGIN
 
@@ -1491,7 +1493,43 @@
         if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si')   AND   v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN 
           v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'INS',v_parametros.id_venta);
         end if;
-
+        
+        --jrr:si la variable global esta habilitada pasar la venta al siguiente estado 
+        if (pxp.f_get_variable_global('vef_sig_estado_automatico') = 'si') THEN 
+        	
+	        v_tabla_aux = pxp.f_crear_parametro(ARRAY[	
+	                                        '_nombre_usuario_ai',
+	                                        '_id_usuario_ai',
+	                                        'id_proceso_wf',                                        
+	                                        'id_estado_wf',
+	                                        'obs'],
+	                                    ARRAY[	
+	                                        coalesce(v_parametros._nombre_usuario_ai,''),
+	                                        coalesce(v_parametros._id_usuario_ai::varchar,''),                                        
+	                                        v_venta.id_proceso_wf::varchar,
+	                                        v_venta.id_estado_wf::varchar,
+	                                        ''::varchar
+	                                        ],
+	                                    ARRAY[
+	                                        'varchar',
+	                                        'int4',  
+	                                        'int4',
+	                                        'int4',                              			
+	                                        'text']
+	                                    );
+			v_resp = wf.f_proceso_wf_ime(p_administrador,p_id_usuario,v_tabla_aux,'WF_SIGPRO_IME');
+			
+			--recueprar id_doc_compra_venta
+            va_id_estado_wf = pxp.f_recupera_clave(v_resp,'id_estado_wf');
+            va_codigo_estado = pxp.f_recupera_clave(v_resp,'estado');
+            
+            --jrr actualizar estado en tabla local
+            update vef.tventa set
+              id_estado_wf = va_id_estado_wf[1]::integer,
+              estado = va_codigo_estado[1]
+            where id_venta = v_parametros.id_venta; 
+			v_resp = '';
+		end if;
         --Definicion de la respuesta
         v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada');
         v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
