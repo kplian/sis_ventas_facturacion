@@ -755,10 +755,11 @@ class MODVenta extends MODbase{
             $this->armarConsulta();
             $stmt = $link->prepare($this->consulta);          
             $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);               
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
             //recupera parametros devuelto depues de insertar ... (id_formula)
             $resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+            $resp_procedimiento['datos']['venta'] = $resp_procedimiento['datos']['id_venta'];
 			$respuesta = $resp_procedimiento['datos'];            
             
 			
@@ -788,7 +789,11 @@ class MODVenta extends MODbase{
         
         return $this->respuesta;
     }
-			
+
+
+
+
+		
 	function modificarVenta(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='vef.ft_venta_ime';
@@ -1169,6 +1174,95 @@ class MODVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	
+	function listarCabecera(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENFAC_SEL';
+		$this->tipo_procedimiento='SEL';
+		$this->setCount(false);		
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		//
+		$this->captura('"numeroFactura"','integer');
+		$this->captura('direccion','varchar');
+		$this->captura('"fechaEmision"','varchar');
+		$this->captura('"codigoTipoDocumentoIdentidad"','integer');
+		$this->captura('cuf','varchar');
+		$this->captura('"numeroDocumento"','varchar');	
+		$this->captura('complemento','varchar');
+		$this->captura('"codigoSucursal"','integer');	
+		$this->captura('"codigoPuntoVenta"','integer');	
+		$this->captura('"nombreRazonSocial"','varchar');	
+		$this->captura('"montoTotal"','decimal');	
+		$this->captura('"montoDescuento"','decimal');	
+		$this->captura('"codigoCliente"','varchar');
+        $this->captura('"codigoDocumentoSector"','integer');
+		$this->captura('"nitEmisor"','integer');	
+		$this->captura('"codigoMetodoPago"','integer');	
+		$this->captura('"numeroTarjeta"','bigint');
+		$this->captura('leyenda','varchar');	
+		$this->captura('usuario','varchar');	
+		$this->captura('"codigoMoneda"','integer');	
+		$this->captura('"montoTotalMoneda"','decimal');	
+		$this->captura('"tipoCambio"','decimal');	
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarDetalle(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENFACDET_SEL';
+		$this->tipo_procedimiento='SEL';
+		$this->setCount(false);		
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		//
+		$this->captura('"actividadEconomica"','varchar');
+		$this->captura('"codigoProductoSin"','integer');
+		$this->captura('"codigoProducto"','varchar');
+		$this->captura('descripcion','varchar');	
+		$this->captura('cantidad','integer');
+		$this->captura('"precioUnitario"','decimal');	
+		$this->captura('"montoDescuento"','decimal');	
+		$this->captura('"subTotal"','decimal');	
+		$this->captura('"numeroSerie"','integer');	
+		$this->captura('"unidadMedida"','varchar');	
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function insertarXml(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='SIAT_FACTXML_INS';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('texto_xml','texto_xml','text');
+		//$this->setParametro('observacion_xml','observacion_xml','varchar');
+		$this->setParametro('ruta','ruta','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+			
 			
 }
 ?>

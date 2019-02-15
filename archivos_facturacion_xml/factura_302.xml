@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<facturaElectronicaEstandar xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="facturaElectronicaEstandar.xsd">
+  <cabecera>
+    <error>1</error>
+    <mensaje>column reference #*#fecha_reg#*# is ambiguous</mensaje>
+    <mensaje_tec>column reference #*#fecha_reg#*# is ambiguous   Procedimientos: pxp.f_intermediario_sel</mensaje_tec>
+    <origen>driver.php</origen>
+    <procedimiento>vef.ft_venta_sel</procedimiento>
+    <transaccion>VF_VENFAC_SEL</transaccion>
+    <capa>base</capa>
+    <consulta>select * from pxp.f_intermediario_sel(1,NULL,NULL::varchar,'ggvggf7ukdf2aslmt1ldfvdkb1',1288,'192.168.56.1','99:99:99:99:99:99','vef.ft_venta_sel','VF_VENFAC_SEL',NULL,NULL,array['filtro','ordenacion','dir_ordenacion','puntero','cantidad','_id_usuario_ai','_nombre_usuario_ai','id_venta'],array[E' 0 = 0  AND v.id_venta = 302 ',E'',E'',E'',E'',E'NULL',E'NULL',E''],array['varchar','varchar','varchar','integer','integer','int4','varchar','int4'],false,'varchar',NULL) as ("numeroFactura" integer,direccion varchar,"fechaEmision" varchar,"codigoTipoDocumentoIdentidad" integer,cuf varchar,"numeroDocumento" varchar,complemento varchar,"codigoSucursal" integer,"codigoPuntoVenta" integer,"nombreRazonSocial" varchar,"montoTotal" decimal,"montoDescuento" decimal,"codigoCliente" varchar,"codigoDocumentoSector" integer,"nitEmisor" integer,"codigoMetodoPago" integer,"numeroTarjeta" bigint,leyenda varchar,usuario varchar,"codigoMoneda" integer,"montoTotalMoneda" decimal,"tipoCambio" decimal)</consulta>
+  </cabecera>
+  <detalle>
+    <actividadEconomica>VE</actividadEconomica>
+    <codigoProductoSin>1112001</codigoProductoSin>
+    <codigoProducto>333</codigoProducto>
+    <descripcion>df sadfas dfasdf sa</descripcion>
+    <cantidad>1</cantidad>
+    <precioUnitario>20.000000</precioUnitario>
+    <montoDescuento>1</montoDescuento>
+    <subTotal>20.000000</subTotal>
+    <numeroSerie>0</numeroSerie>
+    <unidadMedida>Unidad</unidadMedida>
+  </detalle>
+  <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <SignedInfo>
+      <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+      <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+      <Reference URI="">
+        <Transforms>
+          <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+        </Transforms>
+        <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+        <DigestValue/>
+      </Reference>
+    </SignedInfo>
+    <SignatureValue/>
+    <KeyInfo>
+      <X509Data>
+        <X509Certificate/>
+        <X509SubjectName/>
+        <X509IssuerSerial>
+          <X509IssuerName/>
+          <X509SerialNumber/>
+        </X509IssuerSerial>
+      </X509Data>
+    </KeyInfo>
+  </Signature>
+</facturaElectronicaEstandar>
