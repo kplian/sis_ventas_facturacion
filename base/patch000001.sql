@@ -1129,4 +1129,55 @@ WITH (oids = false);
 
 /************************************F-SCP-EGS-VEF-0-08/11/2018*************************************************/
 
+/************************************I-SCP-JMH-VEF-0-18/01/2019*************************************************/
+CREATE TABLE vef.tcuis (
+  id_cuis SERIAL NOT NULL,
+  fecha_inicio TIMESTAMP(0) WITHOUT TIME ZONE,
+  fecha_fin TIMESTAMP(0) WITHOUT TIME ZONE,
+  codigo VARCHAR(200) UNIQUE,
+  PRIMARY KEY(id_cuis)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+CREATE TABLE vef.tcuifd (
+  id_cuifd SERIAL NOT NULL,
+  id_cuis INTEGER NOT NULL,
+  fecha_inicio TIMESTAMP WITHOUT TIME ZONE,
+  fecha_fin TIMESTAMP WITHOUT TIME ZONE,
+  codigo VARCHAR(200),
+  PRIMARY KEY(id_cuifd)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+CREATE TABLE vef.tcuf (
+  id_cuf SERIAL NOT NULL,
+  nit INTEGER NOT NULL,
+  fecha_emision TIMESTAMP(17) WITHOUT TIME ZONE,
+  sucursal NUMERIC(4,0),
+  modalidad INTEGER,
+  tipo_emision INTEGER,
+  codigo_documento_fiscal INTEGER,
+  tipo_documento_sector INTEGER,
+  nro_factura INTEGER,
+  punto_venta INTEGER,
+  codigo_autoverificador INTEGER,
+  concatenacion INTEGER,
+  base11 INTEGER,
+  base16 VARCHAR(100),
+  PRIMARY KEY(id_cuf)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+/************************************F-SCP-JMH-VEF-0-18/01/2019*************************************************/
+
+/************************************I-SCP-JMH-VEF-0-23/01/2019*************************************************/
+  ALTER TABLE vef.tcuifd
+  RENAME COLUMN id_cuifd TO id_cufd; 
+
+ALTER TABLE vef.tcuifd
+  RENAME TO tcufd;
+  
+
+/************************************F-SCP-JMH-VEF-0-23/01/2019*************************************************/
+
 
