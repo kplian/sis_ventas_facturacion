@@ -6,7 +6,8 @@
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 * 		ISSUE 			Fecha				Autor				Descripcion
- * 		#1				19/11/2018			EGS					se aumento botones para subir y descargar plantillas para facturas en excel		
+ * 		#1				19/11/2018			EGS					se aumento botones para subir y descargar plantillas para facturas en excel
+ *		#2	EndeEtr		23/01/2019			EGS					se agrego reporte con lista de productos activos por puntos de venta			
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -40,12 +41,33 @@ Phx.vista.VentaVendedor = {
 				handler: this.SubirArchivo,
 				tooltip: '<b>Subir Archivo</b>'
 			});
+			//#2 Boton que agrega la lista de productos activos por punto de venta
 			this.addButton('btnPlantExcel', {
-				text : 'Plantilla',
+				text : 'Plan y Pro.Activos ',
 				iconCls : 'bprint',
 				disabled : false,
-				handler : this.descargaPlantilla,
-				tooltip : '<b>Descarga ejemplo de Plantilla Excel para subir Facturas</b><br/>'
+				//handler : this.descargaPlantilla,
+				tooltip : '<b>Descarga ejemplo de Plantilla Excel para subir Facturas y Productos Activos Por Punto de Venta</b><br/>',
+				 menu: [{
+			                    text: 'Plantilla',
+			                    iconCls: 'bprint',
+			                    argument: {
+			                        'news': true,
+			                        def: 'csv'
+			                    },
+			                    handler: this.descargaPlantilla,
+			                    scope: this,
+			                    
+			                }, {
+			                    text: 'Productos Activos Pv',
+			                    iconCls: 'bprint',
+			                    argument: {
+			                        'news': true,
+			                        def: 'pdf'
+			                    },
+			                    handler: this.imprimirProductoA,
+			                    scope: this
+			                }],
 			});  
 			
 		}; 
@@ -134,7 +156,25 @@ Phx.vista.VentaVendedor = {
         this.getBoton('anular').disable();        
         this.getBoton('sig_estado').disable();        
         Phx.vista.VentaVendedor.superclass.liberaMenu.call(this);
-    }
+    },
+      imprimirProductoA : function() {
+			//var rec = this.sm.getSelected();
+			//var data = rec.data;
+			//if (data) {
+				//Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_ventas_facturacion/control/ReportesVentas/listarProductoActivoPuntoV',
+					params : {
+						'id_proceso_wf' : 'data.id_proceso_wf'
+					},
+					success : this.successExport,
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			//}
+
+		},
     
     
 };
