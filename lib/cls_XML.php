@@ -1,129 +1,4 @@
 <?php
-<<<<<<< HEAD
-=======
-class convert_xml
-{
-		/**
-     * Funcion que crea un archivo XML (/tmp/facturaEstandar.xml)validado a partir de 2 arreglos, cabecera y detalle
-     * @param arrayCab Arreglo con los datos que se usarán para generar la cabecera de la factura
-     * @param arrayDet Arreglo con los datos que se usarán para generar el detalle de la factura
-	 *  asignacion de spacio de nombres para el XML (URI y prefijo), estatico.en el nodo cabecera
-	 * Cargar el archivo XSD (/tmp/facturaEstandar.xsd)para la validacion
-     */
-	
-	//function array_xml($arrayCab) {
-	function array_xml($arrayCab,$arrayDet) {
-		// var_dump($id);
-		// exit;
-		//iso2utf ::Método que codifica el string como UTF-8 si es que fue pasado como
-        //ISO-8859-1 
-        //regla que permitira que los datos ingresados sean codificados 
-		$arrayCab = json_decode($arrayCab, true);		
-		$arrayCab=array_merge(array_merge(array_merge($arrayCab)));
-		//arrayDet
-		
-		$arrayDet = json_decode($arrayDet,true);		
-		$arrayDet=array_merge(array_merge(array_merge($arrayDet)));
-		
-		//
-		$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($arrayCab));
-		$listado = iterator_to_array($it,true);
-		unset($listado['total']);
-		
-		//arrayDet
-		$idet = new RecursiveIteratorIterator(new RecursiveArrayIterator($arrayDet));
-		$listadod = iterator_to_array($idet,true);
-		unset($listadod['total']);
-		
-		//
-		$xml = new SimpleXMLElement("<?xml version=\"1.0\" encoding='utf-8'?><facturaEstandar></facturaEstandar>");
-        $xml->addAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        $xml->addAttribute("xsi:noNamespaceSchemaLocation", "facturaEstandar.xsd"); 
-        $nod=$xml->addChild('cabecera'); 
-
-        $nododet=$xml->addChild('detalle');
-		
-		foreach($listado as $key => $val) {		
-			$nod->addChild((string)$key, $val);
-		}
-		//arrayDet
-		foreach($listadod as $key => $val) {		
-			$nododet->addChild((string)$key, $val);
-		}
-		
-		$dom = new DOMDocument();       
-        $dom->preserveWhiteSpace = FALSE;
-        $dom->loadXML($xml->asXML());
-        $dom->formatOutput = TRUE;
-        $dom->save("/tmp/facturaEstandar.xml");
-		
-		libxml_use_internal_errors(true);     
-        $dom->load('/tmp/facturaEstandar.xml');
-        
-		
-		//validacion XSD
-        /*if (!$dom->schemaValidate('/tmp/facturaEstandar.xsd')) {
-            print '<b>DOMDocument::schemaValidate() Generated Errors!</b>';
-            $this->libxml_display_errors();
-        }else{
-            $a=1;        
-        }*/
-		return $xml->asXML();
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> f5db3bb04ee1480364d7a379bfda3e9a722f83a7
 
 class convert_xml2
 {
@@ -144,11 +19,7 @@ class convert_xml2
 
 	public function __construct($name, $dirTemp)
 	{
-<<<<<<< HEAD
 		$this->dirArchivoXSD   = dirname(__FILE__).'/../archivos_xsd/facturaElectronicaEstandar.xsd';
-=======
-		$this->dirArchivoXSD   = dirname(__FILE__).'/../archivos_xsd/facturaEstandar.xsd';
->>>>>>> f5db3bb04ee1480364d7a379bfda3e9a722f83a7
 		$this->nombre       = $name; 
 		$this->xmlString    = "";
 		$this->xmlFisico    = $dirTemp.$this->nombre.".xml";		
@@ -156,11 +27,7 @@ class convert_xml2
 		$this->gzipFisico   = $dirTemp.$this->nombre.".txt.gz";		
 	}
 
-<<<<<<< HEAD
 	public function genera_xml($arrayCab,$arrayDet) {
-=======
-	public function array_xml($arrayCab,$arrayDet) {
->>>>>>> f5db3bb04ee1480364d7a379bfda3e9a722f83a7
 
 		// var_dump($arrayCab);exit;
 		$arrayCab = json_decode($arrayCab, true);		
@@ -180,10 +47,6 @@ class convert_xml2
 		$listadod = iterator_to_array($idet,true);
 		unset($listadod['total']);
 		
-<<<<<<< HEAD
-=======
-		//
->>>>>>> f5db3bb04ee1480364d7a379bfda3e9a722f83a7
 		$xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><facturaElectronicaEstandar></facturaElectronicaEstandar>', 0, false, 'xmlns', true);
         // $xml->addAttribute("xsi:noNamespaceSchemaLocation", "facturaElectronicaEstandar.xsd", 'xsi'); 
         $xml->addAttribute('xmlns:xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
@@ -223,7 +86,6 @@ class convert_xml2
 		libxml_use_internal_errors(true);     
         $dom->load($this->xmlFisico);
 	}
-<<<<<<< HEAD
 	 /**
 	 * Compara el archivo fisico XML con el XSD para validar
 	 * @return integer Devuelve 1 si es correcto y 0 si no pasa la validacion
@@ -247,8 +109,6 @@ class convert_xml2
 		return $res;
 		
 	}
-=======
->>>>>>> f5db3bb04ee1480364d7a379bfda3e9a722f83a7
 
 	/**
 	 * Crea el archivo base64.txt
@@ -300,30 +160,6 @@ class convert_xml2
 	}
 
 	/**
-<<<<<<< HEAD
-=======
-	 * Compara el archivo fisico XML con el XSD para validar
-	 * @return integer Devuelve 1 si es correcto y 0 si no pasa la validacion
-	 */
-	public function validarXmlConXSD()
-	{
-		$dom = new DOMDocument();       
-		libxml_use_internal_errors(false);     
-
-        $dom->load($this->xmlFisico);
-		$res = false;
-		if (!$dom->schemaValidate($this->dirArchivoXSD) && !is_file($this->dirArchivoXSD)) {
-            print '<b>DOMDocument::schemaValidate() Generated Errors!</b>';
-            // $this->libxml_display_errors();
-        }else{
-            $res = true;        
-        }
-		
-        return $a;
-	}
-
-	/**
->>>>>>> f5db3bb04ee1480364d7a379bfda3e9a722f83a7
 	 * Llena los demas datos faltantes para el xml
 	 * @return void
 	 */
@@ -369,10 +205,6 @@ class convert_xml2
 		$xmlData->Signature->KeyInfo->X509Data->X509IssuerSerial->addChild("X509IssuerName","");
 		$xmlData->Signature->KeyInfo->X509Data->X509IssuerSerial->addChild("X509SerialNumber","113429176675655193968");
 
-<<<<<<< HEAD
-=======
-		
->>>>>>> f5db3bb04ee1480364d7a379bfda3e9a722f83a7
 		$this->xmlString = $xmlData->asXML();
 	}
 
@@ -386,21 +218,8 @@ class convert_xml2
 		return $this->xmlString;
 	}
 
-<<<<<<< HEAD
 
 private function convertBase64($base64='')
-=======
-	
-
-	
-
-
-	
-
-
-
-	private function convertBase64($base64='')
->>>>>>> f5db3bb04ee1480364d7a379bfda3e9a722f83a7
 	{
 		$res = '';
 		$base64 = trim($base64);
@@ -426,7 +245,6 @@ private function convertBase64($base64='')
 		return $base64;
 	}
 }
-<<<<<<< HEAD
 
 
 
@@ -514,6 +332,4 @@ class convert_xml
     }
 }
 
-=======
->>>>>>> f5db3bb04ee1480364d7a379bfda3e9a722f83a7
 ?>
