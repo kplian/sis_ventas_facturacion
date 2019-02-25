@@ -105,14 +105,8 @@ VALUES (E'vef_integracion_lcv', E'si', E'Si el sistema de ventas se integra con 
 select pxp.f_insert_tgui ('Venta Computarizada Exportación', 'Factura de Exportación', 'VEFACEX', 'si', 5, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacion.php', 3, '', 'VentaVendedorExportacion', 'VEF');
 select pxp.f_insert_tgui ('Exportación Minera', 'Factura de exportación para mineria', 'EXPOMIN', 'si', 7, 'sis_ventas_facturacion/vista/venta/VentaVendedorExportacionMin.php', 3, '', 'VentaVendedorExportacionMin', 'VEF');
 select pxp.f_insert_tgui ('Computarizada minera', 'Computarizada minera', 'COMMIN', 'si', 8, 'sis_ventas_facturacion/vista/venta/VentaVendedorMin.php', 3, '', 'VentaVendedorMin', 'VEF');
-----------------------------------
---COPY LINES TO dependencies.sql FILE  
----------------------------------
 
-select pxp.f_insert_testructura_gui ('VEFACEX', 'VENCARP');
-select pxp.f_insert_testructura_gui ('EXPOMIN', 'VENCARP');
-select pxp.f_insert_testructura_gui ('COMMIN', 'VENCARP');
-
+ 
 /***********************************F-DAT-RAC-VEF-0-05/05/2016*****************************************/
 
 /***********************************I-DAT-JRR-VEF-0-13/07/2016*****************************************/
@@ -136,9 +130,7 @@ select wf.f_import_ttipo_estado ('insert','borrador','VEN','Borrador','si','no',
 select wf.f_import_ttipo_estado ('insert','finalizado','VEN','finalizado','no','no','si','listado','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','','borrador');
 select wf.f_import_ttipo_estado ('insert','anulado','VEN','anulado','no','no','si','anterior','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL);
 select wf.f_import_ttipo_estado ('insert','caja','VEN','caja','no','no','no','funcion_listado','vef.f_lista_funcionario_cajero','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','','borrador');
-select wf.f_import_testructura_estado ('insert','borrador','finalizado','VEN',1,'');
-select wf.f_import_tfuncionario_tipo_estado ('insert','borrador','VEN','3483198',NULL,'');
-select wf.f_import_tfuncionario_tipo_estado ('insert','finalizado','VEN','2738127',NULL,'');
+
 
 
 /***********************************F-DAT-JRR-VEF-0-27/10/2016*****************************************/
@@ -165,8 +157,7 @@ VALUES
 
 select pxp.f_insert_tgui ('Ventas en Caja', 'Ventas en Caja', 'VEFCAJE', 'si', 8, 'sis_ventas_facturacion/vista/venta/VentaCaja.php', 3, '', 'VentaCaja', 'VEF');
 select pxp.f_insert_tgui ('Apertura de Caja', 'Apertura de Caja', 'VEFAPCIECAJ', 'si', 1, 'sis_ventas_facturacion/vista/apertura_cierre_caja/AperturaCierreCaja.php', 3, '', 'AperturaCierreCaja', 'VEF');
-select pxp.f_insert_testructura_gui ('VEFCAJE', 'VENCARP');
-select pxp.f_insert_testructura_gui ('VEFAPCIECAJ', 'VENCARP');
+
 
 /***********************************F-DAT-JRR-VEF-0-17/03/2017*****************************************/
 
@@ -201,9 +192,7 @@ select pxp.f_insert_tgui ('Notas de Crédito ETR', 'Nos ta Credito Sobre Ventas'
 select pxp.f_insert_tgui ('Ventas ETR', 'Ventas ETR', 'VENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaVendedorETR.php', 3, '', 'VentaVendedorETR', 'VEF');
 select pxp.f_insert_tgui ('Ventas Peaje ETR', 'Ventas Peaje ETR', 'VEPEETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaVendedorPeajeETR.php', 3, '', 'VentaVendedorPeajeETR', 'VEF');
 
-select pxp.f_insert_testructura_gui ('NCETR', 'VENCARP');
-select pxp.f_insert_testructura_gui ('VENETR', 'VENCARP');
-select pxp.f_insert_testructura_gui ('VEPEETR', 'VENCARP');
+
 
 
 
