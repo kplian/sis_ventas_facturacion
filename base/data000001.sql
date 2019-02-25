@@ -202,12 +202,7 @@ select pxp.f_insert_tgui ('Ventas Peaje ETR', 'Ventas Peaje ETR', 'VEPEETR', 'si
 
 /***********************************I-DAT-RAC-VEF-0-05/11/2018*****************************************/
 select pxp.f_insert_tgui ('Pendiente Emisión ETR', 'Pendientes Emisión ETR', 'PENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaEmisor.php', 3, '', 'VentaEmisor', 'VEF');
-
-
-select param.f_import_tcatalogo_tipo ('insert','tipo_punto_venta','VEF','tpunto_venta');
-select param.f_import_tcatalogo ('insert','VEF','aeropuerto','ato','tipo_punto_venta');
-
-
+select pxp.f_insert_testructura_gui ('PENETR', 'VENCARP');
 /***********************************F-DAT-RAC-VEF-0-05/11/2018*****************************************/
 
 /***********************************I-DAT-EGS-VEF-1-21/11/2018*****************************************/
@@ -305,10 +300,9 @@ select wf.f_import_testructura_estado ('insert','borrador','emision','VEN',1,'')
 select wf.f_import_testructura_estado ('insert','emision','finalizado','VEN',1,'');
 select wf.f_import_testructura_estado ('delete','borrador','caja','VEN',NULL,NULL);
 select wf.f_import_testructura_estado ('insert','caja','finalizado','VEN',1,'');
-select wf.f_import_tfuncionario_tipo_estado ('insert','emision','VEN','3150751',NULL,'');
-select wf.f_import_tfuncionario_tipo_estado ('insert','emision','VEN',NULL,'VEN','');
-
 /***********************************F-DAT-EGS-VEF-4-11/01/2019*****************************************/
 
-
-
+/***********************************I-DAT-EGS-VEF-5-29/01/2019*****************************************/
+select param.f_import_tcatalogo_tipo ('insert','tipo_punto_venta','VEF','tpunto_venta');
+select param.f_import_tcatalogo ('insert','VEF','aeropuerto','ato','tipo_punto_venta');
+/***********************************F-DAT-EGS-VEF-5-29/01/2019*****************************************/

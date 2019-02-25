@@ -265,10 +265,10 @@ ALTER TABLE vef.tcliente
 ALTER TABLE vef.tventa
   ADD COLUMN id_punto_venta INTEGER;
   
- 
+/*
 ALTER TABLE vef.tventa
   ADD COLUMN correlativo_venta VARCHAR(20)  DEFAULT '' NOT NULL;
-  
+*/
   
 CREATE TABLE vef.tventa_forma_pago (
   id_venta_forma_pago SERIAL,  
@@ -957,7 +957,7 @@ ALTER TABLE vef.tcliente
 
 
 
-/************************************I-SCP-RAC-VEF-0-25/09/2018*************************************************/
+/************************************I-SCP-RAC-VEF-0-27/10/2018*************************************************/
 
 --------------- SQL ---------------
 
@@ -1051,11 +1051,7 @@ ALTER TABLE vef.tventa_detalle
 COMMENT ON COLUMN vef.tventa_detalle.id_doc_concepto
 IS 'referencia el concepto en libro de ventas';
 
-ALTER TABLE vef.tventa
-  ALTER COLUMN correlativo_venta TYPE VARCHAR(40);
-
-
-/************************************F-SCP-RAC-VEF-0-25/09/2018*************************************************/
+/************************************F-SCP-RAC-VEF-0-27/10/2018*************************************************/
 
 /************************************I-SCP-EGS-VEF-0-08/11/2018*************************************************/
 --------------- SQL ---------------
@@ -1161,5 +1157,13 @@ WITH (oids = false);
 
 /************************************F-SCP-EGS-VEF-1-10/01/2019*************************************************/
 
+/************************************I-SCP-EGS-VEF-2-29/01/2019*************************************************/
+ALTER TABLE vef.tventa
+  ALTER COLUMN correlativo_venta TYPE VARCHAR(40);
+/************************************F-SCP-EGS-VEF-2-29/01/2019*************************************************/
+/************************************I-SCP-EGS-VEF-3-20/02/2019*************************************************/
+ALTER TABLE vef.ttemporal_data
+  ADD COLUMN id_punto_venta INTEGER;
+/************************************F-SCP-EGS-VEF-3-20/02/2019*************************************************/
 
 
