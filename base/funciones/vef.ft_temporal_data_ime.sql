@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_temporal_data_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION vef.ft_temporal_data_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_temporal_data_ime
@@ -25,7 +28,7 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_dato_temporal	integer;
+	v_id_temporal_data	integer;
 			    
 BEGIN
 
@@ -66,11 +69,11 @@ BEGIN
 							
 			
 			
-			)RETURNING id_dato_temporal into v_id_dato_temporal;
+			)RETURNING id_temporal_data into v_id_temporal_data;
 			
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','dad almacenado(a) con exito (id_dato_temporal'||v_id_dato_temporal||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_dato_temporal',v_id_dato_temporal::varchar);
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','dad almacenado(a) con exito (id_dato_temporal'||v_id_temporal_data||')'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_temporal_data',v_id_temporal_data::varchar);
 
             --Devuelve la respuesta
             return v_resp;
@@ -95,11 +98,11 @@ BEGIN
 			fecha_mod = now(),
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai
-			where id_dato_temporal=v_parametros.id_dato_temporal;
+			where id_temporal_data=v_parametros.id_temporal_data;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','dad modificado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_dato_temporal',v_parametros.id_dato_temporal::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'id_temporal_data',v_parametros.id_temporal_data::varchar);
                
             --Devuelve la respuesta
             return v_resp;
@@ -118,11 +121,11 @@ BEGIN
 		begin
 			--Sentencia de la eliminacion
 			delete from vef.ttemporal_data
-            where id_dato_temporal=v_parametros.id_dato_temporal;
+            where id_temporal_data=v_parametros.id_temporal_data;
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','dad eliminado(a)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_dato_temporal',v_parametros.id_dato_temporal::varchar);
+            v_resp = pxp.f_agrega_clave(id_temporal_data,'dad eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_temporal_data',v_parametros.id_temporal_data::varchar);
               
             --Devuelve la respuesta
             return v_resp;
@@ -145,7 +148,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_temporal_data_ime"(integer, integer, character varying, character varying) OWNER TO postgres;
