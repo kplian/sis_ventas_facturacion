@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION "vef"."ft_proveedor_cuenta_banco_cobro_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION vef.ft_proveedor_cuenta_banco_cobro_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_proveedor_cuenta_banco_cobro_ime
@@ -43,32 +46,36 @@ BEGIN
 					
         begin
         	--Sentencia de la insercion
-        	insert into vef.tproveedor_cuenta_banco_cobro(
-			id_proveedor,
-			estado_reg,
-			tipo,
-			id_cuenta_bancaria,
-			fecha_reg,
-			usuario_ai,
-			id_usuario_reg,
-			id_usuario_ai,
-			fecha_mod,
-			id_usuario_mod
-          	) values(
-			v_parametros.id_proveedor,
-			'activo',
-			v_parametros.tipo,
-			v_parametros.id_cuenta_bancaria,
-			now(),
-			v_parametros._nombre_usuario_ai,
-			p_id_usuario,
-			v_parametros._id_usuario_ai,
-			null,
-			null
-							
-			
-			
-			)RETURNING id_proveedor_cuenta_banco_cobro into v_id_proveedor_cuenta_banco_cobro;
+        	insert into vef.tproveedor_cuenta_banco_cobro(  id_proveedor,
+                                                            estado_reg,
+                                                            tipo,
+                                                            fecha_reg,
+                                                            usuario_ai,
+                                                            id_usuario_reg,
+                                                            id_usuario_ai,
+                                                            fecha_mod,
+                                                            id_usuario_mod,
+                                                            nro_cuenta_bancario,
+                                                            id_institucion,
+                                                            fecha_alta,
+                                                            fecha_baja,
+                                                            id_moneda
+                                                            ) values(
+                                                            v_parametros.id_proveedor,
+                                                            'activo',
+                                                            v_parametros.tipo,
+                                                            now(),
+                                                            v_parametros._nombre_usuario_ai,
+                                                            p_id_usuario,
+                                                            v_parametros._id_usuario_ai,
+                                                            null,
+                                                            null,
+                                                            v_parametros.nro_cuenta_bancario,
+                                                            v_parametros.id_institucion,
+                                                            v_parametros.fecha_alta,
+                                                            v_parametros.fecha_baja,
+                                                            v_parametros.id_moneda
+                                                            )RETURNING id_proveedor_cuenta_banco_cobro into v_id_proveedor_cuenta_banco_cobro;
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Proveedor Cuenta Banco Cobro almacenado(a) con exito (id_proveedor_cuenta_banco_cobro'||v_id_proveedor_cuenta_banco_cobro||')'); 
@@ -93,11 +100,15 @@ BEGIN
 			update vef.tproveedor_cuenta_banco_cobro set
 			id_proveedor = v_parametros.id_proveedor,
 			tipo = v_parametros.tipo,
-			id_cuenta_bancaria = v_parametros.id_cuenta_bancaria,
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario,
 			id_usuario_ai = v_parametros._id_usuario_ai,
-			usuario_ai = v_parametros._nombre_usuario_ai
+			usuario_ai = v_parametros._nombre_usuario_ai,
+            nro_cuenta_bancario = v_parametros.nro_cuenta_bancario,
+            id_institucion = v_parametros.id_institucion,
+            fecha_alta = v_parametros.fecha_alta,
+            fecha_baja = v_parametros.fecha_baja,
+            id_moneda = v_parametros.id_moneda
 			where id_proveedor_cuenta_banco_cobro=v_parametros.id_proveedor_cuenta_banco_cobro;
                
 			--Definicion de la respuesta
@@ -139,16 +150,18 @@ BEGIN
 	end if;
 
 EXCEPTION
-				
-	WHEN OTHERS THEN
-		v_resp='';
-		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-		raise exception '%',v_resp;
-				        
+                
+    WHEN OTHERS THEN
+        v_resp='';
+        v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+        v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+        v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+        raise exception '%',v_resp;
+                        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "vef"."ft_proveedor_cuenta_banco_cobro_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

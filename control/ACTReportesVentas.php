@@ -5,13 +5,15 @@
 *@author  (admin)
 *@date 01-06-2015 05:58:00
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ * 		ISSUE 			Fecha				Autor				Descripcion
+*		#2	endeEtr			23/01/2019			EGS					se agrego reporte con lista de productos activos por puntos de venta	
 */
 require_once(dirname(__FILE__).'/../reportes/RResumenVentasBoaXLS.php');
 require_once(dirname(__FILE__).'/../reportes/RReporteXProducto.php');
 
 
 require_once(dirname(__FILE__).'/../reportes/RVentasXls.php');
-
+require_once(dirname(__FILE__).'/../reportes/RProductoAcPuntoVXls.php');
 
 class ACTReportesVentas extends ACTbase{    
 			
@@ -295,6 +297,32 @@ class ACTReportesVentas extends ACTbase{
 		
     	
     }
+	//#2  
+	 function listarProductoActivoPuntoV(){	
+		/*		
+		if($this->objParam->getParametro('id_venta')!=''){
+			$this->objParam->addFiltro("vedet.id_venta = ".$this->objParam->getParametro('id_venta'));	
+		}*/		
+    	$this->objFunc = $this->create('MODReportesVentas');
+		$this->res = $this->objFunc->listarProductoActivoPuntoV($this->objParam);
+		//$this->res->imprimirRespuesta($this->res->generarJson());
+	   
+	        $titulo = 'Productos Activos Por Punto de Venta';
+			
+			$nombreArchivo=uniqid(md5(session_id()).$titulo);
+			$nombreArchivo.='.xls';
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			$this->objParam->addParametro('datos',$this->res->datos);			
+			$this->objReporteFormato=new RProductoAcPuntoVXls($this->objParam);
+			$this->objReporteFormato->generarDatos();
+			$this->objReporteFormato->generarReporte();
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genero con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    	
+    }//#2  
+	
 	
 			
 }

@@ -17,7 +17,8 @@ $body$
    HISTORIAL DE MODIFICACIONES:
 
    ISSUE        	FECHA: 			 AUTOR:					DESCRIPCION:
-    #1				22/10/2018		EGS						se aumento las transacciones para facturas en pdf
+    #1				22/10/2018		 EGS					se aumento las transacciones para facturas en pdf
+    #2	endeEtr		23/01/2019		 EGS					se agrego reporte con lista de productos activos por puntos de venta
 
   ***************************************************************************/
 
@@ -1123,6 +1124,73 @@ $body$
                                where';
                                
                   v_consulta:=v_consulta||v_parametros.filtro;
+      			      			        
+                            
+                  --Devuelve la respuesta
+                  return v_consulta;
+      						
+              end; 
+        /*********************************    
+            #TRANSACCION:  'VF_VENINGASPRO_SEL'
+            #DESCRIPCION:   lista los productos activos en un punto de venta  
+            #AUTOR:		EGS	
+            #ISSUE      #2
+            #FECHA:		21/01/2019
+            ***********************************/
+
+            elsif(p_transaccion='VF_VENINGASPRO_SEL')then
+             				
+                begin
+                    --Sentencia de la consulta
+                    v_consulta:='
+                    		 SELECT 
+                                    ptv.id_punto_venta,
+                                    ptv.codigo as codigo_punto_de_venta,
+                                    ptv.nombre as nombre_punto_de_venta,
+                                    pvp.id_punto_venta_producto,
+                                    suc.id_sucursal,
+                                    suc.nombre as nombre_sucursal,
+                                    pvp.id_sucursal_producto,
+                                    supr.id_concepto_ingas,
+                                    cing.codigo as codigo_ingas,
+                                    cing.desc_ingas
+                            FROM vef.tpunto_venta_producto  pvp
+                            left join vef.tpunto_venta ptv on ptv.id_punto_venta = pvp.id_punto_venta
+                            left join vef.tsucursal_producto supr on supr.id_sucursal_producto = pvp.id_sucursal_producto
+                            left join vef.tsucursal suc on suc.id_sucursal = supr.id_sucursal 
+                            left join param.tconcepto_ingas cing on cing.id_concepto_ingas = supr.id_concepto_ingas
+                            order by suc.id_sucursal,ptv.id_punto_venta';
+                /*               
+                  v_consulta:=v_consulta||v_parametros.filtro;
+      			  v_consulta:=v_consulta||'order by vedet.descripcion,vedet.id_venta_detalle asc';    */    			        
+                            
+                  --Devuelve la respuesta
+                  return v_consulta;
+      						
+              end; 
+               /*********************************    
+            #TRANSACCION:  'VF_VENINGASPRO_CONT'
+            #DESCRIPCION:   count los productos activos en un punto de venta  
+            #AUTOR:		EGS	
+            #ISSUE      #2
+            #FECHA:		21/01/2019
+            ***********************************/
+
+            elsif(p_transaccion='VF_VENINGASPRO_CONT')then
+             				
+                begin
+                    --Sentencia de la consulta
+                    v_consulta:='
+                            SELECT 
+                                   count(ptv.id_punto_venta)
+                            FROM vef.tpunto_venta_producto  pvp
+                            left join vef.tpunto_venta ptv on ptv.id_punto_venta = pvp.id_punto_venta
+                            left join vef.tsucursal_producto supr on supr.id_sucursal_producto = pvp.id_sucursal_producto
+                            left join vef.tsucursal suc on suc.id_sucursal = supr.id_sucursal 
+                            left join param.tconcepto_ingas cing on cing.id_concepto_ingas = supr.id_concepto_ingas
+                            ';
+                  /*             
+                  v_consulta:=v_consulta||v_parametros.filtro;*/
       			      			        
                             
                   --Devuelve la respuesta
