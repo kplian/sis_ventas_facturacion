@@ -5,6 +5,8 @@
 *@author  (eddy.gutierrez)
 *@date 06-11-2018 20:39:08
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ *  ISSUE				FECHA		AUTOR				DESCRIPCION
+ 	#4	endeETR	 	21/02/2019		EGS					Se agrego campos para punto de venta 
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -13,11 +15,12 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
-		this.maestro=config.maestro;
+		this.maestro=config;
+		console.log(config);
     	//llama al constructor de la clase padre
 		Phx.vista.TemporalData.superclass.constructor.call(this,config);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		this.load({params:{start:0, limit:this.tam_pag , id_punto_venta :this.maestro.data.id_punto_venta }})
 	},
 			
 	Atributos:[
@@ -30,6 +33,21 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'Field',
 			form:true 
+		},
+		{//#4
+			config:{
+				name: 'nombre_punto_venta',
+				fieldLabel: 'Punto de Venta',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 200,
+				maxLength:-5
+			},
+				type:'TextField',
+				filters:{pfiltro:'dad.razon_social',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:true
 		},
 		{
 			config:{
@@ -79,7 +97,7 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'total_detalle',
-				fieldLabel: 'Total Detalle BS',
+				fieldLabel: 'Total Detalle',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -94,7 +112,7 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'total_venta',
-				fieldLabel: 'Total Venta BS',
+				fieldLabel: 'Total Venta',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -112,13 +130,13 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Total Detalle USD',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:-5
+				gwidth: 100
+				//maxLength:-5
 			},
 				type:'TextField',
 				filters:{pfiltro:'dad.nro_factura',type:'string'},
 				id_grupo:1,
-				grid:true,
+				grid:false,
 				form:true
 		},
 		{
@@ -127,13 +145,13 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Total Venta USD',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:-5
+				gwidth: 100
+				//maxLength:-5
 			},
 				type:'TextField',
 				filters:{pfiltro:'dad.nro_factura',type:'string'},
 				id_grupo:1,
-				grid:true,
+				grid:false,
 				form:true
 		},
 		{
@@ -273,7 +291,8 @@ Phx.vista.TemporalData=Ext.extend(Phx.gridInterfaz,{
 		{name:'total_detalle_usd', type: 'numeric'},
 		{name:'nro', type: 'string'},
 		{name:'error', type: 'string'},
-
+		{name:'id_punto_venta', type: 'numeric'},//#4
+		{name:'nombre_punto_venta', type: 'string'},//#4
 		
 		
 	],
