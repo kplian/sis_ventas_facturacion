@@ -20,7 +20,7 @@ Phx.vista.VentaVendedor = {
     title:'Venta',
     nombreVista: 'VentaVendedor',
     grupoDateFin: [1],
-    
+    estadoInicial:'borrador',
     constructor: function(config) {
         this.maestro=config.maestro;  
         Phx.vista.VentaVendedor.superclass.constructor.call(this,config);        
@@ -29,7 +29,7 @@ Phx.vista.VentaVendedor = {
     'fecha_reg','fecha_mod','usr_reg','usr_mod','nro_factura','excento','fecha','cod_control','nroaut'],
     successGetVariables :function (response,request) {   
     	Phx.vista.VentaVendedor.superclass.successGetVariables.call(this,response,request);  				  		
-  		this.store.baseParams.pes_estado = 'borrador';        
+  		this.store.baseParams.pes_estado = this.estadoInicial;        
 		
 		
 		///#1 19/11/2018 EGS	
