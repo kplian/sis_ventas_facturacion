@@ -20,6 +20,7 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 include(dirname(__FILE__).'/../reportes/RFacturaRecibo.php');
 include(dirname(__FILE__).'/../reportes/RFacturaReciboPdf.php');
 include(dirname(__FILE__).'/../reportes/RPlantillaCarta.php');
+include_once(dirname(__FILE__).'/../lib/cls_XML.php');
 
 class ACTVenta extends ACTbase{    
 			
@@ -419,12 +420,82 @@ class ACTVenta extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-    
+	//
+	function insertarDatos($id, $k, $nombreXml){
+		//var_dump($this->objParam);exit;
+		//$this->objParam->addParametro('id_venta',1000);
+		//$id_venta=$this->objParam->getParametro('id_venta');
+		//$this->objParam->addParametro('id_venta',$id_venta);
+		//$this->objParam->addParametro('observacion_xml','obs');
+		//$this->objParam->addParametro('ruta','mm');
+		$this->objParam->addParametro('id_venta',$id);
+		
+		$text = str_replace('"', "'", $k);
+		$text = str_replace('<', "{", $text);
+		$text = str_replace('>', "}", $text);
+		$text = str_replace("'", ";", $text);
+		$this->objParam->addParametro('texto_xml',$text);
+		$this->objParam->addParametro('ruta',$nombreXml);
+		   
+		$this->objFunc = $this->create('MODVenta');	
+		$this->res = $this->objFunc->insertarXml($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+    //
     function insertarVentaCompleta(){
+    	
         $this->objFunc=$this->create('MODVenta');        
-        $this->res=$this->objFunc->insertarVentaCompleta($this->objParam);        
-        $this->res->imprimirRespuesta($this->res->generarJson());
+        $this->res = $this->objFunc->insertarVentaCompleta($this->objParam);
+		
+
+		$id = $this->res->datos['venta']; // obtiene el id_venta en la variable venta
+		unset($this->res->datos['venta']); // elimina la variable venta para no mostrar en la vista
+
+		$this->res->imprimirRespuesta($this->res->generarJson());
+		$this->objParam->addFiltro("v.id_venta = ". $id);
+		
+		$this->objFunc = $this->create('MODVenta');
+		$cabecera = $this->objFunc->listarCabecera($this->objParam);
+		
+		$this->objFunc = $this->create('MODVenta');
+		$detalle = $this->objFunc->listarDetalle($this->objParam);
+		
+		// $datos = new convert_xml();
+		// $k=$datos->genera_xml($cabecera->generarJson(),$detalle->generarJson(),$id);
+
+
+		$datos2 = new convert_xml2("factura_".$id, dirname(__FILE__).'/../../uploaded_files/archivos_facturacion_xml/');
+		
+		
+		$datos2->genera_xml($cabecera->generarJson(),$detalle->generarJson(),$id);
+		$datos2->llenarSignature();
+		$datos2->crearArchivoXML();
+		$a=$datos2->validarXmlConXSD();
+		if($a)
+		{
+			var_dump('EXITO');
+		}else{
+			var_dump('ERROR');
+		}
+		//echo ( $datos2->validarXmlConXSD() )? 'SIIIIIIII': 'NOOOOOO';
+				
+		
+		$datos2->crearArchivoBase64();
+		$datos2->crearArchivoGZIP();
+		$cadenaBase64GZIP = $datos2->convertirArchivoGZIPABase64();
+		$nombreArchivoXml = $datos2->getNombre();
+		$xmlString        = $datos2->getXmlString();
+
+
+		//var_dump('xmltexto'.$k);
+		
+		$this->res->imprimirRespuesta($this->res->generarJson());  
+		//insertar datos en tfact_xml
+		$this->insertarDatos($id, $xmlString, $nombreArchivoXml);
+		
     }
+
+
 						
 	function eliminarVenta(){
 			$this->objFunc=$this->create('MODVenta');	
