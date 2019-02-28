@@ -14,15 +14,14 @@
   
 */
 
-/*echo ('/../../sis_siat/control/SiatClassWs.inc');
-exit;*/
+
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 include(dirname(__FILE__).'/../reportes/RFacturaRecibo.php');
 include(dirname(__FILE__).'/../reportes/RFacturaReciboPdf.php');
 include(dirname(__FILE__).'/../reportes/RPlantillaCarta.php');
-include('SiatClassWs.inc');
+include(dirname(__FILE__).'/../../sis_siat/control/SiatClassWs.inc');
 
 class ACTVenta extends ACTbase{    
 			
@@ -593,55 +592,30 @@ class ACTVenta extends ACTbase{
 	}
 	 function insertarVentaAnular(){
 	 	
-		//Accede a los datos.
-		// llamar a la funcion
-			/*$cone = new conexion();
-			$this->link = $cone->conectarpdo();
-			$copiado = false;	
-			$sql = "select descripcion
-					from siat.tmensaje_soap where codigo = ".$respuesta;
-			$res = $this->link->prepare($sql);
-			$res->execute();
-			$result = $res->fetchAll(PDO::FETCH_ASSOC);
-			$descripcion=$result[0]['descripcion'];*/
-		/*$codigo_cliente=$this->objParam->getParametro('codigo_cliente');
-		
-		$codigo_motivo_anulacion=$this->objParam->getParametro('codigo_motivo_anulacion');
-			*/	
-		// Acceso al web service.
+				// Acceso al web service.
 		$wsEstandar= new WsFacturacionEstandar($_SESSION["_URLWS_FACTURASTANDAR"],2,'2E07180BA7E','',1009393025,'713E32B4',0);
 		
 		$resultfac = $wsEstandar->anulacionFacturaElectronicaEstandar("123abc",1,1,1,"123abc",1,"123abcasdfaf","cbba75@hotmail.com",77430396,1,1,0);
 		
-	    //$wsEnviaAnulacion='EXITOSO';
 	    $r = $wsEstandar->ConvertObjectToArray($resultfac);
 		
 		
-	     $codigo_motivo_anulacion = ''.$r['return']['codigoEstado'] ;
+	     $codigo_motivo_anulacion = $r['return']['codigoEstado'] ;
 		 
-	    /*if ($respuesta==905)
+	    if ($codigo_motivo_anulacion==905)
 		{
 			//Anulacion
 			$this->objFunc=$this->create('MODVenta');	
 		    $this->res=$this->objFunc->anularVenta($this->objParam);
 		    $this->res->imprimirRespuesta($this->res->generarJson());
 			
-		}  else {*/
-			
-			$this->objFunc=$this->create('MODVenta');	
-			//if ($this->objParam->getParametro('id_sucursal') != '') {
-				      
-			$this->objParam->addFiltro(" codigo = ". $codigo_motivo_anulacion);
-			/* echo $codigo_motivo_anulacion;
-					   exit;*/
-		     //}
-		//var_dump($codigo_motivo_anulacion);
+		}  else {
+						
 			$this->objParam->addParametro('codigo_motivo_anulacion',$codigo_motivo_anulacion );
-		 	//$this->objParam->addParametro('id_venta',$id_venta);
-			var_dump($this->objParam);
+		 	$this->objFunc=$this->create('MODVenta');	
 		    $this->res=$this->objFunc->anulacionVentaRespuesta($this->objParam);
 		    $this->res->imprimirRespuesta($this->res->generarJson());
-		  //}
+		  }
 	 }
 			
 }

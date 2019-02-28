@@ -193,21 +193,7 @@ Phx.vista.AnularVenta=Ext.extend(Phx.gridInterfaz,{
 			form : true
 		}
 		
-        /*,
-	     {
-			config:{
-				name: 'motivo_anulacion',
-				fieldLabel: 'Motivo de Anulacion',
-				allowBlank: false,
-				anchor: '80%',
-				gwidth: 100
-			},
-				type:'TextArea',
-				filters:{pfiltro:'ven.motivo_anulacion',type:'string'},
-				id_grupo:0,
-				grid:true,
-				form:true
-		}  */ 
+       
 	],
 	tam_pag:50,	
 	title:'AnularVenta ',
@@ -262,29 +248,21 @@ Phx.vista.AnularVenta=Ext.extend(Phx.gridInterfaz,{
              this.ocultarComponente(this.Cmp.estado_reg);
              Phx.vista.AnularVenta.superclass.onButtonNew.call(this);
             },
-    /*onButtonEdit: function () {
-            
-             //this.mostrarComponente(this.Cmp.estado_reg);
-             Phx.vista.AnularVenta.superclass.onButtonEdit.call(this);
-            }
-	,*/
+   
     BAnularFactura:function () {
 			var rec = this.sm.getSelected();
 			Phx.vista.AnularVenta.superclass.onButtonEdit.call(this);
-			/*Phx.CP.loadingShow();
-			Ext.Ajax.request({
-				url: '../../sis_siat/control/AnularVenta/insertarAnularFactura',
-				params: {
-					estado: 'recibido'
-				},
-				success: this.successDerivar,
-				failure: this.conexionFailure,
-				timeout: this.timeout,
-				scope: this
-			});*/
-	
 		},
+	successSave:function(resp){
 		
+		 var avd= Ext.util.JSON.decode(resp.responseText);
+		 alert(avd.ROOT.datos.descripcion);
+		 Phx.vista.AnularVenta.superclass.successSave.call(this,resp);
+		
+				
+
+	},
+	
     /*
     preparaMenu:function(n){
       	
@@ -292,8 +270,7 @@ Phx.vista.AnularVenta=Ext.extend(Phx.gridInterfaz,{
 		  var data = this.getSelectedData();
 
 		  var tb =this.tbar;
-		  //si el archivo esta escaneado se permite visualizar
-
+		
 			this.getBoton('anular_factura').disable();
 
 		if (data['codigo_sin'] != '') {

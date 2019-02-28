@@ -1235,8 +1235,8 @@ function anulacionVentaRespuesta(){
 				
 		//Define los parametros para la funcion
 		$this->setParametro('id_venta','id_venta','int4');
-		$this->setParametro('codigo_motivo_anulacion','codigo_motivo_anulacion','text');
-		
+		$this->setParametro('codigo_motivo_anulacion','codigo_motivo_anulacion','numeric');
+		$this->setParametro('codigo_sin','codigo_sin','numeric');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
