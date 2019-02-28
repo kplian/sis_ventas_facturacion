@@ -1170,7 +1170,7 @@ ALTER TABLE vef.ttemporal_data
 /************************************I-SCP-FPT-VEF-0-13/02/2019*************************************************/
 
 ALTER TABLE vef.tventa
-  ADD COLUMN cuf VARCHAR(50) NOT NULL;
+  ADD COLUMN cuf VARCHAR(50);
 
 COMMENT ON COLUMN vef.tventa.cuf
 IS 'Código cuf en ves del código de control, nuevo codigo unico de factura';
