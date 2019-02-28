@@ -2,7 +2,7 @@
 /**
 *@package pXP
 *@file gen-SistemaDist.php
-*@author  (rarteaga)
+*@author  (rarteaga) 
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 * 		ISSUE 			Fecha				Autor				Descripcion

@@ -1199,4 +1199,12 @@ IS 'Parámetro var4 representa el TIPO DOCUMENTO SECTOR, codigo otorgado por imp
 
 
 
+/************************************I-SCP-AVQ-VEF-0-22/02/2019*************************************************/
+ALTER TABLE vef.tventa
+  ADD COLUMN codigo_siat VARCHAR;
+  
+  ALTER TABLE vef.tventa
+  ADD COLUMN motivo_anulacion TEXT;
+/************************************F-SCP-AVQ-VEF-0-22/02/2019*************************************************/
+
 

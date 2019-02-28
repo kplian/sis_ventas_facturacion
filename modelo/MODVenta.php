@@ -38,6 +38,7 @@ class MODVenta extends MODbase{
 
 
 		//Definicion de la lista del resultado del query
+		
 		$this->captura('id_venta','int4');
 		$this->captura('id_cliente','int4');
 		$this->captura('id_sucursal','int4');
@@ -97,11 +98,6 @@ class MODVenta extends MODbase{
 		
 		$this->captura('formato_comprobante','varchar');
 		$this->captura('tipo_factura','varchar');
-		
-		
-		
-      
-		
 		//Ejecuta la instruccion
 		$this->armarConsulta();		
 		$this->ejecutarConsulta();
@@ -1237,6 +1233,85 @@ class MODVenta extends MODbase{
 
 		$this->ejecutarConsulta();
 		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	function listarAnularVenta(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENANU_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+/*
+		$this->setParametro('historico','historico','varchar');
+		$this->setParametro('tipo_factura','tipo_factura','varchar');
+		$this->setParametro('id_sucursal','id_sucursal','integer');
+		$this->setParametro('id_punto_venta','id_punto_venta','integer');
+        $this->setParametro('tipo_usuario','tipo_usuario','varchar');
+*/
+
+		//Definicion de la lista del resultado del query
+		 $this->captura('id_venta','int4');
+		 $this->captura('id_cliente','int4');
+         $this->captura('id_sucursal','int4');
+         $this->captura('id_proceso_wf','int4');
+         $this->captura('id_estado_wf','int4');
+         $this->captura('estado_reg','varchar');
+         $this->captura('correlativo_venta','varchar');
+         $this->captura('a_cuenta','numeric');
+         $this->captura('total_venta','numeric');
+         $this->captura('fecha_estimada_entrega','date');
+         $this->captura('usuario_ai','varchar');
+         $this->captura('fecha_reg','timestamp');
+         $this->captura('id_usuario_reg','int4');
+         $this->captura('id_usuario_ai','int4');
+         $this->captura('id_usuario_mod','int4');
+         $this->captura('fecha_mod','timestamp');
+         $this->captura('porcentaje_descuento','numeric');
+         $this->captura('id_vendedor_medico','varchar');
+         $this->captura('comision','numeric');
+         $this->captura('observaciones','text');
+		 $this->captura('codigo_sin','varchar');
+         $this->captura('motivo_anulacion','text');
+		//Ejecuta la instruccion
+		$this->armarConsulta();		
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	function insertarVentaAnular(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VF_VEANU_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('codigo_sin','codigo_sin','varchar');
+		$this->setParametro('motivo_anulacion','motivo_anulacion','text');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+function anulacionVentaRespuesta(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VF_VEANURES_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('codigo_motivo_anulacion','codigo_motivo_anulacion','text');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
