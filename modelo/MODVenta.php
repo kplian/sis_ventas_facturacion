@@ -466,8 +466,75 @@ class MODVenta extends MODbase{
 		return $this->respuesta;
 	}
 
+ /* funcion para listar datos de Reporte para el sistema siat*/
+ 
+ 
+ function listarDocFiscalesEmitidosReporteSiat(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_FACTEMITIDAS_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+    
+    
+   		//Definicion de la lista del resultado del query
+			
+		
+		$this->captura('id_venta','int4');
+		$this->captura('id_proveedor','int4');
+		$this->captura('id_sucursal','int4');
+		$this->captura('total_venta','NUMERIC');
+		$this->captura('estado','VARCHAR');
+		$this->captura('nombre_factura','VARCHAR');
+		$this->captura('nit','varchar');		
+		$this->captura('total_venta_msuc','NUMERIC');		
+		$this->captura('fecha','date');
+		$this->captura('nro_factura','int4');
+		//$this->captura('nroaut','VARCHAR');
+		$this->captura('observaciones','TEXT');
+		$this->captura('nombre_entidad','VARCHAR');
+		$this->captura('nit_entidad','VARCHAR');
+						
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 
-
+ function listarDocFiscalesAnuladasReporteSiat(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_FACTEMITIDAS_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+				   
+   		//Definicion de la lista del resultado del query
+			
+		
+		$this->captura('id_venta','int4');
+		$this->captura('id_proveedor','int4');
+		$this->captura('id_sucursal','int4');
+		$this->captura('total_venta','NUMERIC');
+		$this->captura('estado','VARCHAR');
+		$this->captura('nombre_factura','VARCHAR');
+		$this->captura('nit','varchar');		
+		$this->captura('total_venta_msuc','NUMERIC');		
+		$this->captura('fecha','date');
+		$this->captura('nro_factura','int4');
+		//$this->captura('nroaut','VARCHAR');
+		$this->captura('observaciones','TEXT');
+		$this->captura('nombre_entidad','VARCHAR');
+		$this->captura('nit_entidad','VARCHAR');
+				
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 
 	function getVariablesBasicas(){
 		//Definicion de variables para ejecucion del procedimientp
@@ -1092,11 +1159,14 @@ class MODVenta extends MODbase{
 		$this->captura('codigo_cliente','varchar');
 		
 			
-		$this->captura('lugar_cliente','varchar');	
+		$this->captura('lugar_cliente','varchar');
+		$this->captura('cuf','varchar');//nuevo	
+		$this->captura('codigo_sin','varchar');//nuevo	
+		$this->captura('tipo_doc_fiscal','SMALLINT'); 
+		$this->captura('tipo_doc_sector','SMALLINT');            
 		$this->captura('cliente_destino','varchar');
 		$this->captura('lugar_destino','varchar');
-		
-		
+			
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		//var_dump($this->consulta);exit;
