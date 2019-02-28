@@ -126,6 +126,7 @@ $body$
     v_tabla_aux			        varchar;
 	va_id_estado_wf			varchar[];
 	va_codigo_estado		varchar[];
+    v_descripcion           text;   --Ana
 
   BEGIN
 
@@ -1656,7 +1657,6 @@ $body$
         into
           v_id_tipo_estado,
           v_id_estado_wf
-          
 
         from wf.testado_wf ew
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
@@ -1684,7 +1684,8 @@ $body$
         
        -- raise EXCEPTION 'sasdasd  1 %, 2 %, 3 %, 4 %, 5 %', coalesce(v_parametros._nombre_usuario_ai,'x'), v_parametros._id_usuario_ai   ,v_venta.id_venta ,v_venta.tipo_factura, v_venta.id_venta_fk  ;
        
-       v_tabla = pxp.f_crear_parametro(ARRAY[	'_nombre_usuario_ai',
+          
+      v_tabla = pxp.f_crear_parametro(ARRAY[	'_nombre_usuario_ai',
                                                 '_id_usuario_ai',
                                                 'id_venta',
                                                 'tipo_factura',
@@ -1704,12 +1705,10 @@ $body$
                                             ]
         );
         
-        
-        v_resp = vef.ft_venta_ime(p_administrador,p_id_usuario,v_tabla,'VF_VENVALI_MOD');
+         v_resp = vef.ft_venta_ime(p_administrador,p_id_usuario,v_tabla,'VF_VENVALI_MOD');
         
         -- obtener datos tipo estado
-
-        select
+          select
           te.codigo,te.fin
         into
           v_codigo_estado_siguiente,v_es_fin
@@ -1727,7 +1726,9 @@ $body$
         ELSE
           v_obs='---';
         END IF;
-
+     
+    
+      
         --configurar acceso directo para la alarma
         v_acceso_directo = '';
         v_clase = '';
@@ -1752,6 +1753,7 @@ $body$
                                                       v_titulo);
 
 
+ 
         IF  vef.f_fun_inicio_venta_wf(p_id_usuario,
                                       v_parametros._id_usuario_ai,
                                       v_parametros._nombre_usuario_ai,
@@ -1776,16 +1778,19 @@ $body$
           --no validamos la fecha en las facturas de exportacion
           --por que  valida al insertar la factura, donde se genera el nro de la factura
           END IF;
-          
+       
           -- #123 si no es una nota de credito botiene de sucusal producto la actividad economica 
-          IF v_ncd = 'no' THEN  
+          IF v_ncd = 'no' THEN 
+              
               select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica
               from vef.tventa_detalle vd
                 inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
                 inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
               where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo';
               v_tipo_dosificacion = 'F';-- #123
+               
           ELSE  
+            
              --#123 para notas de credito la actividad economica se dereiva de la factura relacionada
              
              select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica
@@ -1800,7 +1805,7 @@ $body$
           
           END IF;
           --genera el numero de factura
-
+ 
           IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN  --#123 se agrega el tipo computarizadareg
 			
                 select d.* into v_dosificacion
@@ -1828,7 +1833,6 @@ $body$
                 ELSE    --#123 si es una nota de credito el codigo de contro se genera con el 13% de la total devuelto
                    v_importe_codigo_control = v_venta.total_venta * 0.13;
                 END IF;
-                
                 --la factura de exportacion no altera la fecha
                 update vef.tventa  set
                   id_dosificacion = v_dosificacion.id_dosificacion,
@@ -1841,12 +1845,12 @@ $body$
                                                       to_char(v_fecha_venta,'YYYYMMDD')::varchar,
                                                       round(v_venta.total_venta,0))
                 where id_venta = v_venta.id_venta;
-
+                 
 
                 update vef.tdosificacion
                 set nro_siguiente = nro_siguiente + 1
                 where id_dosificacion = v_dosificacion.id_dosificacion;
-
+                
 
           ELSE
               -- en las facturas de exportacion y minera  el numero se genera al inserta
@@ -1873,9 +1877,9 @@ $body$
 
 
           END IF;
-          
-        end if;
         
+        end if;
+         
         if (v_es_fin = 'si' and pxp.f_get_variable_global('vef_tiene_apertura_cierre') = 'si') then
 
           if (exists(	select 1
@@ -1906,7 +1910,7 @@ $body$
         if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si' and v_es_fin = 'si') then
          v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'FIN',v_venta.id_venta);
         end if;
-        
+         
         --raise exception 'pasa..... % , %', v_es_fin , pxp.f_get_variable_global('vef_integracion_lcv');
 
         -- si hay mas de un estado disponible  preguntamos al usuario
@@ -1957,9 +1961,10 @@ $body$
         
 
         
-        IF     (v_tipo_usuario = 'vendedor' and v_venta.fecha = now()::date)
+      /*  IF     (v_tipo_usuario = 'vendedor' and v_venta.fecha = now()::date)
             or (v_tipo_usuario = 'administrador' )
-            or (p_administrador = 1) THEN
+            or (p_administrador = 1) THEN*/
+  --IF     (v_venta.fecha = now()::date) THEN
 
               --obtenemos datos basicos
               select
@@ -1980,9 +1985,9 @@ $body$
               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','venta anulada');
               v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
         
-        ELSE
+      /*  ELSE
             raise exception 'La venta solo puede ser anulada el mismo dia o por un administrador';
-        END IF;
+        END IF;*/
 
         --Devuelve la respuesta
         return v_resp;
@@ -2040,6 +2045,64 @@ $body$
 
       end;
 
+	/*********************************    
+ 	#TRANSACCION:  'VF_VEANU_MOD'
+ 	#DESCRIPCION:	Anulación de registros
+ 	#AUTOR:		AVQ
+ 	#FECHA:		20-02-2019 21:55:55
+	***********************************/
+
+	elsif(p_transaccion='VF_VEANU_MOD')then
+
+		begin
+			--Sentencia de la modificacion
+          update vef.tventa set
+			codigo_sin = v_parametros.codigo_sin,
+			motivo_anulacion = v_parametros.motivo_anulacion,
+			fecha_mod = now(),
+			id_usuario_mod = p_id_usuario
+			where id_venta=v_parametros.id_venta;
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Registro de Codigo y Motivo de Anulación exitosa'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;
+    
+	/*********************************    
+ 	#TRANSACCION:  'VF_VEANURES_MOD'
+ 	#DESCRIPCION:	Anulación de registros
+ 	#AUTOR:		AVQ	
+ 	#FECHA:		20-02-2019 21:55:55
+	***********************************/
+
+	elsif(p_transaccion='VF_VEANURES_MOD')then
+
+		begin
+			--Sentencia de la modificacion
+           select descripcion
+           into v_descripcion
+   		   from siat.tmensaje_soap 
+           where codigo = v_parametros.codigo_motivo_anulacion;
+                   
+            update vef.tventa set
+			codigo_sin = v_parametros.codigo_sin,
+			--motivo_anulacion = v_parametros.motivo_anulacion,
+			fecha_mod = now(),
+			id_usuario_mod = p_id_usuario
+			where id_venta=v_parametros.id_venta;
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Petición'||v_descripcion); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;
     else
 
       raise exception 'Transaccion inexistente: %',p_transaccion;

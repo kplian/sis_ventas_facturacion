@@ -52,7 +52,7 @@ Phx.vista.VentaVendedor = {
 			///#1 19/11/2018 EGS	      
         
         
-        this.addButton('anular',{grupo:[],text:'Anular',iconCls: 'bdel',disabled:true,handler:this.anular,tooltip: '<b>Anular la venta</b>',hidden:true});
+        this.addButton('anular',{grupo:[1],text:'Anular',iconCls: 'bdel',disabled:false,handler:this.anular,tooltip: '<b>Anular la venta</b>',hidden:false});
         this.addButton('sig_estado',{grupo:[0],text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
         this.addButton('diagrama_gantt',{grupo:[0,1,2,3],text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
         this.addButton('btnImprimir',
@@ -131,11 +131,16 @@ Phx.vista.VentaVendedor = {
     liberaMenu:function() {   
     	this.getBoton('btnImprimir').disable(); 
         this.getBoton('diagrama_gantt').disable();
-        this.getBoton('anular').disable();        
+        this.getBoton('anular').enable();        
         this.getBoton('sig_estado').disable();        
         Phx.vista.VentaVendedor.superclass.liberaMenu.call(this);
-    }
-    
+    }/*,
+    onButtonNew : function () {
+        //abrir formulario de solicitud
+        Phx.vista.Venta.superclass.onButtonNew.call(this);
+        //this.openForm('new');        
+    },    
+    */
     
 };
 </script>

@@ -38,10 +38,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 timeout:this.timeout,
                 scope:this
             });	 
-            
-             			
-        
-	},
+  	},
 	successGetVariables : function (response,request) {
 		var respuesta = JSON.parse(response.responseText);
 		
@@ -262,6 +259,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
             });        
 	},
 	anular : function () {
+		 //Phx.vista.Venta.superclass.onButtonNew.call(this);
 		Phx.CP.loadingShow();
         var rec=this.sm.getSelected();
         if(confirm('¿Está seguro de anular la factura?')){
@@ -608,7 +606,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 	title:'Ventas',
 	ActSave:'../../sis_ventas_facturacion/control/Venta/insertarVenta',
 	ActDel:'../../sis_ventas_facturacion/control/Venta/eliminarVenta',
-	ActList:'../../sis_ventas_facturacion/control/Venta/listarVenta',
+	ActList:'../../sis_ventas_facturacion/control/Venta/listarAnularVenta',
 	id_store:'id_venta',
 	fields: [
 		{name:'id_venta', type: 'numeric'},
@@ -716,8 +714,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     onButtonNew : function () {
         //abrir formulario de solicitud
         this.openForm('new');        
-    },
-    
+    },    
     onButtonEdit : function () {
         //abrir formulario de solicitud
         this.openForm('edit', this.sm.getSelected());               
