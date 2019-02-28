@@ -5,6 +5,8 @@
 *@author  (rarteaga)
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ ISSUE				FECHA		AUTOR				DESCRIPCION
+ 	#4	endeETR	 	21/02/2019	EGS					Se agregaron funciones y boton de subir archivos
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -15,7 +17,7 @@ Phx.vista.VentaVendedorPeajeETR = {
     requireclase: 'Phx.vista.VentaVendedor',
     ActList:'../../sis_ventas_facturacion/control/Venta/listarVentaETR',
     title: 'Venta',
-    nombreVista: 'VentaVendedorETR',
+    nombreVista: 'VentaVendedorPeajeETR',
     tipo_factura:'computarizadareg',
     formUrl: '../../../sis_ventas_facturacion/vista/venta/FormVentaETR.php',
     formClass : 'FormVentaETR',
@@ -76,6 +78,37 @@ Phx.vista.VentaVendedorPeajeETR = {
 				scope:this
 			})
 		}
+	},
+	
+	SubirArchivo : function(rec)//#4
+	{	 console.log('id_punto_venta',this.variables_globales.id_punto_venta) ; 
+		Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/venta/SubirArchivoFac.php',
+		'Subir Facturas',
+		{
+			modal:true,
+			width:450,
+			height:150
+		},
+		{ data: {  //objPadre: me ,
+			    maestro: this.maestro,
+				id_punto_venta:this.variables_globales.id_punto_venta,
+				tipo_factura:this.tipo_factura,
+				nombreVista:this.nombreVista
+
+		 }},
+		this.idContenedor,
+		'SubirArchivoFac');
+	},
+	
+	descargaPlantilla: function(){//#4
+		var     data  = "&extension=xlsx";
+	            data += "&sistema=sis_ventas_facturacion";
+	            data += "&clase=plantilla";
+	            data += "&url=./../../../sis_ventas_facturacion/reportes/plantillaExcelFacturaPeaje.xlsx";
+	            //return  String.format('{0}',"<div style='text-align:center'><a target=_blank href = '../../../lib/lib_control/CTOpenFile.php?"+ data+"' align='center' width='70' height='70'>Abrir</a></div>");
+	            window.open('../../../lib/lib_control/CTOpenFile.php?' + data);
+		
+		
 	},
     
     

@@ -5,7 +5,9 @@
 *@author  (admin)
 *@date 01-06-2015 05:58:00
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+* 		ISSUE 			Fecha				Autor				Descripcion
+*		#2	endeEtr		23/01/2019			EGS					se agrego reporte con lista de productos activos por puntos de venta
+ */
 
 class MODReportesVentas extends MODbase{
 	
@@ -379,6 +381,39 @@ class MODReportesVentas extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+	//#2
+	function listarProductoActivoPuntoV(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_repventa_sel';
+		$this->transaccion='VF_VENINGASPRO_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		//$this->setCount(false);
+				
+		$this->setParametro('id_venta','id_venta','integer');
+
+		//Definicion de la lista del resultado del query
+		//$this->captura('id','integer');
+		
+		$this->captura('id_punto_venta','int4');
+		$this->captura('codigo_punto_de_venta','varchar');
+		$this->captura('nombre_punto_de_venta','varchar');
+		$this->captura('id_punto_venta_producto','int4');
+		$this->captura('id_sucursal','int4');
+		$this->captura('nombre_sucursal','varchar');
+		$this->captura('id_sucursal_producto','int4');
+		$this->captura('id_concepto_ingas','int4');
+		$this->captura('codigo_ingas','varchar');
+		$this->captura('desc_ingas','varchar');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}	//#2
 			
 }
 ?>

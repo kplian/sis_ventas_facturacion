@@ -601,6 +601,17 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:false
         },
+        /* {
+            config:{
+                name: 'cuf',
+                fieldLabel: 'Cuf',              
+                gwidth: 110
+            },
+                type:'TextField',
+                filters:{pfiltro:'ven.cuf',type:'string'},              
+                grid:true,
+                form:false
+        },*/
 	],
 	tam_pag:50,	
 	title:'Ventas',
@@ -821,11 +832,11 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                scope:this
              })
    },
+   setVentaReporte:function(id_venta){
+   		this.id_venta = id_venta;
+   },
    ///#1				 15-10-2018			  EGS	 
-   elegirFormato: function(){
-   	var rec = this.sm.getSelected(),
-		data = rec.data,
-		me = this;
+   elegirFormato: function(){   	
    	
    	 
    var formato_comprobante = this.variables_globales.formato_comprobante.split("-");   
@@ -849,15 +860,18 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
    imprimirNota: function(){
 		//Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
 			
-			var rec = this.sm.getSelected(),
-				data = rec.data,
+			var rec = this.sm.getSelected();
+			if ('data' in rec) {
+				var data = rec.data,
 				me = this;
+			}
+			this.setVentaReporte(data.id_venta);
 			if (data) {
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({
 						url : '../../sis_ventas_facturacion/control/Venta/reporteFacturaRecibo',
 						params : {
-							'id_venta' : data.id_venta,
+							'id_venta' : this.id_venta,
 							'formato_comprobante' : me.variables_globales.formato_comprobante,
 							'tipo_factura': me.tipo_factura
 						},
@@ -881,16 +895,19 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     
     
      ///#1				 15-10-2018			  EGS	
-    imprimirPdf : function() {
-			var rec = this.sm.getSelected();
-			var data = rec.data;
-			me = this;			
+    imprimirPdf : function(id_venta) {
+    	var rec = this.sm.getSelected();
+			if (rec.data) {
+				var data = rec.data,
+				me = this;
+			}	
+			this.setVentaReporte(data.id_venta);		
 			if (data) {
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({
 					url : '../../sis_ventas_facturacion/control/Venta/reporteFacturaReciboPdf',
 					params : {
-							'id_venta' : data.id_venta,
+							'id_venta' : this.id_venta,
 							'formato_comprobante' : me.variables_globales.formato_comprobante,
 							'tipo_factura': me.tipo_factura
 					},

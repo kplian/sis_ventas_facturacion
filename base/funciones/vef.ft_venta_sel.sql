@@ -485,9 +485,9 @@ BEGIN
 		end;
     /*********************************    
  	#TRANSACCION:  'VF_VENREP_SEL'
- 	#DESCRIPCION:   Reporte de Recibo o Factura
+ 	#DESCRIPCION:   Reporte de Recibo o Factura para colocar en formato html en la vista
  	#AUTOR:		admin	
- 	#FECHA:		01-06-2015 05:58:00
+ 	#FECHA:		01-06-2015 05:58:00 modificado 14/02/2019
 	***********************************/
 
 	elsif(p_transaccion='VF_VENREP_SEL')then
@@ -531,7 +531,7 @@ BEGIN
                         ven.nro_factura,
                         dos.nroaut,
                         ven.nit,
-                        ven.cod_control,
+                        ven.cod_control,                        
                         to_char(dos.fecha_limite,''DD/MM/YYYY''),
                         dos.glosa_impuestos,
                         dos.glosa_empresa,
@@ -558,6 +558,7 @@ BEGIN
                         ven.transporte_cif,
                         ven.seguros_cif,
                         ven.otros_cif,
+                        
                         (to_char(ven.fecha,''DD'')::integer || '' de '' ||param.f_literal_periodo(to_char(ven.fecha,''MM'')::integer) || '' de '' || to_char(ven.fecha,''YYYY''))::varchar as fecha_literal,
 			(select count(*) from vef.ttipo_descripcion td where td.estado_reg = ''activo'' and td.id_sucursal = suc.id_sucursal)::integer as descripciones, 
 			ven.estado,
@@ -570,6 +571,10 @@ BEGIN
             ven.nro_tramite,
             tc.codigo as codigo_cliente,
             cli.lugar as lugar_cliente,
+            ven.cuf,
+            tc.codigo_sin,
+            suc.tipo_doc_fiscal,
+            suc.tipo_doc_sector,
             
             '||v_columnas_destino||'
             from vef.tventa ven						
@@ -1361,6 +1366,71 @@ BEGIN
 		end;
       
      
+     
+/*********************************    
+ 	#TRANSACCION:  'VF_FACTREPOREMITIDAS_SEL'
+ 	#DESCRIPCION:	Listado de facturas validadas para reporte des sistema siat 
+ 	#AUTOR:		rac	
+ 	#FECHA:		25-01-2019 05:58:00  
+	***********************************/
+
+	elsif(p_transaccion='VF_FACTEMITIDAS_SEL')then
+
+		begin
+        
+             v_consulta='select
+                           ven.id_venta,
+                          ven.id_proveedor,
+                          ven.id_sucursal,
+                          ven.total_venta,
+                          ven.estado,
+                          cli.nombre_factura as nombre_factura,                      
+                          cli.nit,                         
+                          ven.total_venta_msuc,         
+                          ven.fecha,
+                          ven.nro_factura,                   
+                          ven.observaciones,
+                          ent.nombre as nombre_entidad,
+                          ent.nit as nit_entidad
+                   		from vef.tventa ven				 				
+				        left join vef.tcliente cli on cli.id_cliente  = ven.id_cliente        
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join param.tentidad ent on ent.id_entidad = suc.id_entidad
+                   where ven.estado_reg = ''activo'' and ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+		end;
+        
+    /*********************************    
+ 	#TRANSACCION:  'VF_FACTEMITIDAS_CONT'
+ 	#DESCRIPCION:	Listado de facturas validadas para reporte des sistema siat 
+ 	#AUTOR:		rac	
+ 	#FECHA:		25-01-2019 05:58:00  
+	***********************************/
+
+	elsif(p_transaccion='VF_FACTEMITIDAS_CONT')then
+
+		begin
+        
+             v_consulta='select
+                          COUNT(*)
+                   		from vef.tventa ven				 				
+				        left join vef.tcliente cli on cli.id_cliente  = ven.id_cliente        
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        inner join param.tentidad ent on ent.id_entidad = suc.id_entidad
+                   where ven.estado_reg = ''activo'' and ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+		end;
+
       /*********************************    
  	#TRANSACCION:  'VF_VENEMISOR_SEL'
  	#DESCRIPCION:	Consulta para listar facturas pendientes de emision 
@@ -1643,7 +1713,102 @@ BEGIN
 			return v_consulta;
 
 		end; 
-      
+    
+    
+    	/*********************************    
+ 	#TRANSACCION:  'VF_VENFAC_SEL'
+ 	#DESCRIPCION:	Consulta para obtener datos detalle para factura
+ 	#AUTOR:		EAQ
+ 	#FECHA:		01-02-2019 12:12:51 
+	***********************************/
+
+	elsif(p_transaccion='VF_VENFAC_SEL')then
+
+		begin
+        
+             v_consulta='SELECT
+                        COALESCE(v.nro_factura,1)::integer as "numeroFactura",
+                        COALESCE(s.direccion,''s/n'')::varchar as direccion,
+                        (TO_CHAR(v.fecha_reg, ''YYYY-MM-DD'')||''T''||to_char(v.fecha_reg, ''HH:MI:SS.MS''))::varchar as "fechaEmision",
+                        COALESCE(td.codigo, 1)::integer as "codigoTipoDocumentoIdentidad",
+                        ''315A5639E89D58A2C450405514D2BDC7A9C5D6246''::varchar as cuf,
+                        COALESCE(v.nit,''0'')::varchar as "numeroDocumento",
+                        ''A12''::varchar as complemento,
+                        0::integer as "codigoSucursal",
+                        0::integer as "codigoPuntoVenta",
+                        COALESCE(v.nombre_factura,''s/z'')::varchar as "nombreRazonSocial",
+                        COALESCE(v.total_venta,0)::DECIMAL as "montoTotal",
+                        0::DECIMAL as "montoDescuento",
+                        COALESCE(c.codigo,''s/n'')::varchar as "codigoCliente",
+                        1 as "codigoDocumentoSector",
+                        (select empresa.nit::integer from param.tempresa empresa where empresa.estado_reg=''activo'') as "nitEmisor",
+                        1 as "codigoMetodoPago",
+						0::bigint as "numeroTarjeta",
+                        ''Ley Nro 453''::varchar as leyenda,
+                        u.cuenta::varchar as usuario, 
+                        688::integer as "codigoMoneda",
+                        25::decimal as "montoTotalMoneda",
+                        COALESCE(tc.oficial,0)::DECIMAL as "tipoCambio"
+
+                        FROM vef.tventa v
+                        JOIN vef.tsucursal s on s.id_sucursal = v.id_sucursal
+                        JOIN vef.tcliente c on c.id_cliente = v.id_cliente
+                        LEFT JOIN siat.ttipo_documento_siat td ON td.id_tipo_documento= c.id_tipo_documento
+                        LEFT JOIN vef.tpunto_venta pv ON pv.id_punto_venta=v.id_punto_venta
+                        JOIN segu.tusuario u ON u.id_usuario = v.id_usuario_reg
+                        LEFT JOIN param.ttipo_cambio tc on tc.fecha = v.fecha_reg::DATE
+                        
+                        WHERE';
+        	
+                              
+            --Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+		
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;      
+       
+    
+       	/*********************************    
+ 	#TRANSACCION:  'VF_VENFACDET_SEL'
+ 	#DESCRIPCION:	Consulta para obtener datos detalle para factura,
+ 	#AUTOR:		EAQ
+ 	#FECHA:		01-02-2019 12:12:51  
+	***********************************/
+
+	elsif(p_transaccion='VF_VENFACDET_SEL')then
+
+		begin
+        
+             v_consulta='SELECT
+                        ''11100''::varchar as "actividadEconomica",
+                        1112001::integer as "codigoProductoSin",
+                        ''333''::varchar as "codigoProducto",
+                        COALESCE(v.descripcion,''s/d'')::varchar as descripcion,
+                        COALESCE(v.cantidad,0)::integer as cantidad,
+                        COALESCE(v.precio,0)::decimal as "precioUnitario",
+                        1::decimal as "montoDescuento",
+                        (v.cantidad*v.precio) as "subTotal",
+                        0::integer as "numeroSerie",
+                        um.descripcion as "unidadMedida"
+
+                        FROM vef.tventa_detalle v
+                        LEFT JOIN vef.tsucursal_producto sp ON sp.id_sucursal_producto = v.id_sucursal_producto
+                        LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =  sp.id_concepto_ingas 
+                        LEFT JOIN vef.tactividad_economica ae ON ae.id_actividad_economica = ci.id_actividad_economica
+                        LEFT JOIN param.tunidad_medida um ON um.id_unidad_medida = ci.id_unidad_medida
+                        WHERE';
+        	
+                              
+            --Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+	
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end; 
+   
 	elsif(p_transaccion='VF_VENANU_SEL')then
      				
     	begin
@@ -1774,8 +1939,9 @@ BEGIN
 			--Devuelve la respuesta   
 			return v_consulta;
 
-		end;    
+		end;   
         				
+
 	else
 					     
 		raise exception 'Transaccion inexistente';
@@ -1790,6 +1956,7 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
+
 END;
 $body$
 LANGUAGE 'plpgsql'

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd" />
+  <xs:element name="facturaEstandar">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="cabecera">
+          <xs:complexType>
+            <xs:sequence>
+              
+              <xs:element name="numeroFactura">
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1" />
+                    <xs:maxInclusive value="99999999" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>     
+              
+              <xs:element name="direccion">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:minLength value="1" />
+                  <xs:maxLength value="250" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+              <xs:element name="fechaEmision" type="xs:dateTime" />
+              
+              <xs:element name="codigoTipoDocumentoIdentidad">
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1" />
+                    <xs:maxInclusive value="9" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>   
+              
+              <xs:element name="cuf" >
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1" />
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+              <xs:element name="numeroDocumento" >
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1" />
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="complemento" nillable="true">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="5" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>		   
+              <xs:element name="codigoSucursal">
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                  	<xs:minInclusive value="0"/>
+                    <xs:maxInclusive value="9999" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+			  
+              <xs:element name="codigoPuntoVenta" nillable="true">
+			  <xs:simpleType>
+			  <xs:restriction base="xs:integer">
+			  <xs:maxInclusive value="9999" />
+			  </xs:restriction>
+			  </xs:simpleType>
+			  </xs:element>
+			  
+			  <xs:element name="nombreRazonSocial" >
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1" />
+                    <xs:maxLength value="200" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+              <xs:element name="montoTotal">
+                <xs:simpleType>
+                 <xs:restriction base="xs:decimal">
+                   <xs:totalDigits value="20"/>
+                  <xs:fractionDigits value="5" />
+                  <xs:minExclusive value="0" />
+                </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+              <xs:element name="montoDescuento" nillable="true">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="20"/>
+                    <xs:fractionDigits value="5" />
+                   </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+              <xs:element name="codigoCliente" >
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1" />
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+              <xs:element name="codigoDocumentoSector" type="xs:integer" fixed="1"/>
+              
+              <xs:element name="nitEmisor">
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1" />
+                    <xs:maxInclusive value="9999999999999" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+              <xs:element name="codigoMetodoPago" >
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1" />
+                    <xs:maxInclusive value="99" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+              <xs:element name="numeroTarjeta"  nillable="true">
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                    <xs:maxInclusive value="9999999999999999" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+              <xs:element name="leyenda">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1" />
+                    <xs:maxLength value="200" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+              <xs:element name="usuario">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1" />
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+              <xs:element name="codigoMoneda" nillable="true">
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                    <xs:maxInclusive value="9999" />
+                    <xs:minExclusive value="0"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+              <xs:element name="montoTotalMoneda">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="20"/>
+                    <xs:fractionDigits value="5" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+              <xs:element name="tipoCambio">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="20"/>
+                    <xs:fractionDigits value="5" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>  
+
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="detalle" maxOccurs="100" minOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              
+			  <xs:element name="actividadEconomica">
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1" />
+                    <xs:maxInclusive value="99999999" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+              <xs:element name="codigoProductoSin">
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1" />
+                    <xs:maxInclusive value="9999999999" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+              <xs:element name="codigoProducto">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1" />
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>					  			  
+			  
+              <xs:element name="descripcion">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1" />
+                    <xs:maxLength value="200" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+              <xs:element name="cantidad">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:fractionDigits value="5" />
+                    <xs:minExclusive value="0" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+              <xs:element name="precioUnitario">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="20"/>
+                    <xs:fractionDigits value="5" />
+                    <xs:minExclusive value="0" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>   
+                         
+              <xs:element name="montoDescuento" nillable="true">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="20"/>
+                    <xs:fractionDigits value="5" />
+                    </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              
+              <xs:element name="subTotal">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="20"/>
+                    <xs:fractionDigits value="5" />
+                    <xs:minExclusive value="0" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+              <xs:element name="numeroSerie">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="0" />
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+
+            <xs:element name="unidadMedida" nillable="true">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element> 
+                          
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+		<xs:element ref="ds:Signature" />				
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

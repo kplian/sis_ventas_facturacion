@@ -20,7 +20,7 @@ class MODTemporalData extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 				
 		//Definicion de la lista del resultado del query
-		$this->captura('id_dato_temporal','int4');
+		$this->captura('id_temporal_data','int4');
 		$this->captura('razon_social','varchar');
 		$this->captura('estado_reg','varchar');
 		$this->captura('nro_factura','varchar');
@@ -32,7 +32,8 @@ class MODTemporalData extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-		
+		$this->captura('id_punto_venta','int4');
+		$this->captura('nombre_punto_venta','varchar');				
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -67,7 +68,7 @@ class MODTemporalData extends MODbase{
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_dato_temporal','id_dato_temporal','int4');
+		$this->setParametro('id_temporal_data','id_temporal_data','int4');
 		$this->setParametro('razon_social','razon_social','varchar');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('nro_factura','nro_factura','varchar');
@@ -87,7 +88,7 @@ class MODTemporalData extends MODbase{
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion
-		$this->setParametro('id_dato_temporal','id_dato_temporal','int4');
+		$this->setParametro('id_temporal_data','id_temporal_data','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
