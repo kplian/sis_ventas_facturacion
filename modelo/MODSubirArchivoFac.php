@@ -5,7 +5,9 @@
 *@author  (admin)
 *@date 01-03-2016 14:22:24
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+ ISSUE				FECHA		AUTOR				DESCRIPCION
+ 	#4	endeETR	 	21/02/2019	EGS					Se agregaron campos para punto de venta
+ */
 
 class MODSubirArchivoFac extends MODbase{
 	
@@ -112,6 +114,8 @@ function subirArchivoFac(){
 			$this->procedimiento='vef.f_inserta_factura';
 			$this->transaccion='VF_INSTEM_INS';
 			$this->tipo_procedimiento='IME';
+			
+			$this->setParametro('nombreVista', 'nombreVista','varchar');
 					
 			//Define los parametros para la funcion
 			$this->setParametro('id_funcionario_usu', 'id_funcionario_usu','int4');
@@ -276,6 +280,8 @@ function subirArchivoFac(){
 		$this->captura('total_venta','numeric');
 		$this->captura('total_detalle','numeric');
 		$this->captura('error','varchar');
+		$this->captura('id_punto_venta','integer');//#4
+		$this->captura('nombre_punto_venta','varchar');//#4
 		
 		
 		//Ejecuta la instruccion
