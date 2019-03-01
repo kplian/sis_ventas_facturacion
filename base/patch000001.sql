@@ -1161,5 +1161,25 @@ WITH (oids = false);
 
 /************************************F-SCP-EGS-VEF-1-10/01/2019*************************************************/
 
+/************************************I-SCP-EAQ-VEF-2-28/02/2019*************************************************/
+CREATE TABLE siat.tfact_xml (
+  id_fact_xml SERIAL,
+  id_venta INTEGER,
+  texto_xml TEXT,
+  observacion_xml VARCHAR(50),
+  ruta VARCHAR(1000),
+  CONSTRAINT tfact_xml_pkey PRIMARY KEY(id_fact_xml)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
 
+ALTER TABLE siat.tfact_xml
+  OWNER TO postgres;
+  
+/************************************F-SCP-EAQ-VEF-2-28/02/2019*************************************************/
+
+/************************************I-SCP-EAQ-VEF-3-28/02/2019*************************************************/
+ALTER TABLE vef.tcliente
+ADD id_tipo_documento INTEGER ;
+  
+/************************************F-SCP-EAQ-VEF-3-28/02/2019*************************************************/
 

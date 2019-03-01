@@ -384,6 +384,10 @@ class ACTVenta extends ACTbase{
 		$this->objFunc = $this->create('MODVenta');
 		$cabecera = $this->objFunc->listarCabecera($this->objParam);
 		
+		//var_dump($cabecera);
+		//exit;
+		
+		
 		$this->objFunc = $this->create('MODVenta');
 		$detalle = $this->objFunc->listarDetalle($this->objParam);
 		
