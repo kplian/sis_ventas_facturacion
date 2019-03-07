@@ -721,18 +721,22 @@ class ACTVenta extends ACTbase{
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
     }
 	function listarAnularVenta(){
+		
 		$this->objParam->defecto('ordenacion','id_venta');
 		if ($this->objParam->getParametro('id_gestion') != '') {
 			$this->objParam->addFiltro(" ven.fecha between ''". $this->objParam->getParametro('desde')."'' and ''".$this->objParam->getParametro('hasta')."'' ");
 		}  
+		
 		$this->objParam->defecto('dir_ordenacion','asc');
       	if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarAnularVenta');
 		} else{
+			
 			$this->objFunc=$this->create('MODVenta');
 			
 			$this->res=$this->objFunc->listarAnularVenta($this->objParam);
+		
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
