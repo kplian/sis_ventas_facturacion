@@ -750,7 +750,7 @@ class ACTVenta extends ACTbase{
 	    $r = $wsEstandar->ConvertObjectToArray($resultfac);
 		
 		
-	     $codigo_motivo_anulacion = $r['return']['codigoEstado'] ;
+	     $codigo_mensaje_soap = $r['return']['codigoEstado'] ;
 		 
 	    if ($codigo_motivo_anulacion==905)
 		{
@@ -761,7 +761,7 @@ class ACTVenta extends ACTbase{
 			
 		}  else {
 						
-			$this->objParam->addParametro('codigo_motivo_anulacion',$codigo_motivo_anulacion );
+			$this->objParam->addParametro('codigo_mensaje_soap',$codigo_mensaje_soap );
 		 	$this->objFunc=$this->create('MODVenta');	
 		    $this->res=$this->objFunc->anulacionVentaRespuesta($this->objParam);
 		    $this->res->imprimirRespuesta($this->res->generarJson());

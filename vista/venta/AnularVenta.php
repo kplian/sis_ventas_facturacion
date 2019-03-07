@@ -141,15 +141,14 @@ Phx.vista.AnularVenta=Ext.extend(Phx.gridInterfaz,{
                 form:true,
                 bottom_filter: true
         }
-        , {
-			config : {
-				name : 'id_motivo_anulacion',
+         , {	config : {
+				name : 'codigo_motivo_anulacion',
 				fieldLabel : 'Motivo Anulacion',
 				allowBlank : false,
 				emptyText : 'Motivo Anulacion...',
 				store : new Ext.data.JsonStore({
 					url : '../../sis_siat/control/MotivoAnulacion/listarMotivoAnulacion',
-					id : 'id_motivo_anulacion',
+					id : 'codigo',
 					root : 'datos',
 					sortInfo : {
 						field : 'codigo',
@@ -163,11 +162,11 @@ Phx.vista.AnularVenta=Ext.extend(Phx.gridInterfaz,{
 						par_filtro : 'codigo#descripcion'
 					}
 				}),
-				valueField : 'id_motivo_anulacion',
+				valueField : 'codigo',
 				displayField : 'descripcion',
 				gdisplayField : 'descripcion', //mapea al store del grid
 				tpl : '<tpl for="."><div class="x-combo-list-item"><p>({codigo}) {descripcion}</p> </div></tpl>',
-				hiddenName : 'id_motivo_anulacion',
+				hiddenName : 'codigo',
 				forceSelection : true,
 				typeAhead : true,
 				triggerAction : 'all',
@@ -189,8 +188,23 @@ Phx.vista.AnularVenta=Ext.extend(Phx.gridInterfaz,{
 				type : 'string'
 			},
 
-			grid : true,
+			grid : false,
 			form : true
+		}
+		,
+		 {
+			config:{
+				name: 'motivo_anulacion',
+				fieldLabel: 'Motivo Anulacion',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 300
+			},
+				type:'TextArea',
+				filters:{pfiltro:'ven.motivo_anulacion',type:'string'},
+				id_grupo:0,
+				grid:true,
+				form:false
 		}
 		
        

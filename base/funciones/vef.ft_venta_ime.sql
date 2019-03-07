@@ -1,11 +1,11 @@
-  CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
+CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
   p_transaccion varchar
 )
 RETURNS varchar AS
-$body$  
+$body$
   /**************************************************************************
    SISTEMA:		Sistema de Ventas
    FUNCION: 		vef.ft_venta_ime
@@ -267,7 +267,7 @@ $body$
             'VEN',
             v_id_periodo,-- par_id,
             NULL, --id_uo
-            7,    -- id_depto
+            NULL,    -- id_depto
             p_id_usuario,
             'VEF',
             NULL,
@@ -2045,41 +2045,6 @@ $body$
 
       end;
 
-
-	 /*********************************    
- 	#TRANSACCION:  'SIAT_FACTXML_INS'
- 	#DESCRIPCION:	inserta en siat.tfact_xml
- 	#AUTOR:			EAQ  
- 	#FECHA:		01-02-2019 12:12:51
-	***********************************/
-
-    elsif(p_transaccion='SIAT_FACTXML_INS')then
-
-      begin
-		v_parametros.texto_xml=replace(v_parametros.texto_xml,'{','<');
-        v_parametros.texto_xml=replace(v_parametros.texto_xml,'}','>');
-        v_parametros.texto_xml=replace(v_parametros.texto_xml,';','"');
-		insert into siat.tfact_xml(
-				id_venta,
-                texto_xml,
-                ruta
-            ) values (
-                v_parametros.id_venta,
-                v_parametros.texto_xml,
-                v_parametros.ruta
-            ) RETURNING id_venta into v_id_venta;
-        --Definicion de la respuesta
-        v_resp = pxp.f_agrega_clave(v_resp,'mensaje','INSERTO');
-        v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
-
-        --Devuelve la respuesta
-        return v_resp;
-
-      end;
-
-
-
-
 	/*********************************    
  	#TRANSACCION:  'VF_VEANU_MOD'
  	#DESCRIPCION:	Anulación de registros
@@ -2121,24 +2086,23 @@ $body$
            select descripcion
            into v_descripcion
    		   from siat.tmensaje_soap 
-           where codigo = v_parametros.codigo_motivo_anulacion;
+           where codigo in (v_parametros.codigo_mensaje_soap);
+           
                    
             update vef.tventa set
-			codigo_sin = v_parametros.codigo_sin,
-			--motivo_anulacion = v_parametros.motivo_anulacion,
+		    codigo_sin = v_parametros.codigo_sin,
+			codigo_motivo_anulacion = v_parametros.codigo_motivo_anulacion,
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario
 			where id_venta=v_parametros.id_venta;
-               
-			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Petición'||v_descripcion); 
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Petición no realizada:'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
-               
-            --Devuelve la respuesta
+             v_resp = pxp.f_agrega_clave(v_resp,'descripcion','MENSAJE SIN: '||v_descripcion::varchar);
+             --Devuelve la respuesta
             return v_resp;
             
 		end;
-
     else
 
       raise exception 'Transaccion inexistente: %',p_transaccion;
@@ -2161,4 +2125,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
