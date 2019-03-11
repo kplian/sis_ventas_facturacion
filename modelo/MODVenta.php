@@ -1271,7 +1271,7 @@ class MODVenta extends MODbase{
          $this->captura('comision','numeric');
          $this->captura('observaciones','text');
 		 $this->captura('codigo_sin','varchar');
-         $this->captura('motivo_anulacion','text');
+         $this->captura('motivo_anulacion','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -1305,8 +1305,9 @@ function anulacionVentaRespuesta(){
 
 		//Define los parametros para la funcion
 		$this->setParametro('id_venta','id_venta','int4');
-		$this->setParametro('codigo_motivo_anulacion','codigo_motivo_anulacion','text');
-
+		$this->setParametro('codigo_motivo_anulacion','codigo_motivo_anulacion','numeric');
+		$this->setParametro('codigo_sin','codigo_sin','numeric');
+		$this->setParametro('codigo_mensaje_soap','codigo_mensaje_soap','numeric');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

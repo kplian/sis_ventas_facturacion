@@ -331,4 +331,11 @@ VALUES
 
 /***********************************F-DAT-JRR-VEF-0-29/01/2019*****************************************/
 
+/***********************************I-DAT-AVQ-VEF-0-07/03/2019*****************************************/
+select pxp.f_insert_tgui ('Anular Ventas', 'Anular Ventas', 'ANUVEN', 'si', 10, 'sis_ventas_facturacion/vista/venta/FormFiltroAnularVenta.php', 3, '', 'FormFiltroAnularVenta', 'VEF');
+
+/***********************************F-DAT-AVQ-VEF-0-07/03/2019*****************************************/
+
+
+
 

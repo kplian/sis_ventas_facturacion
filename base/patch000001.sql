@@ -265,10 +265,9 @@ ALTER TABLE vef.tcliente
 ALTER TABLE vef.tventa
   ADD COLUMN id_punto_venta INTEGER;
   
-/*
+
 ALTER TABLE vef.tventa
   ADD COLUMN correlativo_venta VARCHAR(20)  DEFAULT '' NOT NULL;
-*/
   
 CREATE TABLE vef.tventa_forma_pago (
   id_venta_forma_pago SERIAL,  
@@ -1206,5 +1205,18 @@ ALTER TABLE vef.tventa
   ALTER TABLE vef.tventa
   ADD COLUMN motivo_anulacion TEXT;
 /************************************F-SCP-AVQ-VEF-0-22/02/2019*************************************************/
+/************************************I-SCP-AVQ-VEF-0-07/03/2019*************************************************/
+ALTER TABLE vef.tventa
+  RENAME COLUMN codigo_siat TO codigo_sin;
+  
+ ALTER TABLE vef.tventa
+  RENAME COLUMN motivo_anulacion TO codigo_motivo_anulacion;
 
+COMMENT ON COLUMN vef.tventa.codigo_motivo_anulacion
+IS 'Codigo de la tabla motivo anulacion';
+
+ALTER TABLE vef.tventa
+  ALTER COLUMN codigo_motivo_anulacion TYPE NUMERIC
+  USING codigo_motivo_anulacion::NUMERIC;       
+/************************************F-SCP-AVQ-VEF-0-07/03/2019*************************************************/
 
