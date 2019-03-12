@@ -450,7 +450,7 @@ class ACTVenta extends ACTbase{
 		$id = $this->res->datos['venta']; // obtiene el id_venta en la variable venta
 		unset($this->res->datos['venta']); // elimina la variable venta para no mostrar en la vista
 
-		$this->res->imprimirRespuesta($this->res->generarJson());
+		//$this->res->imprimirRespuesta($this->res->generarJson());
 		$this->objParam->addFiltro("v.id_venta = ". $id);
 		
 		$this->objFunc = $this->create('MODVenta');
@@ -462,7 +462,7 @@ class ACTVenta extends ACTbase{
 		// $datos = new convert_xml();
 		// $k=$datos->genera_xml($cabecera->generarJson(),$detalle->generarJson(),$id);
 
-
+		/*
 		$datos2 = new convert_xml2("factura_".$id, dirname(__FILE__).'/../../uploaded_files/archivos_facturacion_xml/');
 		
 		
@@ -485,12 +485,12 @@ class ACTVenta extends ACTbase{
 		$nombreArchivoXml = $datos2->getNombre();
 		$xmlString        = $datos2->getXmlString();
 
-
+*/
 		//var_dump('xmltexto'.$k);
 		
 		$this->res->imprimirRespuesta($this->res->generarJson());  
 		//insertar datos en tfact_xml
-		$this->insertarDatos($id, $xmlString, $nombreArchivoXml);
+		//$this->insertarDatos($id, $xmlString, $nombreArchivoXml);
 		
     }
 

@@ -1839,7 +1839,7 @@ Phx.vista.FormVenta=Ext.extend(Phx.frmInterfaz,{
     	} else {
     		Phx.CP.getPagina(this.idContenedorPadre).reload();
     		//generar reporte
-    		Phx.CP.getPagina(this.idContenedorPadre).setVentaReporte(datos_respuesta.ROOT.datos.id_venta);
+    		Phx.CP.getPagina(this.idContenedorPadre).setVentaReporte(datos_respuesta.ROOT.datos.id_venta,'formulario');
     		Phx.CP.getPagina(this.idContenedorPadre).elegirFormato();
 		    this.panel.close();
     	}

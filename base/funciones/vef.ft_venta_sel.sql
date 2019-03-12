@@ -570,6 +570,10 @@ BEGIN
             ven.nro_tramite,
             tc.codigo as codigo_cliente,
             cli.lugar as lugar_cliente,
+            ven.cuf,
+            tc.codigo_sin,
+            suc.tipo_doc_fiscal,
+            suc.tipo_doc_sector,
             
             '||v_columnas_destino||'
             from vef.tventa ven						
