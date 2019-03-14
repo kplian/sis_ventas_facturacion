@@ -22,6 +22,7 @@ include(dirname(__FILE__).'/../reportes/RFacturaRecibo.php');
 include(dirname(__FILE__).'/../reportes/RFacturaReciboPdf.php');
 include(dirname(__FILE__).'/../reportes/RPlantillaCarta.php');
 include(dirname(__FILE__).'/../../sis_siat/control/SiatClassWs.inc');
+
 include_once(dirname(__FILE__).'/../lib/cls_XML.php');
 
    
@@ -459,6 +460,66 @@ class ACTVenta extends ACTbase{
 		$this->objFunc = $this->create('MODVenta');
 		$detalle = $this->objFunc->listarDetalle($this->objParam);
 		
+		/*seleccionar los datos registrados para enviar a la generacion del CUF*/
+		
+		$cone = new conexion();
+		$this->link = $cone->conectarpdo();
+		$copiado = false;	
+		$sql = "select ent.nit, ven.fecha_reg, 0 as sucursal, 1 as modalidad, 1 as tipo_emision, 1 as codigo_doc, 1 as tipo_sector, ven.nro_factura, 0 as punto_venta
+  					from vef.tventa ven
+  					inner join vef.tsucursal suc on suc.id_sucursal=ven.id_sucursal
+  					inner join param.tentidad ent on ent.id_entidad = suc.id_entidad
+  					where ven.id_venta= ". $id;
+		$res = $this->link->prepare($sql);
+		$res->execute();
+		$result = $res->fetchAll(PDO::FETCH_ASSOC);
+		
+		$nit=$result[0]['nit'];
+		$fecha_emision = $result[0]['fecha_reg'];
+		$sucursal = $result[0]['sucursal'];
+		$modalidad = $result[0]['modalidad'];
+		$nro_factura = $result[0]['nro_factura'];
+		$codigo_documento_fiscal = $result[0]['codigo_doc']; 
+		$punto_venta = $result[0]['punto_venta'];
+		$tipo_documento_sector = $result[0]['tipo_sector']; 
+		$tipo_emision = $result[0]['tipo_emision'];
+		
+		$this->objParam->addParametro('nit',$nit);
+		$this->objParam->addParametro('fecha_emision',$fecha_emision);
+		$this->objParam->addParametro('sucursal',$sucursal);
+		$this->objParam->addParametro('modalidad',$modalidad);
+		$this->objParam->addParametro('nro_factura',$nro_factura);
+		$this->objParam->addParametro('codigo_documento_fiscal',$codigo_documento_fiscal);
+		$this->objParam->addParametro('punto_venta',$punto_venta);
+		$this->objParam->addParametro('tipo_documento_sector',$tipo_documento_sector);
+		$this->objParam->addParametro('tipo_emision',$tipo_emision);
+		
+		$this->objFunc=$this->create('sis_siat/MODCuf');    
+		$this->resCuf = $this->objFunc->insertarCuf($this->objParam);
+		
+		$cuf = $this->resCuf->datos['cuf'];
+		
+		$this->objParam->addParametro('id_venta',$id);
+		$this->objParam->addParametro('cuf',$cuf);
+		
+		$this->objFunc = $this->create('MODVenta');
+		$modCuf = $this->objFunc->modificarVentaCuf($this->objParam);
+		
+		//var_dump($this->resCuf->datos['cuf']);
+		
+		
+		
+		/*
+		$this->objParam->addParametro('historico','');
+		$this->objParam->addParametro('tipo_factura',$this->objParam->getParametro('tipo_factura'));
+		$this->objParam->addParametro('id_sucursal',$this->objParam->getParametro('id_sucursal'));
+		$this->objParam->addParametro('id_punto_venta','');
+		$this->objParam->addParametro('tipo_usuario',$this->objParam->getParametro('tipo_usuario'));
+		$this->objFunc = $this->create('MODVenta');
+		$paramCuf = $this->objFunc->listarVenta($this->objParam);
+		
+		var_dump($paramCuf);*/
+		
 		// $datos = new convert_xml();
 		// $k=$datos->genera_xml($cabecera->generarJson(),$detalle->generarJson(),$id);
 
@@ -491,6 +552,8 @@ class ACTVenta extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());  
 		//insertar datos en tfact_xml
 		//$this->insertarDatos($id, $xmlString, $nombreArchivoXml);
+		
+
 		
     }
 

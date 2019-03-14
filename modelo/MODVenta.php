@@ -866,6 +866,26 @@ class MODVenta extends MODbase{
 		$this->setParametro('a_cuenta','a_cuenta','numeric');
 		$this->setParametro('total_venta','total_venta','numeric');
 		$this->setParametro('fecha_estimada_entrega','fecha_estimada_entrega','date');
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function modificarVentaCuf(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VF_VENCUF_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('cuf','cuf','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
