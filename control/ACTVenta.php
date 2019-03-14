@@ -727,6 +727,9 @@ class ACTVenta extends ACTbase{
 			$this->objParam->addFiltro(" ven.fecha between ''". $this->objParam->getParametro('desde')."'' and ''".$this->objParam->getParametro('hasta')."'' ");
 		}  
 		
+		if ($this->objParam->getParametro('estado') != '') {
+			$this->objParam->addFiltro(" ven.estado= ''". $this->objParam->getParametro('estado')."''");
+		}  
 		$this->objParam->defecto('dir_ordenacion','asc');
       	if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);

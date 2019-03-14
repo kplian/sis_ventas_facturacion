@@ -1241,14 +1241,9 @@ class MODVenta extends MODbase{
 		$this->transaccion='VF_VENANU_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 	
-/*
-		$this->setParametro('historico','historico','varchar');
-		$this->setParametro('tipo_factura','tipo_factura','varchar');
-		$this->setParametro('id_sucursal','id_sucursal','integer');
-		$this->setParametro('id_punto_venta','id_punto_venta','integer');
-        $this->setParametro('tipo_usuario','tipo_usuario','varchar');
-*/
-	
+
+		$this->setParametro('estado','estado','varchar');
+
 		//Definicion de la lista del resultado del query
 		 $this->captura('id_venta','int4');
 		 $this->captura('id_cliente','int4');

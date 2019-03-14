@@ -11,23 +11,39 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.AnularVenta=Ext.extend(Phx.gridInterfaz,{
-
+	swEstado: 'finalizado',
+	filtroiniciado:false,
+gruposBarraTareas: [
+		{
+			name: 'finalizado',
+			title: '<H1 align="center"><i class="fa fa-thumbs-o-down"></i> Finalizados</h1>',
+			grupo: 0,
+			height: 0
+		},
+		{
+			name: 'anulado',
+			title: '<H1 align="center"><i class="fa fa-eye"></i>Anulados</h1>',
+			grupo: 1,
+			height:   0
+		}
+	],
 	constructor:function(config){
 		this.maestro=config.maestro;
-    	//llama al constructor de la clase padre
+		
+		//llama al constructor de la clase padre
 		Phx.vista.AnularVenta.superclass.constructor.call(this,config);
 		
-	    this.grid.getTopToolbar().disable();
-		this.grid.getBottomToolbar().disable();
-		this.init();
-		this.addButton('anular_factura', {
-            text: 'Anular Factura',
-            iconCls: 'bupload',
-            disabled: true,
-            handler: this.BAnularFactura,
-            tooltip: '<b>Anular Factura</b><br/>Anular una factura finalizada.'
-        });
-		//this.load({params:{start:0, limit:this.tam_pag}})
+		    this.grid.getTopToolbar().enable();
+			this.grid.getBottomToolbar().disable();
+			this.init();
+			this.store.baseParams = {'estado': this.swEstado};
+	    	this.addButton('anular_factura', {
+	            text: 'Anular Factura',
+	            iconCls: 'bupload',
+	            disabled: true,
+	            handler: this.BAnularFactura,
+	            tooltip: '<b>Anular Factura</b><br/>Anular una factura finalizada.'
+	        });
 	},
 			
 	Atributos:[
@@ -248,13 +264,16 @@ Phx.vista.AnularVenta=Ext.extend(Phx.gridInterfaz,{
 	bsave:false, 
 	bnew:false,
 	bedit:false,
+	bact:true,
 	onReloadPage:function(param){
 		//Se obtiene la gestión en función de la fecha del comprobante para filtrar partidas, cuentas, etc.
 		var me = this;
 		this.initFiltro(param);
 	},
 	initFiltro: function(param){
+		this.filtroiniciado=true;
 		this.store.baseParams=param;
+		this.store.baseParams={estado:'finalizado'};
 		this.load( { params: { start:0, limit: this.tam_pag } });
 	},
 	onButtonNew: function () {
@@ -276,48 +295,34 @@ Phx.vista.AnularVenta=Ext.extend(Phx.gridInterfaz,{
 				
 
 	},
-	
-    /*
-    preparaMenu:function(n){
-      	
-      	Phx.vista.AnularVenta.superclass.preparaMenu.call(this,n);      	
-		  var data = this.getSelectedData();
-
-		  var tb =this.tbar;
+	getParametrosFiltro: function () {
 		
-			this.getBoton('anular_factura').disable();
-
-		if (data['codigo_sin'] != '') {
-
-			this.getBoton('anular_factura').enable();
-			
-		}
-
-       return tb
+		
+   	 	this.store.baseParams.estado = this.swEstado;
 		
 	},
-	liberaMenu:function(){
-        var tb = Phx.vista.AnularVenta.superclass.liberaMenu.call(this);
-        if(tb){
-           
-           this.getBoton('anular_factura').disable();
-			        
-        }
-       return tb
- },*/
-		successDerivar : function(resp) {
-
-			Phx.CP.loadingHide();
-			var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-			if (!reg.ROOT.error) {
-				alert(reg.ROOT.detalle.mensaje)
-
+	actualizarSegunTab: function (name, indice) {
+		
+		  if (this.filtroiniciado){
+		  	
+		    if (name=='finalizado'){
+				this.swEstado = name;
+				this.getBoton('act').show();
+			}else{
+			    this.swEstado = name;
+			    this.getBoton('act').show();
+			    this.getBoton('excel').show();
+				
 			}
-			this.reload();
-
-		}
+			
+		 	this.getParametrosFiltro();
+			this.load();
+          }
+		
+    }
+	
+   
 	
 		
 })
-</script>
-		
+</script>		
