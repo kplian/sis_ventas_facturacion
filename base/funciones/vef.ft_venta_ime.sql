@@ -125,6 +125,7 @@ $body$
     v_tipo_dosificacion         varchar; --#123
     v_tabla_aux			        varchar;
 	va_id_estado_wf			varchar[];
+    va_id_tipo_estado		VARCHAR[];
 	va_codigo_estado		varchar[];
     v_descripcion           text;   --Ana
 
@@ -664,6 +665,7 @@ $body$
         --Definicion de la respuesta
         v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas almacenado(a) con exito (id_venta'||v_id_venta||')');
         v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_id_venta::varchar);
+        v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_wf',v_id_proceso_wf::varchar);
 
         --Devuelve la respuesta
         return v_resp;
@@ -1044,6 +1046,7 @@ $body$
         --Definicion de la respuesta
         v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ventas modificado(a)');
         v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+        v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_wf',v_registros.id_proceso_wf::varchar);
 
         --Devuelve la respuesta
         return v_resp;
@@ -1501,44 +1504,8 @@ $body$
          
         if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si')   AND   v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN 
           v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'INS',v_parametros.id_venta);
-        end if;
+        end if;        
         
-        --jrr:si la variable global esta habilitada pasar la venta al siguiente estado 
-        if (pxp.f_get_variable_global('vef_sig_estado_automatico') = 'si') THEN 
-        	
-	        v_tabla_aux = pxp.f_crear_parametro(ARRAY[	
-	                                        '_nombre_usuario_ai',
-	                                        '_id_usuario_ai',
-	                                        'id_proceso_wf',                                        
-	                                        'id_estado_wf',
-	                                        'obs'],
-	                                    ARRAY[	
-	                                        coalesce(v_parametros._nombre_usuario_ai,''),
-	                                        coalesce(v_parametros._id_usuario_ai::varchar,''),                                        
-	                                        v_venta.id_proceso_wf::varchar,
-	                                        v_venta.id_estado_wf::varchar,
-	                                        ''::varchar
-	                                        ],
-	                                    ARRAY[
-	                                        'varchar',
-	                                        'int4',  
-	                                        'int4',
-	                                        'int4',                              			
-	                                        'text']
-	                                    );
-			v_resp = wf.f_proceso_wf_ime(p_administrador,p_id_usuario,v_tabla_aux,'WF_SIGPRO_IME');
-			
-			--recueprar id_doc_compra_venta
-            va_id_estado_wf = pxp.f_recupera_clave(v_resp,'id_estado_wf');
-            va_codigo_estado = pxp.f_recupera_clave(v_resp,'estado');
-            
-            --jrr actualizar estado en tabla local
-            update vef.tventa set
-              id_estado_wf = va_id_estado_wf[1]::integer,
-              estado = va_codigo_estado[1]
-            where id_venta = v_parametros.id_venta; 
-			v_resp = '';
-		end if;
         --Definicion de la respuesta
         v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada');
         v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
@@ -1650,25 +1617,101 @@ $body$
        $this->setParametro('json_procesos','json_procesos','text');
        */
        
-       
-        select
-          ew.id_tipo_estado ,
-          ew.id_estado_wf
-        into
-          v_id_tipo_estado,
-          v_id_estado_wf
-
-        from wf.testado_wf ew
-          inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
-        where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
-
-        select 
+       select 
            v.*,s.id_entidad,tv.tipo_base into v_venta
         from vef.tventa v
           inner join vef.tsucursal s on s.id_sucursal = v.id_sucursal          
           inner join vef.ttipo_venta tv on tv.codigo = v.tipo_factura and tv.estado_reg = 'activo'
           left  join vef.tcliente c on c.id_cliente = v.id_cliente
         where v.id_proceso_wf = v_parametros.id_proceso_wf_act;
+       
+       --jrr:si la variable global esta habilitada pasar la venta al siguiente estado 
+        if (pxp.f_existe_parametro(p_tabla,'paso_automatico') and v_venta.estado = 'borrador' ) THEN 
+        	
+	        v_tabla_aux = pxp.f_crear_parametro(ARRAY[	
+	                                        '_nombre_usuario_ai',
+	                                        '_id_usuario_ai',
+	                                        'id_proceso_wf',                                        
+	                                        'id_estado_wf',
+	                                        'obs'],
+	                                    ARRAY[	
+	                                        coalesce(v_parametros._nombre_usuario_ai,''),
+	                                        coalesce(v_parametros._id_usuario_ai::varchar,''),                                        
+	                                        v_venta.id_proceso_wf::varchar,
+	                                        v_venta.id_estado_wf::varchar,
+	                                        ''::varchar
+	                                        ],
+	                                    ARRAY[
+	                                        'varchar',
+	                                        'int4',  
+	                                        'int4',
+	                                        'int4',                              			
+	                                        'text']
+	                                    );
+			v_resp = wf.f_proceso_wf_ime(p_administrador,p_id_usuario,v_tabla_aux,'WF_SIGPRO_IME');
+			--raise exception '%',v_resp;
+            --
+			 
+            va_id_estado_wf = pxp.f_recupera_clave(v_resp,'id_estado_wf');  
+            v_id_estado_actual = va_id_estado_wf[1];
+            va_id_tipo_estado = pxp.f_recupera_clave(v_resp,'id_tipo_estado'); 
+            v_id_tipo_estado = va_id_tipo_estado[1]; 
+                       
+            
+            -- obtener datos tipo estado
+        	select
+              te.codigo,te.fin
+            into
+              v_codigo_estado_siguiente,v_es_fin
+            from wf.ttipo_estado te
+            where te.id_tipo_estado = v_id_tipo_estado;                       
+            
+        else
+        	select
+              ew.id_tipo_estado ,
+              ew.id_estado_wf
+            into
+              v_id_tipo_estado,
+              v_id_estado_wf
+
+            from wf.testado_wf ew
+              inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
+            where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
+            
+            -- obtener datos tipo estado
+        	select
+              te.codigo,te.fin
+            into
+              v_codigo_estado_siguiente,v_es_fin
+            from wf.ttipo_estado te
+            where te.id_tipo_estado = v_parametros.id_tipo_estado;
+            
+            --configurar acceso directo para la alarma
+            v_acceso_directo = '';
+            v_clase = '';
+            v_parametros_ad = '';
+            v_tipo_noti = 'notificacion';
+            v_titulo  = 'Visto Bueno';
+
+            -- hay que recuperar el supervidor que seria el estado inmediato,...
+            v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado,
+                                                          v_parametros.id_funcionario_wf,
+                                                          v_parametros.id_estado_wf_act,
+                                                          v_parametros.id_proceso_wf_act,
+                                                          p_id_usuario,
+                                                          v_parametros._id_usuario_ai,
+                                                          v_parametros._nombre_usuario_ai,
+                                                          v_id_depto,
+                                                          v_obs,
+                                                          v_acceso_directo ,
+                                                          v_clase,
+                                                          v_parametros_ad,
+                                                          v_tipo_noti,
+                                                          v_titulo);
+        
+		end if;
+
+        
         
         
         -- #123  identifica si es una nota de credito o no
@@ -1707,13 +1750,7 @@ $body$
         
          v_resp = vef.ft_venta_ime(p_administrador,p_id_usuario,v_tabla,'VF_VENVALI_MOD');
         
-        -- obtener datos tipo estado
-          select
-          te.codigo,te.fin
-        into
-          v_codigo_estado_siguiente,v_es_fin
-        from wf.ttipo_estado te
-        where te.id_tipo_estado = v_parametros.id_tipo_estado;
+        
 
         IF  pxp.f_existe_parametro(p_tabla,'id_depto_wf') THEN
 
@@ -1726,39 +1763,12 @@ $body$
         ELSE
           v_obs='---';
         END IF;
-     
-    
-      
-        --configurar acceso directo para la alarma
-        v_acceso_directo = '';
-        v_clase = '';
-        v_parametros_ad = '';
-        v_tipo_noti = 'notificacion';
-        v_titulo  = 'Visto Bueno';
-
-        -- hay que recuperar el supervidor que seria el estado inmediato,...
-        v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado,
-                                                      v_parametros.id_funcionario_wf,
-                                                      v_parametros.id_estado_wf_act,
-                                                      v_parametros.id_proceso_wf_act,
-                                                      p_id_usuario,
-                                                      v_parametros._id_usuario_ai,
-                                                      v_parametros._nombre_usuario_ai,
-                                                      v_id_depto,
-                                                      v_obs,
-                                                      v_acceso_directo ,
-                                                      v_clase,
-                                                      v_parametros_ad,
-                                                      v_tipo_noti,
-                                                      v_titulo);
-
-
  
         IF  vef.f_fun_inicio_venta_wf(p_id_usuario,
                                       v_parametros._id_usuario_ai,
                                       v_parametros._nombre_usuario_ai,
                                       v_id_estado_actual,
-                                      v_parametros.id_proceso_wf_act,
+                                      v_venta.id_proceso_wf,
                                       v_codigo_estado_siguiente) THEN
 
         END IF;
