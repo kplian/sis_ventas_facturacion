@@ -265,10 +265,9 @@ ALTER TABLE vef.tcliente
 ALTER TABLE vef.tventa
   ADD COLUMN id_punto_venta INTEGER;
   
- 
+
 ALTER TABLE vef.tventa
   ADD COLUMN correlativo_venta VARCHAR(20)  DEFAULT '' NOT NULL;
-  
   
 CREATE TABLE vef.tventa_forma_pago (
   id_venta_forma_pago SERIAL,  
@@ -957,7 +956,7 @@ ALTER TABLE vef.tcliente
 
 
 
-/************************************I-SCP-RAC-VEF-0-25/09/2018*************************************************/
+/************************************I-SCP-RAC-VEF-0-27/10/2018*************************************************/
 
 --------------- SQL ---------------
 
@@ -1002,12 +1001,12 @@ IS 'centro de costo para contabilizar el ingreso de la factura';
 
 
 --------------- SQL ---------------
-
-ALTER TABLE vef.tventa
-  ADD COLUMN nit_internacional VARCHAR(2) DEFAULT 'no' NOT NULL;
-
-COMMENT ON COLUMN vef.tventa.nit_internacional
-IS 'cuadno el nit es internacional el codigo de control segenera con ceroy tambien para libro de ventas';
+	
+	ALTER TABLE vef.tventa
+	  ADD COLUMN nit_internacional VARCHAR(2) DEFAULT 'no' NOT NULL;
+	
+	COMMENT ON COLUMN vef.tventa.nit_internacional
+	IS 'cuadno el nit es internacional el codigo de control segenera con ceroy tambien para libro de ventas';
 
 
 ALTER TABLE vef.tventa
@@ -1051,11 +1050,7 @@ ALTER TABLE vef.tventa_detalle
 COMMENT ON COLUMN vef.tventa_detalle.id_doc_concepto
 IS 'referencia el concepto en libro de ventas';
 
-ALTER TABLE vef.tventa
-  ALTER COLUMN correlativo_venta TYPE VARCHAR(40);
-
-
-/************************************F-SCP-RAC-VEF-0-25/09/2018*************************************************/
+/************************************F-SCP-RAC-VEF-0-27/10/2018*************************************************/
 
 /************************************I-SCP-EGS-VEF-0-08/11/2018*************************************************/
 --------------- SQL ---------------
@@ -1129,6 +1124,81 @@ WITH (oids = false);
 
 /************************************F-SCP-EGS-VEF-0-08/11/2018*************************************************/
 
+/************************************I-SCP-EGS-VEF-1-10/01/2019*************************************************/
+CREATE TABLE vef.tproveedor_cuenta_banco_cobro (
+  id_proveedor_cuenta_banco_cobro SERIAL,
+  id_proveedor INTEGER,
+  tipo VARCHAR(20) NOT NULL,
+  nro_cuenta_bancario TEXT,
+  id_institucion INTEGER,
+  fecha_alta DATE,
+  fecha_baja DATE,
+  id_moneda INTEGER,
+  CONSTRAINT tproveedor_cuenta_banco_cobro_pkey PRIMARY KEY(id_proveedor_cuenta_banco_cobro)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE vef.tproveedor_cuenta_banco_cobro
+  ALTER COLUMN id_proveedor SET STATISTICS 0;
+
+ALTER TABLE vef.tproveedor_cuenta_banco_cobro
+  ALTER COLUMN tipo SET STATISTICS 0;
+  
+CREATE TABLE vef.tconcepto_carta_plt (
+  id_concepto_carta_plt SERIAL,
+  codigo_concepto_ingas VARCHAR(100),
+  npc VARCHAR(20),
+  id_concepto_ingas INTEGER,
+  tipo VARCHAR(50),
+  id_carta_plantilla INTEGER,
+  CONSTRAINT tconcepto_carta_plt_pkey PRIMARY KEY(id_concepto_carta_plt)
+) INHERITS (pxp.tbase)
+WITH (oids = false);  
+
+/************************************F-SCP-EGS-VEF-1-10/01/2019*************************************************/
+
+/************************************I-SCP-EGS-VEF-2-29/01/2019*************************************************/
+ALTER TABLE vef.tventa
+  ALTER COLUMN correlativo_venta TYPE VARCHAR(40);
+/************************************F-SCP-EGS-VEF-2-29/01/2019*************************************************/
+/************************************I-SCP-EGS-VEF-3-20/02/2019*************************************************/
+ALTER TABLE vef.ttemporal_data
+  ADD COLUMN id_punto_venta INTEGER;
+/************************************F-SCP-EGS-VEF-3-20/02/2019*************************************************/
+
+/************************************I-SCP-FPT-VEF-0-13/02/2019*************************************************/
+
+ALTER TABLE vef.tventa
+  ADD COLUMN cuf VARCHAR(50);
+
+COMMENT ON COLUMN vef.tventa.cuf
+IS 'Código cuf en ves del código de control, nuevo codigo unico de factura';
+/************************************F-SCP-FPT-VEF-0-13/02/2019*************************************************/
+/************************************I-SCP-FPT-VEF-0-14/02/2019*************************************************/
+ALTER TABLE vef.tcliente
+  ADD COLUMN codigo_sin VARCHAR(10) DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tcliente.codigo_sin
+IS 'codigo otorgado por servicio de impuestos';
+
+------------sql--------------
+ALTER TABLE vef.tsucursal
+  ADD COLUMN tipo_doc_fiscal SMALLINT DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tsucursal.tipo_doc_fiscal
+IS 'Parámetro var3 representa el TIPO DE DOCUMENTO FISCAL , código otorgado por impuestos.';
+
+---------------sql----------------------------------
+ALTER TABLE vef.tsucursal
+  ADD COLUMN tipo_doc_sector SMALLINT DEFAULT 1 NOT NULL;
+COMMENT ON COLUMN vef.tsucursal.tipo_doc_sector
+IS 'Parámetro var4 representa el TIPO DOCUMENTO SECTOR, codigo otorgado por impuestos.';
+
+/************************************F-SCP-FPT-VEF-0-14/02/2019*************************************************/
+
+
+
+<<<<<<< HEAD
 /************************************I-SCP-JMH-VEF-0-18/01/2019*************************************************/
 CREATE TABLE vef.tcuis (
   id_cuis SERIAL NOT NULL,
@@ -1180,4 +1250,27 @@ ALTER TABLE vef.tcuifd
 
 /************************************F-SCP-JMH-VEF-0-23/01/2019*************************************************/
 
+=======
+/************************************I-SCP-AVQ-VEF-0-22/02/2019*************************************************/
+ALTER TABLE vef.tventa
+  ADD COLUMN codigo_siat VARCHAR;
+  
+  ALTER TABLE vef.tventa
+  ADD COLUMN motivo_anulacion TEXT;
+/************************************F-SCP-AVQ-VEF-0-22/02/2019*************************************************/
+/************************************I-SCP-AVQ-VEF-0-07/03/2019*************************************************/
+ALTER TABLE vef.tventa
+  RENAME COLUMN codigo_siat TO codigo_sin;
+  
+ ALTER TABLE vef.tventa
+  RENAME COLUMN motivo_anulacion TO codigo_motivo_anulacion;
+
+COMMENT ON COLUMN vef.tventa.codigo_motivo_anulacion
+IS 'Codigo de la tabla motivo anulacion';
+
+ALTER TABLE vef.tventa
+  ALTER COLUMN codigo_motivo_anulacion TYPE NUMERIC
+  USING codigo_motivo_anulacion::NUMERIC;       
+/************************************F-SCP-AVQ-VEF-0-07/03/2019*************************************************/
+>>>>>>> 41f02f75d443527de41fdfc6e7bd4d64f02720a5
 

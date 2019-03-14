@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_venta_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -572,6 +570,10 @@ BEGIN
             ven.nro_tramite,
             tc.codigo as codigo_cliente,
             cli.lugar as lugar_cliente,
+            ven.cuf,
+            tc.codigo_sin,
+            suc.tipo_doc_fiscal,
+            suc.tipo_doc_sector,
             
             '||v_columnas_destino||'
             from vef.tventa ven						
@@ -1564,12 +1566,7 @@ BEGIN
 						
 		end;
 
-	/*********************************    
- 	#TRANSACCION:  'VF_VENEMISOR_CONT'
- 	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
- 	#FECHA:		01-06-2015 05:58:00  
-	***********************************/
+	
 
 	elsif(p_transaccion='VF_VENEMISOR_CONT')then
 
@@ -1645,7 +1642,92 @@ BEGIN
 			return v_consulta;
 
 		end; 
+     	/*********************************    
+ 	#TRANSACCION:  'VF_VENANU_SEL'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-01-2019 05:58:00
+	***********************************/ 
+	elsif(p_transaccion='VF_VENANU_SEL')then
+     				
+    	begin
+         	--Sentencia de la consulta
+			v_consulta:='select
+                            ven.id_venta,
+                            ven.id_cliente,
+                            ven.id_sucursal,
+                            ven.id_proceso_wf,
+                            ven.id_estado_wf,
+                            ven.estado_reg,
+                            ven.correlativo_venta,
+                            ven.a_cuenta,
+                            ven.total_venta,
+                            ven.fecha_estimada_entrega,
+                            ven.usuario_ai,
+                            ven.fecha_reg,
+                            ven.id_usuario_reg,
+                            ven.id_usuario_ai,
+                            ven.id_usuario_mod,
+                            ven.fecha_mod,
+                            ven.porcentaje_descuento,
+                            ven.id_vendedor_medico,
+                            ven.comision,
+                            ven.observaciones,
+                            ven.codigo_sin,
+                            moa.descripcion                       	
+						from vef.tventa ven
+						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+					    inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        --inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
+                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
+                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
+                        left join siat.tmotivo_anulacion moa on moa.codigo=ven.codigo_motivo_anulacion
+                        where ven.estado_reg = ''activo'' and' ;
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            
+            
           
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+
+	/*********************************    
+ 	#TRANSACCION:  'VF_VENANU_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		01-06-2015 05:58:00
+	***********************************/
+
+	elsif(p_transaccion='VF_VENANU_CONT')then
+
+		begin
+        	
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='
+                        select count(ven.id_venta)
+					    from vef.tventa ven
+					    inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg                        
+						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+					    inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
+                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
+                        left join siat.tmotivo_anulacion moa on moa.codigo=ven.codigo_motivo_anulacion
+                        where ven.estado_reg = ''activo'' and' ;
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta   
+			return v_consulta;
+
+		end;    
         				
 	else
 					     

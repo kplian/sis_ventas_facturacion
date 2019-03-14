@@ -96,11 +96,6 @@ class MODVenta extends MODbase{
 		
 		$this->captura('formato_comprobante','varchar');
 		$this->captura('tipo_factura','varchar');
-		
-		
-		
-      
-		
 		//Ejecuta la instruccion
 		$this->armarConsulta();		
 		$this->ejecutarConsulta();
@@ -466,8 +461,75 @@ class MODVenta extends MODbase{
 		return $this->respuesta;
 	}
 
+ /* funcion para listar datos de Reporte para el sistema siat*/
 
 
+ function listarDocFiscalesEmitidosReporteSiat(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_FACTEMITIDAS_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+
+    
+   		//Definicion de la lista del resultado del query
+			
+		
+		$this->captura('id_venta','int4');
+		$this->captura('id_proveedor','int4');
+		$this->captura('id_sucursal','int4');
+		$this->captura('total_venta','NUMERIC');
+		$this->captura('estado','VARCHAR');
+		$this->captura('nombre_factura','VARCHAR');
+		$this->captura('nit','varchar');		
+		$this->captura('total_venta_msuc','NUMERIC');		
+		$this->captura('fecha','date');
+		$this->captura('nro_factura','int4');
+		//$this->captura('nroaut','VARCHAR');
+		$this->captura('observaciones','TEXT');
+		$this->captura('nombre_entidad','VARCHAR');
+		$this->captura('nit_entidad','VARCHAR');
+						
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+ function listarDocFiscalesAnuladasReporteSiat(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_FACTEMITIDAS_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+				   
+   		//Definicion de la lista del resultado del query
+			
+		
+		$this->captura('id_venta','int4');
+		$this->captura('id_proveedor','int4');
+		$this->captura('id_sucursal','int4');
+		$this->captura('total_venta','NUMERIC');
+		$this->captura('estado','VARCHAR');
+		$this->captura('nombre_factura','VARCHAR');
+		$this->captura('nit','varchar');		
+		$this->captura('total_venta_msuc','NUMERIC');		
+		$this->captura('fecha','date');
+		$this->captura('nro_factura','int4');
+		//$this->captura('nroaut','VARCHAR');
+		$this->captura('observaciones','TEXT');
+		$this->captura('nombre_entidad','VARCHAR');
+		$this->captura('nit_entidad','VARCHAR');
+				
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 
 	function getVariablesBasicas(){
 		//Definicion de variables para ejecucion del procedimientp
@@ -755,10 +817,11 @@ class MODVenta extends MODbase{
             $this->armarConsulta();
             $stmt = $link->prepare($this->consulta);          
             $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);               
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
             //recupera parametros devuelto depues de insertar ... (id_formula)
             $resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+            $resp_procedimiento['datos']['venta'] = $resp_procedimiento['datos']['id_venta'];
 			$respuesta = $resp_procedimiento['datos'];            
             
 			
@@ -788,7 +851,7 @@ class MODVenta extends MODbase{
         
         return $this->respuesta;
     }
-			
+
 	function modificarVenta(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='vef.ft_venta_ime';
@@ -803,6 +866,26 @@ class MODVenta extends MODbase{
 		$this->setParametro('a_cuenta','a_cuenta','numeric');
 		$this->setParametro('total_venta','total_venta','numeric');
 		$this->setParametro('fecha_estimada_entrega','fecha_estimada_entrega','date');
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function modificarVentaCuf(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VF_VENCUF_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('cuf','cuf','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -1092,10 +1175,13 @@ class MODVenta extends MODbase{
 		$this->captura('codigo_cliente','varchar');
 		
 			
-		$this->captura('lugar_cliente','varchar');	
+		$this->captura('lugar_cliente','varchar');
+		$this->captura('cuf','varchar');//nuevo	
+		$this->captura('codigo_sin','varchar');//nuevo	
+		$this->captura('tipo_doc_fiscal','SMALLINT'); 
+		$this->captura('tipo_doc_sector','SMALLINT');            
 		$this->captura('cliente_destino','varchar');
 		$this->captura('lugar_destino','varchar');
-		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -1169,6 +1255,173 @@ class MODVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+	function listarAnularVenta(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENANU_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+	
+/*
+		$this->setParametro('historico','historico','varchar');
+		$this->setParametro('tipo_factura','tipo_factura','varchar');
+		$this->setParametro('id_sucursal','id_sucursal','integer');
+		$this->setParametro('id_punto_venta','id_punto_venta','integer');
+        $this->setParametro('tipo_usuario','tipo_usuario','varchar');
+*/
+	
+		//Definicion de la lista del resultado del query
+		 $this->captura('id_venta','int4');
+		 $this->captura('id_cliente','int4');
+         $this->captura('id_sucursal','int4');
+         $this->captura('id_proceso_wf','int4');
+         $this->captura('id_estado_wf','int4');
+         $this->captura('estado_reg','varchar');
+         $this->captura('correlativo_venta','varchar');
+         $this->captura('a_cuenta','numeric');
+         $this->captura('total_venta','numeric');
+         $this->captura('fecha_estimada_entrega','date');
+         $this->captura('usuario_ai','varchar');
+         $this->captura('fecha_reg','timestamp');
+         $this->captura('id_usuario_reg','int4');
+         $this->captura('id_usuario_ai','int4');
+         $this->captura('id_usuario_mod','int4');
+         $this->captura('fecha_mod','timestamp');
+         $this->captura('porcentaje_descuento','numeric');
+         $this->captura('id_vendedor_medico','varchar');
+         $this->captura('comision','numeric');
+         $this->captura('observaciones','text');
+		 $this->captura('codigo_sin','varchar');
+         $this->captura('motivo_anulacion','varchar');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	function insertarVentaAnular(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VF_VEANU_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('codigo_sin','codigo_sin','varchar');
+		$this->setParametro('motivo_anulacion','motivo_anulacion','text');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	function anulacionVentaRespuesta(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VF_VEANURES_MOD';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('codigo_motivo_anulacion','codigo_motivo_anulacion','numeric');
+		$this->setParametro('codigo_sin','codigo_sin','numeric');
+		$this->setParametro('codigo_mensaje_soap','codigo_mensaje_soap','numeric');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	function listarCabecera(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENFAC_SEL';
+		$this->tipo_procedimiento='SEL';
+		$this->setCount(false);		
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		//
+		$this->captura('"numeroFactura"','integer');
+		$this->captura('direccion','varchar');
+		$this->captura('"fechaEmision"','varchar');
+		$this->captura('"codigoTipoDocumentoIdentidad"','integer');
+		$this->captura('cuf','varchar');
+		$this->captura('"numeroDocumento"','varchar');	
+		$this->captura('complemento','varchar');
+		$this->captura('"codigoSucursal"','integer');	
+		$this->captura('"codigoPuntoVenta"','integer');	
+		$this->captura('"nombreRazonSocial"','varchar');	
+		$this->captura('"montoTotal"','decimal');	
+		$this->captura('"montoDescuento"','decimal');	
+		$this->captura('"codigoCliente"','varchar');
+        $this->captura('"codigoDocumentoSector"','integer');
+		$this->captura('"nitEmisor"','integer');	
+		$this->captura('"codigoMetodoPago"','integer');	
+		$this->captura('"numeroTarjeta"','bigint');
+		$this->captura('leyenda','varchar');	
+		$this->captura('usuario','varchar');	
+		$this->captura('"codigoMoneda"','integer');	
+		$this->captura('"montoTotalMoneda"','decimal');	
+		$this->captura('"tipoCambio"','decimal');	
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarDetalle(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_sel';
+		$this->transaccion='VF_VENFACDET_SEL';
+		$this->tipo_procedimiento='SEL';
+		$this->setCount(false);		
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		//
+		$this->captura('"actividadEconomica"','varchar');
+		$this->captura('"codigoProductoSin"','integer');
+		$this->captura('"codigoProducto"','varchar');
+		$this->captura('descripcion','varchar');	
+		$this->captura('cantidad','integer');
+		$this->captura('"precioUnitario"','decimal');	
+		$this->captura('"montoDescuento"','decimal');	
+		$this->captura('"subTotal"','decimal');	
+		$this->captura('"numeroSerie"','integer');	
+		$this->captura('"unidadMedida"','varchar');	
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function insertarXml(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='SIAT_FACTXML_INS';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('texto_xml','texto_xml','text');
+		//$this->setParametro('observacion_xml','observacion_xml','varchar');
+		$this->setParametro('ruta','ruta','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	 		
+			 
 }
 ?>

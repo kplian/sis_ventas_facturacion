@@ -16,12 +16,16 @@ Phx.vista.VentaVendedorComputarizada = {
     title: 'Venta',
     nombreVista: 'VentaVendedorComputarizada',
     tipo_factura:'computarizada',
-    
+    estadoInicial:'finalizado',
     constructor: function(config) {
         this.maestro = config.maestro;  
         Phx.vista.VentaVendedorComputarizada.superclass.constructor.call(this,config);
                 
     } ,
+    gruposBarraTareas:[
+                       {name:'finalizado',title:'<H1 align="center"><i class="fa fa-thumbs-up"></i> Finalizados</h1>',grupo:1, height:0},
+                       {name:'anulado',title:'<H1 align="center"><i class="fa fa-thumbs-down"></i> Anulados</h1>',grupo:2, height:0}
+                       ],
     arrayDefaultColumHidden:['estado_reg','usuario_ai','fecha_reg','fecha_mod','usr_reg','usr_mod','excento','cod_control','nroaut'],
     rowExpander: new Ext.ux.grid.RowExpander({
             tpl : new Ext.Template(
@@ -34,7 +38,8 @@ Phx.vista.VentaVendedorComputarizada = {
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Modificado por:&nbsp;&nbsp;</b> {usr_mod}</p><br>'
             )
-    })
+    }),
+    bnewGroups: [1]
     
     
 };

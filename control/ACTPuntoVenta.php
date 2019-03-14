@@ -11,6 +11,7 @@ class ACTPuntoVenta extends ACTbase{
 			
 	function listarPuntoVenta(){
 		$this->objParam->defecto('ordenacion','id_punto_venta');
+		
 		if ($this->objParam->getParametro('id_sucursal') != '') {
             $this->objParam->addFiltro(" puve.id_sucursal = " .  $this->objParam->getParametro('id_sucursal'));
         }

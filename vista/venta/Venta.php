@@ -38,10 +38,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 timeout:this.timeout,
                 scope:this
             });	 
-            
-             			
-        
-	},
+  	},
 	successGetVariables : function (response,request) {
 		var respuesta = JSON.parse(response.responseText);
 		
@@ -262,6 +259,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
             });        
 	},
 	anular : function () {
+		 //Phx.vista.Venta.superclass.onButtonNew.call(this);
 		Phx.CP.loadingShow();
         var rec=this.sm.getSelected();
         if(confirm('¿Está seguro de anular la factura?')){
@@ -603,6 +601,17 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 grid:true,
                 form:false
         },
+        /* {
+            config:{
+                name: 'cuf',
+                fieldLabel: 'Cuf',              
+                gwidth: 110
+            },
+                type:'TextField',
+                filters:{pfiltro:'ven.cuf',type:'string'},              
+                grid:true,
+                form:false
+        },*/
 	],
 	tam_pag:50,	
 	title:'Ventas',
@@ -716,8 +725,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     onButtonNew : function () {
         //abrir formulario de solicitud
         this.openForm('new');        
-    },
-    
+    },    
     onButtonEdit : function () {
         //abrir formulario de solicitud
         this.openForm('edit', this.sm.getSelected());               
@@ -824,11 +832,12 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                scope:this
              })
    },
+   setVentaReporte:function(id_venta,llamada_reporte){
+   		this.id_venta = id_venta;
+   		this.llamada_reporte = llamada_reporte;
+   },
    ///#1				 15-10-2018			  EGS	 
-   elegirFormato: function(){
-   	var rec = this.sm.getSelected(),
-		data = rec.data,
-		me = this;
+   elegirFormato: function(){   	
    	
    	 
    var formato_comprobante = this.variables_globales.formato_comprobante.split("-");   
@@ -836,7 +845,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
      formato_comprobante = formato_comprobante[0];
       //console.log('data normal',formato_comprobante);
      formato_comprobante = formato_comprobante.toUpperCase();
-     console.log('data',formato_comprobante);
+     
    	
    	if (formato_comprobante == 'PDF') {
    		this.imprimirPdf();
@@ -850,17 +859,23 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     ///#1				 15-10-2018			  EGS	
 
    imprimirNota: function(){
+   		
+		var me = this;
 		//Ext.Msg.confirm('Confirmación','¿Está seguro de Imprimir el Comprobante?',function(btn){
+			if (this.sm.hasSelection() && this.llamada_reporte != 'formulario'){
+				var rec = this.sm.getSelected();
+				if ('data' in rec) {
+					var data = rec.data;
+				}
+				this.setVentaReporte(data.id_venta,'boton');
+			}
 			
-			var rec = this.sm.getSelected(),
-				data = rec.data,
-				me = this;
-			if (data) {
+			if (this.id_venta) {
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({
 						url : '../../sis_ventas_facturacion/control/Venta/reporteFacturaRecibo',
 						params : {
-							'id_venta' : data.id_venta,
+							'id_venta' : this.id_venta,
 							'formato_comprobante' : me.variables_globales.formato_comprobante,
 							'tipo_factura': me.tipo_factura
 						},
@@ -870,6 +885,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 						scope : me
 					});
 			}
+			
+			this.setVentaReporte(undefined,'boton');
 	},
 	successExportHtml: function (resp) {
 
@@ -884,16 +901,22 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
     
     
      ///#1				 15-10-2018			  EGS	
-    imprimirPdf : function() {
-			var rec = this.sm.getSelected();
-			var data = rec.data;
-			me = this;			
-			if (data) {
+    imprimirPdf : function(id_venta) {
+    		var me = this;
+    		if (this.sm.hasSelection() && this.llamada_reporte != 'formulario'){
+				var rec = this.sm.getSelected();
+				if ('data' in rec) {
+					var data = rec.data;
+				}
+				this.setVentaReporte(data.id_venta,'boton');
+			}
+			this.setVentaReporte(data.id_venta);		
+			if (this.id_venta) {
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({
 					url : '../../sis_ventas_facturacion/control/Venta/reporteFacturaReciboPdf',
 					params : {
-							'id_venta' : data.id_venta,
+							'id_venta' : this.id_venta,
 							'formato_comprobante' : me.variables_globales.formato_comprobante,
 							'tipo_factura': me.tipo_factura
 					},
@@ -903,6 +926,7 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
 					scope : this
 				});
 			}
+			this.setVentaReporte(undefined,'boton');
 
 	},
     

@@ -2,11 +2,13 @@
 /**
 *@package pXP
 *@file gen-SistemaDist.php
-*@author  (rarteaga)
+*@author  (rarteaga) 
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 * 		ISSUE 			Fecha				Autor				Descripcion
- * 		#1				19/11/2018			EGS					se aumento botones para subir y descargar plantillas para facturas en excel		
+ * 		#1				19/11/2018			EGS					se aumento botones para subir y descargar plantillas para facturas en excel
+ *		#2	EndeEtr		23/01/2019			EGS					se agrego reporte con lista de productos activos por puntos de venta
+	 	#4	endeETR	 	21/02/2019			EGS					Se añadio la vista venta peajes			
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -18,7 +20,7 @@ Phx.vista.VentaVendedor = {
     title:'Venta',
     nombreVista: 'VentaVendedor',
     grupoDateFin: [1],
-    
+    estadoInicial:'borrador',
     constructor: function(config) {
         this.maestro=config.maestro;  
         Phx.vista.VentaVendedor.superclass.constructor.call(this,config);        
@@ -27,11 +29,11 @@ Phx.vista.VentaVendedor = {
     'fecha_reg','fecha_mod','usr_reg','usr_mod','nro_factura','excento','fecha','cod_control','nroaut'],
     successGetVariables :function (response,request) {   
     	Phx.vista.VentaVendedor.superclass.successGetVariables.call(this,response,request);  				  		
-  		this.store.baseParams.pes_estado = 'borrador';        
+  		this.store.baseParams.pes_estado = this.estadoInicial;        
 		
 		
 		///#1 19/11/2018 EGS	
-		if (this.nombreVista=='VentaVendedorETR'|| this.nombreVista=='VentaVendedorNCETR' ) {
+		if (this.nombreVista=='VentaVendedorETR'|| this.nombreVista=='VentaVendedorNCETR'|| this.nombreVista=='VentaVendedorPeajeETR' ) {//#4
 			this.addButton('btnXls',
 			{
 				text: 'Subir Factura',
@@ -40,12 +42,33 @@ Phx.vista.VentaVendedor = {
 				handler: this.SubirArchivo,
 				tooltip: '<b>Subir Archivo</b>'
 			});
+			//#2 Boton que agrega la lista de productos activos por punto de venta
 			this.addButton('btnPlantExcel', {
-				text : 'Plantilla',
+				text : 'Plantilla y Pro.Activos ',
 				iconCls : 'bprint',
 				disabled : false,
-				handler : this.descargaPlantilla,
-				tooltip : '<b>Descarga ejemplo de Plantilla Excel para subir Facturas</b><br/>'
+				//handler : this.descargaPlantilla,
+				tooltip : '<b>Descarga ejemplo de Plantilla Excel para subir Facturas y Productos Activos Por Punto de Venta</b><br/>',
+				 menu: [{
+			                    text: 'Plantilla',
+			                    iconCls: 'bprint',
+			                    argument: {
+			                        'news': true,
+			                        def: 'csv'
+			                    },
+			                    handler: this.descargaPlantilla,
+			                    scope: this,
+			                    
+			                }, {
+			                    text: 'Productos Activos Pv',
+			                    iconCls: 'bprint',
+			                    argument: {
+			                        'news': true,
+			                        def: 'pdf'
+			                    },
+			                    handler: this.imprimirProductoA,
+			                    scope: this
+			                }],
 			});  
 			
 		}; 
@@ -134,7 +157,25 @@ Phx.vista.VentaVendedor = {
         this.getBoton('anular').disable();        
         this.getBoton('sig_estado').disable();        
         Phx.vista.VentaVendedor.superclass.liberaMenu.call(this);
-    }
+    },
+      imprimirProductoA : function() {
+			//var rec = this.sm.getSelected();
+			//var data = rec.data;
+			//if (data) {
+				//Phx.CP.loadingShow();
+				Ext.Ajax.request({
+					url : '../../sis_ventas_facturacion/control/ReportesVentas/listarProductoActivoPuntoV',
+					params : {
+						'id_proceso_wf' : 'data.id_proceso_wf'
+					},
+					success : this.successExport,
+					failure : this.conexionFailure,
+					timeout : this.timeout,
+					scope : this
+				});
+			//}
+
+		},
     
     
 };

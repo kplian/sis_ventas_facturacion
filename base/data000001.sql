@@ -9,7 +9,7 @@ select pxp.f_insert_tgui ('SISTEMA DE VENTAS', '', 'VEF', 'si', 1, '', 1, '', ''
 INSERT INTO param.tdocumento ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_usuario_ai", "usuario_ai",  "id_subsistema", "codigo", "descripcion", "periodo_gestion", "tipo", "tipo_numeracion", "formato", "ruta_plantilla")
 VALUES (1, NULL, E'2015-12-03 00:00:00', E'2015-12-03 09:38:53', E'activo', NULL, NULL,  (select id_subsistema from segu.tsubsistema s where s.codigo like 'VEF' and s.estado_reg = 'activo'), E'VEN', E'VEN', E'periodo', E'', E'tabla', E'codtabla-correlativo-periodo/gestion', NULL);
 
-
+ 
 /***********************************F-DAT-JRR-VEF-0-02/05/2015*****************************************/
 
 /***********************************I-DAT-JRR-VEF-0-05/07/2015*****************************************/
@@ -64,7 +64,7 @@ INSERT INTO pxp.variable_global ( "variable", "valor", "descripcion")
 VALUES ( E'vef_integracion_almacenes', E'false', E'variable global para definir si el sistema de ventas se integrara con el de almacenes para obtener listadod e items');
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
-VALUES ( E'vef_tiene_punto_venta', E'false', E'variable global para definir si las ventas se manejaran a nivel sucursal o a nivel punto de venta');
+VALUES ( E'vef_tiene_punto_venta', E'true', E'variable global para definir si las ventas se manejaran a nivel sucursal o a nivel punto de venta');
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
 VALUES (E'vef_tipo_venta_habilitado', E'servicio', E'variable global para definir que tipos de venta estaran habilitados');
@@ -202,12 +202,7 @@ select pxp.f_insert_tgui ('Ventas Peaje ETR', 'Ventas Peaje ETR', 'VEPEETR', 'si
 
 /***********************************I-DAT-RAC-VEF-0-05/11/2018*****************************************/
 select pxp.f_insert_tgui ('Pendiente Emisión ETR', 'Pendientes Emisión ETR', 'PENETR', 'si', 1, 'sis_ventas_facturacion/vista/venta/VentaEmisor.php', 3, '', 'VentaEmisor', 'VEF');
-
-
-select param.f_import_tcatalogo_tipo ('insert','tipo_punto_venta','VEF','tpunto_venta');
-select param.f_import_tcatalogo ('insert','VEF','aeropuerto','ato','tipo_punto_venta');
-
-
+select pxp.f_insert_testructura_gui ('PENETR', 'VENCARP');
 /***********************************F-DAT-RAC-VEF-0-05/11/2018*****************************************/
 
 /***********************************I-DAT-EGS-VEF-1-21/11/2018*****************************************/
@@ -290,6 +285,8 @@ select pxp.f_insert_tgui ('Cuenta Bancaria Proveedor', 'Cuenta Bancaria Proveedo
 
 /***********************************F-DAT-EGS-VEF-3-13/12/2018*****************************************/
 
+<<<<<<< HEAD
+     
 /***********************************I-DAT-JRR-VEF-0-29/01/2019*****************************************/
 
 INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
@@ -297,3 +294,48 @@ VALUES
   (E'vef_sig_estado_automatico', E'no', E'Permite pasar al siguiente estado una venta una vez q ha sido registrado');
 
 /***********************************F-DAT-JRR-VEF-0-29/01/2019*****************************************/
+
+=======
+>>>>>>> 099290a8182b53e35d5f073b8432b1045890a5f0
+/***********************************I-DAT-EGS-VEF-4-11/01/2019*****************************************/
+/*actualizacion proceso WF*/
+select wf.f_import_tproceso_macro ('insert','VEN', 'VEF', 'Sistema de Ventas','si');
+select wf.f_import_tcategoria_documento ('insert','legales', 'Legales');
+select wf.f_import_tcategoria_documento ('insert','proceso', 'Proceso');
+select wf.f_import_ttipo_proceso ('insert','VEN',NULL,NULL,'VEN','Sistema de Ventas','','','si','','obligatorio','','VEN',NULL);
+select wf.f_import_ttipo_estado ('insert','borrador','VEN','Borrador','si','no','no','anterior','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL);
+select wf.f_import_ttipo_estado ('insert','finalizado','VEN','finalizado','no','no','si','anterior','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','','borrador');
+select wf.f_import_ttipo_estado ('insert','anulado','VEN','anulado','no','no','si','anterior','','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL);
+select wf.f_import_ttipo_estado ('insert','caja','VEN','caja','no','no','no','funcion_listado','vef.f_lista_funcionario_cajero','ninguno','','','no','no',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','','borrador');
+select wf.f_import_ttipo_estado ('insert','emision','VEN','Emisión de Factura','no','no','no','funcion_listado','vef.f_lista_funcionario_emisor','ninguno','','','si','si',NULL,'<font color="99CC00" size="5"><font size="4">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>','Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})','','no','','','','','','','',NULL);
+select wf.f_import_testructura_estado ('delete','borrador','finalizado','VEN',NULL,NULL);
+select wf.f_import_testructura_estado ('insert','borrador','emision','VEN',1,'');
+select wf.f_import_testructura_estado ('insert','emision','finalizado','VEN',1,'');
+select wf.f_import_testructura_estado ('delete','borrador','caja','VEN',NULL,NULL);
+select wf.f_import_testructura_estado ('insert','caja','finalizado','VEN',1,'');
+/***********************************F-DAT-EGS-VEF-4-11/01/2019*****************************************/
+
+
+/***********************************I-DAT-EGS-VEF-5-29/01/2019*****************************************/
+select param.f_import_tcatalogo_tipo ('insert','tipo_punto_venta','VEF','tpunto_venta');
+select param.f_import_tcatalogo ('insert','VEF','aeropuerto','ato','tipo_punto_venta');
+/***********************************F-DAT-EGS-VEF-5-29/01/2019*****************************************/
+
+
+
+/***********************************I-DAT-JRR-VEF-0-29/01/2019*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion") 
+VALUES 
+  (E'vef_sig_estado_automatico', E'no', E'Permite pasar al siguiente estado una venta una vez q ha sido registrado');
+
+/***********************************F-DAT-JRR-VEF-0-29/01/2019*****************************************/
+
+/***********************************I-DAT-AVQ-VEF-0-07/03/2019*****************************************/
+select pxp.f_insert_tgui ('Anular Ventas', 'Anular Ventas', 'ANUVEN', 'si', 10, 'sis_ventas_facturacion/vista/venta/FormFiltroAnularVenta.php', 3, '', 'FormFiltroAnularVenta', 'VEF');
+
+/***********************************F-DAT-AVQ-VEF-0-07/03/2019*****************************************/
+
+
+
+

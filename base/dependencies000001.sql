@@ -524,10 +524,10 @@ select pxp.f_insert_testructura_gui ('PENETR', 'VENCARP');
 
 /************************************I-DEP-JRR-VEF-1-10/01/2019*************************************************/
 -- jrr: se movio esto aca por si es que no existe almacenes solo la creacion de este fk fallara (si ya tienen estos fk solo anadir el codigo)
-ALTER TABLE ONLY vef.tsucursal_producto
+/*ALTER TABLE ONLY vef.tsucursal_producto
     ADD CONSTRAINT fk_tsucursal_producto__id_item
     FOREIGN KEY (id_item) REFERENCES alm.titem(id_item);   
-
+*/
 ALTER TABLE ONLY vef.tformula_detalle
     ADD CONSTRAINT fk_tformula_detalle__id_item
     FOREIGN KEY (id_item) REFERENCES alm.titem(id_item);
@@ -541,3 +541,7 @@ ALTER TABLE ONLY vef.tsucursal_almacen
     FOREIGN KEY (id_almacen) REFERENCES alm.talmacen(id_almacen);
     
 /************************************F-DEP-JRR-VEF-1-10/01/2019*************************************************/
+
+/************************************I-DEP-AVQ-VEF-0-07/03/2019*************************************************/
+select pxp.f_insert_testructura_gui ('ANUVEN', 'VENCARP');
+/************************************F-DEP-AVQ-VEF-0-07/03/2019*************************************************/

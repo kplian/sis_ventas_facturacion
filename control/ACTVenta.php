@@ -14,23 +14,24 @@
   
 */
 
+
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 include(dirname(__FILE__).'/../reportes/RFacturaRecibo.php');
 include(dirname(__FILE__).'/../reportes/RFacturaReciboPdf.php');
 include(dirname(__FILE__).'/../reportes/RPlantillaCarta.php');
+include(dirname(__FILE__).'/../../sis_siat/control/SiatClassWs.inc');
 
+include_once(dirname(__FILE__).'/../lib/cls_XML.php');
+
+   
 class ACTVenta extends ACTbase{    
 			
 	function listarVenta(){
 		$this->objParam->defecto('ordenacion','id_venta');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
-        
-        
-        
-        
         if ($this->objParam->getParametro('pes_estado') != '') {
             if ($this->objParam->getParametro('pes_estado') == 'proceso_elaboracion') {
                 $this->objParam->addFiltro(" ven.estado in( ''revision'', ''elaboracion'') ");
@@ -323,8 +324,81 @@ class ACTVenta extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 
+  /* lista ventas de Documentos Fiscales Emitidos para el sistema siat reportes*/
+  
+  function listarDocFiscalesEmitidosReporteSiat(){
+		
+		$this->objParam->defecto('ordenacion','id_venta');
+		
+	    if ($this->objParam->getParametro('desde') != '') {
+        	$this->objParam->addFiltro(" ven.fecha::date >= ''" .  $this->objParam->getParametro('desde')."''::date ");   
+        }   
+        if ($this->objParam->getParametro('hasta') != '') {
+       		$this->objParam->addFiltro(" ven.fecha::date <= ''" .  $this->objParam->getParametro('hasta')."''::date ");
+	    }	 
+	    if ($this->objParam->getParametro('nit') != '') {
+       		$this->objParam->addFiltro(" cli.nit = ''" .  $this->objParam->getParametro('nit')."''");  
+        }   
+	   
+        /*if ($this->objParam->getParametro('id_sucursal') != '') {
+       		$this->objParam->addFiltro(" fk_sucursal = " .  $this->objParam->getParametro('id_sucursal')." ");  
+        }	*/	
 
+		$this->objParam->defecto('dir_ordenacion','asc');
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarDocFiscalesEmitidosReporteSiat');
+			
+		} else{
+			
+			$this->objFunc=$this->create('MODVenta');    
+	        $this->res=$this->objFunc->listarDocFiscalesEmitidosReporteSiat($this->objParam);
+		}
+		    $this->res->imprimirRespuesta($this->res->generarJson());
+	}
+  
+  /**/
 
+  /* lista ventas de Documentos Fiscales Emitidos para el sistema siat reportes*/
+  
+  function listarDocFiscalesAnuladasReporteSiat(){
+		
+		$this->objParam->defecto('ordenacion','id_venta');
+		
+	    if ($this->objParam->getParametro('desde') != '') {
+        	$this->objParam->addFiltro(" ven.fecha::date >= ''" .  $this->objParam->getParametro('desde')."''::date ");   
+        }   
+        
+        if ($this->objParam->getParametro('hasta') != '') {
+       		$this->objParam->addFiltro(" ven.fecha::date <= ''" .  $this->objParam->getParametro('hasta')."''::date ");
+	    }	
+	     
+	    if ($this->objParam->getParametro('nit') != '') {
+       		$this->objParam->addFiltro(" cli.nit = ''" .  $this->objParam->getParametro('nit')."''");  
+        }   
+
+        if ($this->objParam->getParametro('estado') != '') {
+       		$this->objParam->addFiltro(" ven.estado = ''" .  $this->objParam->getParametro('estado')."''");  
+        }  
+	   
+        /*if ($this->objParam->getParametro('id_sucursal') != '') {
+       		$this->objParam->addFiltro(" fk_sucursal = " .  $this->objParam->getParametro('id_sucursal')." ");  
+        }	*/	
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarDocFiscalesAnuladasReporteSiat');
+			
+		} else{
+			
+			$this->objFunc=$this->create('MODVenta');    
+	        $this->res=$this->objFunc->listarDocFiscalesEmitidosReporteSiat($this->objParam);
+		}
+		    $this->res->imprimirRespuesta($this->res->generarJson());
+	}
+  
+  /**/
 	function getVariablesBasicas() {	        
 		
 		$this->objFunc=$this->create('MODVenta');
@@ -346,12 +420,144 @@ class ACTVenta extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-    
+	//
+	function insertarDatos($id, $k, $nombreXml){
+		//var_dump($this->objParam);exit;
+		//$this->objParam->addParametro('id_venta',1000);
+		//$id_venta=$this->objParam->getParametro('id_venta');
+		//$this->objParam->addParametro('id_venta',$id_venta);
+		//$this->objParam->addParametro('observacion_xml','obs');
+		//$this->objParam->addParametro('ruta','mm');
+		$this->objParam->addParametro('id_venta',$id);
+		
+		$text = str_replace('"', "'", $k);
+		$text = str_replace('<', "{", $text);
+		$text = str_replace('>', "}", $text);
+		$text = str_replace("'", ";", $text);
+		$this->objParam->addParametro('texto_xml',$text);
+		$this->objParam->addParametro('ruta',$nombreXml);
+		   
+		$this->objFunc = $this->create('MODVenta');	
+		$this->res = $this->objFunc->insertarXml($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+    //
     function insertarVentaCompleta(){
+    	
         $this->objFunc=$this->create('MODVenta');        
-        $this->res=$this->objFunc->insertarVentaCompleta($this->objParam);        
-        $this->res->imprimirRespuesta($this->res->generarJson());
+        $this->res = $this->objFunc->insertarVentaCompleta($this->objParam);
+		
+
+		$id = $this->res->datos['venta']; // obtiene el id_venta en la variable venta
+		unset($this->res->datos['venta']); // elimina la variable venta para no mostrar en la vista
+
+		//$this->res->imprimirRespuesta($this->res->generarJson());
+		$this->objParam->addFiltro("v.id_venta = ". $id);
+		
+		$this->objFunc = $this->create('MODVenta');
+		$cabecera = $this->objFunc->listarCabecera($this->objParam);
+		
+		$this->objFunc = $this->create('MODVenta');
+		$detalle = $this->objFunc->listarDetalle($this->objParam);
+		
+		/*seleccionar los datos registrados para enviar a la generacion del CUF*/
+		
+		$cone = new conexion();
+		$this->link = $cone->conectarpdo();
+		$copiado = false;	
+		$sql = "select ent.nit, ven.fecha_reg, 0 as sucursal, 1 as modalidad, 1 as tipo_emision, 1 as codigo_doc, 1 as tipo_sector, ven.nro_factura, 0 as punto_venta
+  					from vef.tventa ven
+  					inner join vef.tsucursal suc on suc.id_sucursal=ven.id_sucursal
+  					inner join param.tentidad ent on ent.id_entidad = suc.id_entidad
+  					where ven.id_venta= ". $id;
+		$res = $this->link->prepare($sql);
+		$res->execute();
+		$result = $res->fetchAll(PDO::FETCH_ASSOC);
+		
+		$nit=$result[0]['nit'];
+		$fecha_emision = $result[0]['fecha_reg'];
+		$sucursal = $result[0]['sucursal'];
+		$modalidad = $result[0]['modalidad'];
+		$nro_factura = $result[0]['nro_factura'];
+		$codigo_documento_fiscal = $result[0]['codigo_doc']; 
+		$punto_venta = $result[0]['punto_venta'];
+		$tipo_documento_sector = $result[0]['tipo_sector']; 
+		$tipo_emision = $result[0]['tipo_emision'];
+		
+		$this->objParam->addParametro('nit',$nit);
+		$this->objParam->addParametro('fecha_emision',$fecha_emision);
+		$this->objParam->addParametro('sucursal',$sucursal);
+		$this->objParam->addParametro('modalidad',$modalidad);
+		$this->objParam->addParametro('nro_factura',$nro_factura);
+		$this->objParam->addParametro('codigo_documento_fiscal',$codigo_documento_fiscal);
+		$this->objParam->addParametro('punto_venta',$punto_venta);
+		$this->objParam->addParametro('tipo_documento_sector',$tipo_documento_sector);
+		$this->objParam->addParametro('tipo_emision',$tipo_emision);
+		
+		$this->objFunc=$this->create('sis_siat/MODCuf');    
+		$this->resCuf = $this->objFunc->insertarCuf($this->objParam);
+		
+		$cuf = $this->resCuf->datos['cuf'];
+		
+		$this->objParam->addParametro('id_venta',$id);
+		$this->objParam->addParametro('cuf',$cuf);
+		
+		$this->objFunc = $this->create('MODVenta');
+		$modCuf = $this->objFunc->modificarVentaCuf($this->objParam);
+		
+		//var_dump($this->resCuf->datos['cuf']);
+		
+		
+		
+		/*
+		$this->objParam->addParametro('historico','');
+		$this->objParam->addParametro('tipo_factura',$this->objParam->getParametro('tipo_factura'));
+		$this->objParam->addParametro('id_sucursal',$this->objParam->getParametro('id_sucursal'));
+		$this->objParam->addParametro('id_punto_venta','');
+		$this->objParam->addParametro('tipo_usuario',$this->objParam->getParametro('tipo_usuario'));
+		$this->objFunc = $this->create('MODVenta');
+		$paramCuf = $this->objFunc->listarVenta($this->objParam);
+		
+		var_dump($paramCuf);*/
+		
+		// $datos = new convert_xml();
+		// $k=$datos->genera_xml($cabecera->generarJson(),$detalle->generarJson(),$id);
+
+		/*
+		$datos2 = new convert_xml2("factura_".$id, dirname(__FILE__).'/../../uploaded_files/archivos_facturacion_xml/');
+		
+		
+		$datos2->genera_xml($cabecera->generarJson(),$detalle->generarJson(),$id);
+		$datos2->llenarSignature();
+		$datos2->crearArchivoXML();
+		$a=$datos2->validarXmlConXSD();
+		if($a)
+		{
+			var_dump('EXITO');
+		}else{
+			var_dump('ERROR');
+		}
+		//echo ( $datos2->validarXmlConXSD() )? 'SIIIIIIII': 'NOOOOOO';
+				
+		
+		$datos2->crearArchivoBase64();
+		$datos2->crearArchivoGZIP();
+		$cadenaBase64GZIP = $datos2->convertirArchivoGZIPABase64();
+		$nombreArchivoXml = $datos2->getNombre();
+		$xmlString        = $datos2->getXmlString();
+
+*/
+		//var_dump('xmltexto'.$k);
+		
+		$this->res->imprimirRespuesta($this->res->generarJson());  
+		//insertar datos en tfact_xml
+		//$this->insertarDatos($id, $xmlString, $nombreArchivoXml);
+		
+
+		
     }
+
+
 						
 	function eliminarVenta(){
 			$this->objFunc=$this->create('MODVenta');	
@@ -488,6 +694,7 @@ class ACTVenta extends ACTbase{
 		if ($datos['cantidad_descripciones'] > 0){
 			$this->objFunc = $this->create('MODVenta');
 			$this->res = $this->objFunc->listarReciboFacturaDescripcion($this->objParam);
+			
 			$datos['detalle_descripcion'] = $this->res->getDatos();
 		}
 		
@@ -576,6 +783,53 @@ class ACTVenta extends ACTbase{
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
     }
+	function listarAnularVenta(){
+		
+		$this->objParam->defecto('ordenacion','id_venta');
+		if ($this->objParam->getParametro('id_gestion') != '') {
+			$this->objParam->addFiltro(" ven.fecha between ''". $this->objParam->getParametro('desde')."'' and ''".$this->objParam->getParametro('hasta')."'' ");
+		}  
+		
+		$this->objParam->defecto('dir_ordenacion','asc');
+      	if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODVenta','listarAnularVenta');
+		} else{
+			
+			$this->objFunc=$this->create('MODVenta');
+			
+			$this->res=$this->objFunc->listarAnularVenta($this->objParam);
+		
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+	 function insertarVentaAnular(){
+	 	
+				// Acceso al web service.
+		$wsEstandar= new WsFacturacionEstandar($_SESSION["_URLWS_FACTURASTANDAR"],2,'2E07180BA7E','',1009393025,'713E32B4',0);
+		
+		$resultfac = $wsEstandar->anulacionFacturaElectronicaEstandar("123abc",1,1,1,"123abc",1,"123abcasdfaf","cbba75@hotmail.com",77430396,1,1,0);
+		
+	    $r = $wsEstandar->ConvertObjectToArray($resultfac);
+		
+		
+	     $codigo_mensaje_soap = $r['return']['codigoEstado'] ;
+		 
+	    if ($codigo_motivo_anulacion==905)
+		{
+			//Anulacion
+			$this->objFunc=$this->create('MODVenta');	
+		    $this->res=$this->objFunc->anularVenta($this->objParam);
+		    $this->res->imprimirRespuesta($this->res->generarJson());
+			
+		}  else {
+						
+			$this->objParam->addParametro('codigo_mensaje_soap',$codigo_mensaje_soap );
+		 	$this->objFunc=$this->create('MODVenta');	
+		    $this->res=$this->objFunc->anulacionVentaRespuesta($this->objParam);
+		    $this->res->imprimirRespuesta($this->res->generarJson());
+		  }
+	 }
 			
 }
 
