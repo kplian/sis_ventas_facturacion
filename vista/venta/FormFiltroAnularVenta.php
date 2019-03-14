@@ -96,7 +96,8 @@ Phx.vista.FormFiltroAnularVenta=Ext.extend(Phx.frmInterfaz,{
     	var me = this;
     	if (me.form.getForm().isValid()) {
 
-             var parametros = me.getValForm()
+             var parametros = me.getValForm();
+             
              
              console.log('parametros ....', parametros);
              if (this.Cmp.desde.getValue()> this.Cmp.hasta.getValue()){
