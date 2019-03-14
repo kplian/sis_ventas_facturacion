@@ -2113,6 +2113,31 @@ $body$
             return v_resp;
             
 		end;
+    
+     /*********************************    
+ 	#TRANSACCION:  'VF_VENCUF_MOD'
+ 	#DESCRIPCION:	Actualiza el CUF de la factura
+ 	#AUTOR:		JMH	
+ 	#FECHA:		14-03-2019 16:12:51
+	***********************************/
+
+    elsif(p_transaccion='VF_VENCUF_MOD')then
+
+      begin
+
+        --obtener el tipo de usuario, la fecha de venta, etc
+
+        update vef.tventa set cuf = v_parametros.cuf
+        where id_venta = v_parametros.id_venta;
+        --Definicion de la respuesta
+        v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Actualizado CUF');
+        v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
+
+        --Devuelve la respuesta
+        return v_resp;
+
+      end;
+    
     else
 
       raise exception 'Transaccion inexistente: %',p_transaccion;
