@@ -439,7 +439,7 @@ class ACTVenta extends ACTbase{
 		   
 		$this->objFunc = $this->create('MODVenta');	
 		$this->res = $this->objFunc->insertarXml($this->objParam);
-		$this->res->imprimirRespuesta($this->res->generarJson());
+		//$this->res->imprimirRespuesta($this->res->generarJson());
 	}
     //
     function insertarVentaCompleta(){
@@ -501,6 +501,8 @@ class ACTVenta extends ACTbase{
 			
 			$this->objFunc = $this->create('MODVenta');
 			$modCuf = $this->objFunc->modificarVentaCuf($this->objParam);
+			
+			
 			/********************
 			 * Generacion XML
 			 * *******************/	
@@ -518,13 +520,7 @@ class ACTVenta extends ACTbase{
 			$datos2->llenarSignature();
 			$datos2->crearArchivoXML();
 			$a=$datos2->validarXmlConXSD();
-			if($a)
-			{
-				var_dump('EXITO');
-			}else{
-				var_dump('ERROR');
-			}
-			
+						
 			$datos2->crearArchivoBase64();
 			$datos2->crearArchivoGZIP();
 			$cadenaBase64GZIP = $datos2->convertirArchivoGZIPABase64();

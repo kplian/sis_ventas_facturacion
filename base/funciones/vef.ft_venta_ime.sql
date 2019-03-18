@@ -2056,18 +2056,18 @@ $body$
       end;
 
 	 /*********************************    
- 	#TRANSACCION:  ''SIAT_FACTXML_INS''
+ 	#TRANSACCION:  'SIAT_FACTXML_INS'
  	#DESCRIPCION:	inserta en siat.tfact_xml
  	#AUTOR:			EAQ  
  	#FECHA:		01-02-2019 12:12:51
 	***********************************/
 
-    elsif(p_transaccion=''SIAT_FACTXML_INS'')then
+    elsif(p_transaccion='SIAT_FACTXML_INS')then
 
       begin
-		v_parametros.texto_xml=replace(v_parametros.texto_xml,''{'',''<'');
-        v_parametros.texto_xml=replace(v_parametros.texto_xml,''}'',''>'');
-        v_parametros.texto_xml=replace(v_parametros.texto_xml,'';'',''"'');
+		v_parametros.texto_xml=replace(v_parametros.texto_xml,'{','<');
+        v_parametros.texto_xml=replace(v_parametros.texto_xml,'}','>');
+        v_parametros.texto_xml=replace(v_parametros.texto_xml,';'','"');
 		insert into siat.tfact_xml(
 				id_venta,
                 texto_xml,
@@ -2078,8 +2078,8 @@ $body$
                 v_parametros.ruta
             ) RETURNING id_venta into v_id_venta;
         --Definicion de la respuesta
-        v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''INSERTO'');
-        v_resp = pxp.f_agrega_clave(v_resp,''id_venta'',v_parametros.id_venta::varchar);
+        v_resp = pxp.f_agrega_clave(v_resp,'mensaje','INSERTO');
+        v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
 
         --Devuelve la respuesta
         return v_resp;
