@@ -336,6 +336,12 @@ select pxp.f_insert_tgui ('Anular Ventas', 'Anular Ventas', 'ANUVEN', 'si', 10, 
 
 /***********************************F-DAT-AVQ-VEF-0-07/03/2019*****************************************/
 
+/***********************************I-DAT-JRR-VEF-0-18/03/2019*****************************************/
 
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion") 
+VALUES 
+  (E'vef_facturacion_electronica', E'no', E'Bandera que permite identificar si el nuevo sistema de facturacion ha sido habilitado, posibles valores: si, no');
+
+/***********************************F-DAT-JRR-VEF-0-18/03/2019*****************************************/
 
 

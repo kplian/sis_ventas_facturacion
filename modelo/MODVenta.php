@@ -697,6 +697,7 @@ class MODVenta extends MODbase{
             $respuesta = $resp_procedimiento['datos'];
             
             $id_venta = $respuesta['id_venta'];
+			$id_proceso_wf = $respuesta['id_proceso_wf'];
                        
             //decodifica JSON  de detalles 
             $json_detalle = $this->aParam->_json_decode($this->aParam->getParametro('json_new_records'));           
@@ -829,6 +830,34 @@ class MODVenta extends MODbase{
                 throw new Exception("Error al ejecutar en la bd", 3);
             }
 			
+			//jrr: pasamos al siguiente estado de manera automatica si es insercion y la bandera esta habilitada
+			if (MODFunBasicas::getVariableGlobal('vef_sig_estado_automatico') == 'si' && $this->aParam->getParametro('id_venta') == '') {
+				$this->resetParametros();
+				$this->arreglo['id_proceso_wf_act'] = $id_proceso_wf;
+				$this->arreglo['paso_automatico'] = 'si';
+				//Pasar al siguiente estado
+				$this->procedimiento = 'vef.ft_venta_ime';
+				$this->transaccion = 'VEF_SIGEVE_IME';
+				$this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
+				$this->setParametro('paso_automatico','paso_automatico','varchar');
+				
+				//Ejecuta la instruccion
+	            $this->armarConsulta();
+	            $stmt = $link->prepare($this->consulta);          
+	            $stmt->execute();
+	            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+	            
+	            //recupera parametros devuelto depues de insertar ... (id_formula)
+	            $resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+	            $resp_procedimiento['datos']['venta'] = $resp_procedimiento['datos']['id_venta'];
+				$respuesta = $resp_procedimiento['datos'];            
+	            
+				
+	            if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
+	                throw new Exception("Error al ejecutar en la bd", 3);
+	            }
+			}
+			
 
             //si todo va bien confirmamos y regresamos el resultado
             $link->commit();
@@ -866,6 +895,26 @@ class MODVenta extends MODbase{
 		$this->setParametro('a_cuenta','a_cuenta','numeric');
 		$this->setParametro('total_venta','total_venta','numeric');
 		$this->setParametro('fecha_estimada_entrega','fecha_estimada_entrega','date');
+		
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function modificarVentaCuf(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VF_VENCUF_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_venta','id_venta','int4');
+		$this->setParametro('cuf','cuf','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
