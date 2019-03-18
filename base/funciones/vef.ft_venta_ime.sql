@@ -1504,7 +1504,7 @@ $body$
          
         if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si')   AND   v_venta.tipo_factura in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN 
           v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'INS',v_parametros.id_venta);
-        end if;        
+        end if;
         
         --Definicion de la respuesta
         v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Venta Validada');
@@ -1659,7 +1659,7 @@ $body$
                        
             
             -- obtener datos tipo estado
-        	select
+        select
               te.codigo,te.fin
             into
               v_codigo_estado_siguiente,v_es_fin
@@ -1668,18 +1668,18 @@ $body$
             
         else
         	select
-              ew.id_tipo_estado ,
-              ew.id_estado_wf
-            into
-              v_id_tipo_estado,
-              v_id_estado_wf
+          ew.id_tipo_estado ,
+          ew.id_estado_wf
+        into
+          v_id_tipo_estado,
+          v_id_estado_wf
+          
+        from wf.testado_wf ew
+          inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
+        where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
 
-            from wf.testado_wf ew
-              inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
-            where ew.id_estado_wf =  v_parametros.id_estado_wf_act;
-            
             -- obtener datos tipo estado
-        	select
+        select 
               te.codigo,te.fin
             into
               v_codigo_estado_siguiente,v_es_fin
@@ -1727,7 +1727,7 @@ $body$
         
        -- raise EXCEPTION 'sasdasd  1 %, 2 %, 3 %, 4 %, 5 %', coalesce(v_parametros._nombre_usuario_ai,'x'), v_parametros._id_usuario_ai   ,v_venta.id_venta ,v_venta.tipo_factura, v_venta.id_venta_fk  ;
        
-          
+       
       v_tabla = pxp.f_crear_parametro(ARRAY[	'_nombre_usuario_ai',
                                                 '_id_usuario_ai',
                                                 'id_venta',
@@ -1763,7 +1763,7 @@ $body$
         ELSE
           v_obs='---';
         END IF;
- 
+
         IF  vef.f_fun_inicio_venta_wf(p_id_usuario,
                                       v_parametros._id_usuario_ai,
                                       v_parametros._nombre_usuario_ai,
@@ -1788,7 +1788,7 @@ $body$
           --no validamos la fecha en las facturas de exportacion
           --por que  valida al insertar la factura, donde se genera el nro de la factura
           END IF;
-       
+          
           -- #123 si no es una nota de credito botiene de sucusal producto la actividad economica 
           IF v_ncd = 'no' THEN 
               
@@ -1815,7 +1815,7 @@ $body$
           
           END IF;
           --genera el numero de factura
- 
+
           IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN  --#123 se agrega el tipo computarizadareg
 			
                 select d.* into v_dosificacion
@@ -1855,12 +1855,12 @@ $body$
                                                       to_char(v_fecha_venta,'YYYYMMDD')::varchar,
                                                       round(v_venta.total_venta,0))
                 where id_venta = v_venta.id_venta;
-                 
+
 
                 update vef.tdosificacion
                 set nro_siguiente = nro_siguiente + 1
                 where id_dosificacion = v_dosificacion.id_dosificacion;
-                
+
 
           ELSE
               -- en las facturas de exportacion y minera  el numero se genera al inserta
@@ -1887,9 +1887,9 @@ $body$
 
 
           END IF;
-        
+          
         end if;
-         
+        
         if (v_es_fin = 'si' and pxp.f_get_variable_global('vef_tiene_apertura_cierre') = 'si') then
 
           if (exists(	select 1
@@ -1920,7 +1920,7 @@ $body$
         if (pxp.f_get_variable_global('vef_integracion_lcv') = 'si' and v_es_fin = 'si') then
          v_res = vef.f_inserta_lcv(p_administrador,p_id_usuario,p_tabla,'FIN',v_venta.id_venta);
         end if;
-         
+        
         --raise exception 'pasa..... % , %', v_es_fin , pxp.f_get_variable_global('vef_integracion_lcv');
 
         -- si hay mas de un estado disponible  preguntamos al usuario
@@ -2055,7 +2055,38 @@ $body$
 
       end;
 
-	/*********************************    
+	 /*********************************    
+ 	#TRANSACCION:  ''SIAT_FACTXML_INS''
+ 	#DESCRIPCION:	inserta en siat.tfact_xml
+ 	#AUTOR:			EAQ  
+ 	#FECHA:		01-02-2019 12:12:51
+	***********************************/
+
+    elsif(p_transaccion=''SIAT_FACTXML_INS'')then
+
+      begin
+		v_parametros.texto_xml=replace(v_parametros.texto_xml,''{'',''<'');
+        v_parametros.texto_xml=replace(v_parametros.texto_xml,''}'',''>'');
+        v_parametros.texto_xml=replace(v_parametros.texto_xml,'';'',''"'');
+		insert into siat.tfact_xml(
+				id_venta,
+                texto_xml,
+                ruta
+            ) values (
+                v_parametros.id_venta,
+                v_parametros.texto_xml,
+                v_parametros.ruta
+            ) RETURNING id_venta into v_id_venta;
+        --Definicion de la respuesta
+        v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''INSERTO'');
+        v_resp = pxp.f_agrega_clave(v_resp,''id_venta'',v_parametros.id_venta::varchar);
+
+        --Devuelve la respuesta
+        return v_resp;
+
+      end;
+
+    /*********************************    
  	#TRANSACCION:  'VF_VEANU_MOD'
  	#DESCRIPCION:	Anulación de registros
  	#AUTOR:		AVQ
