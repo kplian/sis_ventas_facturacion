@@ -1674,7 +1674,9 @@ BEGIN
                             ven.comision,
                             ven.observaciones,
                             ven.codigo_sin,
-                            moa.descripcion                       	
+                            moa.descripcion,
+                            ven.nro_factura,
+                            ven.cod_control                       	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
@@ -1684,9 +1686,10 @@ BEGIN
                         left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
                         left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
                         left join siat.tmotivo_anulacion moa on moa.codigo=ven.codigo_motivo_anulacion
-                        where ven.estado_reg = ''activo'' and' ;
+                        where ven.estado_reg = ''activo'' and ' ;
 			
-			--Definicion de la respuesta
+			--Definicion de la respuesta	
+          -- raise exception '%',v_consulta;
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
             

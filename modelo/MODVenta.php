@@ -1267,6 +1267,8 @@ class MODVenta extends MODbase{
          $this->captura('observaciones','text');
 		 $this->captura('codigo_sin','varchar');
          $this->captura('motivo_anulacion','varchar');
+		 $this->captura('nro_factura','integer');
+		 $this->captura('cod_control','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

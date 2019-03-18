@@ -99,7 +99,33 @@ gruposBarraTareas: [
                 grid:true,
                 form:false,
                 bottom_filter: true
-        },        
+        }, 
+        {
+            config:{
+                name: 'nro_factura',
+                fieldLabel: 'Nro Factura',              
+                gwidth: 110
+               
+            },
+                type:'TextField',
+                filters:{pfiltro:'ven.nro_factura',type:'numeric'},              
+                grid:true,
+                form:true,
+                bottom_filter: true
+        }, 
+        {
+            config:{
+                name: 'cod_control',
+                fieldLabel: 'Codigo Control',              
+                gwidth: 110
+               
+            },
+                type:'TextField',
+                filters:{pfiltro:'ven.cod_control',type:'string'},              
+                grid:true,
+                form:true,
+                bottom_filter: true
+        },      
         {
             config:{
                 name: 'total_venta',
@@ -253,8 +279,9 @@ gruposBarraTareas: [
        {name:'comision', type: 'numeric'},
        {name:'observaciones', type: 'string'},
        {name:'codigo_sin', type: 'string'},
-       {name:'motivo_anulacion', type: 'string'}
-	
+       {name:'motivo_anulacion', type: 'string'},
+	   {name:'nro_factura', type: 'integer'},
+	   {name:'cod_control', type: 'varchar'}
 	],
 	sortInfo:{
 		field: 'id_venta',
