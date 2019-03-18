@@ -1791,6 +1791,109 @@ BEGIN
 
 		end; 
 
+   
+	elsif(p_transaccion='VF_VENANU_SEL')then
+     				
+    	begin
+        
+           	/*IF  pxp.f_existe_parametro(p_tabla,'historico') THEN             
+            	v_historico =  v_parametros.historico;            
+            ELSE            
+            	v_historico = 'no';            
+            END IF;
+        	
+            --obtener funcionario del usuario
+            select f.id_funcionario into v_id_funcionario_usuario
+            from segu.tusuario u
+            inner join segu.tpersona p on p.id_persona = u.id_persona
+            inner join orga.tfuncionario f on f.id_persona = p.id_persona
+            where u.id_usuario = p_id_usuario;
+            
+            if (v_id_funcionario_usuario is null) then
+            	v_id_funcionario_usuario = -1;
+            end if;
+            
+        select coalesce(pxp.list(su.id_sucursal::text),'-1') into v_sucursales
+            from vef.tsucursal_usuario su
+            where su.id_usuario = p_id_usuario and su.estado_reg = 'activo';
+            
+            v_select = 'ven.id_venta';
+            v_join = 'inner join wf.testado_wf ewf on ewf.id_estado_wf = ven.id_estado_wf';
+            
+            if p_administrador !=1 then
+            	if (v_historico = 'si') then
+                	v_select = 'distinct(ven.id_venta)';
+                	v_join = 'inner join wf.testado_wf ewf on ewf.id_proceso_wf = ven.id_proceso_wf';
+                end if;
+                
+                if (v_parametros.tipo_usuario = 'vendedor') then
+                  v_filtro = ' (ven.id_usuario_reg='||p_id_usuario::varchar||') and ';
+                elsif (v_parametros.tipo_usuario = 'cajero') THEN
+                  v_filtro = ' (ewf.id_funcionario='||v_id_funcionario_usuario::varchar||') and ';
+                ELSE
+                  v_filtro = ' 0 = 0 and ';
+                end if;           
+            else
+            	v_filtro = ' 0 = 0 and ';
+            end if; 
+            
+            
+            if v_parametros.tipo_factura = 'pedido' then
+               v_join_destino = '	inner join vef.vcliente clides on clides.id_cliente = ven.id_cliente_destino';
+               v_columnas_destino = ' clides.nombre_factura as cliente_destino';
+            else
+               v_join_destino = '';
+                v_columnas_destino = ' ''''::varchar as cliente_destino';
+            end if;         
+            
+            */
+    		--Sentencia de la consulta
+			v_consulta:='select
+                            ven.id_venta,
+                            ven.id_cliente,
+                            ven.id_sucursal,
+                            ven.id_proceso_wf,
+                            ven.id_estado_wf,
+                            ven.estado_reg,
+                            ven.correlativo_venta,
+                            ven.a_cuenta,
+                            ven.total_venta,
+                            ven.fecha_estimada_entrega,
+                            ven.usuario_ai,
+                            ven.fecha_reg,
+                            ven.id_usuario_reg,
+                            ven.id_usuario_ai,
+                            ven.id_usuario_mod,
+                            ven.fecha_mod,
+                            ven.porcentaje_descuento,
+                            ven.id_vendedor_medico,
+                            ven.comision,
+                            ven.observaciones,
+                            ven.codigo_sin,
+                            ven.motivo_anulacion
+                        	
+						from vef.tventa ven
+						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
+					    inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
+                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
+                        --inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
+                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
+                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
+                        where ven.estado_reg = ''activo'' and' ;
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            
+            
+            --raise notice 'CONSULTA.... %',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+
+	
 	/*********************************    
  	#TRANSACCION:  'VF_VENANU_CONT'
  	#DESCRIPCION:	Conteo de registros

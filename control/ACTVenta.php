@@ -449,9 +449,7 @@ class ACTVenta extends ACTbase{
 		
 
 		$id = $this->res->datos['venta']; // obtiene el id_venta en la variable venta
-		unset($this->res->datos['venta']); // elimina la variable venta para no mostrar en la vista
-		
-		
+		unset($this->res->datos['venta']); // elimina la variable venta para no mostrar en la vista	
 		
 		/*Ejecutar esto solamente si version electronica esta habilitada*/
 		
@@ -460,7 +458,7 @@ class ACTVenta extends ACTbase{
 			 * Generacion de CUF
 			 * *******************/	
 			 
-			/*@todo no deberia haber conexiones a bd en el controlador*/	
+			/*@todo no deberia haber conexiones a bd en el controlador*/	 
 			$cone = new conexion();
 			$this->link = $cone->conectarpdo();
 			$copiado = false;	
