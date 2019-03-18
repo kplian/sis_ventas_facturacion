@@ -285,7 +285,7 @@ select pxp.f_insert_tgui ('Cuenta Bancaria Proveedor', 'Cuenta Bancaria Proveedo
 
 /***********************************F-DAT-EGS-VEF-3-13/12/2018*****************************************/
 
-<<<<<<< HEAD
+
      
 /***********************************I-DAT-JRR-VEF-0-29/01/2019*****************************************/
 
@@ -295,8 +295,7 @@ VALUES
 
 /***********************************F-DAT-JRR-VEF-0-29/01/2019*****************************************/
 
-=======
->>>>>>> 099290a8182b53e35d5f073b8432b1045890a5f0
+
 /***********************************I-DAT-EGS-VEF-4-11/01/2019*****************************************/
 /*actualizacion proceso WF*/
 select wf.f_import_tproceso_macro ('insert','VEN', 'VEF', 'Sistema de Ventas','si');
@@ -343,5 +342,12 @@ VALUES
   (E'vef_facturacion_electronica', E'no', E'Bandera que permite identificar si el nuevo sistema de facturacion ha sido habilitado, posibles valores: si, no');
 
 /***********************************F-DAT-JRR-VEF-0-18/03/2019*****************************************/
+
+/***********************************I-DAT-JRR-VEF-1-18/03/2019*****************************************/
+
+INSERT INTO vef.ttipo_venta ("id_usuario_reg", "codigo", "nombre", "codigo_relacion_contable", "tipo_base")
+VALUES (1, E'notacredito', E'Nota de Credito Sobre Ventas', E'VENTA', E'computarizada');
+
+/***********************************F-DAT-JRR-VEF-1-18/03/2019*****************************************/
 
 

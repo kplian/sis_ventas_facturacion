@@ -1250,7 +1250,7 @@ ALTER TABLE vef.tcuifd
 
 /************************************F-SCP-JMH-VEF-0-23/01/2019*************************************************/
 
-=======
+
 /************************************I-SCP-AVQ-VEF-0-22/02/2019*************************************************/
 ALTER TABLE vef.tventa
   ADD COLUMN codigo_siat VARCHAR;
@@ -1272,5 +1272,4 @@ ALTER TABLE vef.tventa
   ALTER COLUMN codigo_motivo_anulacion TYPE NUMERIC
   USING codigo_motivo_anulacion::NUMERIC;       
 /************************************F-SCP-AVQ-VEF-0-07/03/2019*************************************************/
->>>>>>> 41f02f75d443527de41fdfc6e7bd4d64f02720a5
 
