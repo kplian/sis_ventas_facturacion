@@ -4,7 +4,8 @@ CREATE OR REPLACE FUNCTION vef.ft_venta_ime (
   p_tabla varchar,
   p_transaccion varchar
 )
-RETURNS varchar AS'
+RETURNS varchar AS
+$body$
   /**************************************************************************
    SISTEMA:		Sistema de Ventas
    FUNCION: 		vef.ft_venta_ime
@@ -2088,7 +2089,8 @@ RETURNS varchar AS'
       raise exception ''%'',v_resp;
 
   END;
-'LANGUAGE 'plpgsql'
+$body$
+LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
