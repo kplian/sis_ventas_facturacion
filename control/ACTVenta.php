@@ -439,7 +439,7 @@ class ACTVenta extends ACTbase{
 		   
 		$this->objFunc = $this->create('MODVenta');	
 		$this->res = $this->objFunc->insertarXml($this->objParam);
-		$this->res->imprimirRespuesta($this->res->generarJson());
+		//$this->res->imprimirRespuesta($this->res->generarJson());
 	}
     //
     function insertarVentaCompleta(){
@@ -449,9 +449,7 @@ class ACTVenta extends ACTbase{
 		
 
 		$id = $this->res->datos['venta']; // obtiene el id_venta en la variable venta
-		unset($this->res->datos['venta']); // elimina la variable venta para no mostrar en la vista
-		
-		
+		unset($this->res->datos['venta']); // elimina la variable venta para no mostrar en la vista	
 		
 		/*Ejecutar esto solamente si version electronica esta habilitada*/
 		
@@ -460,7 +458,7 @@ class ACTVenta extends ACTbase{
 			 * Generacion de CUF
 			 * *******************/	
 			 
-			/*@todo no deberia haber conexiones a bd en el controlador*/	
+			/*@todo no deberia haber conexiones a bd en el controlador*/	 
 			$cone = new conexion();
 			$this->link = $cone->conectarpdo();
 			$copiado = false;	
@@ -503,6 +501,8 @@ class ACTVenta extends ACTbase{
 			
 			$this->objFunc = $this->create('MODVenta');
 			$modCuf = $this->objFunc->modificarVentaCuf($this->objParam);
+			
+			
 			/********************
 			 * Generacion XML
 			 * *******************/	
@@ -520,13 +520,7 @@ class ACTVenta extends ACTbase{
 			$datos2->llenarSignature();
 			$datos2->crearArchivoXML();
 			$a=$datos2->validarXmlConXSD();
-			if($a)
-			{
-				var_dump('EXITO');
-			}else{
-				var_dump('ERROR');
-			}
-			
+						
 			$datos2->crearArchivoBase64();
 			$datos2->crearArchivoGZIP();
 			$cadenaBase64GZIP = $datos2->convertirArchivoGZIPABase64();

@@ -1157,6 +1157,23 @@ WITH (oids = false);
 
 /************************************F-SCP-EGS-VEF-1-10/01/2019*************************************************/
 
+
+/************************************I-SCP-EAQ-VEF-2-28/02/2019*************************************************/
+CREATE TABLE siat.tfact_xml (
+  id_fact_xml SERIAL,
+  id_venta INTEGER,
+  texto_xml TEXT,
+  observacion_xml VARCHAR(50),
+  ruta VARCHAR(1000),
+  CONSTRAINT tfact_xml_pkey PRIMARY KEY(id_fact_xml)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE siat.tfact_xml
+  OWNER TO postgres;
+  
+/************************************F-SCP-EAQ-VEF-2-28/02/2019*************************************************/
+
 /************************************I-SCP-EGS-VEF-2-29/01/2019*************************************************/
 ALTER TABLE vef.tventa
   ALTER COLUMN correlativo_venta TYPE VARCHAR(40);
@@ -1197,8 +1214,6 @@ IS 'Parámetro var4 representa el TIPO DOCUMENTO SECTOR, codigo otorgado por imp
 /************************************F-SCP-FPT-VEF-0-14/02/2019*************************************************/
 
 
-
-<<<<<<< HEAD
 /************************************I-SCP-JMH-VEF-0-18/01/2019*************************************************/
 CREATE TABLE vef.tcuis (
   id_cuis SERIAL NOT NULL,
@@ -1250,7 +1265,7 @@ ALTER TABLE vef.tcuifd
 
 /************************************F-SCP-JMH-VEF-0-23/01/2019*************************************************/
 
-=======
+
 /************************************I-SCP-AVQ-VEF-0-22/02/2019*************************************************/
 ALTER TABLE vef.tventa
   ADD COLUMN codigo_siat VARCHAR;
@@ -1272,5 +1287,11 @@ ALTER TABLE vef.tventa
   ALTER COLUMN codigo_motivo_anulacion TYPE NUMERIC
   USING codigo_motivo_anulacion::NUMERIC;       
 /************************************F-SCP-AVQ-VEF-0-07/03/2019*************************************************/
->>>>>>> 41f02f75d443527de41fdfc6e7bd4d64f02720a5
+
+/************************************I-SCP-EAQ-VEF-3-28/02/2019*************************************************/
+ALTER TABLE vef.tcliente
+ADD id_tipo_documento INTEGER ;
+  
+/************************************F-SCP-EAQ-VEF-3-28/02/2019*************************************************/
+
 
