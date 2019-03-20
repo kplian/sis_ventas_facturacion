@@ -1676,7 +1676,8 @@ BEGIN
                             ven.codigo_sin,
                             moa.descripcion,
                             ven.nro_factura,
-                            ven.cod_control                       	
+                            ven.cod_control,
+                            ven.fecha_reg +(interval ''48 hour'')                     	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
@@ -1799,57 +1800,7 @@ BEGIN
      				
     	begin
         
-           	/*IF  pxp.f_existe_parametro(p_tabla,'historico') THEN             
-            	v_historico =  v_parametros.historico;            
-            ELSE            
-            	v_historico = 'no';            
-            END IF;
-        	
-            --obtener funcionario del usuario
-            select f.id_funcionario into v_id_funcionario_usuario
-            from segu.tusuario u
-            inner join segu.tpersona p on p.id_persona = u.id_persona
-            inner join orga.tfuncionario f on f.id_persona = p.id_persona
-            where u.id_usuario = p_id_usuario;
-            
-            if (v_id_funcionario_usuario is null) then
-            	v_id_funcionario_usuario = -1;
-            end if;
-            
-        select coalesce(pxp.list(su.id_sucursal::text),'-1') into v_sucursales
-            from vef.tsucursal_usuario su
-            where su.id_usuario = p_id_usuario and su.estado_reg = 'activo';
-            
-            v_select = 'ven.id_venta';
-            v_join = 'inner join wf.testado_wf ewf on ewf.id_estado_wf = ven.id_estado_wf';
-            
-            if p_administrador !=1 then
-            	if (v_historico = 'si') then
-                	v_select = 'distinct(ven.id_venta)';
-                	v_join = 'inner join wf.testado_wf ewf on ewf.id_proceso_wf = ven.id_proceso_wf';
-                end if;
-                
-                if (v_parametros.tipo_usuario = 'vendedor') then
-                  v_filtro = ' (ven.id_usuario_reg='||p_id_usuario::varchar||') and ';
-                elsif (v_parametros.tipo_usuario = 'cajero') THEN
-                  v_filtro = ' (ewf.id_funcionario='||v_id_funcionario_usuario::varchar||') and ';
-                ELSE
-                  v_filtro = ' 0 = 0 and ';
-                end if;           
-            else
-            	v_filtro = ' 0 = 0 and ';
-            end if; 
-            
-            
-            if v_parametros.tipo_factura = 'pedido' then
-               v_join_destino = '	inner join vef.vcliente clides on clides.id_cliente = ven.id_cliente_destino';
-               v_columnas_destino = ' clides.nombre_factura as cliente_destino';
-            else
-               v_join_destino = '';
-                v_columnas_destino = ' ''''::varchar as cliente_destino';
-            end if;         
-            
-            */
+           	raise exception '%','especifica';
     		--Sentencia de la consulta
 			v_consulta:='select
                             ven.id_venta,
@@ -1873,7 +1824,10 @@ BEGIN
                             ven.comision,
                             ven.observaciones,
                             ven.codigo_sin,
-                            ven.motivo_anulacion
+                            ven.motivo_anulacion/*,
+                            ven.nro_factura,
+                            ven.cod_control,
+                            ven.fecha_reg +(interval ''48 hour'') as fecha_sw_anular*/
                         	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg

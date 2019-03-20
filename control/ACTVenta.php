@@ -794,20 +794,20 @@ class ACTVenta extends ACTbase{
 		
 	     $codigo_mensaje_soap = $r['return']['codigoEstado'] ;
 		 
-	    if ($codigo_motivo_anulacion==905)
-		{
+	   /* if ($codigo_motivo_anulacion==905)
+		{*/
 			//Anulacion
 			$this->objFunc=$this->create('MODVenta');	
 		    $this->res=$this->objFunc->anularVenta($this->objParam);
 		    $this->res->imprimirRespuesta($this->res->generarJson());
 			
-		}  else {
+		/*}  else {
 						
 			$this->objParam->addParametro('codigo_mensaje_soap',$codigo_mensaje_soap );
 		 	$this->objFunc=$this->create('MODVenta');	
 		    $this->res=$this->objFunc->anulacionVentaRespuesta($this->objParam);
 		    $this->res->imprimirRespuesta($this->res->generarJson());
-		  }
+		  }*/
 	 }
 			
 }

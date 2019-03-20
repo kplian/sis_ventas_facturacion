@@ -110,7 +110,7 @@ gruposBarraTareas: [
                 type:'TextField',
                 filters:{pfiltro:'ven.nro_factura',type:'numeric'},              
                 grid:true,
-                form:true,
+                form:false,
                 bottom_filter: true
         }, 
         {
@@ -123,7 +123,7 @@ gruposBarraTareas: [
                 type:'TextField',
                 filters:{pfiltro:'ven.cod_control',type:'string'},              
                 grid:true,
-                form:true,
+                form:false,
                 bottom_filter: true
         },      
         {
@@ -247,6 +247,32 @@ gruposBarraTareas: [
 				id_grupo:0,
 				grid:true,
 				form:false
+		},
+		 
+		{
+			config : {
+				name : 'fecha_sw_anular',
+				fieldLabel : 'Anular Hasta',
+				disabled : false,
+				allowBlank : false,
+				format : 'd-m-Y',
+				width : 100,
+				gwidth : 200,
+				renderer : function(value, p, record) {
+					return value ? value.dateFormat('d/m/Y H:i:s') : ''
+				}
+			},
+			type : 'DateField',
+			valorInicial : new Date(),
+			filters : {
+				pfiltro : 'vef.fecha_reg',
+				type : 'date'
+			},
+			id_grupo : 1,
+
+			grid : true,
+			form : false,
+			bottom_filter : true
 		}
 		
        
@@ -281,7 +307,9 @@ gruposBarraTareas: [
        {name:'codigo_sin', type: 'string'},
        {name:'motivo_anulacion', type: 'string'},
 	   {name:'nro_factura', type: 'integer'},
-	   {name:'cod_control', type: 'varchar'}
+	   {name:'cod_control', type: 'varchar'},
+	   {name:'fecha_sw_anular', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+       
 	],
 	sortInfo:{
 		field: 'id_venta',

@@ -1284,15 +1284,20 @@ class MODVenta extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	/**
+	 * AVQ.
+	 * Listado de todas las Ventas realizadas para la vista de Anulación.
+	 */
 	function listarAnularVenta(){
 		//Definicion de variables para ejecucion del procedimientp
+		
 		$this->procedimiento='vef.ft_venta_sel';
 		$this->transaccion='VF_VENANU_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 	
 
 		$this->setParametro('estado','estado','varchar');
-
+          
 		//Definicion de la lista del resultado del query
 		 $this->captura('id_venta','int4');
 		 $this->captura('id_cliente','int4');
@@ -1318,6 +1323,8 @@ class MODVenta extends MODbase{
          $this->captura('motivo_anulacion','varchar');
 		 $this->captura('nro_factura','integer');
 		 $this->captura('cod_control','varchar');
+		 $this->captura('fecha_sw_anular','timestamp');   
+	
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

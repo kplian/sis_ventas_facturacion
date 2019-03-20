@@ -437,12 +437,7 @@ $body$
                 	
                 end if;
         end if; 
-        
-        
-        
-        
-        
-        --obtener gestion a partir de la fecha actual
+          --obtener gestion a partir de la fecha actual
         select id_gestion into v_id_gestion
         from param.tgestion
         where gestion = extract(year from now())::integer;
@@ -1947,7 +1942,9 @@ $body$
 
         --obtener el tipo de usuario, la fecha de venta, etc
 
-        select id_venta,fecha,id_sucursal,id_punto_venta into v_venta
+        select id_venta,fecha,id_sucursal,id_punto_venta,v.fecha_reg +(interval '48 hour')as fecha_sw_anular,
+               v.fecha_reg
+        into v_venta
         from vef.tventa v
         where v.id_venta = v_parametros.id_venta;
 
@@ -1975,7 +1972,7 @@ $body$
             or (v_tipo_usuario = 'administrador' )
             or (p_administrador = 1) THEN*/
   --IF     (v_venta.fecha = now()::date) THEN
-
+     IF     (v_venta.fecha_reg<= now() and v_venta.fecha_sw_anular>=now()) THEN
               --obtenemos datos basicos
               select
                 ven.id_estado_wf,
@@ -1990,14 +1987,13 @@ $body$
 
 
               v_res = vef.f_anula_venta(p_administrador,p_id_usuario,p_tabla, v_registros.id_proceso_wf,v_registros.id_estado_wf, v_parametros.id_venta);
-
               --Definicion de la respuesta
               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','venta anulada');
               v_resp = pxp.f_agrega_clave(v_resp,'id_venta',v_parametros.id_venta::varchar);
         
-      /*  ELSE
-            raise exception 'La venta solo puede ser anulada el mismo dia o por un administrador';
-        END IF;*/
+        ELSE
+            raise exception 'La venta solo puede ser anulada si la fecha esta dentro las 48 horas despues de la emision, comuniquese con el administrador';
+        END IF;
 
         --Devuelve la respuesta
         return v_resp;
