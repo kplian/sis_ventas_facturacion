@@ -2067,7 +2067,7 @@ $body$
       begin
 		v_parametros.texto_xml=replace(v_parametros.texto_xml,'{','<');
         v_parametros.texto_xml=replace(v_parametros.texto_xml,'}','>');
-        v_parametros.texto_xml=replace(v_parametros.texto_xml,';'','"');
+        v_parametros.texto_xml=replace(v_parametros.texto_xml,';','"');
 		insert into siat.tfact_xml(
 				id_venta,
                 texto_xml,
