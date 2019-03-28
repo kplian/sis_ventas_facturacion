@@ -38,6 +38,7 @@ DECLARE
     v_historico			varchar;
     v_join_destino		varchar;
     v_columnas_destino	varchar;
+    v_cuis              record;
 			    
 BEGIN
 
@@ -1651,6 +1652,11 @@ BEGIN
 	elsif(p_transaccion='VF_VENANU_SEL')then
      				
     	begin
+             select horas_anulacion
+              into v_cuis
+              from siat.tcuis 
+              where estado_reg='activo' 
+              limit 1;
          	--Sentencia de la consulta
 			v_consulta:='select
                             ven.id_venta,
@@ -1677,7 +1683,8 @@ BEGIN
                             moa.descripcion,
                             ven.nro_factura,
                             ven.cod_control,
-                            ven.fecha_reg +(interval ''48 hour'')                     	
+                            ven.fecha_reg +( interval '''||v_cuis.horas_anulacion||''' hour),
+                            now()::timestamp as fecha_emision                     	
 						from vef.tventa ven
 						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
@@ -1796,61 +1803,6 @@ BEGIN
 		end; 
 
    
-	elsif(p_transaccion='VF_VENANU_SEL')then
-     				
-    	begin
-        
-           	raise exception '%','especifica';
-    		--Sentencia de la consulta
-			v_consulta:='select
-                            ven.id_venta,
-                            ven.id_cliente,
-                            ven.id_sucursal,
-                            ven.id_proceso_wf,
-                            ven.id_estado_wf,
-                            ven.estado_reg,
-                            ven.correlativo_venta,
-                            ven.a_cuenta,
-                            ven.total_venta,
-                            ven.fecha_estimada_entrega,
-                            ven.usuario_ai,
-                            ven.fecha_reg,
-                            ven.id_usuario_reg,
-                            ven.id_usuario_ai,
-                            ven.id_usuario_mod,
-                            ven.fecha_mod,
-                            ven.porcentaje_descuento,
-                            ven.id_vendedor_medico,
-                            ven.comision,
-                            ven.observaciones,
-                            ven.codigo_sin,
-                            ven.motivo_anulacion/*,
-                            ven.nro_factura,
-                            ven.cod_control,
-                            ven.fecha_reg +(interval ''48 hour'') as fecha_sw_anular*/
-                        	
-						from vef.tventa ven
-						inner join segu.tusuario usu1 on usu1.id_usuario = ven.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = ven.id_usuario_mod
-					    inner join vef.vcliente cli on cli.id_cliente = ven.id_cliente
-                        inner join vef.tsucursal suc on suc.id_sucursal = ven.id_sucursal
-                        --inner join forma_pago_temporal forpa on forpa.id_venta = ven.id_venta
-                        left join vef.tpunto_venta puve on puve.id_punto_venta = ven.id_punto_venta
-                        left join param.tmoneda mon on mon.id_moneda = ven.id_moneda
-                        where ven.estado_reg = ''activo'' and' ;
-			
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-            
-            
-            --raise notice 'CONSULTA.... %',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
-						
-		end;
-
-	
 	/*********************************    
  	#TRANSACCION:  'VF_VENANU_CONT'
  	#DESCRIPCION:	Conteo de registros

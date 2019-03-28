@@ -273,6 +273,15 @@ gruposBarraTareas: [
 			grid : true,
 			form : false,
 			bottom_filter : true
+		},
+		{ //configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'fecha_emision'
+			},
+			type:'Field',
+			form:true 
 		}
 		
        
@@ -309,7 +318,7 @@ gruposBarraTareas: [
 	   {name:'nro_factura', type: 'integer'},
 	   {name:'cod_control', type: 'varchar'},
 	   {name:'fecha_sw_anular', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
-       
+       {name:'fecha_emision', type: 'date',dateFormat:'Y-m-d H:i:s.u'}
 	],
 	sortInfo:{
 		field: 'id_venta',
@@ -339,22 +348,25 @@ gruposBarraTareas: [
    
     BAnularFactura:function () {
 			var rec = this.sm.getSelected();
-			Phx.vista.AnularVenta.superclass.onButtonEdit.call(this);
+			if (rec.data.fecha_emision<=rec.data.fecha_sw_anular){
+			     Phx.vista.AnularVenta.superclass.onButtonEdit.call(this);	
+			}
+			else{
+				alert ('No se puede Anular, Paso la fecha límite de anulación');
+			}
+			
+				
 		},
 	successSave:function(resp){
 		
 		 var avd= Ext.util.JSON.decode(resp.responseText);
 		 alert(avd.ROOT.datos.descripcion);
 		 Phx.vista.AnularVenta.superclass.successSave.call(this,resp);
-		
-				
-
 	},
 	getParametrosFiltro: function () {
 		
-		
-   	 	this.store.baseParams.estado = this.swEstado;
-		
+		this.store.baseParams.estado = this.swEstado;
+   	
 	},
 	actualizarSegunTab: function (name, indice) {
 		

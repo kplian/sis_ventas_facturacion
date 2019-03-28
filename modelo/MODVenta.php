@@ -946,10 +946,10 @@ class MODVenta extends MODbase{
 		$this->procedimiento='vef.ft_venta_ime';
 		$this->transaccion='VF_VENANU_MOD';
 		$this->tipo_procedimiento='IME';
-				
+				  
 		//Define los parametros para la funcion
 		$this->setParametro('id_venta','id_venta','int4');
-
+        $this->setParametro('fecha_sw_anular','fecha_sw_anular','date');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -1324,11 +1324,13 @@ class MODVenta extends MODbase{
 		 $this->captura('nro_factura','integer');
 		 $this->captura('cod_control','varchar');
 		 $this->captura('fecha_sw_anular','timestamp');   
+		 $this->captura('fecha_emision','timestamp');   
 	
-		//Ejecuta la instruccion
+		
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-
+     /*   echo ($this->getConsulta());
+		exit;*/
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

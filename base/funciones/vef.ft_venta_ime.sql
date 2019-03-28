@@ -24,7 +24,7 @@ $body$
   ***************************************************************************/
 
   DECLARE
-
+    horas                   varchar;
     v_nro_requerimiento    	integer;
     v_res					varchar;
     v_parametros           	record;
@@ -128,6 +128,7 @@ $body$
     va_id_tipo_estado		VARCHAR[];
 	va_codigo_estado		varchar[];
     v_descripcion           text;   --Ana
+    v_cuis                  record;
 
   BEGIN
 
@@ -1934,20 +1935,27 @@ $body$
  	#DESCRIPCION:	Anulacion de Venta
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
+    
 	***********************************/
 
     elsif(p_transaccion='VF_VENANU_MOD')then
 
       begin
 
-        --obtener el tipo de usuario, la fecha de venta, etc
-
-        select id_venta,fecha,id_sucursal,id_punto_venta,v.fecha_reg +(interval '48 hour')as fecha_sw_anular,
+        --obtener las horas de anulacion que serà variable de acuerdo a la entidad de impuestos
+        select (horas_anulacion || ' hour')::interval as horas_anulacion
+        into v_cuis
+        from siat.tcuis 
+        where estado_reg='activo' 
+        limit 1;
+        
+         --obtener el tipo de usuario, la fecha de venta, etc
+      
+        select id_venta,fecha,id_sucursal,id_punto_venta,(v.fecha_reg + v_cuis.horas_anulacion) as fecha_sw_anular,
                v.fecha_reg
         into v_venta
         from vef.tventa v
         where v.id_venta = v_parametros.id_venta;
-
         v_tipo_usuario = 'vendedor';
 
         if (v_venta.id_punto_venta is null) then
@@ -1965,14 +1973,12 @@ $body$
         --  es un usuario adminsitrador de sistemas p_administrador != 1  
         --  es un usuario administrador del punto de venta v_tipo_usuario = administrador
         -- o es un usuario vendedor , epro solo si es el mismo dia
-        
-
-        
-      /*  IF     (v_tipo_usuario = 'vendedor' and v_venta.fecha = now()::date)
+               
+        /*  IF     (v_tipo_usuario = 'vendedor' and v_venta.fecha = now()::date)
             or (v_tipo_usuario = 'administrador' )
             or (p_administrador = 1) THEN*/
-  --IF     (v_venta.fecha = now()::date) THEN
-     IF     (v_venta.fecha_reg<= now() and v_venta.fecha_sw_anular>=now()) THEN
+  					
+     IF     (now()<=v_venta.fecha_sw_anular  ) THEN
               --obtenemos datos basicos
               select
                 ven.id_estado_wf,
