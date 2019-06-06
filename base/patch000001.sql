@@ -265,10 +265,10 @@ ALTER TABLE vef.tcliente
 ALTER TABLE vef.tventa
   ADD COLUMN id_punto_venta INTEGER;
   
-/*
+
 ALTER TABLE vef.tventa
   ADD COLUMN correlativo_venta VARCHAR(20)  DEFAULT '' NOT NULL;
-*/
+
   
 CREATE TABLE vef.tventa_forma_pago (
   id_venta_forma_pago SERIAL,  
@@ -1165,5 +1165,4 @@ ALTER TABLE vef.tventa
 ALTER TABLE vef.ttemporal_data
   ADD COLUMN id_punto_venta INTEGER;
 /************************************F-SCP-EGS-VEF-3-20/02/2019*************************************************/
-
 
