@@ -541,3 +541,8 @@ ALTER TABLE ONLY vef.tsucursal_almacen
     FOREIGN KEY (id_almacen) REFERENCES alm.talmacen(id_almacen);
     
 /************************************F-DEP-JRR-VEF-1-10/01/2019*************************************************/
+/************************************I-DEP-EGS-VEF-1-06/06/2019*************************************************/
+
+select pxp.f_insert_testructura_gui ('PENETR', 'VENCARP');
+
+/************************************F-DEP-EGS-VEF-1-06/06/2019*************************************************/
