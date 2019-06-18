@@ -513,8 +513,13 @@ class ACTVenta extends ACTbase{
 			
 			$this->objFunc = $this->create('MODVenta');
 			$detalle = $this->objFunc->listarDetalle($this->objParam);
-			$datos2 = new convert_xml2("factura_".$id, dirname(__FILE__).'/../../uploaded_files/archivos_facturacion_xml/');		
 			
+			//creacion de carpeta donde se guarda los archivos xml y archivos encriptados.
+			$carpeta = '../../../uploaded_files/archivos_facturacion_xml/';
+			if (!file_exists($carpeta)) {
+    			mkdir($carpeta, 0777, true);
+			} 
+			$datos2 = new convert_xml2("factura_".$id,$carpeta);
 			
 			$datos2->genera_xml($cabecera->generarJson(),$detalle->generarJson(),$id);
 			$datos2->llenarSignature();
