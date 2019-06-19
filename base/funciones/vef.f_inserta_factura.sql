@@ -114,6 +114,7 @@ DECLARE
     v_fecha_ultima_factura      date;
     v_id_gestion                integer;
     v_id_temporal_data          integer;
+    v_date_now                  date;
     
 BEGIN
 
@@ -128,7 +129,13 @@ BEGIN
     ***********************************/
 
     if(p_transaccion='VF_INSTEM_INS')then
-    	begin  	
+    	begin  
+        --borramos todos los datos de las tablas diferentes al dia de la insercion del excel
+        v_date_now = now()date;
+        DELETE from vef.ttemp_factura_excel WHERE fecha_reg::date <> v_date_now;
+        DELETE from vef.ttemp_factura_detalle_excel WHERE fecha_reg::date <> v_date_now;
+        DELETE from vef.ttemporal_data WHERE fecha_reg::date <> v_date_now;
+        	
         v_bandera_validacion = false;
         --raise exception 'observaciones %',v_parametros.observaciones;
           SELECT
@@ -275,7 +282,12 @@ BEGIN
          IF  pxp.f_existe_parametro(p_tabla,'tipo_factura')  THEN  
          	v_tipo_factura = v_parametros.tipo_factura;
          ELSE
-         	v_tipo_factura ='computarizada';
+
+             IF v_parametros.nombreVista = 'VentaVendedorPeajeETR' THEN --#4 
+                 v_tipo_factura ='computarizadareg';
+              ELSE
+                 v_tipo_factura ='computarizada';
+             END IF;
 		 END IF;
          
          IF  pxp.f_existe_parametro(p_tabla,'nro_contrato') THEN 
@@ -460,14 +472,15 @@ BEGIN
                         into
                        v_fecha_ultima_factura
              from vef.tventa v
-             where v.fecha > v_fecha and v.tipo_factura = v_tipo_factura
+             where v.tipo_factura = v_tipo_factura
                              and v.estado != 'anulado'
                              and v.id_sucursal = v_record_sucursal.id_sucursal
                              and v.estado_reg = 'activo';
-           IF v_fecha_ultima_factura is not null THEN
+           IF v_fecha_ultima_factura::date > v_fecha::date THEN
               raise exception 'Existen facturas emitidas con fechas posteriores al( % ).La fecha que Registrara (%) debe cambiarla a una despues de la indicada.Revise la Razon Social % y Nro %',v_fecha_ultima_factura,v_fecha,v_parametros.razon_social, v_nro;
             END IF;
         
+          
 
         ---verificando si existe la fila del excel en base datos el dia de la creacion  y por punto de venta
        	SELECT
@@ -855,7 +868,7 @@ BEGIN
           FROM orga.tfuncionario fun
           left join segu.tusuario usu on usu.id_persona = fun.id_persona
           WHERE fun.id_funcionario = v_parametros.id_funcionario_usu;
-			p_id_usuario=v_record_persona.id_usuario;
+		  p_id_usuario = v_record_persona.id_usuario;
        FOR item IN(
        			SELECT
 					 tfe.id_factura_excel	,
@@ -1026,14 +1039,14 @@ BEGIN
                                ]
                             );
  			
-            v_resp = vef.ft_venta_ime(p_administrador,p_id_usuario,v_tabla,v_codigo_trans);
+            v_resp = vef.ft_venta_ime(p_administrador,COALESCE(p_id_usuario,1),v_tabla,v_codigo_trans);
             
             --raise exception '%',v_resp;
             
           	v_id_venta = pxp.f_recupera_clave(v_resp,'id_venta');
             v_id_venta	=  split_part(v_id_venta, '{', 2);
             v_id_venta	=  split_part(v_id_venta, '}', 1);
-          -- raise exception 'venta%',v_id_venta;
+          --raise exception 'venta%',v_id_venta;
          	
           
        		v_contador=1;
@@ -1132,7 +1145,7 @@ BEGIN
                             );
            	 --raise exception 'v_tabla_2 %',p_id_usuario;
             
-            v_resp_2 = vef.ft_venta_detalle_ime(p_administrador,p_id_usuario,v_tabla_2,v_codigo_trans_2);
+            v_resp_2 = vef.ft_venta_detalle_ime(p_administrador,COALESCE(p_id_usuario,1),v_tabla_2,v_codigo_trans_2);
             v_id_venta_det = pxp.f_recupera_clave(v_resp_2,'id_venta_detalle');
             v_id_venta_det	=  split_part(v_id_venta_det, '{', 2);
             v_id_venta_det	=  split_part(v_id_venta_det, '}', 1);
@@ -1161,7 +1174,7 @@ BEGIN
                             'NULL'::varchar, ---'_nombre_usuario_ai',
                             ''::varchar,  -----'_id_usuario_ai',	
                              v_id_venta::varchar,--'id_venta',
-                             'computarizada'::varchar--'tipo_factura',
+                             item.tipo_factura::varchar--'tipo_factura',
                				--'id_venta_fk'
                                 ],
                             ARRAY[ 
@@ -1174,7 +1187,7 @@ BEGIN
                             );
            	 --raise exception 'v_tabla_3 %',p_id_usuario;
 		            
-            v_resp_3 = vef.ft_venta_ime(p_administrador,p_id_usuario,v_tabla_3,v_codigo_trans_3);
+            v_resp_3 = vef.ft_venta_ime(p_administrador,COALESCE(p_id_usuario,1),v_tabla_3,v_codigo_trans_3);
             
             UPDATE vef.ttemp_factura_excel 
             SET venta_generada = TRUE

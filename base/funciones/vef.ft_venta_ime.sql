@@ -1363,9 +1363,18 @@ $body$
           END IF;
           -- si es eidicion ya tendremos un numeor de factura que no debemos cambiar
           IF  v_venta.nro_factura is null THEN
-
-
-
+                    
+                    SELECT 
+                        MAX(v.fecha)
+                    INTO 
+                    v_fecha
+                    FROM vef.tventa v
+                    WHERE v.tipo_factura = v_venta.tipo_factura
+                    and v.estado != 'anulado'
+                    and v.id_sucursal = v_venta.id_sucursal
+                    and v.estado_reg = 'activo'
+                    and v.id_venta <> v_parametros.id_venta;
+            
             if (EXISTS(select 1
                        from vef.tventa v
                        where v.fecha > v_venta.fecha and v.tipo_factura = v_venta.tipo_factura
@@ -1374,7 +1383,6 @@ $body$
                              and v.estado_reg = 'activo'))THEN
               raise exception 'Existen facturas emitidas con fechas posterior a la registrada (%). Por favor revise la fecha y hora del sistema (%..%)',v_fecha, v_venta.fecha, v_venta.tipo_factura;
             end if;
-
 
 
             select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica

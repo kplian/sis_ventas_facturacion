@@ -268,6 +268,10 @@ ALTER TABLE vef.tventa
 
 ALTER TABLE vef.tventa
   ADD COLUMN correlativo_venta VARCHAR(20)  DEFAULT '' NOT NULL;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 36fa0dd725eacfe045ec680e013446b2a8c102dd
   
 CREATE TABLE vef.tventa_forma_pago (
   id_venta_forma_pago SERIAL,  
@@ -1293,5 +1297,3 @@ ALTER TABLE vef.tcliente
 ADD id_tipo_documento INTEGER ;
   
 /************************************F-SCP-EAQ-VEF-3-28/02/2019*************************************************/
-
-
