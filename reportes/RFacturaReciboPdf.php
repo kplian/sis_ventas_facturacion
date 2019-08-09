@@ -1,4 +1,9 @@
 <?php
+
+/*
+ * 	ISSUE		FECHA		AUTHOR 		DESCRIPCION
+ * 	#5			09/08/2019	EGS			Nuevo formato de factura 
+ */
 require_once(dirname(__FILE__).'/../../lib/tcpdf/tcpdf.php');
 require_once(dirname(__FILE__).'/../../lib/tcpdf/tcpdf_barcodes_2d.php');
 // Extend the TCPDF class to create custom MultiRow
@@ -86,6 +91,11 @@ class RFacturaReciboPdf extends  ReportePDF {
 			$this->SetHeaderMargin(15); //margin de header de top
 			$this->SetFooterMargin(60); //margin de Footer de botton
 			$this->SetAutoPageBreak(true, 60);
+			}
+			elseif($this->codigo_reporte =='RECIBOETR') {//#5
+			$this->SetHeaderMargin(21); //margin de header de top
+			$this->SetFooterMargin(60); //margin de Footer de botton
+			$this->SetAutoPageBreak(true, 60);	
 			}
 			else{
 			$this->SetHeaderMargin(15); //margin de header de top
@@ -262,8 +272,8 @@ class RFacturaReciboPdf extends  ReportePDF {
 	function noValido(){
 			if ($this->objParam->getParametro('nombre_vista') !='VentaEmisor' or $this->objParam->getParametro('nombre_vista') !='VentaEmisor' && $this->cabecera ['estado'] == 'finalizado') {
 						$this->SetAlpha(0.50);
-		
-						$this->Image(dirname(__FILE__) . "/../../lib/imagenes/estados/".$this->cabecera['estado'].".png", 50, 70, 100,100, '', 'http://www.endetransmision.bo', '', true, 72);
+																																			 //link
+						$this->Image(dirname(__FILE__) . "/../../lib/imagenes/estados/".$this->cabecera['estado'].".png", 50, 70, 100,100, '', '', '', true, 72);
 					
 						$this->SetAlpha(1);
 					};

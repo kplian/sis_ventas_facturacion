@@ -1,4 +1,8 @@
 <?php
+/*
+ * 	ISSUE		FECHA		AUTHOR 		DESCRIPCION
+ * 	#5			09/08/2019	EGS			Nuevo formato de factura 
+ */
 require_once(dirname(__FILE__).'/../../../../lib/tcpdf/tcpdf_barcodes_2d.php');
 
 
@@ -533,5 +537,55 @@ elseif  ($this->codigo_reporte == 'NOTAFACMEDIACAR' || $this->codigo_reporte == 
 <?php
 }
 
+if ($this->codigo_reporte == 'RECIBOETR') {//#5
+			
+setlocale(LC_ALL,"es_ES@euro","es_ES","esp");
 ?>
+				<table  width="660px" style="border:thin solid black;">
+<?php
+							$valor_bruto = 0;
+							$i = 1;
+							foreach ($this->detalle as $item_detalle) {
+								$valor_bruto += $item_detalle['precio_total']; 
+								echo '<tr>
+									<td width="30%" style="text-align: left ;  height:300px " >' . $this->cabecera['observaciones'] . '</td>											
+									<td width="50%" style="text-align: left ;  height:300px" >' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
+									<td width="20%" style="text-align: right;  height:300px" >' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
+								</tr>';
+								$i++;
+							}
+						
+							if ($this->cabecera['estado'] == 'borrador') {
+								$this->estado = 'BORRADOR';
+							} 
+							elseif ($this->cabecera['estado'] == 'anulado'){
+								$this->estado = 'ANULADO';
+							} else {
+								$this->estado = ' ';
+							}
+?>	
+							</tbody>
+					</table>
+				<table style="border-collapse: collapse;" width="660px">
+						<tr>
+							<td width="100%" style="text-align:center;"><br></td>
+						</tr>
+					
+						<tr>
+							<td width="53%" style="text-align:center;"><br></td>
+							<td width="32.5%"><strong>TOTAL  <?php echo $this->cabecera['moneda_venta'] ; ?>:</strong> </td>
+							<td style="text-align: right;" width="14%"><strong><?php echo number_format($this->cabecera['total_venta_msuc'], 2, '.', ',') ; ?></strong></td>
+						</tr>
+						<tr>
+							<td><p>Son : <strong><?php echo  str_replace(",", "", $this->cabecera['total_venta_msuc_literal']);   ?> <?php echo $this->moneda; ?></strong></p></td>
+						</tr>							
+					
+				</table>
+                                                                                 
+                </body>
+            </html>
 
+	
+<?php 
+	}
+?>
