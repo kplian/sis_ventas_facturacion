@@ -219,7 +219,7 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: true,
                 anchor: '100%',
                 gwidth: 100,
-                maxLength:50
+                maxLength:100
             },
                 type:'TextField',
                 filters:{pfiltro:'suc.telefono',type:'string'},
