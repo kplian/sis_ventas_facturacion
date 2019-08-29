@@ -1165,4 +1165,7 @@ ALTER TABLE vef.tventa
 ALTER TABLE vef.ttemporal_data
   ADD COLUMN id_punto_venta INTEGER;
 /************************************F-SCP-EGS-VEF-3-20/02/2019*************************************************/
-
+/************************************I-SCP-EGS-VEF-4-12/08/2019*************************************************/
+ALTER TABLE vef.tsucursal
+  ALTER COLUMN telefono TYPE VARCHAR(150);
+/************************************F-SCP-EGS-VEF-4-12/08/2019*************************************************/

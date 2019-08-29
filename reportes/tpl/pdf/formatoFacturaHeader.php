@@ -281,28 +281,31 @@ if ($this->codigo_reporte == 'RECIBOETR' ) {//#5
 					
 				<body>
 
-			  <table  width="645px">
+			  <table  width="645px" >
 			  	<tr >
 			  		
-			  		<td style="text-align:left;" rowspan="5" width="450px" height="100">
-			  		<?php 
-						echo '<img src="../../../lib'.($this->codigo_reporte== 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_3.png').'" alt="logo" width="200" height="100" />';
-					?>
+			  		<td style="text-align:left;"  width="450px">
+
 			  		</td>
 			  	
-			  		<td width="100px">NIT:</td>
-			  		<td width="150px"><?php echo $this->cabecera['nit_entidad'] ; ?></td>
+			  		<td width="100px" style="font-size:20px"><strong>NIT:</strong></td>
+			  		<td width="150px" style="font-size:20px"><?php echo $this->cabecera['nit_entidad'] ; ?></td>
 			  	
 			  	</tr>
 			  	<tr>
 			  		
-			  		
-			  		<td>FACTURA:</td>
+			  		<td style="text-align:left;"  width="450px">
+
+			  		</td>
+			  		<td><strong>FACTURA:</strong></td>
 			  		<td><?php echo $this->cabecera['numero_factura'] ; ?></td>
 			  	</tr>
 			  	<tr>
+			  					  		
+			  		<td style="text-align:left;" rowspan="2" width="450px" >
 			  		
-			  		<td>AUTORIZACION:</td>
+			  		</td>
+			  		<td><strong>AUTORIZACION:</strong></td>
 			  		<td><?php echo $this->cabecera['autorizacion'] ; ?></td>
 			  	</tr>
 			  	<?php
@@ -312,23 +315,25 @@ if ($this->codigo_reporte == 'RECIBOETR' ) {//#5
 				
 			  	?>
 			  	<tr>
-			  		
+			  		<td style="text-align:left;"  width="450px" height="50">
+			  		<?php 
+						echo '<img src="../../../lib'.($this->codigo_reporte== 'FACMEDIACARVINTO'?'/imagenes/logos/logo_vinto.png':'/imagenes/logos/logo_3.png').'" alt="logo" width="150" height="50" />';
+					?>
+			  		</td>
 			  		<td style="text-align: center;"  colspan="2" ><?php echo $this->cabecera['actividades']; ?></td>
 			  		
 			  	</tr>
 
 			  </table>
-			<br />
-			 <br />
-			
+		
 			  <table   >
 				  	<tr>
 				  		
-				  		<td  width="645px" height="20px" style="text-align: left;"><strong><?php echo $this->cabecera['nombre_sucursal']; ?></strong></td>
+				  		<td  width="645px" height="20px" style="text-align: left; font-size:20px"><strong><?php echo $this->cabecera['nombre_sucursal']; ?></strong></td>
 				  	</tr>
 				  	<tr >
 				  		
-				  		<td width="645px" height="20px" style="text-align: left;"><?php echo $this->cabecera['direccion_sucursal'] ; ?></td>
+				  		<td width="300px" height="20px" style="text-align: left;"><?php echo $this->cabecera['direccion_sucursal'] ; ?></td>
 				  	</tr>
 				  	<tr >
 				  		
@@ -348,18 +353,18 @@ if ($this->codigo_reporte == 'RECIBOETR' ) {//#5
 				<table style="border: thin solid black;" width="660px">
 					<tbody>
 						<tr>
-							<td width="30%">Lugar y Fecha</td>
-							<td width="70%"><strong><?php echo $this->cabecera['departamento_sucursal'] ; ?> , <?php echo $this->cabecera['fecha_literal'] ; ?></strong></td>
+							<td width="30%" height="20px"><strong> Lugar y Fecha</strong></td>
+							<td width="70%"  ><?php echo ucfirst(strtolower($this->cabecera['departamento_sucursal']) ); ?> , <?php echo $this->cabecera['fecha_literal'] ; ?></td>
 							
 						</tr>
 						<tr>
-							<td>Señor(es):</td>
-							<td><strong><?php echo $this->cabecera['cliente'] ; ?></strong></td>
+							<td height="20px"><strong> Señor(es):</strong></td>
+							<td><?php echo $this->cabecera['cliente'] ; ?></td>
 							
 						</tr>						
 						<tr>
-							<td>NIT/CI</td>
-							<td><strong><?php echo $this->cabecera['nit_cliente'] ; ?></strong></td>
+							<td height="20px" ><strong> NIT/CI:</strong></td>
+							<td><?php echo $this->cabecera['nit_cliente'] ; ?></td>
 							
 						</tr>
 						

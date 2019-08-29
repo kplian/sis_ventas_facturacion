@@ -548,9 +548,9 @@ setlocale(LC_ALL,"es_ES@euro","es_ES","esp");
 							foreach ($this->detalle as $item_detalle) {
 								$valor_bruto += $item_detalle['precio_total']; 
 								echo '<tr>
-									<td width="30%" style="text-align: left ;  height:300px " >' . $this->cabecera['observaciones'] . '</td>											
-									<td width="50%" style="text-align: left ;  height:300px" >' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
-									<td width="20%" style="text-align: right;  height:300px" >' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
+									<td width="30%" style="text-align: left ; border-right:thin solid black;  height:300px " >' . $this->cabecera['observaciones'] . '</td>											
+									<td width="50%" style="text-align: left ; border-right:thin solid black; height:300px" >' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
+									<td width="20%" style="text-align: right; border-right:thin solid black; height:300px" >' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
 								</tr>';
 								$i++;
 							}
