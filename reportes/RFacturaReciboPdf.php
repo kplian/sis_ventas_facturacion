@@ -68,7 +68,7 @@ class RFacturaReciboPdf extends  ReportePDF {
 			
 			
 					if ($this->cabecera['estado'] == 'borrador') {
-					
+
 					$this->pagina ='<tr><td style="text-align: center;" colspan="2" > <h3>&nbsp;<strong>Borrador</strong></h3></td></tr>';
 					$this->count = 0;
 					} 
@@ -93,7 +93,7 @@ class RFacturaReciboPdf extends  ReportePDF {
 			$this->SetAutoPageBreak(true, 60);
 			}
 			elseif($this->codigo_reporte =='RECIBOETR') {//#5
-			$this->SetHeaderMargin(3); //margin de header de top
+			$this->SetHeaderMargin(11); //margin de header de top
 			$this->SetFooterMargin(60); //margin de Footer de botton
 			$this->SetAutoPageBreak(true, 60);	
 			}
