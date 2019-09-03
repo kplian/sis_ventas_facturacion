@@ -137,7 +137,7 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
 						$valor_bruto += $item_detalle['precio_total']; 
 						echo '<tr>
 							<td width="10%" style="text-align: center; border-bottom: thin solid black; border-left: thin solid black;">'.$i.'</td>							
-							<td width="40%" style="text-align: left ; border-bottom: thin solid black; border-left: thin solid black;">' . $item_detalle['concepto'] .' '.$item_detalle['descripcion'] . '</td>
+							<td width="40%" style="text-align: left ; border-bottom: thin solid black; border-left: thin solid black;">'.$item_detalle['descripcion'] . '</td>
 							<td width="15%" style="text-align: right; border-bottom: thin solid black; border-left: thin solid black;">' . number_format($item_detalle['cantidad'], 2, '.', ',') . '</td>
 							<td width="15%" style="text-align: right; border-bottom: thin solid black; border-left: thin solid black;">' . number_format($item_detalle['precio_unitario'], 2, '.', ',') . '</td>
 							<td width="20%" style="text-align: right; border-bottom: thin solid black; border-left: thin solid black;">' . number_format($item_detalle['precio_total'], 2, '.', ',') . '</td>
