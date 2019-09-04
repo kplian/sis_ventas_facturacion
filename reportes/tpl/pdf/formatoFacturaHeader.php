@@ -1,4 +1,4 @@
-git <?php
+<?php
 /*
  * 	ISSUE		FECHA		AUTHOR 		DESCRIPCION
  * 	#5			09/08/2019	EGS			Nuevo formato de factura 
@@ -377,8 +377,8 @@ if ($this->codigo_reporte == 'RECIBOETR' ) {//#5
     <table style="border:thin solid black ;border-collapse: collapse; height: 33px;" width="660px">
         <tbody>
         <tr>
-            <td style="border-top: thin solid black;" colspan="3">
-                <h3 style="text-align: center;">DETALLE</h3>
+            <td style="border-top: thin solid black; text-align: center" colspan="3">
+                <strong>DETALLE</strong>
             </td>
         </tr>
         <tr>
