@@ -123,8 +123,8 @@ if ($this->codigo_reporte == 'FACMEDIACAR' || $this->codigo_reporte == 'FACMEDIA
     <table style="border:thin solid black ;border-collapse: collapse; height: 33px;" width="645">
         <tbody>
         <tr>
-            <td style="border-top: thin solid black;" colspan="3">
-                <h3 style="text-align: center;">DETALLE&nbsp;</h3>
+            <td style="border-top: thin solid black; text-align: center;" colspan="3">
+                <strong>DETALLE&nbsp;</strong>
             </td>
         </tr>
         <tr>

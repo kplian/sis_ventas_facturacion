@@ -180,16 +180,31 @@ class RFacturaReciboPdf extends  ReportePDF {
             //inicia el original del emisor cuando es nota de credito
             if ($this->codigo_reporte =='NOTAFACMEDIACAR') {
 
-                $this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>ORIGINAL EMISOR</strong></h3></td></tr>';
+                $this->pagina = '<tr>
+										<td style="text-align:left;" width="400px" >
+										</td>
+			  							<td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>ORIGINAL EMISOR</strong></h3></td>
+			  						
+			  						</tr>';
                 $this->count = 0;
                 $this->originalEmisor();
             }
 
             //inicia copias de las facturas
-            $this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Tesoreria</strong></h3></td></tr>';
+            $this->pagina = '<tr>
+										<td style="text-align:left;" width="400px" >
+										</td>
+			  							<td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Tesoreria</strong></h3></td>
+			  						
+			  						</tr>';
             $this->count = 0;
             $this->copiaTesoreria();
-            $this->pagina = '<tr><td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Contabilidad </strong></h3></td></tr>';
+            $this->pagina = '<tr>
+										<td style="text-align:left;" width="400px" >
+										</td>
+			  							<td style="text-align: center;" colspan="2" ><h3>&nbsp;<strong>Copia Contabilidad</strong></h3></td>
+			  						
+			  						</tr>';
             $this->count = 0;
             $this->copiaContabilidad();
 
