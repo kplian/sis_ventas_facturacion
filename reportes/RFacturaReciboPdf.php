@@ -118,7 +118,7 @@ class RFacturaReciboPdf extends  ReportePDF {
             $this->SetAutoPageBreak(true, 60);
         }
         elseif($this->codigo_reporte =='RECIBOETR') {//#5
-            $this->SetHeaderMargin(11); //margin de header de top
+            $this->SetHeaderMargin(7); //margin de header de top
             $this->SetFooterMargin(60); //margin de Footer de botton
             $this->SetAutoPageBreak(true, 60);
         }
