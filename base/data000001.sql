@@ -305,3 +305,24 @@ select wf.f_import_testructura_estado ('insert','caja','finalizado','VEN',1,'');
 select param.f_import_tcatalogo_tipo ('insert','tipo_punto_venta','VEF','tpunto_venta');
 select param.f_import_tcatalogo ('insert','VEF','aeropuerto','ato','tipo_punto_venta');
 /***********************************F-DAT-EGS-VEF-5-29/01/2019*****************************************/
+/***********************************I-DAT-EGS-VEF-6-28/10/2019*****************************************/
+select param.f_import_tplantilla_archivo_excel ('insert','SUBFACTURA','SubirFactura','activo',NULL,'2',NULL,'','csv',',');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA2','SUBFACTURA','si','',NULL,'6','codigo conIng','codigo','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA3','SUBFACTURA','si','',NULL,'4','cantidad','cantidad','entero','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA4','SUBFACTURA','si','',NULL,'5','unidad','unidad','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA5','SUBFACTURA','no','',NULL,'7','precio uni usd','precio_uni_usd','numeric','.','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA6','SUBFACTURA','no','',NULL,'9','precio total usd','precio_total_usd','numeric','.','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA7','SUBFACTURA','si','',NULL,'1','nro','nro','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA8','SUBFACTURA','si','',NULL,'13','observaciones','observaciones','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA12','SUBFACTURA','si','',NULL,'8','precio_uni_bs','precio_uni_bs','numeric','.','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA13','SUBFACTURA','si','',NULL,'2','razon social','razon_social','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA14','SUBFACTURA','si','',NULL,'3','nit','nit','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA15','SUBFACTURA','si','',NULL,'10','precio total bs','precio_total_bs','numeric','.','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA16','SUBFACTURA','si','',NULL,'11','centro de costo','centro_costo','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA17','SUBFACTURA','si','',NULL,'12','clase de costo','clase_costo','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA9','SUBFACTURA','si','dd/mm/yyyy',NULL,'15','fecha','fecha','date','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA10','SUBFACTURA','si','',NULL,'16','numero contrato','nro_contrato','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA11','SUBFACTURA','si','',NULL,'17','forma de pago','forma_pago','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA1','SUBFACTURA','si','',NULL,'18','aplicacion','aplicacion','string','','activo');
+select param.f_import_tcolumna_plantilla_archivo_excel ('insert','SUBFACTURA18','SUBFACTURA','si','',NULL,'14','descripcion','descripcion','string','','activo');
+/***********************************F-DAT-EGS-VEF-6-28/10/2019*****************************************/
