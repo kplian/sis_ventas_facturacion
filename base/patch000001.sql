@@ -1169,3 +1169,7 @@ ALTER TABLE vef.ttemporal_data
 ALTER TABLE vef.tsucursal
   ALTER COLUMN telefono TYPE VARCHAR(150);
 /************************************F-SCP-EGS-VEF-4-12/08/2019*************************************************/
+/************************************I-SCP-EGS-VEF-6-25/10/2019*************************************************/
+ALTER TABLE vef.ttemp_factura_detalle_excel
+  ADD COLUMN descripcion VARCHAR;
+/************************************F-SCP-EGS-VEF-6-25/10/2019*************************************************/
