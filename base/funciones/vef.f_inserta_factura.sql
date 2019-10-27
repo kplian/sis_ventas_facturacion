@@ -138,7 +138,7 @@ BEGIN
         DELETE from vef.ttemp_factura_excel WHERE fecha_reg::date <> v_date_now;
         DELETE from vef.ttemp_factura_detalle_excel WHERE fecha_reg::date <> v_date_now;
         DELETE from vef.ttemporal_data WHERE fecha_reg::date <> v_date_now;
-        --RAISE EXCEPTION 'v_parametros.descripcion %',v_parametros.descripcion;
+       --RAISE EXCEPTION 'v_parametros.descripcion %',v_parametros.descripcion;
         v_bandera_validacion = false;
         --raise exception 'observaciones %',v_parametros.observaciones;
           SELECT
@@ -544,7 +544,8 @@ BEGIN
             tfed.fecha                ,
             tfed.nro                 ,
             tfed.observaciones         ,
-            tfed.tipo_factura
+            tfed.tipo_factura,
+            tfed.descripcion --#6
         FROM vef.ttemp_factura_detalle_excel tfed
         left join vef.ttemp_factura_excel tfe on tfe.id_factura_excel = tfed.id_factura_excel_fk
         WHERE  tfed.nro = v_parametros.nro and tfed.fecha_reg::date = NOW()::date and tfe.id_punto_venta = v_id_punto_venta  )LOOP--#4
@@ -558,7 +559,9 @@ BEGIN
                 item_validacion_detalle.fecha            = v_fecha                 and
                 item_validacion_detalle.nro                 = v_nro                and
                 item_validacion_detalle.observaciones     = v_observaciones        and
-                item_validacion_detalle.tipo_factura    = v_tipo_factura )THEN
+                item_validacion_detalle.tipo_factura    = v_tipo_factura and
+                item_validacion_detalle.descripcion     = v_descripcion --#6
+                )THEN
 
                 v_bandera_validacion = true;
 
