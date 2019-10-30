@@ -5,6 +5,9 @@
 *@author  (admin)
 *@date 01-03-2016 14:22:24
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ISSUE				FECHA		    AUTOR				DESCRIPCION
+ #6	endeETR	 	    25/10/2019	    EGS					Se agrega descripcion al xls para subir archivos
+
 */
 include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
 class ACTSubirArchivoFac extends ACTbase{
@@ -50,6 +53,7 @@ class ACTSubirArchivoFac extends ACTbase{
 							$this->objParam->addParametro('clase_costo', $fila['clase_costo']);
 							$this->objParam->addParametro('nro', $fila['nro']);
 		                    $this->objParam->addParametro('observaciones', $fila['observaciones']);
+                            $this->objParam->addParametro('descripcion', $fila['descripcion']);//#6
 		                    $this->objParam->addParametro('fecha', $fila['fecha']);
 							$this->objParam->addParametro('nro_contrato', $fila['nro_contrato']);
 							$this->objParam->addParametro('forma_pago', $fila['forma_pago']);

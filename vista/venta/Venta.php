@@ -12,6 +12,7 @@
  #1234           08-10-2018           RAC                 Se agregan datos para proveedor y facturas NCD en ETR 
  #1				 15-10-2018			  EGS				  se agrego validacion para tipo de reporte pdf o nativo del sistema ventas con el prefijo PDF- 
  #2				 12-11-2018			  EGS				  se agrego el campo tipo de usuario cuando el usuario esta asignado a mas de dos puntos de venta
+ #6               25/10/2019          EGS                 Filtro de cliente se cambia a proveedor
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -340,7 +341,8 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
                 gwidth: 110
             },
                 type:'TextField',
-                filters : {pfiltro : 'cli.nombre_factura',type : 'string'},             
+                //filters : {pfiltro : 'cli.nombre_factura',type : 'string'},
+                filters : {pfiltro : 'cli.desc_proveedor',type : 'string'},///#&
                 grid:true,
                 form:false,
                 bottom_filter: true

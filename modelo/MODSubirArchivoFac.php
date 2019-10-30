@@ -7,6 +7,7 @@
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
  ISSUE				FECHA		AUTOR				DESCRIPCION
  	#4	endeETR	 	21/02/2019	EGS					Se agregaron campos para punto de venta
+ * #6	endeETR	 	25/10/2019	EGS					Se agrega descripcion al xls para subir archivos
  */
 
 class MODSubirArchivoFac extends MODbase{
@@ -132,7 +133,8 @@ function subirArchivoFac(){
 			$this->setParametro('clase_costo', 'clase_costo','varchar');
 			$this->setParametro('nro', 'nro','varchar');
 			$this->setParametro('observaciones', 'observaciones','varchar');
-			$this->setParametro('fecha', 'fecha','date');
+            $this->setParametro('descripcion', 'descripcion','varchar');//#6
+            $this->setParametro('fecha', 'fecha','date');
 			$this->setParametro('id_punto_venta', 'id_punto_venta','int4');
 			$this->setParametro('tipo_factura', 'tipo_factura','varchar');
 			$this->setParametro('nro_contrato', 'nro_contrato','varchar');
