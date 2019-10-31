@@ -11,7 +11,7 @@
  ISSUE            FECHA:		      AUTOR               DESCRIPCION
  #0              01-06-2015          RAC            Creacion
  #123            25/09/2018          RAC           se adicionar controlador para  facturas, notas de credito debito y combos ETR
-  
+#7				31/10/2019			EGS					 Se agrega validacion y siguiente estado multiple
 */
 
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
@@ -575,6 +575,16 @@ class ACTVenta extends ACTbase{
         $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
+    function validacionMultiple(){//#7
+        $this->objFunc=$this->create('MODVenta');
+        $this->res=$this->objFunc->validacionMultiple($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function siguienteEstadoMultiple(){//#7
+        $this->objFunc=$this->create('MODVenta');
+        $this->res=$this->objFunc->siguienteEstadoMultiple($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
     }
 			
 }
