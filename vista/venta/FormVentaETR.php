@@ -9,6 +9,7 @@
 
  ISSUE            FECHA:		      AUTOR               DESCRIPCION
  #0              08-10-2018           RAC                 Creacion 
+ #10			 26/02/2020			  MZM				  Adicion de filtro en CC tras seleccion de fecha de factura (caso computarizadareg)
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -25,7 +26,7 @@ Phx.vista.FormVentaETR=Ext.extend(Phx.frmInterfaz,{
     fwidth : '9%',
     cantidadAllowDecimals: false,
     constructor:function(config)
-    {   
+    {  
         Ext.apply(this,config);
         
         if (this.data.objPadre.variables_globales.vef_tiene_punto_venta === 'true') {  
@@ -110,21 +111,7 @@ Phx.vista.FormVentaETR=Ext.extend(Phx.frmInterfaz,{
 		      
 		}
 		
-		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadareg'|| this.data.objPadre.tipo_factura == 'computarizadaexpo'|| this.data.objPadre.tipo_factura == 'computarizadamin'|| this.data.objPadre.tipo_factura == 'computarizadaexpomin'|| this.data.objPadre.tipo_factura == 'pedido') {
-			this.Atributos.push({
-				config:{
-					name: 'fecha',
-					fieldLabel: 'Fecha Factura',
-					allowBlank: false,
-					anchor: '80%',					
-					format: 'd/m/Y'
-								
-				},
-					type:'DateField',					
-					id_grupo:0,					
-					form:true
-			});
-	  }		
+			
 	 if (this.data.objPadre.tipo_factura == 'manual') {	
 			this.Atributos.push({
 	            config: {
@@ -178,6 +165,47 @@ Phx.vista.FormVentaETR=Ext.extend(Phx.frmInterfaz,{
 		                form:true
 		      });
 		}
+		
+		
+		
+		
+		if (this.data.objPadre.tipo_factura == 'manual' || this.data.objPadre.tipo_factura == 'computarizadareg'|| this.data.objPadre.tipo_factura == 'computarizadaexpo'|| this.data.objPadre.tipo_factura == 'computarizadamin'|| this.data.objPadre.tipo_factura == 'computarizadaexpomin'|| this.data.objPadre.tipo_factura == 'pedido') {
+			this.Atributos.push({
+				config:{
+					name: 'fecha',
+					fieldLabel: 'Fecha Factura',
+					allowBlank: false,
+					anchor: '80%',					
+					format: 'd/m/Y'
+								
+				},
+					type:'DateField',					
+					id_grupo:0,		
+					orden:1,			
+					form:true
+			});
+	  }	
+		
+		//#10
+		this.Atributos.push({
+            config:{
+                    name:'id_centro_costo',
+                    origen:'CENTROCOSTO',
+                    fieldLabel: 'Centro de Costos',                                 
+                    url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXUsuaio',
+                    emptyText : 'Centro Costo...',
+                    allowBlank:false,
+                    gdisplayField:'desc_centro_costo',//mapea al store del grid
+                    gwidth:200,
+                    baseParams:{'tipo_pres':'recurso'}
+                },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{pfiltro:'cc.codigo_cc',type:'string'},
+            grid:true,
+            form:true
+      });
+		
 		if (!this.tipoDetalleArray) {			
 		  this.tipoDetalleArray = this.data.objPadre.variables_globales.vef_tipo_venta_habilitado.split(",");
         }
@@ -417,7 +445,7 @@ Phx.vista.FormVentaETR=Ext.extend(Phx.frmInterfaz,{
         
         
         if (this.data.objPadre.tipo_factura == 'manual') {
-	        this.Cmp.fecha.on('blur',function(c) {
+	        this.Cmp.fecha.on('blur',function(c) { 
 	        	
 	            if (this.data.objPadre.tipo_factura == 'manual') {
 	            	this.Cmp.id_dosificacion.reset();
@@ -429,7 +457,25 @@ Phx.vista.FormVentaETR=Ext.extend(Phx.frmInterfaz,{
 	            this.cargarFormaPago();
 	            
 	        },this);
-	    }      
+	    }else{//#10
+	    	if (this.data.objPadre.tipo_factura == 'computarizadareg') {      
+	    	
+	    		this.Cmp.fecha.on('blur',function(c) { 
+	        		this.Cmp.id_centro_costo.reset();
+	            	this.Cmp.id_centro_costo.setDisabled(false);
+	            	this.Cmp.id_centro_costo.store.baseParams.fecha = this.Cmp.fecha.getValue().format('d/m/Y');
+	            	this.Cmp.id_centro_costo.modificado=true;
+	            this.cargarFormaPago();
+	            
+	        },this);
+	    	
+	    	}
+	    	
+	    }
+	    	
+        
+       
+   
         
         
         this.detCmp.tipo.on('select',function(c,r,i) {
@@ -1839,7 +1885,7 @@ Phx.vista.FormVentaETR=Ext.extend(Phx.frmInterfaz,{
 			type: 'ComboBox',
 			id_grupo: 0,
 			form: true
-		},
+		}/*,
         {
             config:{
                     name:'id_centro_costo',
@@ -1857,7 +1903,7 @@ Phx.vista.FormVentaETR=Ext.extend(Phx.frmInterfaz,{
             filters:{pfiltro:'cc.codigo_cc',type:'string'},
             grid:true,
             form:true
-        }
+        }*/
            
           
         
