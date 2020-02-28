@@ -465,7 +465,7 @@ Phx.vista.FormVentaETR=Ext.extend(Phx.frmInterfaz,{
 	            	this.Cmp.id_centro_costo.setDisabled(false);
 	            	this.Cmp.id_centro_costo.store.baseParams.fecha = this.Cmp.fecha.getValue().format('d/m/Y');
 	            	this.Cmp.id_centro_costo.modificado=true;
-	            this.cargarFormaPago();
+	                this.cargarFormaPago();
 	            
 	        },this);
 	    	
@@ -1919,6 +1919,10 @@ Phx.vista.FormVentaETR=Ext.extend(Phx.frmInterfaz,{
     	
         //load detalle de conceptos
         this.mestore.baseParams.id_venta = this.Cmp.id_venta.getValue();
+        //#10
+        this.Cmp.id_centro_costo.store.baseParams.fecha = this.Cmp.fecha.getValue().format('d/m/Y');
+	    this.Cmp.id_centro_costo.modificado=true;
+        
         this.mestore.load();  
         this.crearStoreFormaPago();    	
         
