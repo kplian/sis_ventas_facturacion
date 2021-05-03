@@ -1176,7 +1176,7 @@ class MODVenta extends MODbase{
 		$this->tipo_procedimiento='IME';
 
 		//Define los parametros para la funcion
-		$this->setParametro('data_json','data_json','json_text');
+		$this->setParametro('data_json','data_json','json');
 		//$this->captura('id_tipo_estado','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -1195,7 +1195,7 @@ class MODVenta extends MODbase{
 		$this->tipo_procedimiento='IME';
 
 		//Define los parametros para la funcion
-		$this->setParametro('data_json','data_json','json_text');
+		$this->setParametro('data_json','data_json','json');
 		$this->setParametro('id_funcionario_wf','id_funcionario_wf','integer');
 		$this->setParametro('id_tipo_estado','id_tipo_estado','integer');
 
