@@ -8,7 +8,8 @@
 * 		ISSUE 			Fecha				Autor				Descripcion
  * 		#1				19/11/2018			EGS					se aumento botones para subir y descargar plantillas para facturas en excel
  *		#2	EndeEtr		23/01/2019			EGS					se agrego reporte con lista de productos activos por puntos de venta
-	 	#4	endeETR	 	21/02/2019			EGS					Se añadio la vista venta peajes			
+	 	#4	endeETR	 	21/02/2019			EGS					Se añadio la vista venta peajes
+ *      #7  endeETR     31/10/2019          EGS                 Se agrega boton siguiente multiple
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -77,6 +78,7 @@ Phx.vista.VentaVendedor = {
         
         this.addButton('anular',{grupo:[],text:'Anular',iconCls: 'bdel',disabled:true,handler:this.anular,tooltip: '<b>Anular la venta</b>',hidden:true});
         this.addButton('sig_estado',{grupo:[0],text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
+        this.addButton('sig_estado_multiple',{grupo:[0],text:'Siguiente Multiple',iconCls: 'badelante',disabled:true,handler:this.sigEstadoMultiple,tooltip: '<b>Pasar varios regitros al Siguiente Estado</b>'});//#7
         this.addButton('diagrama_gantt',{grupo:[0,1,2,3],text:'Gant',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de la venta</b>'});
         this.addButton('btnImprimir',
             {   grupo:[0,1,2,3],
@@ -142,6 +144,7 @@ Phx.vista.VentaVendedor = {
     	var rec = this.sm.getSelected();
         if (rec.data.estado == 'borrador') {              
               this.getBoton('sig_estado').enable();
+              this.getBoton('sig_estado_multiple').enable();//#7
         } 
         
         if (rec.data.estado == 'finalizado') {              
@@ -155,7 +158,8 @@ Phx.vista.VentaVendedor = {
     	this.getBoton('btnImprimir').disable(); 
         this.getBoton('diagrama_gantt').disable();
         this.getBoton('anular').disable();        
-        this.getBoton('sig_estado').disable();        
+        this.getBoton('sig_estado').disable();
+        this.getBoton('sig_estado_multiple').disable();//#7
         Phx.vista.VentaVendedor.superclass.liberaMenu.call(this);
     },
       imprimirProductoA : function() {

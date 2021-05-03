@@ -13,7 +13,7 @@
  #0              01-06-2015          RAC            Creacion
  #123            25/09/2018          RAC            se adciona manejo de proveedor para facturas de ETR
  #1            11/10/2018          EGS               se adiciono el campo id_venta_fk
-  
+ #7				31/10/2019			EGS					 Se agrega validacion y siguiente estado multiple
 */
 
 class MODVenta extends MODbase{
@@ -1168,6 +1168,45 @@ class MODVenta extends MODbase{
 		
 		//Devuelve la respuesta
 		return $this->respuesta;
+	}
+	function validacionMultiple(){//#7
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VEF_VALIMUL_IME';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('data_json','data_json','json');
+		//$this->captura('id_tipo_estado','varchar');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		//var_dump('$this->respuesta',$this->respuesta);exit;
+		return $this->respuesta;
+
+	}
+
+	function siguienteEstadoMultiple(){//#7
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='vef.ft_venta_ime';
+		$this->transaccion='VEF_SIGESTMUL_IME';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('data_json','data_json','json');
+		$this->setParametro('id_funcionario_wf','id_funcionario_wf','integer');
+		$this->setParametro('id_tipo_estado','id_tipo_estado','integer');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		//var_dump('$this->respuesta',$this->respuesta);exit;
+		return $this->respuesta;
+
 	}
 			
 }

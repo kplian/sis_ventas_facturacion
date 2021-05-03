@@ -13,6 +13,7 @@
  #1				 15-10-2018			  EGS				  se agrego validacion para tipo de reporte pdf o nativo del sistema ventas con el prefijo PDF- 
  #2				 12-11-2018			  EGS				  se agrego el campo tipo de usuario cuando el usuario esta asignado a mas de dos puntos de venta
  #6               25/10/2019          EGS                 Filtro de cliente se cambia a proveedor
+ #7              31/10/2019           EGS                 Se agrgan funciones para pasar al siguiente estado de borrador  con varios registros
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -932,7 +933,66 @@ Phx.vista.Venta=Ext.extend(Phx.gridInterfaz,{
         resp.argument.wizard.panel.destroy()
         this.reload();
      },
-	}
+    sigEstadoMultiple:function(){//#7
+        // var rec=this.sm.getSelected();
+
+        let filas = this.sm.getSelections();
+        let data = [], aux = {};
+        //arma una matriz de los identificadores de registros
+        let rr = {};
+        for (let i = 0; i < this.sm.getCount(); i++) {
+            aux = {};
+            aux[this.id_store] = filas[i].data[this.id_store];
+            aux.id_estado_wf = filas[i].data.id_estado_wf;
+            aux.id_proceso_wf = filas[i].data.id_proceso_wf;
+            aux.id_punto_venta = filas[i].data.id_punto_venta;
+            aux.estado = filas[i].data.estado;
+            data.push(aux);
+        }
+        var rec = {maestro: this.sm.getSelected().data, data_wf: Ext.util.JSON.encode(data)};
+        console.log('ooo',rec.data_wf);
+            Ext.Ajax.request({
+                url:'../../sis_ventas_facturacion/control/Venta/validacionMultiple',
+                params:{
+                    data_json:rec.data_wf,
+                    data_maestro:rec.maestro
+                },
+                success:function(resp){
+                    Phx.CP.loadingHide();
+                    var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                    if (reg.ROOT.error) {
+                        Ext.Msg.alert('Error','Error a recuperar la variable global')
+                    } else {
+                        this.formEstadoWfMultiple(rec,reg.ROOT.datos.id_tipo_estado,reg.ROOT.datos.id_estado_wf);
+                    }
+                },
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+
+
+    },
+    formEstadoWfMultiple : function (rec,id_tipo_estado,id_estado_wf) {//#7
+        var win = Phx.CP.loadWindows(
+            '../../../sis_ventas_facturacion/vista/venta/FormEstadoWfMultiple.php',
+            'Estado de Wf Multiple', {
+                //modal:true,
+                width:700,
+                height:450
+            },
+            {data:{
+                    data_json:rec.data_wf,
+                    data_maestro:rec.maestro,
+                    id_tipo_estado:id_tipo_estado,
+                    id_estado_wf:id_estado_wf
+                }},
+            this.idContenedor,
+            'FormEstadoWfMultiple'//clase de la vista
+        );
+    }
+
+    }
 )
 </script>
 		
