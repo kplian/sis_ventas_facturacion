@@ -153,7 +153,8 @@ BEGIN
             requiere_descripcion,
             id_moneda,
             contabilizable,
-            excento
+            excento,
+            id_producto_siat
           	) values(
 			v_id_sucursal,
 			v_parametros.id_item,			
@@ -170,7 +171,8 @@ BEGIN
             v_parametros.requiere_descripcion,
             v_parametros.id_moneda,
             v_parametros.contabilizable,
-            v_parametros.excento	
+            v_parametros.excento,
+            v_parametros.id_producto_siat	
 
 			)RETURNING id_sucursal_producto into v_id_sucursal_producto;
 			
@@ -310,7 +312,8 @@ BEGIN
             requiere_descripcion = v_parametros.requiere_descripcion,
             id_moneda = v_parametros.id_moneda,
             contabilizable = v_parametros.contabilizable,
-            excento = v_parametros.excento
+            excento = v_parametros.excento,
+            id_producto_siat = v_parametros.id_producto_siat
 			where id_sucursal_producto=v_parametros.id_sucursal_producto;
                
 			--Definicion de la respuesta

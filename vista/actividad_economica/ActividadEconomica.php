@@ -16,6 +16,13 @@ Phx.vista.ActividadEconomica=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre ...
 		Phx.vista.ActividadEconomica.superclass.constructor.call(this,config);
+		this.addButton('obtener_ws', {
+            text: 'Sincronizar WS',
+            iconCls: 'bupload',
+            disabled: false,
+            handler: this.sincronizar,
+            tooltip: '<b>Obtener Datos</b><br/>Obtener Datos desde el WS del SIN'
+        });
 		this.init();
 		this.load({params:{start:0, limit:this.tam_pag}})
 	},
@@ -212,7 +219,21 @@ Phx.vista.ActividadEconomica=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:true,
+	sincronizar:function () {			
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url: '../../sis_ventas_facturacion/control/ActividadEconomica/sincronizarActividad',
+				params: {
+					estado: 'recibido'
+				},
+				success: this.successSave,
+				failure: this.conexionFailure,
+				timeout: this.timeout,
+				scope: this
+			});
+	
+		}
 	}
 )
 </script>

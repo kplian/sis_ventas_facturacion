@@ -465,6 +465,50 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+
+        {
+            config : {
+                name : 'id_producto_siat',
+                fieldLabel : 'Producto Siat',
+                allowBlank : false,
+                emptyText : 'Producto Siat...',
+                store : new Ext.data.JsonStore({
+                    url : '../../sis_siat/control/Producto/listarProducto',
+                    id : 'id_producto',
+                    root : 'datos',
+                    sortInfo : {
+                        field : 'codigo',
+                        direction : 'ASC'
+                    },
+                    totalProperty : 'total',
+                    fields : ['id_producto', 'codigo', 'descripcion'],
+                    remoteSort : true,
+                    baseParams : {
+                        par_filtro : 'prd.descripcion#prd.codigo'
+                    }
+                }),
+                valueField : 'id_producto',
+                displayField : 'descripcion',   
+                gdisplayField : 'producto_siat',             
+                hiddenName : 'id_producto',
+                forceSelection : true,
+                typeAhead : false,
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}</p><p>{descripcion}</p> </div></tpl>',
+                triggerAction : 'all',
+                lazyRender : true,
+                mode : 'remote',
+                pageSize : 10,
+                queryDelay : 1000,                
+                gwidth : 170,
+                minChars : 2,
+                renderer:function(value, p, record){return String.format('{0}', record.data['producto_siat']);}
+            },
+            type : 'ComboBox',
+            id_grupo : 0,
+            filters:{pfiltro:'prd.descripcion',type:'string'},            
+            form : true,
+            grid:true
+        }, 
 		
 		{
 			config:{
@@ -631,10 +675,12 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 	id_store:'id_sucursal_producto',
 	fields: [
 		{name:'id_sucursal_producto', type: 'numeric'},
+        {name:'id_producto_siat', type: 'numeric'},
 		{name:'id_concepto_ingas', type: 'numeric'},
 		{name:'id_actividad_economica', type: 'numeric'},
 		{name:'id_moneda', type: 'numeric'},
 		{name:'desc_moneda', type: 'string'},
+        {name:'producto_siat', type: 'string'},
 		{name:'contabilizable', type: 'string'},
 		{name:'excento', type: 'string'},
 		{name:'id_sucursal', type: 'numeric'},

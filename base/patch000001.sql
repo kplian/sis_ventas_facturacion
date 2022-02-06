@@ -199,6 +199,9 @@ CREATE TABLE vef.tactividad_economica (
     PRIMARY KEY (id_actividad_economica))
 INHERITS (pxp.tbase) WITHOUT OIDS;
 
+CREATE UNIQUE INDEX tactividad_economica_codigo_idx ON vef.tactividad_economica (codigo);
+
+
 CREATE TABLE vef.tdosificacion (
   id_dosificacion SERIAL,  
   tipo VARCHAR(50) NOT NULL,
@@ -1173,3 +1176,8 @@ ALTER TABLE vef.tsucursal
 ALTER TABLE vef.ttemp_factura_detalle_excel
   ADD COLUMN descripcion VARCHAR;
 /************************************F-SCP-EGS-VEF-6-25/10/2019*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-26/01/2022*************************************************/
+ALTER TABLE vef.tsucursal_producto ADD id_producto_siat int4 NULL;
+/************************************F-SCP-JRR-VEF-0-26/01/2022*************************************************/
+

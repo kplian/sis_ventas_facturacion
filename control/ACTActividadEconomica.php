@@ -39,6 +39,13 @@ class ACTActividadEconomica extends ACTbase{
 		$this->res=$this->objFunc->eliminarActividadEconomica($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
+	function sincronizarActividad(){
+		
+		$this->objFunc=$this->create('MODActividadEconomica');			
+		$this->res=$this->objFunc->sincronizarActividad($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 			
 }
 
