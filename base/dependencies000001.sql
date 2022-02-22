@@ -114,27 +114,8 @@ AS
           ::text) || COALESCE(m.segundo_apellido, '' ::character varying) ::text
            AS nombre_completo
   FROM vef.tmedico m;
-  
-  CREATE OR REPLACE VIEW vef.vcliente(
-    id_usuario_reg,
-    id_usuario_mod,
-    fecha_reg,
-    fecha_mod,
-    estado_reg,
-    id_usuario_ai,
-    usuario_ai,
-    id_cliente,
-    nombres,
-    primer_apellido,
-    segundo_apellido,
-    telefono_celular,
-    telefono_fijo,
-    otros_telefonos,
-    correo,
-    otros_correos,
-    nombre_factura,
-    nit,
-    nombre_completo)
+  ------------
+  CREATE OR REPLACE VIEW vef.vcliente
 AS
   SELECT c.id_usuario_reg,
          c.id_usuario_mod,
@@ -154,9 +135,11 @@ AS
          c.otros_correos,
          c.nombre_factura,
          c.nit,
-         (((c.nombres::text || ' ' ::text) || c.primer_apellido::text) || ' '
-          ::text) || COALESCE(c.segundo_apellido, '' ::character varying) ::text
-           AS nombre_completo
+         (((c.nombres::text || ' '::text) || c.primer_apellido::text) || ' '::
+           text) || COALESCE(c.segundo_apellido, ''::character varying)::text AS
+           nombre_completo,
+         COALESCE(c.lugar, ''::character varying) AS lugar,
+         c.codigo
   FROM vef.tcliente c;
 
 /************************************F-DEP-JRR-VEF-0-02/05/2015*************************************************/
@@ -210,49 +193,7 @@ ALTER TABLE ONLY vef.tventa_forma_pago
     ADD CONSTRAINT fk_tventa_forma_pago__id_venta
     FOREIGN KEY (id_venta) REFERENCES vef.tventa(id_venta); 
 
-CREATE OR REPLACE VIEW vef.vcliente(
-    id_usuario_reg,
-    id_usuario_mod,
-    fecha_reg,
-    fecha_mod,
-    estado_reg,
-    id_usuario_ai,
-    usuario_ai,
-    id_cliente,
-    nombres,
-    primer_apellido,
-    segundo_apellido,
-    telefono_celular,
-    telefono_fijo,
-    otros_telefonos,
-    correo,
-    otros_correos,
-    nombre_factura,
-    nit,
-    nombre_completo)
-AS
-  SELECT c.id_usuario_reg,
-         c.id_usuario_mod,
-         c.fecha_reg,
-         c.fecha_mod,
-         c.estado_reg,
-         c.id_usuario_ai,
-         c.usuario_ai,
-         c.id_cliente,
-         c.nombres,
-         c.primer_apellido,
-         c.segundo_apellido,
-         c.telefono_celular,
-         c.telefono_fijo,
-         c.otros_telefonos,
-         c.correo,
-         c.otros_correos,
-         c.nombre_factura,
-         c.nit,
-         (((c.nombres::text || ' ' ::text) || c.primer_apellido::text) || ' '
-          ::text) || COALESCE(c.segundo_apellido, '' ::character varying) ::text
-           AS nombre_completo
-  FROM vef.tcliente c;
+
 /************************************F-DEP-JRR-VEF-0-20/09/2015*************************************************/
 
 
@@ -404,44 +345,10 @@ CREATE TRIGGER trig_tcliente
   ON vef.tcliente FOR EACH ROW 
   EXECUTE PROCEDURE vef.f_trig_cliente();
   
-  --------------- SQL ---------------
--- object recreation
-DROP VIEW vef.vcliente;
-
-CREATE OR REPLACE VIEW vef.vcliente
-AS
-  SELECT c.id_usuario_reg,
-         c.id_usuario_mod,
-         c.fecha_reg,
-         c.fecha_mod,
-         c.estado_reg,
-         c.id_usuario_ai,
-         c.usuario_ai,
-         c.id_cliente,
-         c.nombres,
-         c.primer_apellido,
-         c.segundo_apellido,
-         c.telefono_celular,
-         c.telefono_fijo,
-         c.otros_telefonos,
-         c.correo,
-         c.otros_correos,
-         c.nombre_factura,
-         c.nit,
-         (((c.nombres::text || ' '::text) || c.primer_apellido::text) || ' '::
-           text) || COALESCE(c.segundo_apellido, ''::character varying)::text AS
-           nombre_completo,
-         COALESCE(c.lugar, ''::character varying) AS lugar,
-         c.codigo
-  FROM vef.tcliente c;
-
-
 /************************************F-DEP-RAC-VEF-0-11/11/2016*************************************************/
 
 
 /************************************I-DEP-RCM-VEF-0-13/11/2016*************************************************/
-DROP VIEW IF EXISTS vef.vproducto;
-
 CREATE VIEW vef.vproducto
 AS
 
