@@ -321,7 +321,10 @@ CREATE TABLE vef.tactividad_economica (
     CONSTRAINT pk_tactividad_economica__id_actividad_economica
     PRIMARY KEY (id_actividad_economica))
 INHERITS (pxp.tbase) WITHOUT OIDS;
-------------
+
+CREATE UNIQUE INDEX tactividad_economica_codigo_idx ON vef.tactividad_economica (codigo);
+
+
 CREATE TABLE vef.tdosificacion (
   id_dosificacion SERIAL,  
   tipo VARCHAR(50) NOT NULL,
@@ -640,5 +643,26 @@ CREATE TABLE vef.tconcepto_carta_plt (
   CONSTRAINT tconcepto_carta_plt_pkey PRIMARY KEY(id_concepto_carta_plt)
 ) INHERITS (pxp.tbase)
 WITH (oids = false);  
-
 /************************************F-SCP-EGS-VEF-1-10/01/2019*************************************************/
+
+/************************************I-SCP-EGS-VEF-2-29/01/2019*************************************************/
+ALTER TABLE vef.tventa
+  ALTER COLUMN correlativo_venta TYPE VARCHAR(40);
+/************************************F-SCP-EGS-VEF-2-29/01/2019*************************************************/
+/************************************I-SCP-EGS-VEF-3-20/02/2019*************************************************/
+ALTER TABLE vef.ttemporal_data
+  ADD COLUMN id_punto_venta INTEGER;
+/************************************F-SCP-EGS-VEF-3-20/02/2019*************************************************/
+/************************************I-SCP-EGS-VEF-4-12/08/2019*************************************************/
+ALTER TABLE vef.tsucursal
+  ALTER COLUMN telefono TYPE VARCHAR(150);
+/************************************F-SCP-EGS-VEF-4-12/08/2019*************************************************/
+/************************************I-SCP-EGS-VEF-6-25/10/2019*************************************************/
+ALTER TABLE vef.ttemp_factura_detalle_excel
+  ADD COLUMN descripcion VARCHAR;
+/************************************F-SCP-EGS-VEF-6-25/10/2019*************************************************/
+
+/************************************I-SCP-JRR-VEF-0-26/01/2022*************************************************/
+ALTER TABLE vef.tsucursal_producto ADD id_producto_siat int4 NULL;
+/************************************F-SCP-JRR-VEF-0-26/01/2022*************************************************/
+

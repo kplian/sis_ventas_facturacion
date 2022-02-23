@@ -121,7 +121,7 @@ Phx.vista.TipoVenta=Ext.extend(Phx.gridInterfaz,{
 	                    'sw_tesoro', 'sw_compro','sw_monto_excento','sw_descuento',
 	                    'sw_autorizacion','sw_codigo_control','tipo_plantilla','sw_nro_dui','sw_ice'],
 	                    remoteSort: true,
-	                    baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
+	                    baseParams:{par_filtro:'plt.desc_plantilla'}
 	                }),
 	                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_plantilla}</p></div></tpl>',
 	                valueField: 'id_plantilla',

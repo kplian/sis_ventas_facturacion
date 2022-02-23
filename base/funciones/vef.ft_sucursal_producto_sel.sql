@@ -85,11 +85,13 @@ BEGIN
                         um.codigo as desc_unidad_medida,
                         cig.nandina,
                         COALESCE(cig.ruta_foto,'''')::varchar as ruta_foto,
-                        cig.codigo 
-			
+                        cig.codigo,
+						sprod.id_producto_siat,
+						prd.descripcion			
                         
 						from vef.tsucursal_producto sprod
-						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						
+						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg	
+						inner join siat.tproducto prd on prd.id_producto = 	sprod.id_producto_siat					
 						left join segu.tusuario usu2 on usu2.id_usuario = sprod.id_usuario_mod
                         left join param.tconcepto_ingas cig on cig.id_concepto_ingas = sprod.id_concepto_ingas
                         left join vef.tactividad_economica acteco on acteco.id_actividad_economica = cig.id_actividad_economica

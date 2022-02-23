@@ -51,11 +51,8 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('nandina','VARCHAR');
 		$this->captura('ruta_foto','VARCHAR');
 		$this->captura('codigo','VARCHAR');
-		
-		
-		
-		
-		
+		$this->captura('id_producto_siat','integer');
+		$this->captura('producto_siat','VARCHAR');		
 		 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -150,6 +147,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
 		$this->setParametro('nandina','nandina','varchar');
 		$this->setParametro('codigo','codigo','VARCHAR');
+		$this->setParametro('id_producto_siat','id_producto_siat','int4');
 
 
 		//Ejecuta la instruccion
@@ -187,6 +185,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
 		$this->setParametro('nandina','nandina','varchar');
 		$this->setParametro('codigo','codigo','VARCHAR');
+		$this->setParametro('id_producto_siat','id_producto_siat','int4');
 
 
 		//Ejecuta la instruccion

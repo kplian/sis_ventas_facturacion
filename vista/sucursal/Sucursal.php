@@ -31,11 +31,11 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
         
         this.addButton('btnDosificaciones',
             {
-                text: 'Dosificaciones',
+                text: 'CUIS',
                 iconCls: 'blist',
                 disabled: true,                
                 handler: this.onButtonDosificaciones,
-                tooltip: 'Dosificaciones para la sucursal'                
+                tooltip: 'Cuis para la sucursal'                
             }
         );
         
@@ -67,7 +67,7 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
     onButtonDosificaciones : function() {
         var rec = {maestro: this.sm.getSelected().data};
                               
-            Phx.CP.loadWindows('../../../sis_ventas_facturacion/vista/dosificacion/Dosificacion.php',
+            Phx.CP.loadWindows('../../../sis_siat/vista/cuis/Cuis.php',
                     'Dosificaciones por sucursal',
                     {
                         width:800,
@@ -75,7 +75,7 @@ Phx.vista.Sucursal=Ext.extend(Phx.gridInterfaz,{
                     },
                     rec,
                     this.idContenedor,
-                    'Dosificacion');
+                    'Cuis');
     },
     
     onButtonPVenta : function() {
